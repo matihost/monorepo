@@ -1,4 +1,4 @@
-# ansible-playbook update-okd.yaml
+#usage: ansible-playbook update-okd.yaml
 ---
 - hosts: okd
   remote_user: student
