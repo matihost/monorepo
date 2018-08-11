@@ -1,0 +1,31 @@
+# ansible-playbook start-okd.yaml
+---
+- hosts: localhost
+  gather_facts: False
+  tasks:
+  - name: get already started VMs
+    shell: VBoxManage list runningvms
+    register: runningvms
+  - name: start OKD node
+    command: VBoxManage startvm "{{hostvars[item].vm_name}}" --type headless
+    when: not(runningvms.stdout is search(hostvars[item].vm_name))
+    loop: "{{ groups['okd'] }}"
+  - name: wait for OKD nodes
+    wait_for:
+      host: "{{ item }}"
+      port: 22
+      state: started
+      timeout: 90         
+    loop: "{{ groups['okd'] }}"
+  - name: pause 60 seconds (for lazy init services startup)
+    pause:
+      seconds: 60  
+- hosts: okd
+  remote_user: student
+  become: yes
+  gather_facts: False
+  tasks:
+  - name: make sure all origin services are started
+    systemd:
+      name: origin*
+      state: started

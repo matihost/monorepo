@@ -1,0 +1,11 @@
+[okd]
+node1
+node2
+master
+
+[nodes]
+node1
+node2
+
+[masters]
+master

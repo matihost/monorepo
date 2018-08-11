@@ -1,0 +1,37 @@
+# sample usage:
+# oc process -f pv-template.yaml --local -o yaml COUNTER=02 |oc apply -f - -n desired-project
+---
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  template: pv-template
+metadata:
+  annotations:  
+  name: pv-template
+objects:
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    name: ${NAME}-${COUNTER}
+  spec:
+    accessModes: 
+    - ReadWriteMany
+    - ReadWriteOnce    
+    capacity:
+      storage: ${MAX_STORAGE}
+    nfs:
+      path: /exports/${NAME}/${COUNTER}
+      server: ${NFS_BOX}
+parameters:
+- name: NAME
+  required: false
+  value: 'pv'
+- name: COUNTER
+  required: false
+  value: '01'
+- name: MAX_STORAGE
+  required: false
+  value: '10Gi'
+- name: NFS_BOX
+  required: false
+  value: 'master.matihost'

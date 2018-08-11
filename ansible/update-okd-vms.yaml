@@ -1,0 +1,31 @@
+# ansible-playbook update-okd.yaml
+---
+- hosts: okd
+  remote_user: student
+  become: yes
+  gather_facts: False
+  tasks:
+  - name: stop all origin services
+    systemd:
+      name: origin*
+      state: stopped
+  - name: update packages
+    yum:
+      name: '*'
+      state: latest
+  - name: start all origin services again
+    systemd:
+      name: origin*
+      state: started
+      # has to be async, b/c from time to time task fail reporing service doesn't start, but it is a matter of time
+      no_block: true
+  - name: pause 60 seconds
+    pause:
+      seconds: 60
+  - name: make sure all origin services are started
+    systemd:
+      name: origin*
+      state: started
+      no_block: true
+
+

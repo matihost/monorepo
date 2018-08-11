@@ -1,0 +1,43 @@
+#usage: ansible-playbook shutdown-okd.yaml
+---
+- hosts: okd
+  remote_user: student
+  become: yes
+  gather_facts: False
+  tasks:
+  - name: stop all origin services
+    systemd:
+      name: origin*
+      state: stopped
+- hosts: localhost
+  gather_facts: False  
+  tasks:
+  - name: acpi power off OKD node
+    command: VBoxManage controlvm "{{ hostvars[item].vm_name }}" acpipowerbutton
+    loop: "{{ groups['okd'] }}"
+
+  - name: pause 60 seconds
+    pause:
+      seconds: 60    
+  - name: wait for OKD nodes SSH port down
+    wait_for:
+      host: "{{ item }}"
+      port: 22
+      state: stopped
+      timeout: 90         
+    loop: "{{ groups['okd'] }}"
+  - name: get still running OKD VMs
+    shell: VBoxManage list runningvms
+    register: runningvms
+  - name: power off OKD node
+    command: VBoxManage controlvm "{{ hostvars[item].vm_name }}" poweroff
+    when: runningvms.stdout is search(hostvars[item].vm_name)
+    ignore_errors: true 
+    loop: "{{ groups['okd'] }}"
+  - name: get still running OKD VMs
+    shell: VBoxManage list runningvms
+    register: runningvms
+  - fail:
+      msg: 'OKD node: {{ item }} is still  running'
+    when: runningvms.stdout is search(hostvars[item].vm_name)
+    loop: "{{ groups['okd'] }}"
