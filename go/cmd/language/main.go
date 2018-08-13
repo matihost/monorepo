@@ -2,11 +2,13 @@
 // Executable Programs start running in package main.
 // This is only the program. It follows the pattern that is is in "cmd" subpackage
 //
-// The package "main" here is special exception - even when for downloading the code
-// the package has to be 
+// The name of package "main" here is special exception - even for downloading the code
+// the package has to be
 // go get github.com/matihost/learning/go/cmd/language
 //
-// For more language structure go to github.com/matihost/learning/go/internal/language and 
+// The library specific packages has normal name (the last directory) and can imported
+//
+// For more language structure go to github.com/matihost/learning/go/internal/language and
 // github.com/matihost/learning/go/pkg/language
 package main
 

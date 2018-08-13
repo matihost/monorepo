@@ -2,6 +2,8 @@
 // The name is always the last directory name in the path
 // Even when the full package name is github.com/matihost/learning/go/internal/language
 // The convention is to have the last directory in sync with cmd app name
+//
+// The "internal" package exported elements are visible only by the current application only.
 package language
 
 import (
@@ -48,8 +50,8 @@ func pow(x, n, lim float64) float64 {
 		return v
 	} else {
 		fmt.Printf("%g >= %g\n", v, lim)
+		return lim
 	}
-	return lim
 }
 
 // OsName - switch statement - "break" is automatic, "init" statement as well
@@ -67,7 +69,7 @@ func OsName() string {
 	}
 }
 
-// Welcome
+// Welcome - welcome func comment
 func Welcome() string {
 	t := time.Now()
 	// defering function - is to invoke function after the current function finishes (like finally in Java)
@@ -91,6 +93,7 @@ func Welcome() string {
 	}
 }
 
+// casting example
 func same(os string) string {
 	return string(os)
 }
