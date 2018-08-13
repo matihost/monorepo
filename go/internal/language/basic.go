@@ -4,6 +4,11 @@
 // The convention is to have the last directory in sync with cmd app name
 //
 // The "internal" package exported elements are visible only by the current application only.
+//
+// There can be many go files within package and they constitute one go package - file name of the go file doesn't mean something important
+// The good practice is to divide the files per functions they contain - but from 3rd party user  -
+// it does not matter,
+// clients see only exported entries from all files within the same package
 package language
 
 import (
@@ -14,7 +19,7 @@ import (
 )
 
 // AddTwo -  exported function staring in capital letter - has to have a comment starting with name of the method
-// x and y are the same type arguments - so do not need to repeast the int type for both
+// x and y are the same type arguments - so do not need to repeat the int type for both
 func AddTwo(x, y int) int {
 	return x + y
 }
@@ -51,7 +56,7 @@ func pow(x, n, lim float64) (result float64) {
 	} else {
 		result = lim
 	}
-	return 
+	return
 }
 
 // OsName - switch statement - "break" is automatic, "init" statement as well
@@ -82,7 +87,7 @@ func Welcome() string {
 	defer fmt.Println("ma")
 	defer fmt.Println("kota")
 
-	// switch w/o variable - is like with bool = true  - usefull for long if/else chains
+	// switch w/o variable - is like with bool = true  - useful for long if/else chains
 	switch {
 	case t.Hour() < 12:
 		return "Good morning"
