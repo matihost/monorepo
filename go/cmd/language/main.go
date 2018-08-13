@@ -44,7 +44,7 @@ const (
 	ExportedConstant = nonExportedConstant >> 95
 )
 
-// Definining variables visible in the package (non-exported)
+// Defining variables visible in the package (non-exported)
 // These variables are initiliazed with default value per type
 var (
 	c            int
@@ -58,7 +58,7 @@ var (
 // type is inherited if initialized
 var initializedVar = 5
 
-// there can be only one "main" function in the same package and directory (essentually the same package)
+// there can be only one "main" function in the same package and directory (essentially the same package)
 func main() {
 	// variable declaration (w/o initializer it initializes to "zero" value)
 	var i int
@@ -76,7 +76,7 @@ func main() {
 	// Any "unexported" names are not accessible from outside the package.
 	fmt.Println(basic.Welcome(), "to", basic.OsName())
 
-	// when object is not string, the .String() funtion is called to return string
+	// when object is not string, the .String() function is called to return string
 	fmt.Println("The time is", time.Now())
 
 	// to defererence pointer

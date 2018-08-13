@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-// AddTwo -  exported function staring in capital letter - has to have a comment starting wiht name of the method
+// AddTwo -  exported function staring in capital letter - has to have a comment starting with name of the method
 // x and y are the same type arguments - so do not need to repeast the int type for both
 func AddTwo(x, y int) int {
 	return x + y
@@ -32,7 +32,7 @@ func Add(a ...int) int {
 	return sum
 }
 
-// Sqrt - this is example of exported funtion from the package, start with capital letter and contains a comment
+// Sqrt - this is example of exported function from the package, start with capital letter and contains a comment
 // with description
 func Sqrt(x float64) string {
 	// if statements are like its for loops;
@@ -45,17 +45,17 @@ func Sqrt(x float64) string {
 
 // the if statement can have "init" section like for, v is visible only inside if statement
 // or its else statement
-func pow(x, n, lim float64) float64 {
+func pow(x, n, lim float64) (result float64) {
 	if v := math.Pow(x, n); v < lim {
-		return v
+		result = v
 	} else {
-		fmt.Printf("%g >= %g\n", v, lim)
-		return lim
+		result = lim
 	}
+	return 
 }
 
 // OsName - switch statement - "break" is automatic, "init" statement as well
-// case are run from top to bottown, case can be a function returnig desired type
+// case are run from top to bottown, case can be a function returning desired type
 func OsName() string {
 	switch os := runtime.GOOS; os {
 	case "linux":
