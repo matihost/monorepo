@@ -13,6 +13,7 @@
 package main
 
 import (
+	"os"
 	// ( ) factored statement to be used to gather more the same elements
 	// in here it is used for imports
 	"fmt"
@@ -24,8 +25,8 @@ import (
 	"math/rand"
 
 	// imports are like variables there can named differently, here to shortcut default language - lang is used
-	// convention is to use "internal" subpackage for code not inteded for other apps do import
-	// convention is that last word should represen the app code is intended for
+	// convention is to use "internal" subpackage for code not intended for other apps do import
+	// convention is that last word should represent the app code is intended for
 	// do not split code to too many packages like in Java
 	basic "github.com/matihost/learning/go/internal/language"
 
@@ -40,12 +41,12 @@ import (
 const (
 	// constant is high precision value
 	nonExportedConstant = 1 << 100
-	// ExportedConstant exported entries are only started with capital lette
+	// ExportedConstant exported entries are only started with capital letter
 	ExportedConstant = nonExportedConstant >> 95
 )
 
 // Defining variables visible in the package (non-exported)
-// These variables are initiliazed with default value per type
+// These variables are initialized with default value per type
 var (
 	c            int
 	python, java bool
@@ -82,12 +83,30 @@ func main() {
 	// to defererence pointer
 	fmt.Println("The time is", *now)
 
-	fmt.Println("My favorite numbers are ", basic.AddTwo(rand.Intn(10), 5), basic.Add(1, 2, 3))
+	fmt.Fprintln(os.Stdout, "My favorite numbers are ", basic.AddTwo(rand.Intn(10), 5), basic.Add(1, 2, 3))
+
 	fmt.Printf("Now you have %g problems and PI is %g and i is: %v\n", math.Sqrt(7), math.Pi, i)
 	// casting too big constant to floating value
 	c := float64(nonExportedConstant)
-	fmt.Printf("Big constant value type: %T and value: %v\n", c, basic.Sqrt(c))
+	fmt.Fprintf(os.Stdout, "Big constant value type: %T and value: %v\n", c, basic.Sqrt(c))
 
 	x, y := basic.Split(ExportedConstant)
 	fmt.Println("Swapped strings: ", a, b, "and splitted value", x, y)
+
+	// creating struct with explicit saying which field is which
+	v := lang.Vertex{X: 1, Y: 2}
+
+	
+	// creating pointer to newly constructed and empty struct
+	// it is possible because struct are created on heap, 
+	//results from function are on stack so it is not possible to take pointer for them directly
+	vert = &lang.Vertex{}
+	
+	pv := &v
+
+	// accessing struct content does not require dereference (like pv.X instead of (*pv).X)
+	fmt.Printf("Vertex dimensions are (%d, %d)\n", pv.X, lang.CreateVertex(5, 6).Y)
+	fmt.Println("Vertex string representation is:", *pv)
+
+	lang.ShowArraysAndSlices()
 }
