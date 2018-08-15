@@ -93,15 +93,16 @@ func main() {
 	x, y := basic.Split(ExportedConstant)
 	fmt.Println("Swapped strings: ", a, b, "and splitted value", x, y)
 
+	lang.ShowStructOperations()
+
 	// creating struct with explicit saying which field is which
 	v := lang.Vertex{X: 1, Y: 2}
 
-	
 	// creating pointer to newly constructed and empty struct
-	// it is possible because struct are created on heap, 
+	// it is possible because struct are created on heap,
 	//results from function are on stack so it is not possible to take pointer for them directly
 	vert = &lang.Vertex{}
-	
+
 	pv := &v
 
 	// accessing struct content does not require dereference (like pv.X instead of (*pv).X)

@@ -1,3 +1,4 @@
+// Package language - the package from "pkg" are intended to be imported by 3rd party apps
 package language
 
 import (
@@ -6,24 +7,31 @@ import (
 
 var (
 	// a is an array of 10 strings, size is the part of array type
-	// array cannot be resized
+	// arrays cannot be resized
 	a [10]string
+
+	// slice is like table but with size declaration
+	// slices are more common than tables
+	// zero value of a slice is nil.
+	slice []int
 
 	// array variable can be initialized in place
 	// last element is 0 because is not initialized
 	primes = [6]int{2, 3, 5, 7, 11}
+
+	
 )
 
-// ShowArraysAndSlices - show convertion from table to slice
+// ShowArraysAndSlices - show conversion from table to slice
 func ShowArraysAndSlices() {
 
 	var (
-		// slice is like table but with size declaration
-		// slices are more common than tables
-		slice []int
 		// len is build in function for calculating size of the structure
 		sliceMaxIndex = len(primes) - 1
 	)
+
+	// nil slice has a length and capacity of 0 and has no underlying array. 		
+	printSlice(slice)
 
 	// create slice from array
 	slice = primes[2:4]
@@ -34,6 +42,9 @@ func ShowArraysAndSlices() {
 	slice = primes[:sliceMaxIndex]
 
 	slice = primes[1:]
+
+	// shortest to convert table to same slice, equivalent for primes[0:len(primes)]
+	slice = primes[:]
 
 	coolSlice := slice[:len(slice)-1]
 
@@ -47,7 +58,16 @@ func ShowArraysAndSlices() {
 	slice[0] = 1
 	primes[1] = 2
 
-	fmt.Println("Not really primes:", coolSlice)
+	printSlice(coolSlice)
+
+	// slice capacity can be decreased by limiting it from the left
+	coolSlice = coolSlice[2:]
+	printSlice(coolSlice)
+
+	// enlarging slice to the capacity
+	coolSlice = coolSlice[:cap(coolSlice)]
+	printSlice(coolSlice)
+	
 
 	// slice literal - is in fact an array of the size and then slice version of it
 	slice = []int{1, 5, 8}
@@ -66,4 +86,23 @@ func ShowArraysAndSlices() {
 	}
 
 	fmt.Println("Complex slice literal:", s)
+
+	// dynamically created slice - the way to dynamically allocate tables
+	// build-in make function allocates a zeroed array and returns a slice that refers to that array
+	// make(tableSpec, len, cap)
+	slice = make([]int, 5, 10)
+	slice[0] = 5
+	slice[4] = 5
+	printSlice(slice)
+	
+	// slice is also an interface
+	Print(slice)
+
+}
+
+
+
+func printSlice(s []int) {
+	// slice has length and capacity - so slice can be still enlarged to the underlying table
+	fmt.Printf("Slice: %v len=%d cap=%d\n", s, len(s), cap(s))
 }
