@@ -12,6 +12,8 @@
 // github.com/matihost/learning/go/pkg/language
 package main
 
+// importing other packages from standard library or other sources
+// Go implicitly imports : https://golang.org/pkg/builtin/ package with function like len, cap, make, new etc.
 import (
 	"os"
 	// ( ) factored statement to be used to gather more the same elements
@@ -73,6 +75,11 @@ func main() {
 	// the := short assignment statement can be used in place of a var declaration
 	a, b := basic.Swap("ala", "ma")
 
+	// you can init more than one variable via many function invocations
+	k, l := 5, basic.AddTwo(4, 5)
+
+	fmt.Println(k, l)
+
 	// When importing a package, you can refer only to its exported names.
 	// Any "unexported" names are not accessible from outside the package.
 	fmt.Println(basic.Welcome(), "to", basic.OsName())
@@ -110,4 +117,10 @@ func main() {
 	fmt.Println("Vertex string representation is:", *pv)
 
 	lang.ShowArraysAndSlices()
+
+	lang.ShowMapsUsage()
+
+	lang.ShowFunctionValuesUsage()
+
+	lang.ShowClosuresUsage()
 }

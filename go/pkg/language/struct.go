@@ -1,7 +1,10 @@
 // Package language - the package from "pkg" are intended to be imported by 3rd party apps
 package language
 
-import "fmt"
+import (
+	"fmt"
+	lang "github.com/matihost/learning/go/internal/language"
+)
 
 // Vertex - sample exported struct
 type Vertex struct {
@@ -32,10 +35,10 @@ func ShowStructOperations() {
 	s := struct{ int }{4}
 	// be default is field has no name, its type is the name of the field
 	s.int = 3
-	Print(s)
+	lang.Print(s)
 
 	// same by divide declaration from initialization
-	// semicolon to make struct declaration in one line
+	// semicolon to make struct declaration in one line (however it is against gofmt -s)
 	// when struct field name is not provided - its type cannot repeat in the declaration
 	var ds struct {
 		int
@@ -52,10 +55,5 @@ func ShowStructOperations() {
 	ds.string = "ala"
 	ds.s = "ma"
 
-	Print(ds)
-}
-
-// Print - generic way to print struct, every struct is an interface
-func Print(s interface{}) {
-	fmt.Printf("Interface=%v\n", s)
+	lang.Print(ds)
 }
