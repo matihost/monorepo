@@ -100,7 +100,8 @@ func main() {
 	x, y := basic.Split(ExportedConstant)
 	fmt.Println("Swapped strings: ", a, b, "and splitted value", x, y)
 
-	lang.ShowStructOperations()
+	basic.ShowBasicTypes()
+
 
 	// creating struct with explicit saying which field is which
 	v := lang.Vertex{X: 1, Y: 2}
@@ -116,6 +117,11 @@ func main() {
 	fmt.Printf("Vertex dimensions are (%d, %d)\n", pv.X, lang.CreateVertex(5, 6).Y)
 	fmt.Println("Vertex string representation is:", *pv)
 
+	// pv is a pointer to vertex but it is possible to omit dereference as well
+	pv.ShowVertex()
+
+	lang.ShowStructOperations()
+
 	lang.ShowArraysAndSlices()
 
 	lang.ShowMapsUsage()
@@ -123,4 +129,8 @@ func main() {
 	lang.ShowFunctionValuesUsage()
 
 	lang.ShowClosuresUsage()
+
+	lang.ShowAddedMethodToBasicType()
+
+	lang.ShowInterfaceUsage()
 }

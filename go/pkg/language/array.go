@@ -1,4 +1,6 @@
 // Package language - the package from "pkg" are intended to be imported by 3rd party apps
+// Package is a directory - all types, function, variables, const etc. from all files within directory are visible each other
+// Only entries names with capital letter are visible outside package
 package language
 
 import (
@@ -7,8 +9,9 @@ import (
 )
 
 var (
-	// a is an array of 10 strings, size is the part of array type
-	// arrays cannot be resized
+	// a is an array of 10 strings, 
+	// size is the part of array type
+	// arrays cannot be resized 
 	a [10]string
 
 	// slice is like table but with size declaration

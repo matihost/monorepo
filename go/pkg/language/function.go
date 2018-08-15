@@ -1,4 +1,3 @@
-// Package language - the package from "pkg" are intended to be imported by 3rd party apps
 package language
 
 import (

@@ -37,12 +37,12 @@ func ShowClosuresUsage() {
 	adder, subtractor := adderFunc(), adderFunc()
 
 	// add will effectively result in 3
-	add := adder(1)
-	add = adder(2)
+	adder(1)
+	add := adder(2)
 
 	// sub will effectively result in 6
-	sub := subtractor(10)
-	sub = subtractor(-4)
+	subtractor(10)
+	sub := subtractor(-4)
 
 	fmt.Println(add, sub)
 
