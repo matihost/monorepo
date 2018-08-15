@@ -54,7 +54,7 @@ func ShowBasicTypes() {
 		f  float64
 		c  complex64
 		s  string
-		p *int
+		p  *int
 	)
 
 	i := 5
@@ -73,14 +73,14 @@ func ShowBasicTypes() {
 	p = &i
 
 	// go does not support pointer arithmetic
-	// p = p +1 
+	// p = p +1
 
 	// converting number to string will result in creating one character string
 	// number is Unicode number
 	// if number is invalid, then it so called "replacement character" It’s a replacement character (\uFFFD)
 	s = string(322)
 
-	// the * operator denotes the pointer's underlying value	
+	// the * operator denotes the pointer's underlying value
 	fmt.Println("Various basic types", b, i, f, ui, si, c, s, p, *p)
 
 	// converting between slices of bytes, runes and strings

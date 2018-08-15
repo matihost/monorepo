@@ -8,10 +8,10 @@ import (
 )
 
 // Abs - Value of interface type can hold any value that implements those methods.
-// 
+//
 // Interfaces are implemented implicitly
 // A type implements an interface by implementing its methods. There is no explicit declaration of intent, no "implements" keyword.
-// Implicit interfaces decouple the definition of an interface from its implementation, 
+// Implicit interfaces decouple the definition of an interface from its implementation,
 // which could then appear in any package without prearrangement.
 type Abs interface {
 	Abs() float64

@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	// a is an array of 10 strings, 
+	// a is an array of 10 strings,
 	// size is the part of array type
-	// arrays cannot be resized 
+	// arrays cannot be resized
 	a [10]string
 
 	// slice is like table but with size declaration

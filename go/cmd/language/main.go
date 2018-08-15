@@ -102,7 +102,6 @@ func main() {
 
 	basic.ShowBasicTypes()
 
-
 	// creating struct with explicit saying which field is which
 	v := lang.Vertex{X: 1, Y: 2}
 
