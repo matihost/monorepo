@@ -27,19 +27,27 @@ func ShowVertex(v Vertex) {
 }
 
 // ShowStructOperations - show various vertex operation
-func ShowStructOperations(){
+func ShowStructOperations() {
 	// s is a variable to anonymous struct containing one int
-	s :=  struct{int}{4}
+	s := struct{ int }{4}
 	// be default is field has no name, its type is the name of the field
 	s.int = 3
 	Print(s)
 
 	// same by divide declaration from initialization
-	// semicolon to make struct declaration in one line 
+	// semicolon to make struct declaration in one line
 	// when struct field name is not provided - its type cannot repeat in the declaration
-	var ds struct{int; string; s string}
+	var ds struct {
+		int
+		string
+		s string
+	}
 	// providing values are optional - default zero values are used
-	ds = struct{int; string; s string}{}
+	ds = struct {
+		int
+		string
+		s string
+	}{}
 	ds.int = 5
 	ds.string = "ala"
 	ds.s = "ma"
@@ -47,8 +55,7 @@ func ShowStructOperations(){
 	Print(ds)
 }
 
-
 // Print - generic way to print struct, every struct is an interface
-func Print(s interface{}){
+func Print(s interface{}) {
 	fmt.Printf("Interface=%v\n", s)
 }

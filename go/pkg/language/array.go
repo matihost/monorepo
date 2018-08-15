@@ -18,8 +18,6 @@ var (
 	// array variable can be initialized in place
 	// last element is 0 because is not initialized
 	primes = [6]int{2, 3, 5, 7, 11}
-
-	
 )
 
 // ShowArraysAndSlices - show conversion from table to slice
@@ -30,7 +28,7 @@ func ShowArraysAndSlices() {
 		sliceMaxIndex = len(primes) - 1
 	)
 
-	// nil slice has a length and capacity of 0 and has no underlying array. 		
+	// nil slice has a length and capacity of 0 and has no underlying array.
 	printSlice(slice)
 
 	// create slice from array
@@ -67,7 +65,6 @@ func ShowArraysAndSlices() {
 	// enlarging slice to the capacity
 	coolSlice = coolSlice[:cap(coolSlice)]
 	printSlice(coolSlice)
-	
 
 	// slice literal - is in fact an array of the size and then slice version of it
 	slice = []int{1, 5, 8}
@@ -94,13 +91,11 @@ func ShowArraysAndSlices() {
 	slice[0] = 5
 	slice[4] = 5
 	printSlice(slice)
-	
+
 	// slice is also an interface
 	Print(slice)
 
 }
-
-
 
 func printSlice(s []int) {
 	// slice has length and capacity - so slice can be still enlarged to the underlying table
