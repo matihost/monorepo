@@ -20,6 +20,7 @@ ensure-dep:
 	cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \
 	dep ensure
 
+// https://golang.org/cmd/go/#hdr-Vendor_Directories how vendor directory works
 init-dep: prepare-gopath
 	cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \
 	dep init
@@ -58,15 +59,16 @@ clean-independent-before clean-independent-after:
 	rm -rf ${TEMP_GO_PATH}
 
 build-docker:
-	docker build -t github.com/matihost/learning/go/language:latest .
+	docker build -t github.com/matihost/learning/go/cmd/language:latest .
 
 run-docker:
-	docker run -it --rm github.com/matihost/learning/go/language:latest
+	docker run -it --rm github.com/matihost/learning/go/cmd/language:latest
 
 build-s2i:
-	s2i build . registry.access.redhat.com/devtools/go-toolset-7-rhel7:latest github.com/matihost/learning/go/language:latest -c  -e IMPORT_URL=github.com/matihost/learning/go -e INSTALL_URL=github.com/matihost/learning/go/cmd/language
+	s2i build . registry.access.redhat.com/devtools/go-toolset-7-rhel7:latest github.com/matihost/learning/go/cmd/language:latest -e IMPORT_URL=github.com/matihost/learning/go -e INSTALL_URL=github.com/matihost/learning/go/cmd/language --loglevel q
 
-.PHONY: build clean-independent-before clean-independent-after
+.PHONY: build prepare-gopath clean ensure-dep init-dep clean-independent-before clean-independent-after build-s2i run-docker build-docker
+
 
 
 

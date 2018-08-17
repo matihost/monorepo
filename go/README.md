@@ -56,7 +56,9 @@ cat << EOF | sudo tee /etc/docker/daemon.json > /dev/null
 }
 
 # Docker daemon  is accessible via file /var/run/docker.sock
-# to make user acced docker utility without sudo-ing user must belong to "group" from /etc/docker/daemon.json
+# in order access docker utility without sudo-ing user must belong to "group" from /etc/docker/daemon.json
+# it is dockerroot in above example
+# usually the easiest way is to check posix group of /var/run/docker.sock
 sudo usermod -aG dockerroot $(whoami)
 
 cat << EOF |sudo tee -a /etc/sysconfig/docker > /dev/null
@@ -103,6 +105,6 @@ make run-docker
 
 
 # to build image using S2I : https://github.com/openshift/source-to-image approach
-# resultign Docker image is the same and make run-docker can be used for running application
+# resulting Docker image tag is the same and `make run-docker` can be used to run application
 make build-s2i
 ```
