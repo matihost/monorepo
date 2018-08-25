@@ -1,4 +1,4 @@
-#usage: ansible-playbook shutdown-okd.yaml
+#usage: ansible-playbook shutdown-okd-vms.yaml -v
 ---
 - hosts: okd
   remote_user: student

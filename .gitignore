@@ -5,6 +5,7 @@ idea
 # Build files
 .build-workspace
 language
+galaxy
 
 # Binaries for programs and plugins
 *.exe

@@ -1,9 +1,8 @@
-#usage: ansible-playbook update-okd.yaml
+#usage: ansible-playbook update-okd-vms.yaml -v
 ---
 - hosts: okd
   remote_user: student
   become: yes
-  gather_facts: False
   tasks:
   - name: stop all origin services
     systemd:
@@ -17,7 +16,7 @@
     systemd:
       name: origin*
       state: started
-      # has to be async, b/c from time to time task fail reporing service doesn't start, but it is a matter of time
+      # has to be async, b/c from time to time task fail reporting service doesn't start, but it is a matter of time
       no_block: true
   - name: pause 60 seconds
     pause:

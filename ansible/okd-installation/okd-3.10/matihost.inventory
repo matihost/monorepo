@@ -1,0 +1,76 @@
+# OKD cluster characteristic:
+# - one master, 
+# - one infra node (DNS *.apps.matihost must point to that node), it is also compute node
+# - one app node,
+# - all nodes are schedulable inclusing infra nodes (normally it is not)
+# - NFS on master configured with PVs for ImageRegistry
+#
+# Inventory file reference: galaxy/openshift-ansible/inventory/hosts.example
+
+[masters]
+master.matihost
+
+[etcd]
+master.matihost
+
+[nodes]
+# master is automatically schedulable
+master.matihost openshift_node_group_name="node-config-master"
+
+# infra node, needs to be labeled compute in order other apps can be scheduled there as well
+node1.matihost openshift_node_group_name="node-config-compute-infra"
+
+#  non master and non infra is automatically assigned to openshift_schedulable=true node_group_name="node-config-compute"n
+node2.matihost openshift_node_group_name="node-config-compute"
+
+
+[nfs]
+master.matihost
+
+[OSEv3:children]
+masters
+nodes
+etcd
+nfs
+
+[OSEv3:vars]
+openshift_node_groups=[{'name': 'node-config-master', 'labels': ['node-role.kubernetes.io/master=true']}, {'name': 'node-config-compute', 'labels': ['node-role.kubernetes.io/compute=true'], 'edits': [{ 'key': 'kubeletArguments.pods-per-core','value': ['20']}]}, {'name': 'node-config-infra', 'labels': ['node-role.kubernetes.io/infra=true',]}, {'name': 'node-config-compute-infra', 'labels': ['node-role.kubernetes.io/compute=true','node-role.kubernetes.io/infra=true']}]
+ansible_user=root
+
+openshift_deployment_type=origin
+openshift_release=v3.10
+
+openshift_master_default_subdomain=apps.matihost
+
+openshift_disable_check=memory_availability
+
+debug_level=2
+
+openshift_install_examples=true
+
+openshift_hosted_router_force_subdomain='${name}-${namespace}.apps.matihost'
+
+# adding user on master using httpasswd - ok only for single master mode
+# install httpasswd tool on master node - to generate authentication files
+#
+# sudo yum install httpd-tools
+# sudo htpasswd /etc/origin/master/htpasswd userName 
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+
+# normally htpasswd_file option encrypted with Ansible vault, but this is for learning only
+#openshift_master_htpasswd_users={'admin': '$apr1$ooNjJEID$BX9/WuzOUVJcpiRTO4uFu0', 'mati': '$apr1$LwyT5llr$f5/fMrQ9/CoezFUZmRtG00','user': '$apr1$BoCnZ.7Z$1jI4yAysxhs0CL1p4lm/J/', , 'user2': '<pre-hashed password>'}
+
+# the file can be already present on the master, or in case of upgrade
+openshift_master_htpasswd_file=/etc/origin/master/htpasswd
+
+
+# nfs for registry storage, w/o it it is ephemeral
+openshift_hosted_registry_storage_kind=nfs
+openshift_hosted_registry_storage_access_modes=['ReadWriteMany']
+openshift_hosted_registry_storage_nfs_directory=/exports
+openshift_hosted_registry_storage_nfs_options='*(rw,root_squash)'
+openshift_hosted_registry_storage_volume_name=registry
+openshift_hosted_registry_storage_volume_size=10Gi
+
+# must be enabled, b/c NFS is unsupported for RegistryStorage
+openshift_enable_unsupported_configurations=True

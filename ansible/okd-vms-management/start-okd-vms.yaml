@@ -1,7 +1,6 @@
-#usage: ansible-playbook start-okd.yaml
+#usage: ansible-playbook start-okd-vms.yaml -v
 ---
 - hosts: localhost
-  gather_facts: False
   tasks:
   - name: get already started VMs
     shell: VBoxManage list runningvms
@@ -23,7 +22,6 @@
 - hosts: okd
   remote_user: student
   become: yes
-  gather_facts: False
   tasks:
   - name: make sure all origin services are started
     systemd:
