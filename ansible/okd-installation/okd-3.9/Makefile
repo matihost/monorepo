@@ -1,5 +1,5 @@
 # Assumptions that playbooks are run
-# from RHEL with access to GitHub to download openshift-ansible
+# from RHEL master with access to GitHub to download openshift-ansible
 # with access to GitHub to download openshift/ansible repository
 # from root
 dependencies:

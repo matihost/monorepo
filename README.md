@@ -4,6 +4,6 @@
 
 Various technology code, snippets, home tools.
 
-* [Ansible](ansible/README.md)
-* [Go](go/README.md)
-* [OpenShift](openshift/README.md)
+* [Ansible](ansible)
+* [Go](go)
+* [OpenShift](openshift)

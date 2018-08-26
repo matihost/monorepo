@@ -5,13 +5,12 @@ master.matihost
 master.matihost
 
 [nodes]
-# master is automatically schedulable
 master.matihost openshift_node_group_name="node-config-master"
 
-# infra node, needs to be labeled compute in order other apps can be scheduled there as well
+# infra node is also compute node
 node1.matihost openshift_node_group_name="node-config-compute-infra"
 
-#  non master and non infra is automatically assigned to openshift_schedulable=true node_group_name="node-config-compute"n
+# non infra and non master has to be compute node (aka app node)
 node2.matihost openshift_node_group_name="node-config-compute"
 
 
@@ -50,10 +49,10 @@ openshift_hosted_router_force_subdomain='${name}-${namespace}.apps.matihost'
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
 
 # normally htpasswd_file option encrypted with Ansible vault, but this is for learning only
-openshift_master_htpasswd_users={'admin': '$apr1$ooNjJEID$BX9/WuzOUVJcpiRTO4uFu0', 'mati': '$apr1$LwyT5llr$f5/fMrQ9/CoezFUZmRtG00','user': '$apr1$BoCnZ.7Z$1jI4yAysxhs0CL1p4lm/J/'}
+#openshift_master_htpasswd_users={'admin': '$apr1$ooNjJEID$BX9/WuzOUVJcpiRTO4uFu0', 'mati': '$apr1$LwyT5llr$f5/fMrQ9/CoezFUZmRtG00','user': '$apr1$BoCnZ.7Z$1jI4yAysxhs0CL1p4lm/J/'}
 
 # the file can be already present on the master, or in case of upgrade
-#openshift_master_htpasswd_file=/etc/origin/master/htpasswd
+openshift_master_htpasswd_file=/etc/origin/master/htpasswd
 
 # allow all option for testing
 #openshift_master_identity_providers=[{'name': 'allow_all', 'login': 'true', 'challenge': 'true', 'kind': 'AllowAllPasswordIdentityProvider'}]

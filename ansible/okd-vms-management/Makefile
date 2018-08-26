@@ -4,5 +4,4 @@ help:
 *.yaml:
 	ansible-playbook $@ -v
 
-
 .PHONY: *.yaml

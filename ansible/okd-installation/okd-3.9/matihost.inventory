@@ -1,12 +1,3 @@
-# OKD cluster characteristic:
-# - one master, 
-# - one infra node (DNS *.apps.matihost must point to that node), 
-# - one app node,
-# - all nodes are schedulable inclusing infra nodes (normally it is not)
-# - NFS on master configured with PVs for ImageRegistry
-#
-# Inventory file reference: # Inventory file reference: galaxy/openshift-ansible/inventory/hosts.example
-
 [masters]
 master.matihost
 

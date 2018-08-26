@@ -19,8 +19,8 @@ install-matihost-okd:
 	ansible-playbook -i ../../matihost.inventory playbooks/prerequisites.yml && \
 	ansible-playbook -i ../../matihost.inventory playbooks/deploy_cluster.yml
 
-
+# upgrade from previous 3.9 installation
 upgrade-from-3.9:
 	cd galaxy/openshift-ansible && \
-	ansible-playbook -i ../../matihost.inventory playbooks/openshift-master/openshift_node_group.yml && \
-	ansible-playbook -i ../../matihost.inventory playbooks/byo/openshift-cluster/upgrades/v3_10/upgrade.yml
+	ansible-playbook -i ../../matihost.upgrade.inventory playbooks/openshift-master/openshift_node_group.yml && \
+	ansible-playbook -i ../../matihost.upgrade.inventory playbooks/byo/openshift-cluster/upgrades/v3_10/upgrade.yml
