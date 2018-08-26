@@ -1,0 +1,15 @@
+---
+- hosts: local
+  tasks:
+  - name: Update the repository cache and update all packages to latest
+    apt:
+      name: "*"
+      state: latest
+      update_cache: yes
+      cache_valid_time: "{{ update_cache_timeout }}"
+      force_apt_get: yes
+  - name: Remove dependencies that are no longer required
+    apt:
+      autoremove: yes
+      autoclean: yes
+      force_apt_get: yes
