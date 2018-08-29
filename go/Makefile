@@ -65,7 +65,7 @@ run-docker:
 	docker run -it --rm github.com/matihost/learning/go/cmd/language:latest
 
 build-s2i:
-	s2i build . registry.access.redhat.com/devtools/go-toolset-7-rhel7:latest github.com/matihost/learning/go/cmd/language:latest -e IMPORT_URL=github.com/matihost/learning/go -e INSTALL_URL=github.com/matihost/learning/go/cmd/language --loglevel q
+	s2i build . registry.access.redhat.com/devtools/go-toolset-7-rhel7:latest github.com/matihost/learning/go/cmd/language:latest -e IMPORT_URL=github.com/matihost/learning/go -e INSTALL_URL=github.com/matihost/learning/go/cmd/language --loglevel 5 -c
 
 .PHONY: build prepare-gopath clean ensure-dep init-dep clean-independent-before clean-independent-after build-s2i run-docker build-docker
 
