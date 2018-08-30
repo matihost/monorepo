@@ -49,4 +49,7 @@ cd learning/ansible/okd-installation/okd-3.9
 
 make dependencies
 make install-matihost-okd
+
+# (optional) to install metric subsystem (Heapster, Hawkular on Cassandra) afterwards
+make install-metrics-subsystem
 ```

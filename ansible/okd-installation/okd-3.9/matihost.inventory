@@ -67,3 +67,38 @@ openshift_hosted_registry_storage_volume_size=10Gi
 
 # must be enabled, b/c NFS is unsupported for RegistryStorage
 openshift_enable_unsupported_configurations=True
+
+# install metrics subsystem in openshift-infra namespace
+# default is false
+#openshift_metrics_install_metrics=false
+
+# https://github.com/openshift/origin/issues/19440  - weird, but image v3.9.0 is not present in docker.io
+# openshift_metrics_image_version has to be overridden
+openshift_metrics_image_version=v3.9
+
+# auto create NFS storage on boxes from nfs group for metrics
+# creates only on PV so that there cannot be more than one Cassandra pod
+# if they have to be more, metrics subsystem should be installed after initial install
+openshift_metrics_storage_kind=nfs
+openshift_metrics_storage_access_modes=['ReadWriteOnce']
+openshift_metrics_storage_nfs_directory=/exports
+openshift_metrics_storage_nfs_options='*(rw,root_squash)'
+openshift_metrics_storage_volume_name=metrics
+openshift_metrics_storage_volume_size=10Gi
+openshift_metrics_storage_labels={'storage': 'metrics'}
+
+openshift_metrics_hawkular_replicas=1
+openshift_metrics_hawkular_requests_memory=500Mi
+
+# each C* pod requires own PV instance, for HA 3 instances of C* are needed
+openshift_metrics_cassandra_replicas=1
+#openshift_metrics_cassandra_storage_type: "{{ openshift_metrics_storage_kind | default('emptydir') }}"
+openshift_metrics_cassandra_storage_type=pv
+#openshift_metrics_cassandra_pv_selector: "{{ openshift_metrics_storage_labels | default('') }}"
+openshift_metrics_cassandra_pv_selector=''
+openshift_metrics_cassandra_pvc_size=5Gi
+openshift_metrics_cassandra_pvc_prefix=metrics-cassandra
+openshift_metrics_cassandra_requests_memory=500Mi
+openshift_metrics_heapster_requests_memory=500Mi
+openshift_metrics_cassandra_enable_prometheus_endpoint=True
+openshift_metrics_hawkular_enable_prometheus_endpoint=True
