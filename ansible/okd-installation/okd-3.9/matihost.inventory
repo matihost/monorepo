@@ -70,6 +70,12 @@ openshift_enable_unsupported_configurations=True
 
 # install metrics subsystem in openshift-infra namespace
 # default is false
+#
+# it may fail as there is a very short timeout between Hawkular / Cassandra during table creation
+# it cannot be changed https://github.com/openshift/origin-metrics/issues/413 and it will be not fixed as Hawkular/Cassandra stack will vanish in 3.11
+# when Hawkular runs -> go to https://hawkular-metrics.apps.matihost/ to so that WebConsole could get metrics from it and show pods  statuses (cpu, mem, network) graphs
+#
+# on one machine - it runs but it takes at normally 1 core and 2.5Gi memory - so for development don't install it
 #openshift_metrics_install_metrics=false
 
 # https://github.com/openshift/origin/issues/19440  - weird, but image v3.9.0 is not present in docker.io
@@ -98,7 +104,8 @@ openshift_metrics_cassandra_storage_type=pv
 openshift_metrics_cassandra_pv_selector=''
 openshift_metrics_cassandra_pvc_size=5Gi
 openshift_metrics_cassandra_pvc_prefix=metrics-cassandra
-openshift_metrics_cassandra_requests_memory=500Mi
+openshift_metrics_cassandra_requests_memory=1500Mi
 openshift_metrics_heapster_requests_memory=500Mi
-openshift_metrics_cassandra_enable_prometheus_endpoint=True
-openshift_metrics_hawkular_enable_prometheus_endpoint=True
+# https://github.com/openshift/origin-metrics/issues/424  - bug, by default Prometheus endpoints are disabled
+openshift_metrics_cassandra_enable_prometheus_endpoint='true'
+openshift_metrics_hawkular_enable_prometheus_endpoint='true'
