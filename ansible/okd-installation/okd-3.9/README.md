@@ -16,7 +16,8 @@ Inventory file reference: `galaxy/openshift-ansible/inventory/hosts.example`
 
 * Single Linux machine, tested on Ubuntu with 16GiB  RAM
 * VirtualBox with 3 x RHEL 7.x VMs in the same HostNetwork
-  * 2 GiB RAM for each VM is enough
+  * (minimum) 2 GiB RAM for each VM  (w/o metrics subsystem)
+  * (optimal) 4 GiB RAM foe each VM when metrics subsystem is planned to be installed. Metric subsystem itself takes all the time 1-2 core and ~3 GiB memory.
   * HostNetwork has disabled DHCP and Network adapter is manually defined
 * DNS bind server on host machine pointing **.apps.matihost*  to one of VMs (which will be infra node). Normally there should be LB exposing infra nodes and *.apps.matihost DNS point to that.
   * Each VM has setup own network adapter manually (`mmcli`)
@@ -50,7 +51,6 @@ cd learning/ansible/okd-installation/okd-3.9
 make dependencies
 make install-matihost-okd
 
-# (optional, on single machine not recommended, see inventory file)
-# to install metric subsystem (Heapster, Hawkular on Cassandra) afterwards
+# (optional) to install metric subsystem (Heapster, Hawkular on Cassandra) afterwards
 make install-metrics-subsystem
 ```
