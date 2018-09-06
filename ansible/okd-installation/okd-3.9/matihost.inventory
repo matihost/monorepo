@@ -53,7 +53,7 @@ openshift_hosted_router_force_subdomain='${name}-${namespace}.apps.matihost'
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
 
 # normally htpasswd_file option encrypted with Ansible vault, but this is for learning only
-openshift_master_htpasswd_users={'admin': '$apr1$ooNjJEID$BX9/WuzOUVJcpiRTO4uFu0', 'mati': '$apr1$LwyT5llr$f5/fMrQ9/CoezFUZmRtG00','user': '$apr1$BoCnZ.7Z$1jI4yAysxhs0CL1p4lm/J/', , 'user2': '<pre-hashed password>'}
+openshift_master_htpasswd_users={'admin': '$apr1$ooNjJEID$BX9/WuzOUVJcpiRTO4uFu0', 'mati': '$apr1$LwyT5llr$f5/fMrQ9/CoezFUZmRtG00','user': '$apr1$BoCnZ.7Z$1jI4yAysxhs0CL1p4lm/J/'}
 #openshift_master_htpasswd_file=<path to local pre-generated htpasswd file>
 
 
@@ -108,8 +108,8 @@ openshift_metrics_cassandra_storage_type=pv
 openshift_metrics_cassandra_pv_selector=''
 openshift_metrics_cassandra_pvc_size=5Gi
 openshift_metrics_cassandra_pvc_prefix=metrics-cassandra
-openshift_metrics_cassandra_limits_memory: 2Gi
-openshift_metrics_cassandra_requests_memory: 1.5Gi
+openshift_metrics_cassandra_limits_memory=2Gi
+openshift_metrics_cassandra_requests_memory=1.5Gi
 
 openshift_metrics_heapster_requests_memory=400Mi
 
