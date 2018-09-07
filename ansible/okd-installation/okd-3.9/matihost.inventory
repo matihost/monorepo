@@ -37,7 +37,7 @@ openshift_release=v3.9
 
 openshift_master_default_subdomain=apps.matihost
 
-openshift_disable_check=memory_availability
+openshift_disable_check=memory_availability,package_version
 
 debug_level=2
 
@@ -80,7 +80,7 @@ openshift_enable_unsupported_configurations=True
 # Metric subsystem itself takes all the time 1-2 core and ~3 GiB memory.
 # Not recommended for dev only installation.
 #
-#openshift_metrics_install_metrics=false
+openshift_metrics_install_metrics=true
 
 # https://github.com/openshift/origin/issues/19440  - image v3.9.0 is not present in docker.io
 # openshift_metrics_image_version has to be overridden

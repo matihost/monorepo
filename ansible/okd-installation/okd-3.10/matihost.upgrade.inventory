@@ -33,7 +33,7 @@ openshift_release=v3.10
 
 openshift_master_default_subdomain=apps.matihost
 
-openshift_disable_check=memory_availability
+openshift_disable_check=memory_availability,package_version
 
 debug_level=2
 
