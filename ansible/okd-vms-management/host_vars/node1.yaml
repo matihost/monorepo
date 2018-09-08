@@ -1,1 +1,12 @@
-vm_name: 'OCP Node 1'
+vm_name: 'OKD Node 1 Centos'
+packages_to_install:
+- pyOpenSSL
+- python-cryptography
+- python-lxml
+- git2u
+- docker
+- patch
+- bash-completion
+- bash-completion-extras
+- wget
+- python-passlib

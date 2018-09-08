@@ -30,4 +30,8 @@ make shutdown-okd-vms.yaml
 # it shutdowns all origin services before that and attempt to start them after update
 # VMs snapshots are recommended before that
 make update-okd-vms.yaml
+
+
+# to install and setup bare RHEL/CentOS boxes so that OKD can be installed
+make start-okd-vms.yaml
 ```

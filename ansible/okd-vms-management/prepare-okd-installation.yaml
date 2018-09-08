@@ -6,7 +6,7 @@
 # On machine running ansible:
 #  ssh-copy-id student@master
 ---
-- hosts: master
+- hosts: okd
   remote_user: student
   become: yes
   gather_facts: true
@@ -41,20 +41,7 @@
       state: present
   - name: Install openshift-ansible required
     yum:
-      name:
-        - pyOpenSSL
-        - python-cryptography
-        - python-lxml
-        - java-1.8.0-openjdk-headless
-        - git2u
-        - docker
-        - ansible
-        - patch
-        - httpd-tools
-        - bash-completion
-        - bash-completion-extras
-        - wget
-        - python-passlib
+      name: "{{ packages_to_install }}"
       state: present
   - name: Start and enable Docker service
     systemd:
