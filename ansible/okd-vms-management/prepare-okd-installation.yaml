@@ -1,0 +1,73 @@
+# Prerequisites:
+# master has to be accessible and has correct network configuration
+# On master:
+#  sudo nmcli c mod enp0s8 ipv4.method manual ipv4.dns 172.25.250.1 ipv4.addresses 172.25.250.10/24 ipv4.gateway 172.25.250.1 ipv4.dns-search "matihost"
+#  sudo hostnamectl set-hostname master.matihost
+# On machine running ansible:
+#  ssh-copy-id student@master
+---
+- hosts: master
+  remote_user: student
+  become: yes
+  gather_facts: true
+  tasks:
+  - name: update packages
+    yum:
+      name: '*'
+      state: latest
+  - debug:
+      msg: " {{ vars }}"
+  - name: Enable RHSM repositories
+    rhsm_repository:
+      name:
+      - rhel-7-server-rpms
+      - rhel-7-server-extras-rpms 
+      state: present
+    when: ansible_os_family == "RedHat" and ansible_distribution == "RedHat"
+  - name: Install Epel and CentOS repos
+    yum:
+      name:
+        - 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm'
+        - 'https://centos7.iuscommunity.org/ius-release.rpm'
+      state: present
+  - name: Remove git avoid conflict with git2u
+    yum:
+      name: git
+      state: absent
+  - name: Install nice to have packages
+    yum:
+      name:
+        - bind-utils
+      state: present
+  - name: Install openshift-ansible required
+    yum:
+      name:
+        - pyOpenSSL
+        - python-cryptography
+        - python-lxml
+        - java-1.8.0-openjdk-headless
+        - git2u
+        - docker
+        - ansible
+        - patch
+        - httpd-tools
+        - bash-completion
+        - bash-completion-extras
+        - wget
+        - python-passlib
+      state: present
+  - name: Start and enable Docker service
+    systemd:
+      name: docker
+      state: started
+      enabled: true
+  - name: Add user to dockerroot groups
+    user:
+      name: student
+      groups: dockerroot
+      append: yes  
+  - name: Make dockerroot group able to use docker cli
+    file:
+      path: /var/run/docker.sock
+      group: dockerroot
+

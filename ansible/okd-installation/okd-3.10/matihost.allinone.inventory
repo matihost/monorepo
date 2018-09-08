@@ -1,76 +1,66 @@
-[masters]
-master.matihost
-
-[etcd]
-master.matihost
-
-[nodes]
-# master is automatically schedulable
-master.matihost openshift_node_group_name="node-config-master"
-
-# infra node, needs to be labeled compute in order other apps can be scheduled there as well
-node1.matihost openshift_node_group_name="node-config-compute-infra"
-
-#  non master and non infra is automatically assigned to openshift_schedulable=true node_group_name="node-config-compute"n
-node2.matihost openshift_node_group_name="node-config-compute"
-
-
-[nfs]
-master.matihost
-
-[OSEv3:children]
-masters
-nodes
-etcd
-nfs
-
+[masters] 
+localhost ansible_connection=local 
+ 
+[etcd] 
+localhost ansible_connection=local 
+ 
+[nodes] 
+localhost  ansible_connection=local openshift_node_group_name="node-config-all-in-one"
+ 
+ 
+[nfs] 
+localhost ansible_connection=local 
+ 
+[OSEv3:children] 
+masters 
+nodes 
+etcd 
+nfs 
+ 
 [OSEv3:vars]
-openshift_node_groups=[{'name': 'node-config-master', 'labels': ['node-role.kubernetes.io/master=true']}, {'name': 'node-config-compute', 'labels': ['node-role.kubernetes.io/compute=true'], 'edits': [{ 'key': 'kubeletArguments.pods-per-core','value': ['20']}]}, {'name': 'node-config-infra', 'labels': ['node-role.kubernetes.io/infra=true',]}, {'name': 'node-config-compute-infra', 'labels': ['node-role.kubernetes.io/compute=true','node-role.kubernetes.io/infra=true']}]
-
-ansible_user=root
-
-openshift_deployment_type=origin
+openshift_node_groups=[{'name': 'node-config-all-in-one', 'labels': ['node-role.kubernetes.io/master=true', 'node-role.kubernetes.io/infra=true', 'node-role.kubernetes.io/compute=true']}]
+ansible_user=root 
+ 
+openshift_deployment_type=origin 
 openshift_release=v3.10
+openshift_rolling_restart_mode=system 
+openshift_master_default_subdomain=allinone.matihost
+# when master is behind load balancer
+#openshift_master_cluster_public_hostname=openshift-master.allinone.matihost
+os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant' 
 
-openshift_master_default_subdomain=apps.matihost
+ 
+openshift_disable_check=memory_availability,disk_availability,package_version
 
-openshift_disable_check=memory_availability,package_version
-
-debug_level=2
-
-openshift_install_examples=true
-
-openshift_hosted_router_force_subdomain='${name}-${namespace}.apps.matihost'
-
-# adding user on master using httpasswd - ok only for single master mode
-# install httpasswd tool on master node - to generate authentication files
-#
-# sudo yum install httpd-tools
+debug_level=2 
+ 
+openshift_install_examples=true 
+ 
+openshift_hosted_router_force_subdomain='${name}-${namespace}.allinone.matihost' 
+ 
+osm_cluster_network_cidr=10.128.0.0/14 
+openshift_portal_net=172.30.0.0/16 
+osm_host_subnet_length=9 
+ 
+ 
+ 
 # sudo htpasswd /etc/origin/master/htpasswd userName 
-openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
-
-# normally htpasswd_file option encrypted with Ansible vault, but this is for learning only
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}] 
+ 
 openshift_master_htpasswd_users={'admin': '$apr1$ooNjJEID$BX9/WuzOUVJcpiRTO4uFu0', 'mati': '$apr1$LwyT5llr$f5/fMrQ9/CoezFUZmRtG00','user': '$apr1$BoCnZ.7Z$1jI4yAysxhs0CL1p4lm/J/'}
-
-# the file can be already present on the master, or in case of upgrade
-#openshift_master_htpasswd_file=/etc/origin/master/htpasswd
-
-# allow all option for testing
-#openshift_master_identity_providers=[{'name': 'allow_all', 'login': 'true', 'challenge': 'true', 'kind': 'AllowAllPasswordIdentityProvider'}]
-
-
-# nfs for registry storage, w/o it it is ephemeral
-openshift_hosted_registry_storage_kind=nfs
-openshift_hosted_registry_storage_access_modes=['ReadWriteMany']
-openshift_hosted_registry_storage_nfs_directory=/exports
-openshift_hosted_registry_storage_nfs_options='*(rw,root_squash)'
-openshift_hosted_registry_storage_volume_name=registry
-openshift_hosted_registry_storage_volume_size=10Gi
-
-# must be enabled, b/c NFS is unsupported for RegistryStorage
-openshift_enable_unsupported_configurations=True
-
-
+ 
+ 
+# nfs for registry storage, w/o it it is ephemeral 
+openshift_hosted_registry_storage_kind=nfs 
+openshift_hosted_registry_storage_access_modes=['ReadWriteMany'] 
+openshift_hosted_registry_storage_nfs_directory=/exports 
+openshift_hosted_registry_storage_nfs_options='*(rw,root_squash)' 
+openshift_hosted_registry_storage_volume_name=registry 
+openshift_hosted_registry_storage_volume_size=10Gi 
+ 
+# must be enabled, b/c NFS is unsupported for RegistryStorage 
+openshift_enable_unsupported_configurations=True 
+ 
 # install metrics subsystem in openshift-infra namespace
 # default is false
 #
@@ -78,7 +68,7 @@ openshift_enable_unsupported_configurations=True
 # it may fail as there is a very short timeout between Hawkular / Cassandra during table creation
 # it cannot be changed https://github.com/openshift/origin-metrics/issues/413 and it will be not fixed as Hawkular/Cassandra stack will vanish in 3.11
 # when Hawkular Metrics fails with timeout issue, terminate the pod, rc will spawn new one and it will try again...
-# When Hawkular Metrics pod starts correctly and Heapster after it -> go to https://hawkular-metrics.apps.matihost/ to so that WebConsole could get metrics from it and show pods  statuses (cpu, mem, network) graphs
+# When Hawkular Metrics pod starts correctly and Heapster after it -> go to https://hawkular-metrics.router_suffix/ to so that WebConsole could get metrics from it and show pods  statuses (cpu, mem, network) graphs
 #
 # Metric subsystem itself takes all the time 1-2 core and ~3 GiB memory.
 # Not recommended for dev only installation.
@@ -102,15 +92,13 @@ openshift_metrics_storage_volume_name=metrics
 openshift_metrics_storage_volume_size=10Gi
 openshift_metrics_storage_labels={'storage': 'metrics'}
 
-
-
 openshift_metrics_hawkular_replicas=1
 openshift_metrics_hawkular_requests_memory=1.5Gi
 
 # each C* pod requires own PV instance, for HA 3 instances of C* are needed
 openshift_metrics_cassandra_replicas=1
 #openshift_metrics_cassandra_storage_type: "{{ openshift_metrics_storage_kind | default('emptydir') }}"
-openshift_metrics_cassandra_storage_type=pv
+#openshift_metrics_cassandra_storage_type=pv
 
 
 #openshift_metrics_cassandra_pv_selector: "{{ openshift_metrics_storage_labels | default('') }}"
@@ -126,3 +114,8 @@ openshift_metrics_heapster_requests_memory=400Mi
 # Prometheus endpoints are exposed on port 7575 and /metrics context path.
 openshift_metrics_cassandra_enable_prometheus_endpoint='true'
 openshift_metrics_hawkular_enable_prometheus_endpoint='true'
+
+# Cockpit installation is intended to work only with enterprise version
+# ./openshift-ansible/playbooks/openshift-master/private/additional_config.yml
+osm_use_cockpit=true
+osm_cockpit_plugins=['cockpit-kubernetes']

@@ -1,4 +1,4 @@
-RANGE = $(shell seq 1 10)
+RANGE = $(shell seq 1 3)
 
 login:
 	oc login https://master.matihost:8443 -u admin

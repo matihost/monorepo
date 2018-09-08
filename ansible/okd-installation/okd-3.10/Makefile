@@ -1,16 +1,13 @@
-# Assumptions that playbooks are run
-# from RHEL with access to GitHub to download openshift-ansible
-# with access to GitHub to download openshift/ansible repository
-# from root
 dependencies:
 	test `whoami` == root -a -e /etc/redhat-release
+	rm -rf galaxy
 	ansible-galaxy install -r requirements.yaml -p galaxy -f
 
-# all in one localhost, allow all authen mode
-install-all-in-one:
+# all in one localhost
+install-all-in-one: requires-rhel-root
 	cd galaxy/openshift-ansible && \
-	ansible-playbook -i inventory/hosts.localhost playbooks/prerequisites.yml && \
-	ansible-playbook -i inventory/hosts.localhost playbooks/deploy_cluster.yml
+	ansible-playbook -i ../../matihost.allinone.inventory playbooks/prerequisites.yml && \
+	ansible-playbook -i ../../matihost.allinone.inventory playbooks/deploy_cluster.yml
 
 
 # my configuration of the OKD cluster
@@ -24,3 +21,12 @@ upgrade-from-3.9:
 	cd galaxy/openshift-ansible && \
 	ansible-playbook -i ../../matihost.upgrade.inventory playbooks/openshift-master/openshift_node_group.yml && \
 	ansible-playbook -i ../../matihost.upgrade.inventory playbooks/byo/openshift-cluster/upgrades/v3_10/upgrade.yml
+
+
+# to install metrics subsystem (Heapster, Hawkular on Cassandra)
+install-metrics-subsystem: requires-rhel-root
+	cd galaxy/openshift-ansible && \
+	ansible-playbook -i ../../matihost.inventory playbooks/openshift-metrics/config.yml -e openshift_metrics_install_metrics=true
+
+requires-rhel-root:
+	test `whoami` == root -a -e /etc/redhat-release	

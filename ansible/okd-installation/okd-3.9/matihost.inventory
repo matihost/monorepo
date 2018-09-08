@@ -117,3 +117,4 @@ openshift_metrics_heapster_requests_memory=400Mi
 # Prometheus endpoints are exposed on port 7575 and /metrics context path.
 openshift_metrics_cassandra_enable_prometheus_endpoint='true'
 openshift_metrics_hawkular_enable_prometheus_endpoint='true'
+

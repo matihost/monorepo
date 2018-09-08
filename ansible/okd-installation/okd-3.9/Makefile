@@ -1,13 +1,15 @@
 # Metrics subsystem playbook requires java 
 dependencies:
-	yum install -y java-1.8.0-openjdk-devel.x86_64
+	test `whoami` == root -a -e /etc/redhat-release
+	rm -rf galaxy
 	ansible-galaxy install -r requirements.yaml -p galaxy -f
 
-# all in one localhost, allow all authen mode
+
+# all in one localhost
 install-all-in-one: requires-rhel-root
 	cd galaxy/openshift-ansible && \
-	ansible-playbook -i inventory/hosts.localhost playbooks/prerequisites.yml && \
-	ansible-playbook -i inventory/hosts.localhost playbooks/deploy_cluster.yml
+	ansible-playbook -i ../../matihost.allinone.inventory playbooks/prerequisites.yml && \
+	ansible-playbook -i ../../matihost.allinone.inventory playbooks/deploy_cluster.yml
 
 
 # my configuration of the OKD cluster
