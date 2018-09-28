@@ -31,10 +31,13 @@ ansible_user=root
 
 openshift_deployment_type=origin
 openshift_release=v3.10
-
+openshift_rolling_restart_mode=system 
 openshift_master_default_subdomain=apps.matihost
+# when master is behind load balancer
+#openshift_master_cluster_public_hostname=openshift-master.allinone.matihost
+os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant' 
 
-openshift_disable_check=memory_availability,package_version
+openshift_disable_check=memory_availability,disk_availability,package_version
 
 debug_level=2
 
@@ -102,15 +105,14 @@ openshift_metrics_storage_volume_name=metrics
 openshift_metrics_storage_volume_size=10Gi
 openshift_metrics_storage_labels={'storage': 'metrics'}
 
-
-
 openshift_metrics_hawkular_replicas=1
 openshift_metrics_hawkular_requests_memory=1.5Gi
 
 # each C* pod requires own PV instance, for HA 3 instances of C* are needed
 openshift_metrics_cassandra_replicas=1
-#openshift_metrics_cassandra_storage_type: "{{ openshift_metrics_storage_kind | default('emptydir') }}"
-openshift_metrics_cassandra_storage_type=pv
+# when openshift_metrics_storage_kind=nfs is missing then it is emptydir
+# when openshift_metrics_cassandra_storage_type=pv then nfs is not auto created
+#openshift_metrics_cassandra_storage_type=pv
 
 
 #openshift_metrics_cassandra_pv_selector: "{{ openshift_metrics_storage_labels | default('') }}"
@@ -126,3 +128,8 @@ openshift_metrics_heapster_requests_memory=400Mi
 # Prometheus endpoints are exposed on port 7575 and /metrics context path.
 openshift_metrics_cassandra_enable_prometheus_endpoint='true'
 openshift_metrics_hawkular_enable_prometheus_endpoint='true'
+
+# Cockpit installation is intended to work only with enterprise version:
+# galaxy/openshift-ansible/playbooks/openshift-master/private/additional_config.yml
+osm_use_cockpit=true
+osm_cockpit_plugins=['cockpit-kubernetes']

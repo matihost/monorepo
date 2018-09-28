@@ -62,4 +62,7 @@ cd learning/ansible/okd-installation/okd-3.10
 
 make dependencies
 make install-matihost-okd
+
+# to install all-in-one
+#make install-all-in-one
 ```

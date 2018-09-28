@@ -33,5 +33,6 @@ make update-okd-vms.yaml
 
 
 # to install and setup bare RHEL/CentOS boxes so that OKD can be installed
-make start-okd-vms.yaml
+# master has to be accessible and has correct config, see playbook file for details
+make prepare-okd-installation.yaml
 ```

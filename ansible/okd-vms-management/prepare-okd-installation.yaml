@@ -3,6 +3,8 @@
 # On master:
 #  sudo nmcli c mod enp0s8 ipv4.method manual ipv4.dns 172.25.250.1 ipv4.addresses 172.25.250.10/24 ipv4.gateway 172.25.250.1 ipv4.dns-search "matihost"
 #  sudo hostnamectl set-hostname master.matihost
+#  sudo ssh-copy-id root@nodeX # for each node, master should be able to ssh directly to other nodes
+#
 # On machine running ansible:
 #  ssh-copy-id student@master
 ---

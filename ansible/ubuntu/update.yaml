@@ -11,5 +11,8 @@
   - name: Remove dependencies that are no longer required
     apt:
       autoremove: yes
+      force_apt_get: yes
+  - name: Remove useless packages from the cache
+    apt:
       autoclean: yes
       force_apt_get: yes
