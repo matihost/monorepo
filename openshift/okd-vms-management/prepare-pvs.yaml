@@ -1,0 +1,47 @@
+---
+- hosts: single_master
+  remote_user: student
+  become: yes
+  tasks:
+  - name: Create pv parent directory
+    file:
+      path: /exports/pv
+      mode: "777"
+      owner: nfsnobody
+      group: nfsnobody
+      state: directory  
+  - name: Create pv directories
+    file:
+      path: /exports/pv/{{ item }}
+      mode: "777"
+      owner: nfsnobody
+      group: nfsnobody
+      state: directory
+    loop: "{{pvs}}"
+  - name: Create NSF exports file
+    file:
+      path: /etc/exports.d/pvs.exports
+      mode: "644"
+      owner: root
+      group: root
+      state: touch
+  - name: Define NFS mount for pv directories
+    lineinfile:
+      path: /etc/exports.d/pvs.exports
+      line: '"/exports/pv/{{item}}" *(rw,root_squash)'
+    loop: "{{pvs}}"
+  - name: Reload NFS server
+    shell: exportfs -ra
+# it could be run on master as well, because root is system:admin, 
+# but it requires proper pip and, openshift module on master as well
+- hosts: localhost
+  become: false
+  gather_facts: false
+  tasks:
+  - name: Create PVs
+    k8s:
+      state: present
+      definition: "{{ lookup('template', files + 'pv.yaml.j2') | from_yaml }}"
+    loop: "{{hostvars['master'].pvs}}"
+
+

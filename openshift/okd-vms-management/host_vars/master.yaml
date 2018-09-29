@@ -1,12 +1,17 @@
-vm_name: 'OKD Node 1 Centos'
+vm_name: 'OKD Master Centos'
 packages_to_install:
 - pyOpenSSL
 - python-cryptography
 - python-lxml
+- java-1.8.0-openjdk-headless
 - git2u
 - docker
+- ansible
 - patch
+- httpd-tools
 - bash-completion
 - bash-completion-extras
 - wget
 - python-passlib
+
+pvs: "{{ range(0, 5, 1)|list }}"

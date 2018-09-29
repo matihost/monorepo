@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: RoleBinding
+metadata:
+  name: admin
+roleRef:
+  name: admin
+userNames:
+- admin
+- mati
+- user

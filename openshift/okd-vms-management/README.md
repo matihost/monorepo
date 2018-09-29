@@ -2,19 +2,17 @@
 
 ## Prerequisites
 
-Ansible 2.6+ installed
+- Ansible 2.6+
+- Pip
+- openshift pip module (k8s ansible module dependency)
 
 Ubuntu:
 
 ```bash
+sudo apt-add-repository ppa:ansible/ansible
 sudo apt install ansible
-```
-
-RHEL 7.x:
-
-```bash
-sudo subscription-manager repos --enable=rhel-7-server-extras-rpms
-sudo yum --disablerepo=* --enablerepo="rhel-7-server-extras-rpms,rhel-7-server-rpms" install ansible
+sudo apt install python-pip
+sudo pip install openshift
 ```
 
 ## Running
@@ -31,8 +29,10 @@ make shutdown-okd-vms.yaml
 # VMs snapshots are recommended before that
 make update-okd-vms.yaml
 
-
 # to install and setup bare RHEL/CentOS boxes so that OKD can be installed
 # master has to be accessible and has correct config, see playbook file for details
 make prepare-okd-installation.yaml
+
+# to prepare NFS volumes and install PVs on OKD cluster for apps usage
+make prepare-pvs.yaml
 ```

@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-{{item}}
+spec:
+  accessModes: 
+  - ReadWriteMany
+  - ReadWriteOnce    
+  capacity:
+    storage: 10Gi
+  nfs:
+    path: /exports/pv/{{item}}
+    server: "{{ hostvars['master'].inventory_hostname }}"

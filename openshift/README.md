@@ -1,22 +1,8 @@
-# OpenShift
+# Ansible
 
-Various [OpenShift Origin](https://www.okd.io/) templates, scripts etc.
+Various Ansible playbooks:
 
-## Prerequisites
-
-OKD or Minishift installation.
-
-See [../ansible/okd-installation/okd-3.10](../ansible/okd-installation/okd-3.10) for instruction how to install sample OKD on 3 VirtualBox VMs.
-
-## Usage
-
-```bash
-# login as admin, required for remaining steps
-make login
-
-# show cluster status
-make cluster-status
-
-# add PVs being NFS exported dirs on master node
-make add-pvs
-```
+* [okd-installation/okd-3.10](okd-installation/okd-3.10) - to install, upgrade OKD 3.x on VirtualBox VMs
+* [okd-vms-management](okd-vms-management) - to start, shutdown VMs, update RPMs, prepare nodes and NFS for OKD installation in the VirtualBox VMs
+* [okd-projects](okd-projects) - to deploy application and manage OKD cluster itself
+* [ubuntu](ubuntu)  - to manage Ubuntu installation

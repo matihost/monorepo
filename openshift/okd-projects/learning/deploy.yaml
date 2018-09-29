@@ -1,0 +1,25 @@
+---
+- hosts: local
+  tasks:
+  - name: Create project learning
+    k8s:
+      state: present
+      definition:
+        apiVersion: v1
+        kind: ProjectRequest
+        metadata:
+          name: learning
+        description: Learning
+        displayName: Various learning apps
+
+  - name: Run jenkins-persistent template objects
+    shell: oc process openshift//jenkins-persistent | oc apply -f - -n learning
+  - name: Wait for jenkins to start
+    shell: oc rollout status dc jenkins -n learning
+  - name: Grant access to users
+    k8s:
+      state: present
+      src: "{{ files }}/rbac.yaml"
+      namespace: learning
+    
+

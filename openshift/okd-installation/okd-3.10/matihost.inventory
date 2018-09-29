@@ -86,7 +86,7 @@ openshift_enable_unsupported_configurations=True
 # Metric subsystem itself takes all the time 1-2 core and ~3 GiB memory.
 # Not recommended for dev only installation.
 #
-openshift_metrics_install_metrics=true
+openshift_metrics_install_metrics=false
 
 # https://github.com/openshift/origin-metrics/issues/429
 openshift_metrics_cassandra_image="docker.io/openshift/origin-metrics-cassandra:v3.11.0"

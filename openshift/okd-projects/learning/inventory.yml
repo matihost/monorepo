@@ -1,0 +1,8 @@
+all:
+  children:
+    local:
+      hosts:
+        localhost:
+      vars:
+        files: "{{ playbook_dir }}/files"
+
