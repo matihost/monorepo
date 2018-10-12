@@ -22,7 +22,7 @@ Inventory file reference: `galaxy/openshift-ansible/inventory/hosts.example`
   * Each VM has setup own network adapter manually (`mmcli`)
   * VMs should use DNS server on host to resolve themselves
   * **VMs hostname (`uname -n` or `hostname -f`) [MUST match](https://github.com/openshift/openshift-ansible/issues/9730#issuecomment-415482818) the name used in inventory file**
-* Ansible 2.6.x installed on CentOS/RHEL master node
+* Ansible 2.6.5 + (and < 2.7) installed on CentOS/RHEL master node
 
 ```bash
 # install EPEL
@@ -33,18 +33,6 @@ sudo yum install ansible
 ```
 
 * SSH keys propagated from master to other VMs allowing Ansible to SSH to every VM as root
-
-## Upgrade from OKD 3.9
-
-```bash
-ssh root@master
-mkdir -p ~/src && cd ~/src
-git clone https://github.com/matihost/learning
-cd learning/ansible/okd-installation/okd-3.10
-
-make dependencies
-make upgrade-from-3.9
-```
 
 ## Installation
 
