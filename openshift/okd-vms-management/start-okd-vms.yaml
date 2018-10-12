@@ -27,3 +27,5 @@
     systemd:
       name: origin*
       state: started
+    tags:
+    - origin    

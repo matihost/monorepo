@@ -9,6 +9,8 @@
     systemd:
       name: origin*
       state: stopped
+    tags:
+    - origin
 - hosts: localhost
   gather_facts: False  
   tasks:

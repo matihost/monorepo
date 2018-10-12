@@ -8,6 +8,8 @@
     systemd:
       name: origin*
       state: stopped
+    tags:
+    - origin
   - name: update packages
     yum:
       name: '*'
@@ -18,6 +20,8 @@
       state: started
       # has to be async, b/c from time to time task fail reporting service doesn't start, but it is a matter of time
       no_block: true
+    tags:
+    - origin
   - name: pause 60 seconds
     pause:
       seconds: 60
@@ -26,5 +30,7 @@
       name: origin*
       state: started
       no_block: true
+    tags:
+    - origin
 
 
