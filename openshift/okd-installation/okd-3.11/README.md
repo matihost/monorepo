@@ -40,7 +40,7 @@ sudo yum install ansible
 ssh root@master
 mkdir -p ~/src && cd ~/src
 git clone https://github.com/matihost/learning
-cd learning/ansible/okd-installation/okd-3.10
+cd learning/openshift/okd-installation/okd-3.11
 
 make dependencies
 make install-matihost-okd

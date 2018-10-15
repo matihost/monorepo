@@ -46,7 +46,7 @@ sudo rpm -Uvh https://releases.ansible.com/ansible/rpm/release/epel-7-x86_64/ans
 ssh root@master
 mkdir -p ~/src && cd ~/src
 git clone https://github.com/matihost/learning
-cd learning/ansible/okd-installation/okd-3.9
+cd learning/openshift/okd-installation/okd-3.9
 
 make dependencies
 make install-matihost-okd

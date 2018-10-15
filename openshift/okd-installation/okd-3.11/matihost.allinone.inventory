@@ -73,7 +73,7 @@ openshift_enable_unsupported_configurations=True
 # Metric subsystem itself takes all the time 1-2 core and ~3 GiB memory.
 # Not recommended for dev only installation.
 #
-openshift_metrics_install_metrics=true
+openshift_metrics_install_metrics=false
 
 # auto create NFS storage on boxes from nfs group for metrics
 # creates only on PV so that there cannot be more than one Cassandra pod

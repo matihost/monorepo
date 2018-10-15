@@ -86,7 +86,7 @@ openshift_enable_unsupported_configurations=True
 # Metric subsystem itself takes all the time 1-2 core and ~3 GiB memory.
 # Not recommended for dev only installation.
 #
-openshift_metrics_install_metrics=true
+openshift_metrics_install_metrics=false
 
 # auto create NFS storage on boxes from nfs group for metrics
 # creates only on PV so that there cannot be more than one Cassandra pod
@@ -127,3 +127,6 @@ openshift_metrics_hawkular_enable_prometheus_endpoint='true'
 # galaxy/openshift-ansible/playbooks/openshift-master/private/additional_config.yml
 osm_use_cockpit=true
 osm_cockpit_plugins=['cockpit-kubernetes']
+
+# https://github.com/openshift/openshift-ansible/issues/9875 - not yet released CentOS rpms workaround, using CI rpms repo
+openshift_additional_repos=[{'id': 'centos-okd-ci', 'name': 'centos-okd-ci', 'baseurl' :'https://rpms.svc.ci.openshift.org/openshift-origin-v3.11', 'gpgcheck' :'0', 'enabled' :'1'}]
