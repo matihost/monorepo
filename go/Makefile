@@ -2,72 +2,53 @@ PROJECT := "github.com/matihost/learning"
 REPOSITORY := "go"
 CMD_PACKAGE_NAME := "language"
 
-
-
 DIR := $(shell pwd )
 GOPATH := $(shell go env GOPATH)
 TEMP_GO_PATH := ${DIR}/.build-workspace
 
-build: prepare-gopath
-	cd ${GOPATH}/src/${PROJECT}/${REPOSITORY}/cmd/${CMD_PACKAGE_NAME} && \
-	(ls vendor 2>/dev/null || go get -v ./...) && \
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo && \
-	mv ${CMD_PACKAGE_NAME} ${DIR} && echo OK
+build: ## build app language, assumes  'make init' has been previously run
+	@cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \
+	(ls vendor >/dev/null 2>&1 || ${MAKE} get-dependencies) && \
+	cd cmd/${CMD_PACKAGE_NAME} && \
+	go build && \
+	mv ${CMD_PACKAGE_NAME} ${DIR} && \
+	echo "Application ${CMD_PACKAGE_NAME} has been build"
+
+get-dependencies: ## download dependencies to vendor using dep tool
+	@cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \
+	dep ensure -update
+
+get-dependencies-to-gopath: ## download dependencies to GOPATH, old style, works when vendor directory is empty
+	cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \
+	go get -v ./...	
 	
 
-
-ensure-dep:
-	cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \
-	dep ensure
-
-// https://golang.org/cmd/go/#hdr-Vendor_Directories how vendor directory works
-init-dep: prepare-gopath
-	cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \
+init: prepare-gopath ## populates GOPATH with this project and inialize deb files if not present, follows https://golang.org/cmd/go/#hdr-Vendor_Directories vendoring
+	@cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \
 	dep init
 
+clean: ## removes compiled application and vendor directory
+	@rm -rf ${DIR}/${CMD_PACKAGE_NAME} && rm -rf vendor
 
-clean:
-	rm -rf ${DIR}/${CMD_PACKAGE_NAME}
 
-
-prepare-gopath:
-	mkdir -p ${GOPATH}/src/${PROJECT} && \
+prepare-gopath: ## populates GOPATH with this project, removes previos GOPATH reference
+	@mkdir -p ${GOPATH}/src/${PROJECT} && \
 	cd ${GOPATH}/src/${PROJECT} && \
 	(rm -f ${REPOSITORY} && ln -s ${DIR} ${REPOSITORY})
 
+build-docker: ## builds docker image
+	@docker build -t github.com/matihost/learning/go/cmd/language:latest .
 
-# build independently in temporary Go workspace
-# works like https://github.com/cloudflare/hellogopher
-# but I found it after i wrote this makefile
-build-independently: prepare-independent-workspace build-independently-cmd clean-independent-after
-	echo OK
+run-docker: ## run previous docker image
+	@docker run -it --rm github.com/matihost/learning/go/cmd/language:latest
 
-build-independently-cmd:
-	export GOPATH=${TEMP_GO_PATH}:${GOPATH} && \
-	cd ${TEMP_GO_PATH}/src/${PROJECT}/${REPOSITORY}/cmd/${CMD_PACKAGE_NAME} && \
-	(ls vendor 2>/dev/null || go get -v ./...) && \
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo && \
-	mv ${CMD_PACKAGE_NAME} ${DIR} 
-	
+build-s2i: ## builds docker using s2i tooling
+	@s2i build . registry.access.redhat.com/devtools/go-toolset-7-rhel7:latest github.com/matihost/learning/go/cmd/language:latest -e IMPORT_URL=github.com/matihost/learning/go -e INSTALL_URL=github.com/matihost/learning/go/cmd/language --loglevel 5 -c
 
-prepare-independent-workspace: clean-independent-before
-	mkdir -p ${TEMP_GO_PATH}/src/${PROJECT} && \
-	cd ${TEMP_GO_PATH}/src/${PROJECT} && \
-	ln -s ${DIR} ${REPOSITORY} 
-
-clean-independent-before clean-independent-after:
-	rm -rf ${TEMP_GO_PATH}
-
-build-docker:
-	docker build -t github.com/matihost/learning/go/cmd/language:latest .
-
-run-docker:
-	docker run -it --rm github.com/matihost/learning/go/cmd/language:latest
-
-build-s2i:
-	s2i build . registry.access.redhat.com/devtools/go-toolset-7-rhel7:latest github.com/matihost/learning/go/cmd/language:latest -e IMPORT_URL=github.com/matihost/learning/go -e INSTALL_URL=github.com/matihost/learning/go/cmd/language --loglevel 5 -c
-
-.PHONY: build prepare-gopath clean ensure-dep init-dep clean-independent-before clean-independent-after build-s2i run-docker build-docker
+help: ## show usage and tasks (default)
+	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
+.DEFAULT_GOAL := help
+.PHONY: help build prepare-gopath clean ensure-dep init-dep clean-independent-before clean-independent-after build-s2i run-docker build-docker
 
 
 
