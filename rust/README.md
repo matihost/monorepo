@@ -17,6 +17,9 @@ curl https://sh.rustup.rs -sSf | sh
 
 cd guessing_game
 
+# build
 make build
 
+# run application
+make run
 ```

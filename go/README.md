@@ -82,27 +82,22 @@ go get github.com/matihost/learning/go/cmd/http-server
 ## Building from code
 
 ```bash
+
 # will make symbolic lint in current GOPATH  so that the source code can be cloned into whatever localization on disk
 # Compiled application will land is root source code directory
 make build
 
+# to remove vendor directory adn compiled application
+make clean
+
 # dep tool ensure - run for example when program imports new libraries, or versions changes
-make ensure-dep
-
-# to init Dep vendor structure - needed only for new go programs
-make init-dep
-
-# build independently in temporary Go workspace
-# works like https://github.com/cloudflare/hellogopher
-# but I found it after I wrote this task
-make build-independently
+make get-dependencies
 
 # to build application packaged as Docker
 make build-docker
 
 # to run application Docker container from previously created Docker image
 make run-docker
-
 
 # to build image using S2I : https://github.com/openshift/source-to-image approach
 # resulting Docker image tag is the same and `make run-docker` can be used to run application

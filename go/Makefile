@@ -6,32 +6,28 @@ DIR := $(shell pwd )
 GOPATH := $(shell go env GOPATH)
 TEMP_GO_PATH := ${DIR}/.build-workspace
 
-build: ## build app language, assumes  'make init' has been previously run
-	@cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \
-	(ls vendor >/dev/null 2>&1 || ${MAKE} get-dependencies) && \
+#TODO  build all packages within 'cmd' package
+build:  ## build app language
+	@(ls vendor >/dev/null 2>&1 || ${MAKE} get-dependencies) && \
+	cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \
 	cd cmd/${CMD_PACKAGE_NAME} && \
 	go build && \
 	mv ${CMD_PACKAGE_NAME} ${DIR} && \
 	echo "Application ${CMD_PACKAGE_NAME} has been build"
 
-get-dependencies: ## download dependencies to vendor using dep tool
+get-dependencies: prepare-gopath ## download dependencies to vendor using dep tool
 	@cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \
+	(ls Gopkg.toml >/dev/null 2>&1 || dep init) && \
 	dep ensure -update
 
 get-dependencies-to-gopath: ## download dependencies to GOPATH, old style, works when vendor directory is empty
 	cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \
 	go get -v ./...	
-	
-
-init: prepare-gopath ## populates GOPATH with this project and inialize deb files if not present, follows https://golang.org/cmd/go/#hdr-Vendor_Directories vendoring
-	@cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \
-	dep init
 
 clean: ## removes compiled application and vendor directory
 	@rm -rf ${DIR}/${CMD_PACKAGE_NAME} && rm -rf vendor
 
-
-prepare-gopath: ## populates GOPATH with this project, removes previos GOPATH reference
+prepare-gopath: ## populates GOPATH with this project, removes previous GOPATH reference
 	@mkdir -p ${GOPATH}/src/${PROJECT} && \
 	cd ${GOPATH}/src/${PROJECT} && \
 	(rm -f ${REPOSITORY} && ln -s ${DIR} ${REPOSITORY})
