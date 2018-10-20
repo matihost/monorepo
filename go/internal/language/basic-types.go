@@ -95,4 +95,8 @@ func ShowBasicTypes() {
 	fmt.Printf("%#v\n", runes)         // []int32{97, 98, 322}
 	fmt.Printf("%+q\n", runes)         // ['a' 'b' '\u0142']
 	fmt.Printf("%#v\n", string(runes)) // "abł"
+
+	// floats
+	one, two, three := 0.1, 0.2, 0.3 
+	fmt.Println(one+two > three)
 }
