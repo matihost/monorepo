@@ -1,6 +1,6 @@
 # Learning
 
-[![License](https://img.shields.io/github/license/matihost/learning.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
+[![License](https://img.shields.io/github/license/matihost/learning.svg)](https://opensource.org/licenses/MIT)
 
 Various technology code, snippets, home tools.
 
