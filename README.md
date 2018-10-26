@@ -4,6 +4,7 @@
 
 Various technology code, snippets, home tools.
 
+* [Algorithms](algorithms/project-euler)
 * [Ansible](ansible)
 * [Go](go)
 * [Rust](rust)

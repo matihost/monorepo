@@ -1,6 +1,7 @@
 # Tools
 .vscode
 idea
+*.iml
 
 # Build files
 .build-workspace
@@ -15,7 +16,6 @@ vendor
 *.dll
 *.so
 *.dylib
-main
 
 # Test binary, build with `go test -c`
 *.test

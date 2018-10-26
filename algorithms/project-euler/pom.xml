@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.matihost.algorithms</groupId>
+  <artifactId>project-euler</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <description>The http://projecteuler.net algorithms</description>
+  <url>https://github.com/matihost/learning/algorithms</url>
+
+  <issueManagement>
+    <url>https://github.com/matihost/learning/issues</url>
+    <system>GitHub Issues</system>
+  </issueManagement>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>https://github.com/matihost/learning</url>
+    <connection>scm:git:git://github.com/matihost/learning.git</connection>
+    <developerConnection>scm:git:git@github.com:matihost/learning.git</developerConnection>
+  </scm>
+
+  <properties>
+    <java.version>11</java.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+</project>
