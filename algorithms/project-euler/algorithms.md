@@ -4,7 +4,7 @@
 
 * 1 is not a prime.
 * All primes except 2 are odd.
-* All primes greater than 3 can be written in the form $6k+/-1$.
+* All primes greater than 3 can be written in the form $$6k+/-1$$.
 * Any number n can have only one prime factor greater than sqrt(n) .
 * The consequence for primality testing of a number n is: if we cannot find a number f less than or equal $\sqrt{n}$ that divides $n$ then $n$ is prime: the only prime factor of $n$ is $n$ itself.
 
