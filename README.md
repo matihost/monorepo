@@ -7,5 +7,6 @@ Various technology code, snippets, home tools.
 * [Algorithms](algorithms/project-euler)
 * [Ansible](ansible)
 * [Go](go)
+* [Java](java)
 * [Rust](rust)
 * [OpenShift](openshift)

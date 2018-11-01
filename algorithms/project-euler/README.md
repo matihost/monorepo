@@ -5,9 +5,9 @@ Project Euler algorithms [description](algorithms.md).
 ## Prerequisites
 
 ```bash
-
-# jdk 11
+# Ubuntu JDK 11
 sudo apt install openjdk-11-jdk
+sudo apt install openjdk-11-source
 
 # maven (via sdkman)
 curl -s "https://get.sdkman.io" | bash
