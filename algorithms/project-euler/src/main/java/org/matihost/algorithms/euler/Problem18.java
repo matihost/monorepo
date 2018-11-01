@@ -51,13 +51,13 @@ public class Problem18 {
           {2,4,6},
          {8,5,9,3}
         };
-        int [][] sampleAfter=
-                {
-                        {3},
-                        {10,7},
-                        {12,14,13},
-                       {22,19,23,16}
-                };
+        // int [][] sampleAfter=
+        //         {
+        //                 {3},
+        //                 {10,7},
+        //                 {12,14,13},
+        //                {22,19,23,16}
+        //         };
         System.out.println(maxPathLength(sample));
         int [][] graph= {
                 {75},

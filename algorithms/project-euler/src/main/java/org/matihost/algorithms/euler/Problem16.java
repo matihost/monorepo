@@ -1,7 +1,6 @@
 package org.matihost.algorithms.euler;
 
 import java.math.BigInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
 

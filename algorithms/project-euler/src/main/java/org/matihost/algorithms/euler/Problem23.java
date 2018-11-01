@@ -18,15 +18,15 @@ import static org.matihost.algorithms.euler.Problem21.*;
  */
 public class Problem23 {
 
-    private static boolean [] abudantTable(int maxNumber){
-        boolean [] abudantTable = new boolean[maxNumber];
-        for (int i = 11; i <maxNumber; i++) {
-            if (sum(divisors(i+1)) > i + 1){
-                abudantTable[i] = true;
-            }
-        }
-        return abudantTable;
-    }
+    // private static boolean [] abudantTable(int maxNumber){
+    //     boolean [] abudantTable = new boolean[maxNumber];
+    //     for (int i = 11; i <maxNumber; i++) {
+    //         if (sum(divisors(i+1)) > i + 1){
+    //             abudantTable[i] = true;
+    //         }
+    //     }
+    //     return abudantTable;
+    // }
 
 
     private static boolean [] abudantSums(int maxNumber) {
