@@ -1,4 +1,4 @@
-# OKD 3.10 installation
+# OKD 3.11 installation
 
 Instruction how to setup OKD cluster on single Linux based host with VirtualBox with 3 VMs.
 
