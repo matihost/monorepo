@@ -1,4 +1,4 @@
-package org.matihost.learning.java;
+package org.matihost.learning.java.beans;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

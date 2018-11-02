@@ -3,6 +3,7 @@ package org.matihost.learning.java.handlers;
 import org.matihost.learning.java.utils.NBPExchangeRate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
 
@@ -19,11 +20,14 @@ import static org.matihost.learning.java.utils.Utils.getArg;
 public class ExchangeRate implements Consumer<ApplicationArguments> {
   private static Logger logger = LoggerFactory.getLogger(ExchangeRate.class);
 
+  @Autowired
+  private NBPExchangeRate nbpEchangeRate;
+
   @Override
   public void accept(ApplicationArguments appArgs) {
     Currency targetCurrency = Currency.getInstance(getArg(appArgs, "currency", "USD"));
 
-    var plnExchangeRate = NBPExchangeRate.getExchangeRateInPLN(targetCurrency);
+    var plnExchangeRate = nbpEchangeRate.getExchangeRateToPLN(targetCurrency);
 
     logger.info(format("Exchange rate:  1 %s =  %.4f PLN", targetCurrency.getCurrencyCode(), plnExchangeRate));
   }

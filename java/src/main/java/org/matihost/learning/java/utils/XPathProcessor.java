@@ -1,11 +1,11 @@
 package org.matihost.learning.java.utils;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.namespace.QName;
 import javax.xml.xpath.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,7 +56,7 @@ public class XPathProcessor {
     xPath.setXPathVariableResolver(new MapVariableResolver());
     try {
       this.xPathExpression = xPath.compile(expression);
-    } catch (XPathExpressionException e) {
+    } catch (Exception e) {
       throw new RuntimeException(String.format("Unable to create XPath expression from '%s'", expression), e);
     }
   }
@@ -71,7 +71,7 @@ public class XPathProcessor {
       resultType = XPathConstants.NUMBER;
     } else if (Node.class.isAssignableFrom(type)) {
       resultType = XPathConstants.NODE;
-    } else if (List.class.isAssignableFrom(type)) {
+    } else if (NodeList.class.isAssignableFrom(type)) {
       resultType = XPathConstants.NODESET;
     } else {
       throw new XPathExpressionException("Incompatible xPath result type: " + type);
