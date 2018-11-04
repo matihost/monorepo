@@ -7,20 +7,21 @@
   <artifactId>java</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
-
   <name>java</name>
-  <description>Demo project for Spring Boot</description>
 
-  <parent>
+  <description>Spring Boot 2 Java Learning App</description>
+
+  <!-- use parent from Spring Boot -->
+  <!--parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>2.1.0.RELEASE</version>
     <relativePath/>
-    <!-- lookup parent from repository -->
-  </parent>
+  </parent-->
 
   <properties>
     <java.version>11</java.version>
+    <spring.boot.version>2.1.0.RELEASE</spring.boot.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -50,7 +51,7 @@
       <artifactId>junit-jupiter-params</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- In order to Surefire run JUnit4 tests using JUnit 5 engine -->
+    <!-- In order to Surefire could run JUnit4 tests using JUnit 5 engine -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-migrationsupport</artifactId>
@@ -85,6 +86,18 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <!--
+        Needed only when Spring Boot is not parent pom
+        https://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-maven-plugin.html#build-tool-plugins-include-maven-plugin
+        Spring Boot creates executable jar during repackage goal
+        -->
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <!-- Spring Boot Actuator displays build-related information if a git.properties
         file is present at the classpath -->
@@ -108,4 +121,20 @@
       </plugin>
     </plugins>
   </build>
+
+  <dependencyManagement>
+    <dependencies>
+      <!--
+      Needed only when Spring Boot is not parent pom
+      https://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-build-systems.html#using-boot-maven-without-a-parent
+      -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring.boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>
