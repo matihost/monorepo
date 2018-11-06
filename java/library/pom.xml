@@ -12,4 +12,7 @@
   <packaging>pom</packaging>
   <name>library</name>
 
+  <modules>
+    <module>groovy-samples</module>
+  </modules>
 </project>

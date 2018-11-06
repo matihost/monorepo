@@ -2,7 +2,6 @@ package org.matihost.learning.java.handlers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport;
 import org.matihost.junit5.extensions.OutputCaptureExtension;
 import org.matihost.learning.java.utils.NBPExchangeRate;
 import org.mockito.InjectMocks;
@@ -20,7 +19,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@EnableRuleMigrationSupport
 @ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 class ExchangeRateTest {
 
@@ -32,7 +30,7 @@ class ExchangeRateTest {
 
 
   @Test
-  void accept() {
+  void shouldReturnExchangeRateForDollar() {
     // given
     String targetCurrency = "USD";
     BigDecimal exchangeRate = BigDecimal.TEN;
