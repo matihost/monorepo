@@ -17,13 +17,24 @@
 
   <properties>
     <java.version>11</java.version>
-    <groovy.version>2.5.3</groovy.version>
-    <spring.boot.version>2.1.0.RELEASE</spring.boot.version>
-    <spock.version>1.2-groovy-2.5</spock.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
+
+    <spring.boot.version>2.1.0.RELEASE</spring.boot.version>
+
+    <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <!-- Groovy -->
+    <groovy.version>2.5.3</groovy.version>
+    <spock.version>1.2-groovy-2.5</spock.version>
+
+    <!-- Scala -->
+    <scala.compat.version>2.12</scala.compat.version>
+    <scala.version>${scala.compat.version}.7</scala.version>
+    <scala.spec2.version>4.2.0</scala.spec2.version>
+    <scala.test.version>3.0.5</scala.test.version>
   </properties>
 
   <dependencies>
@@ -70,6 +81,8 @@
   </dependencies>
 
   <build>
+    <!--<sourceDirectory>src/main/scala</sourceDirectory>-->
+    <!--<testSourceDirectory>src/test/scala</testSourceDirectory>-->
     <plugins>
       <plugin>
         <groupId>pl.project13.maven</groupId>
@@ -139,6 +152,46 @@
           </executions>
         </plugin>
 
+        <!-- Scala -->
+        <plugin>
+          <groupId>net.alchim31.maven</groupId>
+          <artifactId>scala-maven-plugin</artifactId>
+          <version>3.4.4</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>compile</goal>
+                <goal>testCompile</goal>
+              </goals>
+              <configuration>
+                <args>
+                  <arg>-dependencyfile</arg>
+                  <arg>${project.build.directory}/.scala_dependencies</arg>
+                </args>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <!-- Scalatest Maven plugin requires Surefire to be turned off  in the scala project-->
+        <plugin>
+          <groupId>org.scalatest</groupId>
+          <artifactId>scalatest-maven-plugin</artifactId>
+          <version>2.0.0</version>
+          <configuration>
+            <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+            <junitxml>.</junitxml>
+            <filereports>TestSuiteReport.txt</filereports>
+          </configuration>
+          <executions>
+            <execution>
+              <id>test</id>
+              <goals>
+                <goal>test</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
         <!-- To enforce Maven version, the prerequisites tag no works in mvn 3 https://maven.apache.org/pom.html#Prerequisites -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -185,7 +238,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>2.22.1</version>
+          <version>3.0.0-M1</version>
           <configuration>
             <!-- To mitigate Jigsaw warnings from heavily using reflection groovy -->
             <argLine>
@@ -236,6 +289,7 @@
         <scope>import</scope>
       </dependency>
 
+      <!-- Groovy -->
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-all</artifactId>
@@ -246,6 +300,32 @@
         <groupId>org.spockframework</groupId>
         <artifactId>spock-core</artifactId>
         <version>${spock.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <!-- Scala -->
+      <dependency>
+        <groupId>org.scala-lang</groupId>
+        <artifactId>scala-library</artifactId>
+        <version>${scala.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest_${scala.compat.version}</artifactId>
+        <version>${scala.test.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.specs2</groupId>
+        <artifactId>specs2-core_${scala.compat.version}</artifactId>
+        <version>${scala.spec2.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.specs2</groupId>
+        <artifactId>specs2-junit_${scala.compat.version}</artifactId>
+        <version>${scala.spec2.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
