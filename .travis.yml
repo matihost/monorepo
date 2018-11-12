@@ -1,0 +1,14 @@
+---
+branches:
+  only:
+  - master
+
+jobs:
+  include:
+  - stage: build
+    language: java
+    jdk: openjdk11
+    before_script: cd java
+  - language: java
+    jdk: openjdk11
+    before_script: cd algorithms/project-euler
