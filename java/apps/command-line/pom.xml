@@ -10,7 +10,7 @@
   </parent>
   <artifactId>command-line</artifactId>
   <packaging>jar</packaging>
-  <name>command-line</name>
+  <name>${project.artifactId}</name>
 
   <!-- use parent from Spring Boot -->
   <!--parent>

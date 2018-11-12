@@ -9,11 +9,10 @@ class NBPExchangeRateTest extends Specification {
     expect:
     exchangeRates.getExchangeRateToPLN(currency) < exchangeRate
 
-    //https://github.com/spockframework/spock/issues/911 spock 2.5.3 doesn't like long nor bigdecimal constants
     where:
     currency | exchangeRate
-    "USD"    | 3.99d
-    "EUR"    | 4.99d
+    "USD"    | 4.99
+    "EUR"    | 5.99
   }
 
 }
