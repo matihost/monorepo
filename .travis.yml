@@ -1,8 +1,11 @@
 ---
+sudo: false
 branches:
   only:
   - master
-
+cache:
+  directories:
+  - $HOME/.m2
 jobs:
   include:
   - stage: build
