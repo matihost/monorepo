@@ -36,4 +36,4 @@ jobs:
     - ./language
     cache:
       directories:
-      - $TRAVIS_BUILD_DIR/vendor
+      - $TRAVIS_BUILD_DIR/go/vendor
