@@ -25,3 +25,10 @@ jobs:
   - language: rust
     before_script: cd rust/guessing_game
     cache: cargo
+  - language: go
+    go: "1.11"
+    before_script: cd go
+    go_import_path: github.com/matihost/learning/go
+    script:
+    - go build github.com/matihost/learning/go/cmd/http-server
+    - go build github.com/matihost/learning/go/cmd/language
