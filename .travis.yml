@@ -27,7 +27,8 @@ jobs:
     cache: cargo
   - language: go
     go: "1.11"
-    before_script: cd go
+    before_install: cd go
     script:
     - go build github.com/matihost/learning/go/cmd/http-server
     - go build github.com/matihost/learning/go/cmd/language
+    - ./language
