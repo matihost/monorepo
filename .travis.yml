@@ -3,15 +3,25 @@ sudo: false
 branches:
   only:
   - master
-cache:
-  directories:
-  - $HOME/.m2
 jobs:
   include:
   - stage: build
     language: java
     jdk: openjdk11
     before_script: cd java
+    cache:
+      directories:
+      - $HOME/.m2
+    env:
+    - CACHE=java
   - language: java
     jdk: openjdk11
     before_script: cd algorithms/project-euler
+    cache:
+      directories:
+      - $HOME/.m2
+    env:
+    - CACHE="algorithms/project-euler"
+  - language: rust
+    before_script: cd rust/guessing_game
+    cache: cargo
