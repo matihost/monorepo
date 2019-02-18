@@ -1,0 +1,30 @@
+---
+- hosts: local
+  gather_facts: false
+  tasks:
+    - set_fact:
+        dictionaries:
+          books:
+            valid-k8s-name:
+              title: valid k8s name
+              author: matihost
+            some_valid_ansible_key:
+              title: Valid_ansible_key
+              author: cat
+
+    - name: Show all dictionaries
+      debug:
+        msg: "{{ dictionaries }}"
+
+    - set_fact:
+        some_books: "{{ dictionaries.books }}"
+
+    - name: Show books
+      debug:
+        msg: "{{ some_books }}"
+
+    - name: Show all books
+      include_role:
+        name: show-books
+      vars:
+        books: "{{ some_books }}"

@@ -1,0 +1,7 @@
+<books>
+{% for book in books|dict2items %}
+  <book isbn="{{ book.key }}" author="{{ book.value.author }}">
+    {{ book.value.title }}
+  </book>
+{% endfor %}
+</books>
