@@ -13,7 +13,13 @@ build:  ## build app language
 	cd cmd/${CMD_PACKAGE_NAME} && \
 	go build && \
 	mv ${CMD_PACKAGE_NAME} ${DIR} && \
+	cd ${DIR} && ${MAKE} test && \
 	echo "Application ${CMD_PACKAGE_NAME} has been build"
+	
+
+test:  ## run go tests
+	@cd ${GOPATH}/src/${PROJECT}/${REPOSITORY}/pkg/language && \
+	go test
 
 get-dependencies: prepare-gopath ## download dependencies to vendor using dep tool
 	@cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \

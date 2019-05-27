@@ -94,6 +94,9 @@ make build
 # to remove vendor directory adn compiled application
 make clean
 
+# run go tests
+make test
+
 # dep tool ensure - run for example when program imports new libraries, or versions changes
 make get-dependencies
 
