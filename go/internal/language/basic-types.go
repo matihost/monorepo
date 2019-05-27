@@ -37,6 +37,7 @@ package language
 
 import (
 	"fmt"
+	"strings"
 )
 
 // ShowBasicTypes - show basic type operations
@@ -90,11 +91,27 @@ func ShowBasicTypes() {
 	fmt.Printf("%#v\n", bytes) // []byte{0x61, 0x62, 0xc5, 0x82}
 	fmt.Printf("%#v\n", text)  // "abł"
 
+	// inline multiline strings
+	clob := `
+	<sizes>
+		<size type="ala ma kota">small</size>
+		<size>regular</size>
+		<size>large</size>
+		<size>unrecognized</size>
+		<size>small</size>
+		<size>normal</size>
+		<size>small</size>
+		<size>large</size>
+	</sizes>
+	`
+
 	// 3 characters string is ... 3 character aka runes slice
 	runes := []rune("abł")
 	fmt.Printf("%#v\n", runes)         // []int32{97, 98, 322}
 	fmt.Printf("%+q\n", runes)         // ['a' 'b' '\u0142']
 	fmt.Printf("%#v\n", string(runes)) // "abł"
+
+	fmt.Println(strings.TrimSpace(clob)) // "<sizes>..."
 
 	// floats
 	one, two, three := 0.1, 0.2, 0.3
