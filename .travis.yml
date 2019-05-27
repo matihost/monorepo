@@ -26,7 +26,7 @@ jobs:
     before_script: cd rust/guessing_game
     cache: cargo
   - language: go
-    go: "1.11"
+    go: "1.12"
     before_install: cd go
     install:
     - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh

@@ -1,5 +1,5 @@
 # for Docker >= 17.5, it uses multistage build
-FROM golang:1.11 as builder
+FROM golang:1.12 as builder
 WORKDIR /go/src/github.com/matihost/learning/go
 COPY . .
 WORKDIR cmd/language

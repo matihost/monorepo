@@ -9,17 +9,21 @@ Directories and files:  `Gopkg.toml`, `Gopkg.lock`, and `vendor/` are generated 
 
 ## Prerequisites
 
-Go lang 1.10.x+
+Go lang 1.12.x+
 
 Ubuntu
 
 ```bash
-sudo apt install golang-go
+sudo apt-get install golang-1.12
 sudo apt install golang-golang-x-tools
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+
+# install golang and dep tools from Ubuntu packages (older)
+#sudo apt install golang-go
+#sudo apt-get install go-dep
 ```
 
-RHEL 7.x:
+CentOS/RHEL 7.x:
 
 ```bash
 sudo yum --disablerepo=* --enablerepo=rhel-7-server-optional-rpms install golang
