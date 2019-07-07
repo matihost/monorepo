@@ -14,6 +14,9 @@ show-dependency-resolve: ## show Maven dependencies versions
 show-effective-pom: ## show Maven effective pom
 	mvn help:effective-pom
 
+show-enforcer-info: ## show Maven enforcer plugin display info
+	mvn -T1 enforcer:display-info
+
 build: ## builds the project
 	mvn clean install
 

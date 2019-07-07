@@ -30,6 +30,7 @@
 
   <properties>
     <java.version>11</java.version>
+    <enforce.maven.version>3.6</enforce.maven.version>
     <maven.compiler.release>${java.version}</maven.compiler.release>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -46,9 +47,27 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
       </plugin>
+      <plugin>
+        <groupId>org.sonatype.ossindex.maven</groupId>
+        <artifactId>ossindex-maven-plugin</artifactId>
+      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.sonatype.ossindex.maven</groupId>
+          <artifactId>ossindex-maven-plugin</artifactId>
+          <version>3.0.4</version>
+          <executions>
+            <execution>
+              <id>audit-dependencies</id>
+              <phase>validate</phase>
+              <goals>
+                <goal>audit</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
         <!-- To enforce Maven version, the prerequisites tag no works in mvn 3 https://maven.apache.org/pom.html#Prerequisites -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -62,9 +81,18 @@
               </goals>
               <configuration>
                 <rules>
+                  <dependencyConvergence/>
                   <requireMavenVersion>
-                    <version>3.5</version>
+                    <version>${enforce.maven.version}</version>
                   </requireMavenVersion>
+                  <requireReleaseDeps>
+                    <message>No Snapshots Allowed</message>
+                    <failWhenParentIsSnapshot>fail</failWhenParentIsSnapshot>
+                  </requireReleaseDeps>
+                  <reactorModuleConvergence>
+                    <message>The reactor is not valid</message>
+                    <ignoreModuleDependencies>true</ignoreModuleDependencies>
+                  </reactorModuleConvergence>
                 </rules>
               </configuration>
             </execution>
