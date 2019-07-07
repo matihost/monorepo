@@ -1,3 +1,4 @@
+---
 all:
   children:
     local:
@@ -5,4 +6,6 @@ all:
         localhost:
       vars:
         update_cache_timeout: 300
-
+        systemd_journal:
+          max_size: 1G
+          max_duration: 10days

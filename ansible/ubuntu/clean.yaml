@@ -1,0 +1,36 @@
+---
+- hosts: local
+  tasks:
+    - name: Clean /var/log rotated logs and dist upgrade logs
+      shell: 
+        find /var/log -type f -regex ".*\.gz$" -delete -print && \
+        find /var/log -type f -regex ".*\.[0-9]$" -delete -print && \
+        for i in `find /var/log/dist-upgrade -mindepth 1 -type d` ; do echo $i && rm -rf $i; done
+      register: log_clean
+      changed_when: log_clean.stdout
+      
+      #TODO ensure SystemMaxUse=1G RuntimeMaxUse=1G are set in /etc/systemd/journald.conf 
+    - name: Clean systemd journal /var/log/journal logs
+      shell: 
+        journalctl --vacuum-size={{ systemd_journal.max_size }} --vacuum-time={{ systemd_journal.max_duration }} --rotate
+      register: journal_clean
+      changed_when: not(journal_clean.stderr is search('freed 0B'))
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: "{{ update_cache_timeout }}"
+    - name: Remove dependencies that are no longer required
+      apt:     
+        autoremove: yes
+        force_apt_get: yes
+    - name: Remove useless packages from the cache
+      apt:
+        autoclean: yes
+        force_apt_get: yes
+    - name: Clean apt-get
+      shell: 
+        apt-get clean
+      args:
+        warn: false 
+      register: apt_clean_result
+      changed_when: apt_clean_result.stdout
