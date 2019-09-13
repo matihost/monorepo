@@ -36,12 +36,15 @@
     - name: Remove useless packages from the cache from RHEL based system
       shell:
         yum clean all
+      args:
+        warn: false 
       register: yum_result
       changed_when: '"0 files removed" not in yum_result.stdout'
     when: ansible_os_family == "RedHat"
 
   - name: Check whether snap is present on the machine
     shell: which snap
+    ignore_errors: true
     changed_when: false
     register: snap_presence
 

@@ -7,7 +7,7 @@
       shell: 
         journalctl --vacuum-size={{ systemd_journal.max_size }} --vacuum-time={{ systemd_journal.max_duration }} --rotate
       register: journal_clean
-      changed_when: not(journal_clean.stderr is search('freed 0B'))
+      changed_when: not(journal_clean.stderr is search('freed 0B')) or journal_clean.stdout != ""
     - block:
       - name: Update apt cache
         apt:
@@ -46,6 +46,8 @@
       - name: Remove useless packages from the cache from RHEL based system
         shell:
           yum clean all
+        args:
+          warn: false 
         register: yum_result
         changed_when: '"0 files removed" not in yum_result.stdout'
       when: ansible_os_family == "RedHat"
