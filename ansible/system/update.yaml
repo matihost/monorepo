@@ -1,0 +1,52 @@
+---
+- hosts: local
+  gather_facts: true
+  tasks:
+  - block:
+    - name: Update packages for Debian based distribution
+      apt:
+        name: "*"
+        state: latest
+        update_cache: yes
+        cache_valid_time: "{{ update_cache_timeout }}"
+        force_apt_get: yes
+    - name: Upgrade all packages to the latest version in Debian distribution
+      apt:
+        upgrade: dist
+        force_apt_get: yes
+    - name: Remove dependencies that are no longer required from Debian based system
+      apt:
+        autoremove: yes
+        force_apt_get: yes
+    - name: Remove useless packages from the cache from Debian based system
+      apt:
+        autoclean: yes
+        force_apt_get: yes
+    when: ansible_os_family == "Debian"
+
+  - block:
+    - name: Update packages for RHEL based distribution
+      yum:
+        name: "*"
+        update_cache: yes
+        state: latest
+    - name: Remove dependencies that are no longer required from RHEL based system
+      yum:
+        autoremove: yes
+    - name: Remove useless packages from the cache from RHEL based system
+      shell:
+        yum clean all
+      register: yum_result
+      changed_when: '"0 files removed" not in yum_result.stdout'
+    when: ansible_os_family == "RedHat"
+
+  - name: Check whether snap is present on the machine
+    shell: which snap
+    changed_when: false
+    register: snap_presence
+
+  - name: Update snap packages
+    shell: snap refresh
+    register: snap_result
+    changed_when: not(snap_result.stderr is search('All snaps up to date.'))
+    when: snap_presence.rc == 0
