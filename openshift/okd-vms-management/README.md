@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Ansible 2.6+
+- Ansible 2.8+
 - Pip
 - openshift pip module (k8s ansible module dependency)
 
