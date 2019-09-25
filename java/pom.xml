@@ -40,7 +40,7 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
-    <spring.boot.version>2.1.6.RELEASE</spring.boot.version>
+    <spring.boot.version>2.1.8.RELEASE</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -49,13 +49,14 @@
     <enforce.maven.version>3.5</enforce.maven.version>
 
     <!-- Groovy -->
-    <groovy.version>2.5.7</groovy.version>
+    <groovy.version>2.5.8</groovy.version>
     <spock.version>1.3-groovy-2.5</spock.version>
 
     <!-- Scala -->
     <scala.compat.version>2.13</scala.compat.version>
+    <!-- TODO https://github.com/sbt/zinc/issues/698  prevents from migration to Scala 2.13.1 -->
     <scala.version>${scala.compat.version}.0</scala.version>
-    <scala.spec2.version>4.6.0</scala.spec2.version>
+    <scala.spec2.version>4.7.1</scala.spec2.version>
     <scala.test.version>3.0.8</scala.test.version>
   </properties>
 
@@ -141,7 +142,7 @@
         <plugin>
           <groupId>pl.project13.maven</groupId>
           <artifactId>git-commit-id-plugin</artifactId>
-          <version>3.0.0</version>
+          <version>3.0.1</version>
           <executions>
             <execution>
               <goals>
@@ -163,7 +164,7 @@
         <plugin>
           <groupId>org.codehaus.gmavenplus</groupId>
           <artifactId>gmavenplus-plugin</artifactId>
-          <version>1.7.1</version>
+          <version>1.8.0</version>
           <executions>
             <execution>
               <goals>
@@ -180,7 +181,7 @@
         <plugin>
           <groupId>net.alchim31.maven</groupId>
           <artifactId>scala-maven-plugin</artifactId>
-          <version>4.1.0</version>
+          <version>4.2.0</version>
           <executions>
             <execution>
               <goals>
@@ -320,7 +321,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.7.1</version>
+          <version>3.8.2</version>
         </plugin>
       </plugins>
     </pluginManagement>
