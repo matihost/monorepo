@@ -8,7 +8,7 @@ jobs:
     language: java
     jdk: openjdk11
     before_script: cd java
-    script: mvn -T1 package
+    script: make build
     cache:
       directories:
       - $HOME/.m2
