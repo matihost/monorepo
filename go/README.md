@@ -23,11 +23,22 @@ curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 #sudo apt-get install go-dep
 ```
 
-CentOS/RHEL 7.x:
+CentOS/RHEL:
 
 ```bash
-sudo yum --disablerepo=* --enablerepo=rhel-7-server-optional-rpms install golang
+# CentOS / RHEL 7.x
+#sudo yum --disablerepo=* --enablerepo=rhel-7-server-optional-rpms install golang
+# CentOS / RHEL 8.x
+sudo yum module install go-toolset
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+```
+
+Podman
+
+CentOS / RHEL 8.x:
+
+```bash
+sudo yum module install container-tools
 ```
 
 Docker
@@ -38,14 +49,14 @@ Ubuntu:
 sudo apt install docker.io
 ```
 
-RHEL 7.x:
+CentOS /RHEL 7.x:
 
 ```bash
 sudo subscription-manager repos --enable=rhel-7-server-extras-rpms
 sudo yum install docker
 ```
 
-Configuring Docker:
+Configuring Docker (Ubuntu / CentOS /RHEL 7.x)
 
 ```bash
 cat << EOF | sudo tee /etc/docker/daemon.json > /dev/null
@@ -101,10 +112,10 @@ make test
 make get-dependencies
 
 # to build application packaged as Docker
-make build-docker
+make build-image
 
 # to run application Docker container from previously created Docker image
-make run-docker
+make run-container
 
 # to build image using S2I : https://github.com/openshift/source-to-image approach
 # resulting Docker image tag is the same and `make run-docker` can be used to run application

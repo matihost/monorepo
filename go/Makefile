@@ -38,11 +38,13 @@ prepare-gopath: ## populates GOPATH with this project, removes previous GOPATH r
 	cd ${GOPATH}/src/${PROJECT} && \
 	(rm -f ${REPOSITORY} && ln -s ${DIR} ${REPOSITORY})
 
-build-docker: ## builds docker image
-	@docker build -t github.com/matihost/learning/go/cmd/language:latest .
+DOCKER := $(shell which podman 2>/dev/null || echo docker)
 
-run-docker: ## run previous docker image
-	@docker run -it --rm github.com/matihost/learning/go/cmd/language:latest
+build-image: ## builds docker image
+	@$(DOCKER) build -t github.com/matihost/learning/go/cmd/language:latest .
+
+run-container: ## run docker image
+	@$(DOCKER) run -it --rm github.com/matihost/learning/go/cmd/language:latest
 
 build-s2i: ## builds docker using s2i tooling
 	@s2i build . registry.access.redhat.com/devtools/go-toolset-7-rhel7:latest github.com/matihost/learning/go/cmd/language:latest -e IMPORT_URL=github.com/matihost/learning/go -e INSTALL_URL=github.com/matihost/learning/go/cmd/language --loglevel 5 -c
@@ -50,7 +52,7 @@ build-s2i: ## builds docker using s2i tooling
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help build prepare-gopath clean ensure-dep init-dep clean-independent-before clean-independent-after build-s2i run-docker build-docker
+.PHONY: help build prepare-gopath clean ensure-dep init-dep clean-independent-before clean-independent-after build-s2i run-container build-image
 
 
 
