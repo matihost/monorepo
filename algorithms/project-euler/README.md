@@ -14,14 +14,25 @@ curl -s "https://get.sdkman.io" | bash
 source "/home/mati/.sdkman/bin/sdkman-init.sh"
 
 sdk i maven
+
+
+# asciidoctor plus diagram and pdf extensions
+sudo apt install ruby
+sudo gem install prawn asciidoctor asciidoctor-diagram rouge --user-install
+sudo gem install asciidoctor-pdf --pre --user-install
+
+# install mathematical and asciidoctor-mathematical
+sudo apt-get -qq -y install bison flex libffi-dev libxml2-dev libgdk-pixbuf2.0-dev libcairo2-dev libpango1.0-dev fonts-lyx cmake ruby-dev
+sudo gem install mathematical --user-install
+sudo gem install asciidoctor-mathematical --user-install
 ```
 
 ## Usage
 
 ```bash
 # build
-mvn clean install
+make build
 
-# run
-java -cp target/project-euler-1.0.0-SNAPSHOT.jar org.matihost.algorithms.euler.Problem1
+# run application for ProblemX 
+make Problem4
 ```

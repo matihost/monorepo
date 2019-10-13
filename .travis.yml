@@ -17,6 +17,7 @@ jobs:
   - language: java
     jdk: openjdk11
     before_script: cd algorithms/project-euler
+    script: make build
     cache:
       directories:
       - $HOME/.m2
