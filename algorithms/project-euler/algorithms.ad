@@ -8,6 +8,7 @@ matihost@github
 :data-uri:
 :imagesoutdir: target/generatedimages
 :stem: latexmath
+:toc: left
 
 http://projecteuler.net/[Project Euler] algorithms description implemented in https://github.com/matihost/learning/tree/master/algorithms/project-euler repository.
 
@@ -73,7 +74,7 @@ we know the remaining number is prime.
 Triangle number:
 stem:[1 + 2 + 3 + 4 + 5 + .. + n = \frac{n(n+1)}{2}]
 
-### Divisors
+## Divisors
 
 Any integer N can be expressed as follows:
 
@@ -92,7 +93,7 @@ stem:[D(28) = (2+1)*(1+1) = 3*2 = 6]
 A table of primes will be required to apply this relationship. The efficient preparation of a prime
 table is already covered in the overview for Problem 7 and will not be discussed here. Since the largest expected triangle number is within a 32-bit integer, a table containing primes up to 65500.
 
-### Pascal Triangle
+## Pascal Triangle
 
 ```
 1 1 1 1
