@@ -6,7 +6,7 @@ matihost@github
 :listing-caption: Listing
 :math:
 :data-uri:
-:imagesoutdir: target/generatedimages
+:imagesoutdir: target/generated-images
 :stem: latexmath
 :toc: left
 

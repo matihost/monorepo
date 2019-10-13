@@ -8,8 +8,7 @@ ALGORITHMS := $(shell ls src/main/java/org/matihost/algorithms/euler |cut -d'.' 
 ${ALGORITHMS}: ## run ProblemX
 	java -cp target/project-euler-1.0.0-SNAPSHOT.jar org.matihost.algorithms.euler.$@
 
-
-docs:
+docs: ## generate html/pdf from *.ad in target directory 
 	asciidoctor -r asciidoctor-diagram,asciidoctor-mathematical -b html -D target *.ad
 	asciidoctor -r asciidoctor-pdf,asciidoctor-diagram,asciidoctor-mathematical -b pdf -D target *.ad
 

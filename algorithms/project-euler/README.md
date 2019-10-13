@@ -51,4 +51,10 @@ make build
 
 # run application for ProblemX
 make Problem4
+
+# generate html/pdf from *.ad in target directory
+make docs
+
+# clean build artifacts
+make clean
 ```
