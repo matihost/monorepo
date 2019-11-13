@@ -1,0 +1,9 @@
+[fellows] 
+zenek
+wieloslaw[3:9].some.fm
+stefan[00:10]
+
+[fellows:vars] 
+server_address=some1.example.com 
+proxy_address=some2.atlanta.example.com 
+proxy_port=8080

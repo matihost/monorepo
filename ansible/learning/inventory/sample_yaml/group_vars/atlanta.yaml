@@ -1,0 +1,6 @@
+var1: value
+complex_var2:
+  property1: abc
+  table2:
+  - abc
+  - cba
