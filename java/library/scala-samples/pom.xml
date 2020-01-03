@@ -29,6 +29,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.scalatestplus</groupId>
+      <artifactId>junit-4-12_${scala.compat.version}</artifactId>
+      <version>${scala.test.plus.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.specs2</groupId>
       <artifactId>specs2-core_${scala.compat.version}</artifactId>
       <version>${scala.spec2.version}</version>
@@ -63,7 +69,8 @@
         <artifactId>scalatest-maven-plugin</artifactId>
         <configuration>
           <!-- Comma separated list of JUnit test class names to execute -->
-          <jUnitClasses>samples.AppTest</jUnitClasses>
+          <!-- TODO uncomment when   at org.scalatest.tools.Runner$.doRunRunRunDaDoRunRun(Runner.scala:1208) is fixed -->
+          <!--jUnitClasses>samples.AppTest</jUnitClasses-->
         </configuration>
       </plugin>
     </plugins>

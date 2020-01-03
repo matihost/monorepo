@@ -50,13 +50,13 @@ class StackSuite extends Assertions {
 /*
 Here's an example of a FunSuite with Matchers mixed in:
 */
-import org.scalatest.FunSuite
-import org.scalatest.Matchers
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
-class ListSuite extends FunSuite with Matchers {
+class ListSuite extends AnyFunSuite with Matchers {
 
   test("An empty list should be empty") {
     List() should be ('empty)
@@ -84,9 +84,9 @@ A Map
 - should only contain keys and values that were added to it
 - should report its size as the number of key/value pairs it contains
 */
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
-class ExampleSpec extends FunSpec {
+class ExampleSpec extends AnyFunSpec {
 
   describe("An ArrayStack") {
 
