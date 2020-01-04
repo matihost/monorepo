@@ -1,0 +1,55 @@
+---
+- hosts: local
+  gather_facts: true
+  tasks:
+  # https://github.com/ansible/ansible/issues/48714 apt_repository module does not support standard repositories
+  - name: Ensure standard package repositories are present
+    shell: "add-apt-repository -yu {{ item.name }}"
+    changed_when: not(shell_out.stdout is search('enabled'))
+    register: shell_out
+    loop: "{{ repositories|selectattr('repo','undefined')|list }}"
+  - name: Ensure required external package repositories
+    apt_repository:
+      repo: "{{ item.repo }}"
+      update_cache: false 
+      filename: "{{ item.name }}"  
+    loop: "{{ repositories|selectattr('repo','defined')|list }}"
+
+  - name: Ensure required packages are latest 
+    apt:
+      name: "{{ packages }}"
+      state: latest
+      update_cache: true
+      cache_valid_time: "{{ update_cache_timeout }}"
+      force_apt_get: yes
+
+  - name: Install required snaps
+    snap:
+      name: "{{ snaps }}"
+  - name: Install required classic snaps
+    snap:
+      name: "{{ item }}"    
+      classic: true
+    loop: "{{ classic_snaps }}"
+  - name: Update snap packages
+    shell: snap refresh
+    register: snap_result
+    ignore_errors: true
+    changed_when: not(snap_result.stderr is search('All snaps up to date.'))
+
+  - block:
+    - name: Install user level CLIs
+      shell: "{{ item.command }}"
+      args:
+        warn: false
+        executable: /bin/bash
+      ignore_errors: true
+      loop: "{{ clis|selectattr('become','equalto',false)|list }}"
+    become: false
+  - name: Install root level CLIs
+    shell: "{{ item.command|quote }}"
+    args:
+      warn: false
+      executable: /bin/bash
+    ignore_errors: true
+    loop: "{{ clis|selectattr('become','equalto',true)|list }}"

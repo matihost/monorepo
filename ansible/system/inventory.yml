@@ -9,3 +9,56 @@ all:
         systemd_journal:
           max_size: 1G
           max_duration: 10days
+        repositories:
+          - name: universe
+          - name: multiverse
+          - name: vscode
+            repo: "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main"
+          - name: ansible
+            repo: "deb http://ppa.launchpad.net/ansible/ansible/ubuntu {{ ansible_distribution_release }} main"
+          - name: keepass
+            repo: "deb http://ppa.launchpad.net/jtaylor/keepass/ubuntu {{ ansible_distribution_release }} main"
+          - name: virtualbox
+            repo: "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian {{ ansible_distribution_release }} contrib"
+        packages:
+          - ubuntu-restricted-extras
+          - golang-1.13
+          - golang-golang-x-tools
+          - ansible
+          - ansible-lint
+          - python3-pip
+          - ruby
+          - openjdk-[8|11]-jdk
+          - openjdk-[8|11]-source
+          - dos2unix
+          - guake                    
+          - keepass2
+          - code
+          - youtube-dl
+          - onedrive
+          - nautilus-dropbox
+          - openssh-server
+          - iftop
+          - docker.io
+          - dosbox
+          - steam
+          - virtualbox-6.1
+          - virt-manager
+          - awscli
+        snaps:
+          - mc-installer
+          - minecraft-server-jdstrand
+        classic_snaps:
+          - google-cloud-sdk
+          - kubectl
+        clis:
+          - name: sdkman
+            become: false
+            command: |
+              curl -s "https://get.sdkman.io" | bash
+              bash -ic "sdk i java 8-openjdk /usr/lib/jvm/java-8-openjdk-amd64;\
+              sdk i java 11-openjdk /usr/lib/jvm/java-11-openjdk-amd64;\
+              sdk d java 11-openjdk;\
+              sdk i groovy;\
+              sdk i scala"
+              [ $(bash -ic "sdk c" |grep -cE 'groovy|maven|scala|java') -eq 4 ]

@@ -53,3 +53,14 @@
     register: snap_result
     changed_when: not(snap_result.stderr is search('All snaps up to date.'))
     when: snap_presence.rc == 0
+
+  - block:
+    - name: Update SDKMan and its installations
+      shell: "bash -ic 'sdk selfupdate && sdk update && sdk ug'"
+      register: sdk_result
+      ignore_errors: true
+      changed_when:  
+        - sdk_result.stdout is not regex('No update available at this time')
+        - sdk_result.stdout is not regex('No new candidates found at this time')
+    become: false
+    
