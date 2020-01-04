@@ -47,7 +47,7 @@ run-container: ## run docker image
 	@$(DOCKER) run -it --rm github.com/matihost/learning/go/cmd/language:latest
 
 build-s2i: ## builds docker using s2i tooling
-	@s2i build . registry.access.redhat.com/devtools/go-toolset-7-rhel7:latest github.com/matihost/learning/go/cmd/language:latest -e IMPORT_URL=github.com/matihost/learning/go -e INSTALL_URL=github.com/matihost/learning/go/cmd/language --loglevel 5 -c
+	@s2i build . registry.access.redhat.com/ubi8/go-toolset github.com/matihost/learning/go/cmd/language:latest -e IMPORT_URL=github.com/matihost/learning/go -e INSTALL_URL=github.com/matihost/learning/go/cmd/language --loglevel 5 -c
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
