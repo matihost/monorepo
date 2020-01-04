@@ -46,7 +46,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <enforce.maven.version>3.5</enforce.maven.version>
+    <enforce.maven.version>3.6</enforce.maven.version>
 
     <!-- Groovy -->
     <groovy.version>2.5.8</groovy.version>

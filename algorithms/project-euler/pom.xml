@@ -30,7 +30,6 @@
 
   <properties>
     <java.version>11</java.version>
-    <enforce.maven.version>3.5</enforce.maven.version>
     <maven.compiler.release>${java.version}</maven.compiler.release>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -38,6 +37,8 @@
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <enforce.maven.version>3.6</enforce.maven.version>
   </properties>
 
 
@@ -54,25 +55,11 @@
     </plugins>
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>org.sonatype.ossindex.maven</groupId>
-          <artifactId>ossindex-maven-plugin</artifactId>
-          <version>3.0.4</version>
-          <executions>
-            <execution>
-              <id>audit-dependencies</id>
-              <phase>validate</phase>
-              <goals>
-                <goal>audit</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
         <!-- To enforce Maven version, the prerequisites tag no works in mvn 3 https://maven.apache.org/pom.html#Prerequisites -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
-          <version>3.0.0-M2</version>
+          <version>3.0.0-M3</version>
           <executions>
             <execution>
               <id>enforce-maven</id>
@@ -99,6 +86,25 @@
           </executions>
         </plugin>
 
+        <!-- Audit a project dependencies using Sonatype OSS Index https://ossindex.sonatype.org -->
+        <plugin>
+          <groupId>org.sonatype.ossindex.maven</groupId>
+          <artifactId>ossindex-maven-plugin</artifactId>
+          <version>3.1.0</version>
+          <executions>
+            <execution>
+              <id>audit-dependencies</id>
+              <phase>validate</phase>
+              <goals>
+                <goal>audit</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <reportFile>${project.build.directory}/audit-report.json</reportFile>
+          </configuration>
+        </plugin>
+
         <!-- Explicit version for Maven Apache plugin, w/o it Maven uses the minimal versions -->
         <!-- When project takes parent form Spring Boot it is not necessary -->
         <!-- Versions can be taken from  mvn -T1 versions:display-plugin-updates -->
@@ -112,7 +118,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.22.2</version>
+          <version>3.0.0-M4</version>
           <configuration>
             <!-- To mitigate Jigsaw warnings from heavily using reflection groovy -->
             <argLine>
@@ -123,7 +129,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>3.0.0-M3</version>
+          <version>3.0.0-M4</version>
           <configuration>
             <!-- To mitigate Jigsaw warnings from heavily using reflection groovy -->
             <argLine>
@@ -149,11 +155,11 @@
         </plugin>
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.1.2</version>
+          <version>3.2.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.7.1</version>
+          <version>3.8.2</version>
         </plugin>
       </plugins>
     </pluginManagement>
