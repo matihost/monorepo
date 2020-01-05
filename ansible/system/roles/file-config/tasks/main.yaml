@@ -1,0 +1,26 @@
+---
+# Cannot be used for JSON configs
+# - Uses Ansible blockinfile module requires usage of markers while JSON files cannot accept comments
+# - Ansible proactively converts JSON like string to dict making multiline queries problematic for JSON files (https://stackoverflow.com/questions/41144922/ansible-passing-json-string-in-environment-to-shell-module)
+- name: Check file_config variable
+  fail:
+    msg: No file_config variable provided
+  when: file_config is not defined or file_config.content is not defined or file_config.file is not defined
+
+- name: Ensure {{ file_config.file }} content 
+  blockinfile:
+    path: "{{ file_config.file }}"
+    block: "{{ file_config.content }}"    
+    create: true
+  register: blockinfile_result
+
+
+- name: Run post file change command
+  shell: "{{ file_config.command }}"
+  register: cli_result
+  changed_when: cli_result.stdout
+  args:
+    warn: false
+    executable: /bin/bash
+  ignore_errors: true
+  when: file_config.command is defined and blockinfile_result.changed

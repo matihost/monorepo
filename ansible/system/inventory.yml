@@ -21,6 +21,7 @@ all:
           - name: virtualbox
             repo: "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian {{ ansible_distribution_release }} contrib"
         packages:
+          - dlocate
           - ubuntu-restricted-extras
           - golang-1.13
           - golang-golang-x-tools
@@ -28,10 +29,15 @@ all:
           - ansible-lint
           - python3-pip
           - ruby
-          - openjdk-[8|11]-jdk
-          - openjdk-[8|11]-source
+          - openjdk-8-jdk
+          - openjdk-8-source
+          - openjdk-11-jdk
+          - openjdk-11-source          
           - dos2unix
-          - guake                    
+          - guake
+          - mono-complete
+          - jq
+          - curl      
           - keepass2
           - code
           - youtube-dl
@@ -52,13 +58,65 @@ all:
           - google-cloud-sdk
           - kubectl
         clis:
+          - name: nss-order
+            become: true
+            command: |
+              sed -i -E "s/^hosts: .+$/hosts:          myhostname files mdns4_minimal [NOTFOUND=return] dns/" /etc/nsswitch.conf 
+          - name: docker-config
+            become: true
+            command: |
+              export DESIRED_DAEMON_CONFIG='{
+                "exec-opts": ["native.cgroupdriver=systemd"],
+                "log-driver": "json-file",
+                "log-opts": {
+                  "max-size": "100m"
+                },
+                "storage-driver": "overlay2",
+                "insecure-registries": [
+                  "192.168.0.0/16",
+                  "172.16.0.0/12",
+                  "10.0.0.0/8"
+                ]
+              }'
+              [ "$(grep -c systemd /etc/docker/daemon.json 2>/dev/null || echo 0)" -eq 1 ] || (\
+              echo -n "${DESIRED_DAEMON_CONFIG}" > /etc/docker/daemon.json; \
+              systemctl restart docker && \
+              systemctl is-enabled docker &>/dev/null || systemctl enable docker)
+
+              [ "$(grep -c systemd /etc/docker/daemon.json 2>/dev/null || echo 0)" -eq 1 ] && \
+              systemctl is-enabled docker &>/dev/null && systemctl is-active docker &>/dev/null
+          - name: python-alternatives
+            become: true
+            command: |
+              [ $(update-alternatives --display python 2>/dev/null |grep -c priority) -eq 2 ] || (\
+                update-alternatives --debug --install /usr/bin/python python /usr/bin/python3 10;\
+                update-alternatives --debug --install /usr/bin/python python /usr/bin/python2 11;\
+                update-alternatives --set python /usr/bin/python2)
+              [ $(update-alternatives --display python 2>/dev/null |grep -c priority) -eq 2 ]
+          - name: asciidoctor
+            become: false
+            command: |
+              [ $(gem list asciidoctor --no-verbose |grep -cE 'diagram|pdf') -eq 2 ] || (\
+                gem install prawn asciidoctor asciidoctor-diagram rouge --user-install && \
+                gem install asciidoctor-pdf --pre --user-install)
+              [ $(gem list asciidoctor --no-verbose |grep -cE 'diagram|pdf') -eq 2 ]
           - name: sdkman
             become: false
             command: |
+              [ $(bash -ic "sdk c 2>/dev/null" |grep -cE 'groovy|maven|scala|java') -eq 4 ] || (\
               curl -s "https://get.sdkman.io" | bash
               bash -ic "sdk i java 8-openjdk /usr/lib/jvm/java-8-openjdk-amd64;\
               sdk i java 11-openjdk /usr/lib/jvm/java-11-openjdk-amd64;\
               sdk d java 11-openjdk;\
+              sdk i maven;\
               sdk i groovy;\
-              sdk i scala"
-              [ $(bash -ic "sdk c" |grep -cE 'groovy|maven|scala|java') -eq 4 ]
+              sdk i scala")
+              [ $(bash -ic "sdk c 2>/dev/null" |grep -cE 'groovy|maven|scala|java') -eq 4 ]
+        files_config:
+          - file: /etc/gai.conf
+            content: |
+              precedence  ::1/128       50
+              precedence  ::/0          40
+              precedence  2002::/16     30
+              precedence ::/96          20
+              precedence ::ffff:0:0/96  100

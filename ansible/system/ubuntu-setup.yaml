@@ -37,19 +37,31 @@
     ignore_errors: true
     changed_when: not(snap_result.stderr is search('All snaps up to date.'))
 
+  - name: Install root level CLIs
+    shell: "{{ item.command }}"
+    register: cli_result
+    changed_when: cli_result.stdout
+    args:
+      warn: false
+      executable: /bin/bash
+    ignore_errors: true
+    loop: "{{ clis|selectattr('become','equalto',true)|list }}"
+
   - block:
     - name: Install user level CLIs
       shell: "{{ item.command }}"
+      register: cli_result
+      changed_when: cli_result.stdout
       args:
         warn: false
         executable: /bin/bash
       ignore_errors: true
       loop: "{{ clis|selectattr('become','equalto',false)|list }}"
     become: false
-  - name: Install root level CLIs
-    shell: "{{ item.command|quote }}"
-    args:
-      warn: false
-      executable: /bin/bash
-    ignore_errors: true
-    loop: "{{ clis|selectattr('become','equalto',true)|list }}"
+
+  - name: Ensure files config is desired
+    include_role:
+      name: file-config
+    vars:
+      file_config: "{{ item }}"
+    loop: "{{ files_config|default([])}}"
