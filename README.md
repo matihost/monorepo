@@ -10,4 +10,4 @@ Various technology code, snippets, home tools.
 * [Go](go)
 * [Java, Groovy, Scala](java)
 * [Rust](rust)
-* [OpenShift](openshift)
+* [K8S, OpenShift](k8s)
