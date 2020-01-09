@@ -26,6 +26,7 @@ if [[ "${OSTYPE}" =~ ^linux.*$ ]]; then
     sudo chmod -R a+rwx /etc/kubernetes && \
     minikube update-context &>/dev/null && \
     minikube addons enable registry && \
+    { minikube tunnel &>/tmp/minikube-tunnel.log & } && \
     echo "Minikube has been started"
   else
     echo "Minikube already started"

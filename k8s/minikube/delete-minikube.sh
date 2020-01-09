@@ -1,6 +1,10 @@
-K8S_CONTEXT=$(kubectl config current-context 2>/dev/null) 
+#!/usr/bin/env bash
+
+pkill -f 'minikube tunnel'
+minikube tunnel -c
+
 minikube delete 2>/dev/null 
-if [ "${K8S_CONTEXT}" = "minikube" ]; then 
+if [ "$(kubectl config current-context 2>/dev/null)" = "minikube" ]; then 
   kubectl config unset current-context &>/dev/null 
 fi 
 kubectl config delete-context minikube &>/dev/null 
