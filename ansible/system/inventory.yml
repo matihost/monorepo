@@ -20,6 +20,9 @@ all:
             repo: "deb http://ppa.launchpad.net/jtaylor/keepass/ubuntu {{ ansible_distribution_release }} main"
           - name: virtualbox
             repo: "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian {{ ansible_distribution_release }} contrib"
+          #TODO replace disco with `lsb_release -cs` when https://github.com/containers/libpod/issues/4769 is fixed
+          - name: project-atomic
+            repo: "deb http://ppa.launchpad.net/projectatomic/ppa/ubuntu disco main"            
         packages:
           - dlocate
           - ubuntu-restricted-extras
@@ -51,6 +54,10 @@ all:
           - virtualbox-6.1
           - virt-manager
           - awscli
+          #TODO update when https://github.com/cri-o/cri-o/issues/2963 fixed
+          - cri-o-1.15
+          - podman
+          - buildah
         snaps:
           - mc-installer
           - minecraft-server-jdstrand
@@ -112,6 +119,19 @@ all:
               sdk i groovy;\
               sdk i scala")
               [ $(bash -ic "sdk c 2>/dev/null" |grep -cE 'groovy|maven|scala|java') -eq 4 ]
+          #TODO remove when fixed https://github.com/cri-o/cri-o/issues/1767
+          - name: runc-fix
+            become: true
+            command: |
+              [ -e /usr/bin/runc ] || { ln -s /usr/sbin/runc /usr/bin/runc; echo "runc path fixed"; }
+          - name: crictl
+            become: false
+            command: |
+              [ -x /usr/local/bin/crictl ] || (\
+              VERSION="v1.17.0";\
+              wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz ;\
+              sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin;\
+              rm -f crictl-$VERSION-linux-amd64.tar.gz)
         files_config:
           - file: /etc/gai.conf
             content: |
