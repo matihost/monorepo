@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+[ "$(lsb_release -is 2>/dev/null || echo "non-ubuntu")" = 'Ubuntu' ] || { echo "Only Ubuntu supported";exit 1; }
+
 MINIKUBE_VERSION=1.6.2
 CRICTL_VERSION=v1.17.0
 CRIO_VERSION=1.15
@@ -9,8 +11,8 @@ function ensureMinikubePresent() {
 }
 
 function ensureDockerCGroupSystemD(){
-  CGROUP_DRIVER=`docker info -f {{.CgroupDriver}}`
-  [ "${CGROUP_DRIVER}" = "systemd" ] || { echo 'Docker cgroup-driver has to be systemd. Add "exec-opts": ["native.cgroupdriver=systemd"] to /etc/docker/daemon.json and restart docker service'; exit 1; }
+  CGROUP_DRIVER=`docker info -f {{.CgroupDriver}} 2>/dev/null || echo 'Docker not running?'`
+  [ "${CGROUP_DRIVER}" = "systemd" ] || { echo -e "Docker invalid status: ${CGROUP_DRIVER}.\nDocker has to be running and its cgroup-driver has to be systemd. Add "exec-opts": ["native.cgroupdriver=systemd"] to /etc/docker/daemon.json and restart docker service"; exit 1; }
 }
 
 function ensureCrioAndCrictlPresent(){
@@ -30,15 +32,26 @@ function ensureCrioAndCrictlPresent(){
   [ -e /usr/bin/runc ] || sudo ln -s /usr/sbin/runc /usr/bin/runc
 }
 
+function  ensureLocalMasqueradeRuleIsMissing(){
+  COUNTER=1
+  RC=1
+  while [ "$[COUNTER++]" -le 60 ] && [ ${RC} -ne 0 ]; do
+    sleep 1
+    sudo iptables -t nat -D POSTROUTING -s 127.0.0.0/8 -o lo -m comment --comment "SNAT for localhost access to hostports" -j MASQUERADE 2>/dev/null
+    RC=$?
+  done
+  [ "${RC}" -eq 0 ] || echo "Wrong iptable rule was not found during last ${COUNTER} seconds" && echo "Wrong iptables rule was removed"
+} 
+
 ensureMinikubePresent
 
 case "$1" in
    --with-crio|crio|c) 
    ensureCrioAndCrictlPresent
    EXTRA_PARAMS='--container-runtime=cri-o'
-   MORE='crio'
+   MODE='crio'
    ;; 
-   *) 
+   --with-docker|dockker|d|*) 
    ensureDockerCGroupSystemD
    EXTRA_PARAMS='--extra-config=kubelet.cgroup-driver=systemd'
    MODE='docker'
@@ -66,8 +79,7 @@ if [ $? -ne 0  ]; then
 
   # To avoid https://github.com/kubernetes/kubernetes/issues/66067 
   #TODO run it in background as it happens upon some static pod creation
-  sudo iptables -t nat -D POSTROUTING -s 127.0.0.0/8 -o lo -m comment --comment "SNAT for localhost access to hostports" -j MASQUERADE
-
+  [ "${MODE}" = "crio" ] && echo "Ensure breaking iptables rule is missing..." && ensureLocalMasqueradeRuleIsMissing
   sudo chmod -R a+rwx /etc/kubernetes && \
   minikube update-context &>/dev/null && \
   minikube addons enable registry && \
