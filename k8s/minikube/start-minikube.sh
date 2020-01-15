@@ -22,26 +22,20 @@ function ensureCrioAndCrictlPresent(){
   rm -f crictl-${CRICTL_VERSION}-linux-amd64.tar.gz)
 
 
-  #TODO replace disco with `lsb_release -cs` variable when https://github.com/containers/libpod/issues/4769 is fixed
+  #TODO bring back podman when https://github.com/containers/libpod/issues/4747 fixed
   [ -x /usr/bin/crio ] || (\
-    sudo add-apt-repository -y 'deb http://ppa.launchpad.net/projectatomic/ppa/ubuntu disco main';\
-    sudo apt-get install -y cri-o-${CRIO_VERSION} podman buildah
+    . /etc/os-release;\
+    sudo sh -c "echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x${NAME}_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list";\
+    wget -nv https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x${NAME}_${VERSION_ID}/Release.key -O Release.key;\
+    sudo apt-key add - < Release.key;\
+    rm Release.key;\
+    sudo apt-get update -qq;\
+    sudo apt-get install -y cri-o-${CRIO_VERSION} buildah;\
   )
 
   #TODO remove when fixed https://github.com/cri-o/cri-o/issues/1767
   [ -e /usr/bin/runc ] || sudo ln -s /usr/sbin/runc /usr/bin/runc
 }
-
-function  ensureLocalMasqueradeRuleIsMissing(){
-  COUNTER=1
-  RC=1
-  while [ "$[COUNTER++]" -le 60 ] && [ ${RC} -ne 0 ]; do
-    sleep 1
-    sudo iptables -t nat -D POSTROUTING -s 127.0.0.0/8 -o lo -m comment --comment "SNAT for localhost access to hostports" -j MASQUERADE 2>/dev/null
-    RC=$?
-  done
-  [ "${RC}" -eq 0 ] || echo "Wrong iptable rule was not found during last ${COUNTER} seconds" && echo "Wrong iptables rule was removed"
-} 
 
 ensureMinikubePresent
 
@@ -51,7 +45,7 @@ case "$1" in
    EXTRA_PARAMS='--container-runtime=cri-o'
    MODE='crio'
    ;; 
-   --with-docker|dockker|d|*) 
+   --with-docker|docker|d|*) 
    ensureDockerCGroupSystemD
    EXTRA_PARAMS='--extra-config=kubelet.cgroup-driver=systemd'
    MODE='docker'
@@ -72,14 +66,12 @@ if [ $? -ne 0  ]; then
   # With docker as continer runtime --extra-config=kubelet.cgroup-driver=systemd \
   # Added --extra-config=kubelet.resolv-conf=/run/systemd/resolve/resolv.conf due to  https://coredns.io/plugins/loop/
   # because under Ubuntu systemd-resolved service conflicts create a loop between CodeDNS and systemc DNS wrapper systemd-resolved.
+  # TODO replace usage of /run/systemd/resolve/resolv.conf with some temporary file withot any 127.0.0.x entries ,because CRC add dnsmasq
   sudo -E minikube start --vm-driver=none --apiserver-ips 127.0.0.1 --apiserver-name localhost \
     --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook" \
     --extra-config=kubelet.resolv-conf=/run/systemd/resolve/resolv.conf \
     ${EXTRA_PARAMS}
 
-  # To avoid https://github.com/kubernetes/kubernetes/issues/66067 
-  #TODO run it in background as it happens upon some static pod creation
-  [ "${MODE}" = "crio" ] && echo "Ensure breaking iptables rule is missing..." && ensureLocalMasqueradeRuleIsMissing
   sudo chmod -R a+rwx /etc/kubernetes && \
   minikube update-context &>/dev/null && \
   minikube addons enable registry && \
@@ -88,7 +80,6 @@ if [ $? -ne 0  ]; then
 else
   echo "Minikube already started"
 fi
-
 
 
 

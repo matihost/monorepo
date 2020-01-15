@@ -1,0 +1,25 @@
+---
+- name: Check file_config variable
+  fail:
+    msg: No file_config variable provided
+  when: apt_repo is not defined or apt_repo.name is not defined
+
+- name: Ensure apt key is present 
+  apt_key:
+    url: "{{ apt_repo.key_url }}"
+    state: present
+  when: apt_repo.key_url is defined and apt_repo.key_url
+
+# https://github.com/ansible/ansible/issues/48714 apt_repository module does not support standard repositories
+- name: Ensure {{ apt_repo.name }} is present as a standard package repository when it is standard repo
+  shell: "add-apt-repository -yu {{ apt_repo.name }}"
+  changed_when: not(shell_out.stdout is search('enabled'))
+  register: shell_out
+  when: apt_repo['repo'] is not defined
+
+- name: Ensure package {{ apt_repo.name }} repositories when is external
+  apt_repository:
+    repo: "{{ apt_repo.repo }}"
+    update_cache: false 
+    filename: "{{ apt_repo.name }}"
+  when: apt_repo.repo is defined and apt_repo.repo

@@ -2,18 +2,12 @@
 - hosts: local
   gather_facts: true
   tasks:
-  # https://github.com/ansible/ansible/issues/48714 apt_repository module does not support standard repositories
-  - name: Ensure standard package repositories are present
-    shell: "add-apt-repository -yu {{ item.name }}"
-    changed_when: not(shell_out.stdout is search('enabled'))
-    register: shell_out
-    loop: "{{ repositories|selectattr('repo','undefined')|list }}"
-  - name: Ensure required external package repositories
-    apt_repository:
-      repo: "{{ item.repo }}"
-      update_cache: false 
-      filename: "{{ item.name }}"  
-    loop: "{{ repositories|selectattr('repo','defined')|list }}"
+  - name: Ensure package repositories
+    include_role:
+      name: apt
+    vars:
+      apt_repo: "{{ item }}"
+    loop: "{{ repositories }}"
 
   - name: Ensure required packages are latest 
     apt:

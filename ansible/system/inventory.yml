@@ -20,9 +20,9 @@ all:
             repo: "deb http://ppa.launchpad.net/jtaylor/keepass/ubuntu {{ ansible_distribution_release }} main"
           - name: virtualbox
             repo: "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian {{ ansible_distribution_release }} contrib"
-          #TODO replace disco with `lsb_release -cs` when https://github.com/containers/libpod/issues/4769 is fixed
-          - name: project-atomic
-            repo: "deb http://ppa.launchpad.net/projectatomic/ppa/ubuntu disco main"            
+          - name: libcontainers
+            repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/ /"
+            key_url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/Release.key"
         packages:
           - dlocate
           - ubuntu-restricted-extras
@@ -54,9 +54,9 @@ all:
           - virtualbox-6.1
           - virt-manager
           - awscli
-          #TODO update when https://github.com/cri-o/cri-o/issues/2963 fixed
-          - cri-o-1.15
-          - podman
+          - cri-o-1.16
+          #TODO bring back podman when https://github.com/containers/libpod/issues/4747 fixed
+          # - podman
           - buildah
         snaps:
           - mc-installer
