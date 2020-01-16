@@ -3,7 +3,7 @@
 
 MINIKUBE_VERSION=1.6.2
 CRICTL_VERSION=v1.17.0
-CRIO_VERSION=1.15
+CRIO_VERSION=1.16
 
 function ensureMinikubePresent() {
   [ ! -x /usr/bin/minikube ] && curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_${MINIKUBE_VERSION}.deb \
@@ -21,16 +21,14 @@ function ensureCrioAndCrictlPresent(){
   sudo tar zxvf crictl-${CRICTL_VERSION}-linux-amd64.tar.gz -C /usr/local/bin;\
   rm -f crictl-${CRICTL_VERSION}-linux-amd64.tar.gz)
 
-
-  #TODO bring back podman when https://github.com/containers/libpod/issues/4747 fixed
   [ -x /usr/bin/crio ] || (\
     . /etc/os-release;\
     sudo sh -c "echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x${NAME}_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list";\
     wget -nv https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x${NAME}_${VERSION_ID}/Release.key -O Release.key;\
     sudo apt-key add - < Release.key;\
-    rm Release.key;\
+    rm -f Release.key;\
     sudo apt-get update -qq;\
-    sudo apt-get install -y cri-o-${CRIO_VERSION} buildah;\
+    sudo apt-get install -y cri-o-${CRIO_VERSION} podman buildah;\
   )
 
   #TODO remove when fixed https://github.com/cri-o/cri-o/issues/1767

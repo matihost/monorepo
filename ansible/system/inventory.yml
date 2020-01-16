@@ -55,8 +55,7 @@ all:
           - virt-manager
           - awscli
           - cri-o-1.16
-          #TODO bring back podman when https://github.com/containers/libpod/issues/4747 fixed
-          # - podman
+          - podman
           - buildah
         snaps:
           - mc-installer
