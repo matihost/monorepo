@@ -131,6 +131,12 @@ all:
               wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz ;\
               sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin;\
               rm -f crictl-$VERSION-linux-amd64.tar.gz)
+          - name: helm
+            become: false
+            command: |
+              [ -x /usr/local/bin/helm ] || (\
+              curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash; \
+              helm repo add stable https://kubernetes-charts.storage.googleapis.com/)
         files_config:
           - file: /etc/gai.conf
             content: |

@@ -2,11 +2,12 @@
 [ "$(lsb_release -is 2>/dev/null || echo "non-ubuntu")" = 'Ubuntu' ] || { echo "Only Ubuntu supported";exit 1; }
 
 MINIKUBE_VERSION=1.6.2
+MINIKUBE_DIR_VERSION=1.6.2
 CRICTL_VERSION=v1.17.0
 CRIO_VERSION=1.16
 
 function ensureMinikubePresent() {
-  [ ! -x /usr/bin/minikube ] && curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_${MINIKUBE_VERSION}.deb \
+  [ ! -x /usr/bin/minikube ] && curl -LO https://github.com/kubernetes/minikube/releases/download/v${MINIKUBE_DIR_VERSION}/minikube_${MINIKUBE_VERSION}.deb \
   && sudo dpkg -i minikube_${MINIKUBE_VERSION}.deb && rm -f minikube_${MINIKUBE_VERSION}.deb
 }
 
