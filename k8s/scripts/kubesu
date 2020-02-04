@@ -3,7 +3,7 @@ set -e
 
 if [[ -z "$1" ]]; then 
  echo -e "Usage: `basename $0` <service_account_name> [namespace]\n" 
- echo "Creates kube context for service_account_name from namespace and switch to it. When namespace is not in use" 
+ echo "Creates kube context for service_account_name from namespace and switch to it. When namespace is not defined, it assumes current namespace." 
  exit 1 
 fi 
 

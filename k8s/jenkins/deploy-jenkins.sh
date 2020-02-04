@@ -8,7 +8,7 @@ kubectl config set-context --current --namespace=ci
 helm install ci stable/jenkins -f configuration.yaml
 
 
-while [ "`kubectl get svc ci-jenkins -n ci -o jsonpath="{.status..ip}"| xargs`" == "" ]; do
+while [ "`kubectl get svc ci-jenkins -n ci -o jsonpath="{.status..ip}" 2>/dev/null | xargs`" == "" ]; do
   echo "Waiting for LoadBalancer for Jenkins..."; sleep 1
 done
 
