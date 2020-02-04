@@ -1,0 +1,19 @@
+# Default values for jenkins: https://raw.githubusercontent.com/helm/charts/master/stable/jenkins/values.yaml
+namespaceOverride: ci
+
+master:
+  image: "mirror.gcr.io/jenkins/jenkins"
+  tag: "lts"
+
+  servicePort: 80
+  serviceType: LoadBalancer
+
+  installPlugins:
+    - kubernetes:1.21.2
+    - workflow-job:2.36
+    - workflow-aggregator:2.6
+    - credentials-binding:1.20
+    - git:4.0.0
+
+agent:
+  image: "mirror.gcr.io/jenkins/jnlp-slave"

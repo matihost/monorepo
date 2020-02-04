@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 [ "$(lsb_release -is 2>/dev/null || echo "non-ubuntu")" = 'Ubuntu' ] || { echo "Only Ubuntu supported";exit 1; }
 
-MINIKUBE_VERSION=1.6.2
-MINIKUBE_DIR_VERSION=1.6.2
+MINIKUBE_VERSION=1.7.0.beta.2-0_amd64
+MINIKUBE_DIR_VERSION=1.7.0-beta.2
 CRICTL_VERSION=v1.17.0
 CRIO_VERSION=1.16
 
