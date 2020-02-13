@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 [ "$(lsb_release -is 2>/dev/null || echo "non-ubuntu")" = 'Ubuntu' ] || { echo "Only Ubuntu supported";exit 1; }
 
-MINIKUBE_VERSION=1.7.0.beta.2-0_amd64
-MINIKUBE_DIR_VERSION=1.7.0-beta.2
-CRICTL_VERSION=v1.17.0
-CRIO_VERSION=1.16
+CRIO_VERSION=1.17
 
 function ensureMinikubePresent() {
-  [ ! -x /usr/bin/minikube ] && curl -LO https://github.com/kubernetes/minikube/releases/download/v${MINIKUBE_DIR_VERSION}/minikube_${MINIKUBE_VERSION}.deb \
-  && sudo dpkg -i minikube_${MINIKUBE_VERSION}.deb && rm -f minikube_${MINIKUBE_VERSION}.deb
+  [ ! -x /usr/bin/minikube ] && \
+  curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
+  && chmod +x minikube && sudo mv minikube /usr/bin/
 }
 
 function ensureDockerCGroupSystemD(){
@@ -18,6 +16,7 @@ function ensureDockerCGroupSystemD(){
 
 function ensureCrioAndCrictlPresent(){
   [ -x /usr/local/bin/crictl ] || (\
+  CRICTL_VERSION=`git ls-remote -t https://github.com/kubernetes-sigs/cri-tools.git | cut -d'/' -f3 |sort -n |tail -n 1`;\
   wget https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz ;\
   sudo tar zxvf crictl-${CRICTL_VERSION}-linux-amd64.tar.gz -C /usr/local/bin;\
   rm -f crictl-${CRICTL_VERSION}-linux-amd64.tar.gz)
@@ -74,7 +73,10 @@ if [ $? -ne 0  ]; then
   sudo chmod -R a+rwx /etc/kubernetes && \
   minikube update-context &>/dev/null && \
   minikube addons enable registry && \
+  minikube addons enable ingress && \
+  minikube addons enable dashboard && \
   { minikube tunnel &>/tmp/minikube-tunnel.log & } && \
+  [ "$(sudo systemctl is-enabled kubelet)" == 'enabled' ] && sudo systemctl disable kubelet && \
   echo "Minikube has been started"
 else
   echo "Minikube already started"

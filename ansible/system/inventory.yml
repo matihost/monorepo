@@ -26,6 +26,7 @@ all:
         packages:
           - dlocate
           - ubuntu-restricted-extras
+          - grub-customizer
           - golang-1.13
           - golang-golang-x-tools
           - ansible
@@ -54,7 +55,7 @@ all:
           - virtualbox-6.1
           - virt-manager
           - awscli
-          - cri-o-1.16
+          - cri-o-1.17
           - podman
           - buildah
         snaps:
@@ -127,7 +128,7 @@ all:
             become: false
             command: |
               [ -x /usr/local/bin/crictl ] || (\
-              VERSION="v1.17.0";\
+              VERSION=`git ls-remote -t https://github.com/kubernetes-sigs/cri-tools.git | cut -d'/' -f3 |sort -n |tail -n 1`;\
               wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz ;\
               sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin;\
               rm -f crictl-$VERSION-linux-amd64.tar.gz)
@@ -137,6 +138,37 @@ all:
               [ -x /usr/local/bin/helm ] || (\
               curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash; \
               helm repo add stable https://kubernetes-charts.storage.googleapis.com/)
+          - name: minikube
+            become: false
+            command: |
+              [ -x /usr/bin/minikube ] || (
+              curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64  &&
+              chmod a+x minikube && sudo mv minikube /usr/bin/ && echo "minikube installed"
+              )
+          - name: krew
+            become: false
+            command: |
+              [ -h ~/.krew/bin/kubectl-krew ] || (
+                [ "$(grep -c 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' ~/.bashrc)" -eq 0 ] && echo 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' >> ~/.bashrc
+                KREW_VERSION=`git ls-remote -t https://github.com/kubernetes-sigs/krew.git | grep -v '\^{}' | cut -d'/' -f3 |sort -n |tail -n 1` &&
+                cd "$(mktemp -d)" &&
+                curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/download/v0.3.4/krew.{tar.gz,yaml}" &&
+                tar zxvf krew.tar.gz &&
+                KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" &&
+                "$KREW" install --manifest=krew.yaml --archive=krew.tar.gz &&
+                "$KREW" install change-ns ctx whoami &&
+                "$KREW" update
+              )
+          - name: k9s
+            become: false
+            command: |
+              [ -x /usr/local/bin/k9s ] || (
+                K9S_VERSION=`git ls-remote -t https://github.com/derailed/k9s.git | grep -v '\^{}' | cut -d'/' -f3 |sort -n |tail -n 1` &&
+                cd "$(mktemp -d)" &&
+                curl -fsSLO "https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_Linux_x86_64.tar.gz" &&
+                tar -zxvf k9s_Linux_x86_64.tar.gz -o k9s &&
+                sudo mv k9s /usr/local/bin
+              )              
         files_config:
           - file: /etc/gai.conf
             content: |
