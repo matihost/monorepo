@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+function usage(){
+echo -e "Usage: `basename $0` <instance-name> [--public] [-m instance-type] [-p gcp-project-name] [-r region] [-z zone]  
+
+Creates VM with name 'instance-name' being private instance (unless --public requested) in project '-p gcp-project-name' (default: current one) 
+being '-m instance-type' (default: f1-micro) in region (default: current one) and zone (default current one)
+
+When instance is declared public, https ingress firewall is opened as well.
+
+Non public instance does not have external IP assigned and has no access to internet, to allow it run 'create-nat-gateway'.
+"    
+}
+
+while [[ "$#" -gt 0 ]]; do case $1 in
+  -h|--help|help) usage; exit 1;;
+  -p) GCP_PROJECT="$2"; shift;;
+  -r) GCP_REGION="$2"; shift;;
+  -z) GCP_ZONE="$2"; shift;;
+  -m) MACHINE_TYPE="$2"; shift;;
+  --public) PUBLIC=1;; 
+  *) PARAMS+=("$1");; # save it in an array for later
+esac; shift; done
+set -- "${PARAMS[@]}" # restore positional parameters
+
+
+if [[ -z "${PARAMS[0]}" ]]; then 
+usage
+exit 1 
+fi 
+
+
+MACHINE_TYPE=${MACHINE_TYPE:-f1-micro}
+GCP_PROJECT=${GCP_PROJECT:-$(gcloud config get-value project)}
+GCP_REGION=${GCP_REGION:-$(gcloud config get-value compute/region)}
+GCP_ZONE=${GCP_ZONE:-$(gcloud config get-value compute/zone)}
+GCP_ZONE=${GCP_ZONE:-${GCP_REGION}-a}
+
+gcloud beta compute instances create \
+${1:?Instance name is mandatory} \
+--project=${GCP_PROJECT} \
+--zone=${GCP_ZONE} \
+--machine-type=${MACHINE_TYPE} \
+--subnet=default \
+--network-tier=STANDARD \
+--maintenance-policy=MIGRATE \
+--service-account=default \
+--scopes default,bigquery,cloud-platform,compute-rw,datastore,storage-full,taskqueue,userinfo-email,sql-admin \
+--tags=http-server,https-server \
+--image=ubuntu-minimal-1910-eoan-v20200129 --image-project=ubuntu-os-cloud \
+--boot-disk-size=10GB \
+--boot-disk-type=pd-standard \
+--boot-disk-device-name=boot-disk-1 \
+$([ -z "${PUBLIC}" ] && echo -n '--no-address')
+
+if [ -n "${PUBLIC}" -a -z "$(gcloud compute --project=${GCP_PROJECT} firewall-rules list --filter="
+name=(default-allow-https)" --format="value(name)")" ]; then
+  gcloud compute --project=${GCP_PROJECT} firewall-rules create default-allow-https \
+  --direction=INGRESS --priority=1000 \
+  --network=default \
+  --action=ALLOW \
+  --rules=tcp:443 \
+  --source-ranges=0.0.0.0/0 \
+  --target-tags=https-server 
+fi

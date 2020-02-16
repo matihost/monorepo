@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+function usage(){
+echo -e "Usage: `basename $0` <instance-name> [-f|--force|--quiet|-q] [-p gcp-project-name] [-r region] [-z zone]
+
+Deletes VM with name 'instance-name' in project 'gcp-project-name' (default: current one)  in zone (default: current zone)
+"
+}
+
+while [[ "$#" -gt 0 ]]; do case $1 in
+  -h|--help|help) usage; exit 1;;
+  -f|--force|--quiet|-q) FORCE="--quiet"; shift;;
+  -p) GCP_PROJECT="$2"; shift;;
+  -r) GCP_REGION="$2"; shift;;
+  -z) GCP_ZONE="$2"; shift;;  
+  *) PARAMS+=("$1");; # save it in an array for later
+esac; shift; done
+set -- "${PARAMS[@]}" # restore positional parameters
+
+
+if [[ -z "${PARAMS[0]}" ]]; then 
+usage
+exit 1 
+fi 
+
+
+GCP_PROJECT=${GCP_PROJECT:-$(gcloud config get-value project)}
+GCP_REGION=${GCP_REGION:-$(gcloud config get-value compute/region)}
+GCP_ZONE=${GCP_ZONE:-$(gcloud config get-value compute/zone)}
+GCP_ZONE=${GCP_ZONE:-${GCP_REGION}-a}
+
+set -x
+gcloud beta compute instances delete \
+ ${1:?Instance name is mandatory} \
+ --project=${GCP_PROJECT} \
+ --zone=${GCP_ZONE} \
+ ${FORCE}
+

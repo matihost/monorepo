@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+function usage(){
+echo -e "Usage: `basename $0` <cluster-name> [-f|--force|--quiet|-q] [-r region] [-z zone]  
+
+Deletes GKE cluster with name 'cluster-name' in zone (default current one).
+"    
+}
+
+while [[ "$#" -gt 0 ]]; do case $1 in
+  -h|--help|help) usage; exit 1;;
+  -f|--force|--quiet|-q) FORCE="--quiet"; shift;;
+  -p) GCP_PROJECT="$2"; shift;;
+  -r) GCP_REGION="$2"; shift;;
+  -z) GCP_ZONE="$2"; shift;;
+  *) PARAMS+=("$1");; # save it in an array for later
+esac; shift; done
+set -- "${PARAMS[@]}" # restore positional parameters
+
+
+if [[ -z "${PARAMS[0]}" ]]; then 
+usage
+exit 1 
+fi 
+
+
+GCP_REGION=${GCP_REGION:-$(gcloud config get-value compute/region)}
+GCP_ZONE=${GCP_ZONE:-$(gcloud config get-value compute/zone)}
+GCP_ZONE=${GCP_ZONE:-${GCP_REGION}-a}
+
+echo "Deleting cluster ${GCP_PROJECT} in zone ${ZONE}..."
+set -x
+gcloud beta container \
+  clusters delete "${1:?Cluster name is mandatory}" \
+  --zone "${GCP_ZONE}" \
+  ${FORCE}
