@@ -1,3 +1,4 @@
+---
 # Default values for jenkins: https://raw.githubusercontent.com/helm/charts/master/stable/jenkins/values.yaml
 namespaceOverride: ci
 
@@ -6,8 +7,16 @@ master:
   tag: "lts"
 
   servicePort: 80
-  serviceType: LoadBalancer
+  serviceType: {{ jenkins_service_type|default("NodePort") }}
 
+  ingress:
+    enabled: true
+    apiVersion: "networking.k8s.io/v1beta1"
+    hostName: {{ jenkins_ingress }}
+    tls:
+    - hosts:
+        - {{ jenkins_ingress }}
+        
   installPlugins:
     - kubernetes:1.21.2
     - workflow-job:2.36
@@ -17,3 +26,4 @@ master:
 
 agent:
   image: "mirror.gcr.io/jenkins/jnlp-slave"
+

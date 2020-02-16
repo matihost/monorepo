@@ -1,0 +1,9 @@
+all:
+  children:
+    local:
+      hosts:
+        localhost:
+      vars:
+        files: "{{ playbook_dir }}/files"
+        namespace: ci
+        jenkins_service_type: NodePort
