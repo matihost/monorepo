@@ -5,7 +5,11 @@ function ensurePlaybookRequirements(){
     curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
     helm repo add stable https://kubernetes-charts.storage.googleapis.com/
   )
-  pip3 show openshift 1>/dev/null || pip3 install openshift
+  pip3 show openshift &>/dev/null || {
+    pip3 install openshift --user
+    pip3 install --pre --upgrade kubernetes --user
+    pip3 install kubernetes-validate --user
+  }
 }
 
 function usage(){

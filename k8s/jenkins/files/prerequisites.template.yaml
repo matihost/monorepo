@@ -23,3 +23,6 @@ subjects:
 - kind: ServiceAccount
   name: ci
   namespace: "{{ namespace }}"
+- kind: ServiceAccount
+  name: "{{ namespace }}-jenkins"
+  namespace: "{{ namespace }}"  

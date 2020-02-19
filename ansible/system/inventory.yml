@@ -187,7 +187,15 @@ all:
               [ -h /usr/local/bin/kubectl-su ] || (
                 ln -s {{ playbook_dir }}/../../k8s/scripts/kubesu /usr/local/bin/kubectl-su
                 echo "kubectl su enabled"
-              )                  
+              )
+          - name: python-modules
+            become: false
+            command: |
+                pip3 show openshift &>/dev/null || {
+                  pip3 install openshift --user
+                  pip3 install --pre --upgrade kubernetes --user
+                  pip3 install kubernetes-validate --user
+                }
         files_config:
           - file: /etc/gai.conf
             content: |

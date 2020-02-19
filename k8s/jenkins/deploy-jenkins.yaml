@@ -19,15 +19,32 @@
     k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/prerequisites.template.yaml') }}"
+      validate:
+        fail_on_error: true
+        strict: true
   - name: Deploy latest version of Jenkins chart inside {{ namespace }} namespace
     helm_cli:
-      name: ci
+      name: "{{ namespace }}"
       chart_ref: stable/jenkins
       release_namespace: "{{ namespace }}"
       values: "{{ lookup('template', '{{ files }}/jenkins_helm.template.yaml') | from_yaml }}"
+
+  - name: Ensure Jenkins Deployment finishes
+    k8s:
+      name: "{{ namespace }}-jenkins"
+      api_version: v1
+      kind: Deployment
+      state: present
+      namespace: "{{ namespace }}"
+      wait: true
+
   - name: Ensure Jenkins Ingress DNS is resolvable locally
     shell: |
-      INGRESS_IP=`kubectl get ingress ci-jenkins -n ci -o jsonpath="{.status..ip}"`
+      while [ -z "$(kubectl get ingress {{ namespace }}-jenkins -n {{ namespace }} -o jsonpath="{.status..ip}" | xargs)"  ]; do 
+        sleep 1;
+        echo "Awaiting for LoadBalancer for Ingress..."
+      done
+      INGRESS_IP=`kubectl get ingress {{ namespace }}-jenkins -n {{ namespace }} -o jsonpath="{.status..ip}"`
       CHANGED=`grep -c "${INGRESS_IP} {{ jenkins_ingress }}" /etc/hosts`
       [ "${CHANGED}" -eq 0 ]  && echo "update hosts" && sudo -E sh -c "echo \"${INGRESS_IP} {{ jenkins_ingress }}\" >> /etc/hosts" || echo "hosts already present"
     register: hosts_result
