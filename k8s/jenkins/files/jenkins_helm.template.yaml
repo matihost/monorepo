@@ -14,7 +14,8 @@ master:
     apiVersion: "networking.k8s.io/v1beta1"
     hostName: {{ jenkins_ingress }}
     tls:
-    - hosts:
+    - secretName: {{ jenkins_ingress }}
+      hosts:
         - {{ jenkins_ingress }}
         
   installPlugins:

@@ -15,6 +15,31 @@
       extensions:
       - yaml
       - yml
+  
+  - name: Ensure Jenkins CN={{ jenkins_ingress }} is present
+    block:    
+    - name: Ensure Jenkins CN={{ jenkins_ingress }} is present
+      include_role:
+        name: create_certificate
+      vars:
+        certificate_def:
+          cn: "{{ jenkins_ingress }}"
+    become: true
+  - name: Ensure TLS Secret {{ jenkins_ingress }} is present in namespace {{ namespace }}
+    k8s:
+      state: present
+      definition:
+        apiVersion: "v1"
+        kind: Secret
+        metadata:
+          name: "{{ jenkins_ingress }}"
+          namespace: "{{ namespace }}"
+        data:
+          tls.crt: "{{ tls.crt}}"
+          tls.key: "{{ tls.key}}"
+        type: kubernetes.io/tls
+    no_log: true
+
   - name: Ensure Jenkins helm dependencies are in place
     k8s:
       state: present

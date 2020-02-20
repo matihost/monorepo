@@ -1,0 +1,37 @@
+---
+- name: Check certificate_def variable
+  fail:
+    msg: No certificate_def with cn variable provided
+  when: certificate_def is not defined or certificate_def.cn is not defined
+
+- name: Check whether certificate is already created
+  stat:
+    path: "{{ cert_base_path }}/{{ certificate_def.cn }}.crt"
+  register: cert_stat
+
+- name: Ensure "{{ cert_base_path }}/{{ certificate_def.cn }}.crt is present
+  block:
+  - name: Generate an OpenSSL private key for Jenkins CN={{ certificate_def.cn }}
+    openssl_privatekey:
+      path: "{{ cert_base_path }}/{{ certificate_def.cn }}.pem"
+  - name: Generate an OpenSSL Certificate Signing Request for CN={{ certificate_def.cn }}
+    openssl_csr:
+      path: "{{ cert_base_path }}/{{ certificate_def.cn }}.csr"
+      privatekey_path: "{{ cert_base_path }}/{{ certificate_def.cn }}.pem"
+      common_name: "{{ certificate_def.cn }}"
+      mode: '644'
+  - name: Generate a Self Signed OpenSSL certificate for CN={{ certificate_def.cn }}
+    openssl_certificate:
+      path: "{{ cert_base_path }}/{{ certificate_def.cn }}.crt"
+      privatekey_path: "{{ cert_base_path }}/{{ certificate_def.cn }}.pem"
+      csr_path: "{{ cert_base_path }}/{{ certificate_def.cn }}.csr"
+      provider: selfsigned
+  no_log: true
+  when: not(cert_stat.stat.exists is defined and cert_stat.stat.exists)
+
+- name: Set tls fact
+  set_fact:
+      tls:
+        key: "{{ lookup('file', cert_base_path + '/' + certificate_def.cn + '.pem') | string | b64encode }}"
+        crt: "{{ lookup('file', cert_base_path + '/' + certificate_def.cn + '.crt') | string | b64encode }}"
+  no_log : true
