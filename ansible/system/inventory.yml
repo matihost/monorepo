@@ -68,7 +68,6 @@ all:
           - openshift
           - kubernetes
           - kubernetes-validate
-          - PyOpenSSL
         clis:
           - name: nss-order
             become: true

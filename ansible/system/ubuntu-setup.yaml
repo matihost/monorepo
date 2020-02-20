@@ -44,10 +44,9 @@
   - block:
     - name: Install required Python modules in user directory
       pip:
-        name: "{{ item }}"
+        name: "{{ pips }}"
         extra_args: --user
         state: latest
-      loop: "{{ pips }}"  
     - name: Install user level CLIs
       shell: "{{ item.command }}"
       register: cli_result
