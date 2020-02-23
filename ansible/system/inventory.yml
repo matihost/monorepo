@@ -14,8 +14,6 @@ all:
           - name: multiverse
           - name: vscode
             repo: "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main"
-          - name: ansible
-            repo: "deb http://ppa.launchpad.net/ansible/ansible/ubuntu {{ ansible_distribution_release }} main"
           - name: keepass
             repo: "deb http://ppa.launchpad.net/jtaylor/keepass/ubuntu {{ ansible_distribution_release }} main"
           - name: virtualbox
@@ -29,8 +27,6 @@ all:
           - grub-customizer
           - golang-1.13
           - golang-golang-x-tools
-          - ansible
-          - ansible-lint
           - python3-pip
           - ruby
           - openjdk-8-jdk
@@ -68,6 +64,10 @@ all:
           - openshift
           - kubernetes
           - kubernetes-validate
+          - "molecule[lint]"
+          - "molecule[docker]"
+          - ansible-lint
+          - requests
         clis:
           - name: nss-order
             become: true
@@ -191,6 +191,14 @@ all:
               [ -h /usr/local/bin/kubectl-su ] || (
                 ln -s {{ playbook_dir }}/../../k8s/scripts/kubesu /usr/local/bin/kubectl-su
                 echo "kubectl su enabled"
+              )
+          - name: shellcheck
+            become: false
+            command: |
+              [ -x ~/bin/shellcheck ] || (
+                cd ~/bin &&
+                wget -qO- https://storage.googleapis.com/shellcheck/shellcheck-stable.linux.x86_64.tar.xz | tar -xJv -o shellcheck-stable/shellcheck &&
+                mv shellcheck-stable/shellcheck . && rmdir shellcheck-stable
               )
         files_config:
           - file: /etc/gai.conf
