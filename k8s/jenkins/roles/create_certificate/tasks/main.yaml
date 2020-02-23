@@ -14,6 +14,7 @@
   - name: Generate an OpenSSL private key for Jenkins CN={{ certificate_def.cn }}
     openssl_privatekey:
       path: "{{ cert_base_path }}/{{ certificate_def.cn }}.pem"
+      size: "{{ certificate_def.size|default(cert_size) }}"pip
   - name: Generate an OpenSSL Certificate Signing Request for CN={{ certificate_def.cn }}
     openssl_csr:
       path: "{{ cert_base_path }}/{{ certificate_def.cn }}.csr"
