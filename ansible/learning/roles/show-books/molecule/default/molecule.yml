@@ -1,0 +1,15 @@
+---
+lint: |
+  yamllint .
+  ansible-lint
+  flake8
+driver:
+  name: docker
+platforms:
+  - name: instance
+    image: docker.io/pycontribs/centos:7
+    pre_build_image: true
+provisioner:
+  name: ansible
+verifier:
+  name: ansible

@@ -1,0 +1,15 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+    books:
+      valid-k8s-name:
+        title: valid k8s name
+        author: matihost
+      some_valid_ansible_key:
+        title: Valid_ansible_key
+        author: cat
+  tasks:
+    - name: "Include show_books"
+      include_role:
+        name: "show-books"

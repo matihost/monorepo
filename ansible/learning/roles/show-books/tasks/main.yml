@@ -5,7 +5,9 @@
   when: books is not defined
 - name: Show books
   debug:
-    msg: "ISBN: {{ book.key }} Book: {{ book.value.title }} Author: {{ book.value.author }}"
+    msg: "ISBN: {{ book.key }}
+          Book: {{ book.value.title }}
+          Author: {{ book.value.author }}"
   loop: "{{ books|dict2items }}"
   loop_control:
     loop_var: book
