@@ -1,0 +1,14 @@
+ARG UBUNTU_VERSION=18.04
+FROM mirror.gcr.io/library/ubuntu:${UBUNTU_VERSION}
+#has to repeat ARG due to https://github.com/moby/moby/issues/34129
+ARG UBUNTU_VERSION=18.04
+RUN apt-get -y update && apt-get -y install curl gnupg uidmap && \
+    echo "deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${UBUNTU_VERSION}/ /" > /etc/apt/sources.list.d/libcontainers.list && \
+    curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/xUbuntu_${UBUNTU_VERSION}/Release.key -o Release.key && \
+    apt-key add - < Release.key && rm -rf Release.key && \
+    apt-get -y update && \
+    apt-get -y install buildah
+RUN sed -i -e 's|^#mount_program|mount_program|g' -e '/additionalimage.*/a "/var/lib/shared",' /etc/containers/storage.conf
+ENV _BUILDAH_STARTED_IN_USERNS=""
+ENV BUILDAH_ISOLATION=chroot
+CMD ["buildah"]
