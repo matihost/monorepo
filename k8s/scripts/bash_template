@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+if [ -z $1 ]; then
+  template=$(tee)
+else 
+  template=$(cat $1)
+fi
+
+eval "echo -e \"${template}\""
