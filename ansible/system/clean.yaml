@@ -57,17 +57,17 @@
       changed_when: log_clean.stdout
     - name: Clean all podman and docker containers and images
       shell: |
-        command -v podman 1>/dev/null && {
+        command -v podman 1>/dev/null 2>/dev/null && {
           podman container rm --all --force
           podman image rm --all --force
           sudo podman container rm --all --force
           sudo podman image rm --all --force
         }
-        command -v docker 1>/dev/null && {
+        command -v docker 1>/dev/null 2>/dev/null && {
           ITEMS=$(docker container ls --all -q)
-          [ -n "${ITEMS}" ] && docker container rm $(ITEMS) --force          
+          [ -n "${ITEMS}" ] && docker container rm ${ITEMS} --force          
           ITEMS=$(docker images --all -q)
-          [ -n "${ITEMS}" ] && docker image rm $(ITEMS) --force
+          [ -n "${ITEMS}" ] && docker image rm ${ITEMS} --force
         }
       register: clean_out
       changed_when: clean_out.stdout
