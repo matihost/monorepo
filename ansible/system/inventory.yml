@@ -52,6 +52,7 @@ all:
           - virt-manager
           - awscli
           - cri-o-1.17
+          - fuse-overlayfs
           - podman
           - buildah
         snaps:

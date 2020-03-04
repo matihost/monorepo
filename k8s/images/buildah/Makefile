@@ -9,8 +9,18 @@ build-useronly: ## build buildah builder image full
 run: ## run buildah container
 	podman run -it --rm buildah:$(BASE_OS) /bin/bash
 
-run-user: ## run buildah container
+run-user: ## run buildah container as user (does no work)
 	podman run -it --rm buildah-user:$(BASE_OS) /bin/bash
+
+
+docher-run: # run buildah from official image
+	mkdir -p /tmp/buildah
+	docker run --security-opt seccomp:unconfined -it --device /dev/fuse:rw -v /tmp/buildah:/var/lib/buildah:Z quay.io/buildah/stable 
+
+test-build-image: # build sample image with VFS as storage driver
+	echo -e "FROM mirror.gcr.io/library/centos\nRUN echo test" | buildah bud -f - --storage-driver vfs -t alamakota .
+
+buildah bud --storage-driver vfs -t alamakota . 
 
 deploy: ## deploy base container
 	BASE_OS=$(BASE_OS) eval "echo \"`cat pod.manifest.yaml`\"" | kubectl apply -f -
