@@ -9,7 +9,7 @@
       -->
       <id>central</id>
       <name>Apache Maven Central</name>
-      <url>http://repo1.maven.apache.org/maven2</url>
+      <url>https://repo.maven.apache.org/maven2</url>
       <mirrorOf>central</mirrorOf>
     </mirror>
   </mirrors>
