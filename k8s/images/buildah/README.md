@@ -16,6 +16,8 @@ BASE_OS=ubuntu make run
 # not yet work
 BASE_OS=centos make deploy
 
+# deploys original buildah image from quay
+BASE_OS=original make deploy
 
 # deploy buildah in currect context K8S
 # not yet work

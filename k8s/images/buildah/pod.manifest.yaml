@@ -1,24 +1,35 @@
----
+--- 
 apiVersion: v1
 kind: Pod
 metadata:
-  labels:
-    baseos: ${BASE_OS}
   name: buildah
 spec:
   containers:
-  - args:
-    - -c
-    - while true; do sleep 1d;done
-    command:
-    - /bin/bash
-    image: localhost/buildah:${BASE_OS}
-    imagePullPolicy: Never
-    name: buildah-${BASE_OS}
-    resources:
-      requests:
-        memory: "64Mi"
-        cpu: "250m"
-      limits:
-        memory: "128Mi"
-        cpu: "1"
+    - name: buildah
+      image: ${IMAGE:-quay.io/buildah/stable}
+      imagePullPolicy: IfNotPresent
+      command: ["/bin/bash"]
+      args:
+      - -c
+      - sleep infinity
+      resources:
+        limits:
+          cpu: "2"
+          memory: 4Gi
+        requests:
+          cpu: "1"
+          memory: 1Gi
+      volumeMounts: 
+      - name: devfuse
+        mountPath: /dev/fuse
+      - name: varlibcontainers
+        mountPath: /var/lib/containers
+      securityContext:
+        runAsUser: 0
+  restartPolicy: Never
+  volumes:
+  - name: varlibcontainers
+    emptyDir: {}
+  - name: devfuse
+    hostPath: 
+      path: /dev/fuse
