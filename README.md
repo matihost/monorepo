@@ -9,5 +9,6 @@ Various technology code, snippets, home tools.
 * [Ansible](ansible)
 * [Go](go)
 * [Java, Groovy, Scala](java)
+* [Python](python)
 * [Rust](rust)
 * [K8S, OpenShift](k8s)
