@@ -18,5 +18,9 @@ def get_exchange_rate_to_pln(currency):
         RATE_TO_PLN_XPATH.format(currency)
     ).text
 
+
+def main(args=None):
+  print('1 USD = {0} PLN'.format(get_exchange_rate_to_pln('USD')))
+
 if __name__ == "__main__":
-    print('1 USD = {0} PLN'.format(get_exchange_rate_to_pln('USD')))
+  main()

@@ -16,7 +16,7 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 
 setup(
-    name="exchange_Rate",  # Required
+    name="exchange-rate",  # Required
     version="0.0.1",  # Required
     description="A sample Python project showing exchange rate between two currencies",  # Optional
     long_description=long_description,  # Optional
@@ -31,19 +31,20 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
     ],
-    keywords="exchagnerate nbp",  # Optional
+    keywords="exchange rate nbp",  # Optional
     # When your source code is in a subdirectory under the project root, e.g.
     # `src/`, it is necessary to specify the `package_dir` argument.
     package_dir={"": "src"},  # Optional
     packages=find_packages(where="src"),  # Required
     python_requires=">=3.5, <4",
     install_requires=[
-        "certifi==2019.11.28",
-        "chardet==3.0.4",
-        "idna==2.9",
-        "requests==2.23.0",
-        "urllib3==1.25.8",
+        "requests>=2.23.0, <3",
     ],  # Optional
     dependency_links=[],
+    entry_points={
+        "console_scripts": [
+            "exchange-rate=exchange_rate.cli.exchange_rate:main",
+        ],
+    },
     project_urls={"Source": "https://github.com/matihost/learning/",},  # Optional
 )

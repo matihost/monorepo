@@ -35,6 +35,30 @@ galaxy
 target
 vendor
 
+# Python Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+*.eggs
+*~
+
+# Python Unit test / coverage reports
+.[nt]ox/
+htmlcov/
+.coverage
+.coverage.*
+.*cache
+nosetests.xml
+coverage.xml
+*.cover
+tests/data/common_wheels/
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
