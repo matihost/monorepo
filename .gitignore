@@ -41,6 +41,7 @@ __pycache__/
 *$py.class
 
 # Python Distribution / packaging
+.venv
 build/
 dist/
 *.egg-info/

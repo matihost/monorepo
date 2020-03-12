@@ -1,4 +1,6 @@
 import exchange_rate.cli.exchange_rate as ex
+
+
 def test_exchange_rate():
   # given
   currency = 'USD'

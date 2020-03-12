@@ -6,6 +6,8 @@ verify_ssl = true
 [dev-packages]
 pipenv-setup = "*"
 pylint = "*"
+pytest = "*"
+exchange-rate = {editable = true,path = "."}
 
 [packages]
 requests = "*"

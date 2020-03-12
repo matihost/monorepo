@@ -42,9 +42,7 @@ setup(
     ],  # Optional
     dependency_links=[],
     entry_points={
-        "console_scripts": [
-            "exchange-rate=exchange_rate.cli.exchange_rate:main",
-        ],
+        "console_scripts": ["exchange-rate=exchange_rate.cli.exchange_rate:main",],
     },
     project_urls={"Source": "https://github.com/matihost/learning/",},  # Optional
 )
