@@ -1,32 +1,29 @@
 #!/usr/bin/env python3
 """
-Shows USD/PLN pair based on Polish Central Bank (NBP) fixing exchange rate.
+Shows Foreign Currency/PLN pair based on Polish Central Bank (NBP) fixing exchange rate.
 """
 import sys
-import xml.etree.ElementTree as ET
-import requests
+import argparse
+from exchange_rate.helpers.version import package_version
+from exchange_rate.exchange_rate_to_pln import ExchangeRateToPLN
 
-RATE_TO_PLN_XPATH = './pozycja[kod_waluty="{0}"]/kurs_sredni'
-NPB_FIXING_URL = 'http://www.nbp.pl/kursy/xml/LastA.xml'
+_DESCRIPTION="Shows Foreign Currency/PLN pair based on Polish Central Bank (NBP) fixing exchange rate."
 
-
-def get_exchange_rate_to_pln(currency):
-    """
-    Get convertion rate for currency
-    """
-    response = requests.get(NPB_FIXING_URL).text
-    xml = ET.fromstring(response)
-    rate = xml.find(RATE_TO_PLN_XPATH.format(currency))
-    return None if rate is None else rate.text
-
+def _parse_program_argv():
+    parser = argparse.ArgumentParser(description=_DESCRIPTION)
+    parser.add_argument('currency', metavar='currency', nargs='?', type=str, default='USD',
+                    help='currency code to compare with PLN')
+    parser.add_argument('-v', '--version',  action='version', version=package_version('exchange-rate'))
+    args = parser.parse_args()
+    return args.currency
 
 def main():
     """
     Main program method
     """
-    currency = 'USD' if len(sys.argv) == 1 else sys.argv[1]
-    print('1 {0} = {1} PLN'.format(
-        currency, get_exchange_rate_to_pln(currency)))
+    currency = _parse_program_argv()
+    rate_to_pln = ExchangeRateToPLN().get_exchange_rate_to_pln(currency)
+    print('1 {0} = {1} PLN'.format(currency, rate_to_pln))
 
 
 if __name__ == "__main__":

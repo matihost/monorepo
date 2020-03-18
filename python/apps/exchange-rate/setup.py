@@ -9,6 +9,9 @@ from setuptools import setup, find_packages
 from os import path
 
 here = path.abspath(path.dirname(__file__))
+sys.path.append(path.join(here, 'src'))
+
+from exchange_rate.helpers.version import git_version
 
 # Get the long description from the README file
 with open(path.join(here, "README.md"), encoding="utf-8") as f:
@@ -17,7 +20,7 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="exchange-rate",  # Required
-    version="0.0.1",  # Required
+    version=git_version(),  # Required
     description="A sample Python project showing exchange rate between two currencies",  # Optional
     long_description=long_description,  # Optional
     long_description_content_type="text/markdown",  # Optional (see note above)
