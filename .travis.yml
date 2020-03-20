@@ -40,3 +40,13 @@ jobs:
     cache:
       directories:
       - $TRAVIS_BUILD_DIR/go/vendor
+  - language: python
+    python: "3.7"
+    before_install: cd python/apps/exchange-rate
+    install:
+    - pip3 install pipenv
+    - make init
+    script:
+    - make test
+    - make run
+    cache: pip
