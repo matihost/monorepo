@@ -47,6 +47,7 @@ jobs:
     - pip3 install pipenv
     - make init
     script:
+    - make lint
     - make test
     - make run
     cache: pip

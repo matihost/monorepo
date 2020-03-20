@@ -3,10 +3,11 @@
 Created based on https://github.com/pypa/sampleproject
 and dependencies ensured via pipenv-setup sync tooling.
 """
-
+import sys
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
 from os import path
+
 
 here = path.abspath(path.dirname(__file__))
 sys.path.append(path.join(here, 'src'))

@@ -15,5 +15,3 @@ def package_version(package):
     except pkg_resources.DistributionNotFound:
         version = "0.0.1dev1"
     return version
-
-

@@ -2,20 +2,23 @@
 """
 Shows Foreign Currency/PLN pair based on Polish Central Bank (NBP) fixing exchange rate.
 """
-import sys
 import argparse
 from exchange_rate.helpers.version import package_version
 from exchange_rate.exchange_rate_to_pln import ExchangeRateToPLN
 
-_DESCRIPTION="Shows Foreign Currency/PLN pair based on Polish Central Bank (NBP) fixing exchange rate."
+_DESCRIPTION = "Shows Foreign Currency/PLN pair based on Polish \
+Central Bank (NBP) fixing exchange rate."
+
 
 def _parse_program_argv():
     parser = argparse.ArgumentParser(description=_DESCRIPTION)
     parser.add_argument('currency', metavar='currency', nargs='?', type=str, default='USD',
-                    help='currency code to compare with PLN')
-    parser.add_argument('-v', '--version',  action='version', version=package_version('exchange-rate'))
+                        help='currency code to compare with PLN')
+    parser.add_argument('-v', '--version', action='version',
+                        version=package_version('exchange-rate'))
     args = parser.parse_args()
     return args.currency
+
 
 def main():
     """
