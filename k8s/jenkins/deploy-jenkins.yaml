@@ -15,7 +15,15 @@
       extensions:
       - yaml
       - yml
-  
+
+  - name: Ensure Jenkins helm dependencies are in place
+    k8s:
+      state: present
+      definition: "{{ lookup('template', '{{ files }}/prerequisites.template.yaml') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+
   - name: Ensure Jenkins CN={{ jenkins_ingress }} is present
     block:    
     - name: Ensure Jenkins CN={{ jenkins_ingress }} is present
@@ -40,13 +48,6 @@
         type: kubernetes.io/tls
     no_log: true
 
-  - name: Ensure Jenkins helm dependencies are in place
-    k8s:
-      state: present
-      definition: "{{ lookup('template', '{{ files }}/prerequisites.template.yaml') }}"
-      validate:
-        fail_on_error: true
-        strict: true
   - name: Deploy latest version of Jenkins chart inside {{ namespace }} namespace
     helm_cli:
       name: "{{ namespace }}"
@@ -62,6 +63,7 @@
       state: present
       namespace: "{{ namespace }}"
       wait: true
+      wait_timeout: 300
 
   - name: Ensure Jenkins Ingress DNS is resolvable locally
     shell: |

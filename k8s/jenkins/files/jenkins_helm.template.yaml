@@ -19,11 +19,13 @@ master:
         - {{ jenkins_ingress }}
         
   installPlugins:
-    - kubernetes:1.21.2
-    - workflow-job:2.36
+    - kubernetes:1.24.1
+    - workflow-job:2.37
     - workflow-aggregator:2.6
-    - credentials-binding:1.20
-    - git:4.0.0
+    - credentials-binding:1.21
+    - git:4.2.2
+
+    
 
 agent:
   image: "mirror.gcr.io/jenkins/jnlp-slave"
