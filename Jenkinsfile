@@ -99,28 +99,10 @@ spec:
             container("golang"){
               dir("go"){
                 echo "Building ${pwd()}..."
-                script {
-                  def GOPATH = sh(script: 'go env GOPATH', returnStdout: true).trim()
-                  def PROJECT = "github.com/matihost/learning"
-                  def REPOSITORY = "go"
-                  def CMD_PACKAGE_NAME = "language"
-                  def DIR = pwd()
-                  def TEMP_GO_PATH = "${DIR}/.build-workspace"
-                  sh """
-                    curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-                    mkdir -p ${GOPATH}/src/${PROJECT} && \
-                    cd ${GOPATH}/src/${PROJECT} && \
-                    (rm -f ${REPOSITORY} && ln -s ${DIR} ${REPOSITORY})
-                    cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \
-                    (ls Gopkg.toml >/dev/null 2>&1 || dep init) && \
-                    dep ensure -update
-	                  cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \
-                    cd cmd/${CMD_PACKAGE_NAME} && \
-                    go build && \
-                    cd ${GOPATH}/src/${PROJECT}/${REPOSITORY}/pkg/language && \
-	                  go test                 
-                  """     
-                }                    
+                sh """
+                  curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+                  make build             
+                """
               }   
             }
           }
