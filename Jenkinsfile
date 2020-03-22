@@ -125,7 +125,23 @@ spec:
               }   
             }
           }
-        }              
+        }
+        stage('Build :: Python') {
+          steps {
+            container("python"){
+              dir("python/apps/exchange-rate"){
+                echo "Building ${pwd()}..."
+                sh """
+                  pip3 install pipenv
+                  make lint
+                  make build
+                  make test
+                  make run
+                """
+              }   
+            }
+          }
+        }             
       }
     }
   }
