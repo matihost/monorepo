@@ -1,3 +1,4 @@
+#!/usr/bin/env groovy
 pipeline {
   agent {
     kubernetes {
@@ -8,69 +9,90 @@ metadata:
   labels:
     purpose: ci
 spec:
-  containers:
+  containers:    
   - name: maven-jdk11
     image: maven:3-jdk-11
-    workingDir: /workdir
     command:
     - sleep
     args:
     - infinity
     volumeMounts:
-    - mountPath: /workdir
-      name: workdir    
+    - mountPath: /home/jenkins/agent
+      name: workspace-volume
   - name: golang
     image: mirror.gcr.io/library/golang:latest
-    workingDir: /workdir
     command:
     - sleep
     args:
     - infinity
     volumeMounts:
-    - mountPath: /workdir
-      name: workdir    
+    - mountPath: /home/jenkins/agent
+      name: workspace-volume
   - name: python
     image: mirror.gcr.io/library/python:3.7
-    workingDir: /workdir
     command:
     - cat
     tty: true
     volumeMounts:
-    - mountPath: /workdir
-      name: workdir    
+    - mountPath: /home/jenkins/agent
+      name: workspace-volume
   - name: rust
     image: rust
-    workingDir: /workdir
     command:
     - cat
     tty: true
     volumeMounts:
-    - mountPath: /workdir
-      name: workdir   
-  volumes:
-  - name: workdir
-    emptyDir: {}
+    - mountPath: /home/jenkins/agent
+      name: workspace-volume
 """
     }
-  }
-  environment {
-    WORK_DIR = '/workdir'
   }
   stages {
     stage('Checkout') {
       steps {
-          checkout scm
-          input 'stop'
+        checkout scm
       }
     }
-    stage('Build Java') {
-      steps {
-        container("maven-jdk11"){
-          dir("${WORK_DIR}"){
-            sh """
-            mvn -s .mvn/settings.xml clean install
-            """
-          }    
+    stage('Build') {
+      parallel {
+        stage('Build :: Java') {
+          steps {
+              container("maven-jdk11"){
+                dir("java"){
+                  echo "Building ${pwd()}..."
+                  sh """
+                  mvn -s .mvn/settings.xml clean install
+                  """
+                }   
+              }
+          }
+          post{
+            always {
+              dir("java"){
+                archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+                junit '**/target/surefire-reports/*.xml'     
+              }
+            }
+          }
+        }
+        stage('Build :: Project Euler') {
+          steps {
+            container("maven-jdk11"){
+              dir("algorithms/project-euler"){
+                echo "Building ${pwd()}..."
+                sh """
+                mvn -s .mvn/settings.xml clean install
+                """                         
+              }   
+            }
+          }
+          post{
+            always {
+              dir("algorithms/project-euler"){
+                archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+              }
+            }
+          }      
         }
       }
     }
