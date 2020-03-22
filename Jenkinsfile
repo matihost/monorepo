@@ -112,8 +112,20 @@ spec:
                 archiveArtifacts artifacts: '**/language', fingerprint: true
               }
             }
-          }      
-        }        
+          }
+        }
+        stage('Build :: Rust') {
+          steps {
+            container("rust"){
+              dir("rust/guessing_game"){
+                echo "Building ${pwd()}..."
+                sh """
+                  make build             
+                """
+              }   
+            }
+          }
+        }              
       }
     }
   }
