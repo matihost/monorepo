@@ -13,19 +13,19 @@ function ensurePlaybookRequirements(){
 }
 
 function usage(){
-echo -e "Usage: `basename $0` -e|--env minikube/gke [env]
+echo -e "Usage: `basename $0` -e|--env minikube/gke -p jenkins-admin-password [env]
 
 Deploys Jenkins in 'env'.
 Assumes kubectl is logged to 'env' cluster already.
 
 Samples:
 # deploy to minikube
-`basename $0` -e minikube
+`basename $0` -e minikube -p password-for-jenkins
 or
-`basename $0` minikube
+`basename $0` minikube -p password-for-jenkins
 
 # deploy to gke
-`basename $0` -e gke
+`basename $0` -e gke -p password-for-jenkins
 "    
 }
 
@@ -35,18 +35,19 @@ ensurePlaybookRequirements
 while [[ "$#" -gt 0 ]]; do case $1 in
   -h|--help|help) usage; exit 1;;
   -e|--env) ENV="$2"; shift;;
+  -p|--jenkins-password) PASS="$2"; shift;;  
   *) PARAMS+=("$1");; # save it in an array for later
 esac; shift; done
 set -- "${PARAMS[@]}" # restore positional parameters
 
 ENV=${ENV:-${PARAMS[0]}}
 
-if [[ -z "$ENV" ]]; then 
+if [[ -z "$ENV" || -z "$PASS" ]]; then 
   usage
   exit 1
 fi 
 
-ansible-playbook deploy-jenkins.yaml -v -e env=${ENV} && (
+ansible-playbook deploy-jenkins.yaml -v -e env=${ENV} -e jenkins_admin_pass="${PASS}" && (
   echo "Jenkins Url: https://$(kubectl get ingress ci-jenkins -n ci -o jsonpath="{.spec.rules[0].host}")"
-  echo "User: admin Password: $(kubectl get secret --namespace ci ci-jenkins -o jsonpath="{.data.jenkins-admin-password}" | base64 -d)"
+  echo "User: admin Password: ${PASS}"
 )

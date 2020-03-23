@@ -1,7 +1,10 @@
 #!/usr/bin/env groovy
+//TODO add kaniko, add ansible, get test artifacts from pytest, golang?
 pipeline {
   agent {
     kubernetes {
+      label "learning-${env.BRANCH_NAME}" // subsequent builds from the same branch will reuse pods
+      idleMinutes 60 // pod will be available to reuse for 1 h
       yaml """
 apiVersion: v1
 kind: Pod
@@ -47,8 +50,19 @@ spec:
 """
     }
   }
+  options{
+    buildDiscarder(logRotator(numToKeepStr: '10'))
+    timeout(time: 1, unit: 'HOURS')
+    skipDefaultCheckout()  // to avoid auto checkout sources matching Jenkinsfile, if skipped pipeline needs to call: checkout scm
+    skipStagesAfterUnstable()
+    parallelsAlwaysFailFast()
+    timestamps()
+  }
+  triggers {
+    pollSCM('H/10 * * * 1-5')
+  }
   stages {
-    stage('Checkout') {
+    stage('Checkout sources') {
       steps {
         checkout scm
       }

@@ -24,9 +24,41 @@ master:
     - workflow-aggregator:2.6
     - credentials-binding:1.21
     - git:4.2.2
+    - timestamper:1.11.2
+    - github-branch-source:2.6.0
 
-    
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "256Mi"
+    limits: 
+      cpu: "{{ jenkins_max_cpu|default('2000m') }}"
+      memory: "{{ jenkins_max_memory|default('2Gi') }}"
+
+  securityRealm: |-
+    <securityRealm class="hudson.security.HudsonPrivateSecurityRealm">
+    <disableSignup>true</disableSignup>
+    <enableCaptcha>false</enableCaptcha>
+    </securityRealm>
+  scriptApproval:
+  - 'method groovy.json.JsonSlurperClassic parseText java.lang.String'
+  initScripts:
+    create-admin-account: |
+      import jenkins.model.*
+      import hudson.security.*
+      def instance = Jenkins.getInstance()
+      def hudsonRealm = new HudsonPrivateSecurityRealm(false)
+      if (!hudsonRealm.getUser("admin")){
+        hudsonRealm.createAccount("admin", "{{ jenkins_admin_pass|mandatory }}")
+      }
+      instance.save()
 
 agent:
   image: "mirror.gcr.io/jenkins/jnlp-slave"
-
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "64Mi"
+    limits:
+      cpu: "{{ jenkins_agent_max_cpu|default('2') }}"
+      memory: "{{ jenkins_agent_max_memory|default('1Gi') }}"
