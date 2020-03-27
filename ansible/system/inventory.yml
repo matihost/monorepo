@@ -45,12 +45,13 @@ all:
           - nautilus-dropbox
           - openssh-server
           - iftop
-          - docker.io
           - dosbox
           - steam
           - virtualbox-6.1
           - virt-manager
           - awscli
+          - docker.io
+          - conntrack
           - cri-o-1.17
           - fuse-overlayfs
           - podman
