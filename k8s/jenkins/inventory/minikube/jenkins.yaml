@@ -1,1 +1,7 @@
 jenkins_ingress: jenkins.ci.minikube
+jenkins_jobs:
+- name: learning
+  description: Learning Multibranch Pipeline
+  type: multibranch    
+  git:
+    scm: https://github.com/matihost/learning.git

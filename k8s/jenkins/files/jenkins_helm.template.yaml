@@ -49,7 +49,7 @@ master:
       def instance = Jenkins.getInstance()
       def hudsonRealm = new HudsonPrivateSecurityRealm(false)
       if (!hudsonRealm.getUser("admin")){
-        hudsonRealm.createAccount("admin", "{{ jenkins_admin_pass|mandatory }}")
+        hudsonRealm.createAccount("{{ jenkins_admin_username|default('admin') }}", "{{ jenkins_admin_pass|mandatory }}")
       }
       instance.save()
 
