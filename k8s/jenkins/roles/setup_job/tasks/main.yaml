@@ -5,7 +5,7 @@
   loop:
   - jenkins_ingress
   - job
-  - jenkins_admin_api_token
+  - jenkins_admin_pass
 
 - name: Prepare job form
   set_fact:
@@ -16,33 +16,33 @@
     script_value: "{{ lookup('template', role_path + '/files/ensure-job.template.groovy') }}"
 
 
-# TODO No valid crumb was included in the request is returned
-# - name: Get Jenkins crump
-#   uri:
-#     url: "https://{{ jenkins_ingress }}//crumbIssuer/api/xml?xpath=concat(//crumbRequestField,\":\",//crumb)"
-#     validate_certs: no
-#     force_basic_auth: yes
-#     user: "{{ jenkins_admin_user|default('admin')}}"
-#     password: "{{ jenkins_admin_pass|mandatory }}"
-#     method: GET
-#     status_code: 200
-#     return_content: true
-#   register: crump_result
+- name: Get Jenkins crump
+  uri:
+    url: "https://{{ jenkins_ingress }}//crumbIssuer/api/xml?xpath=concat(//crumbRequestField,\":\",//crumb)"
+    validate_certs: no
+    force_basic_auth: yes
+    user: "{{ jenkins_admin_user|default('admin')}}"
+    password: "{{ jenkins_admin_pass|mandatory }}"
+    method: GET
+    status_code: 200
+    return_content: true
+  register: crump_result
 
 
-- name: Login to a form based webpage, then use the returned cookie to access the app in later tasks
+- name: Endsure Job {{ job.nam }} is present
   uri:
     url: https://{{ jenkins_ingress }}/scriptText
     validate_certs: no
     force_basic_auth: yes
     user: "{{ jenkins_admin_user|default('admin')}}"
-    password: "{{ jenkins_admin_api_token|mandatory }}"
+    password: "{{ jenkins_admin_pass|mandatory }}"
     method: POST
     body_format: form-urlencoded
     body:
       script: "{{ script_value }}"
-    # headers:
-    #   Jenkins-Crumb: "{{crump_result.content.split(':')[1]}}"
+    headers:
+      Jenkins-Crumb: "{{crump_result.content.split(':')[1]}}"
+      Cookie: "{{ crump_result.set_cookie }}"
     status_code: 200
     return_content: true
   register: job_result

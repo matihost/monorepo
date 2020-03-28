@@ -21,6 +21,5 @@ deploy-jenkins.sh minikube -p password-for-jenkins
 deploy-jenkins.sh -e gke -p password-for-jenkins
 
 # ensure Jobs for env are present
-# requires token to be generated for admin user
-ensure-jobs.sh -e minikube -p "$(< .api-token)"
+ensure-jobs.sh -e minikube -p password-for-jenkins
 ```
