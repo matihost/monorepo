@@ -9,7 +9,7 @@
 
 - name: Prepare job form
   set_fact:
-    job_definition: "{{ lookup('template', role_path + '/files/multibranch-job.template.xml') }}"
+    job_definition: "{{ lookup('template', role_path + '/files/' + job.type + '-job.template.xml') }}"
 
 - name: Prepare script 
   set_fact:
@@ -29,7 +29,7 @@
   register: crump_result
 
 
-- name: Endsure Job {{ job.nam }} is present
+- name: Endsure Job {{ job.name }} is present
   uri:
     url: https://{{ jenkins_ingress }}/scriptText
     validate_certs: no

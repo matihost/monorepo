@@ -5,3 +5,11 @@ jenkins_jobs:
   type: multibranch    
   git:
     scm: https://github.com/matihost/learning.git
+- name: learning-github
+  description: Learning GitHub Pipeline
+  type: github    
+  github:
+    owner: matihost
+    projects:
+      include: '*'
+      exclude: 'bento'

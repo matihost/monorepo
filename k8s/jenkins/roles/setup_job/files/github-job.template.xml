@@ -1,0 +1,58 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<jenkins.branch.OrganizationFolder>
+  <actions/>
+  <description>{{ job.description }}</description>
+  <displayName>{{ job.name }}</displayName>
+  <properties>
+    <jenkins.branch.OrganizationChildTriggersProperty>
+      <templates>
+        <com.cloudbees.hudson.plugins.folder.computed.PeriodicFolderTrigger>
+          <spec>H/15 * * * *</spec>
+          <interval>3600000</interval>
+        </com.cloudbees.hudson.plugins.folder.computed.PeriodicFolderTrigger>
+      </templates>
+    </jenkins.branch.OrganizationChildTriggersProperty>
+    <jenkins.branch.NoTriggerOrganizationFolderProperty>
+      <branches>{{ job.github.projects.branches|default('.*') }}</branches>
+    </jenkins.branch.NoTriggerOrganizationFolderProperty>
+  </properties>
+  <orphanedItemStrategy class="com.cloudbees.hudson.plugins.folder.computed.DefaultOrphanedItemStrategy" plugin="cloudbees-folder@6.11.1">
+    <pruneDeadBranches>true</pruneDeadBranches>
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>10</numToKeep>
+  </orphanedItemStrategy>
+  <triggers>
+    <com.cloudbees.hudson.plugins.folder.computed.PeriodicFolderTrigger>
+      <spec>H/15 * * * *</spec>
+      <interval>3600000</interval>
+    </com.cloudbees.hudson.plugins.folder.computed.PeriodicFolderTrigger>
+  </triggers>
+  <disabled>false</disabled>
+  <navigators>
+    <org.jenkinsci.plugins.github__branch__source.GitHubSCMNavigator>
+      <repoOwner>{{ job.github.owner }}</repoOwner>
+      <traits>
+        <jenkins.scm.impl.trait.WildcardSCMSourceFilterTrait>
+          <includes>{{ job.github.projects.include|default('*') }}</includes>
+          <excludes>{{ job.github.projects.exclude|default('') }}</excludes>
+        </jenkins.scm.impl.trait.WildcardSCMSourceFilterTrait>
+        <org.jenkinsci.plugins.github__branch__source.BranchDiscoveryTrait>
+          <strategyId>1</strategyId>
+        </org.jenkinsci.plugins.github__branch__source.BranchDiscoveryTrait>
+        <org.jenkinsci.plugins.github__branch__source.OriginPullRequestDiscoveryTrait>
+          <strategyId>1</strategyId>
+        </org.jenkinsci.plugins.github__branch__source.OriginPullRequestDiscoveryTrait>
+        <org.jenkinsci.plugins.github__branch__source.ForkPullRequestDiscoveryTrait>
+          <strategyId>1</strategyId>
+          <trust class="org.jenkinsci.plugins.github_branch_source.ForkPullRequestDiscoveryTrait\$TrustPermission"/>
+        </org.jenkinsci.plugins.github__branch__source.ForkPullRequestDiscoveryTrait>
+      </traits>
+    </org.jenkinsci.plugins.github__branch__source.GitHubSCMNavigator>
+  </navigators>
+  <projectFactories>
+    <org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProjectFactory>
+      <scriptPath>Jenkinsfile</scriptPath>
+    </org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProjectFactory>
+  </projectFactories>
+  <buildStrategies/>
+</jenkins.branch.OrganizationFolder>
