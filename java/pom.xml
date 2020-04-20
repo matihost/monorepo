@@ -40,7 +40,7 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
-    <spring.boot.version>2.2.5.RELEASE</spring.boot.version>
+    <spring.boot.version>2.2.6.RELEASE</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -49,15 +49,16 @@
     <enforce.maven.version>3.6</enforce.maven.version>
 
     <!-- Groovy -->
-    <groovy.version>3.0.1</groovy.version>
+    <groovy.version>3.0.3</groovy.version>
     <spock.version>2.0-M2-groovy-3.0</spock.version>
 
     <!-- Scala -->
     <scala.compat.version>2.13</scala.compat.version>
     <scala.version>${scala.compat.version}.1</scala.version>
-    <scala.spec2.version>4.8.1</scala.spec2.version>
-    <scala.test.version>3.2.0-M2</scala.test.version>
-    <scala.test.plus.version>3.2.0.0-M2</scala.test.plus.version>
+    <!-- TODO update scala.spec2.version 4.9.3 when compatible with latest scala.test 3.3.0.x -->
+    <scala.spec2.version>4.9.2</scala.spec2.version>
+    <scala.test.version>3.3.0-SNAP2</scala.test.version>
+    <scala.test.plus.version>3.3.0.0-SNAP2</scala.test.plus.version>
   </properties>
 
   <dependencies>
@@ -164,7 +165,7 @@
         <plugin>
           <groupId>org.codehaus.gmavenplus</groupId>
           <artifactId>gmavenplus-plugin</artifactId>
-          <version>1.8.1</version>
+          <version>1.9.0</version>
           <executions>
             <execution>
               <goals>
@@ -321,7 +322,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.8.2</version>
+          <version>3.9.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
