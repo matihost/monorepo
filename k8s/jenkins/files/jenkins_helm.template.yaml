@@ -19,12 +19,12 @@ master:
         - {{ jenkins_ingress }}
         
   installPlugins:
-    - kubernetes:1.24.1
-    - workflow-job:2.37
+    - kubernetes:1.25.3
+    - workflow-job:2.38
     - workflow-aggregator:2.6
     - credentials-binding:1.21
     - git:4.2.2
-    - timestamper:1.11.2
+    - timestamper:1.11.3
     - github-branch-source:2.6.0
 
   resources:
