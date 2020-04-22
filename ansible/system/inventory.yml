@@ -25,6 +25,8 @@ all:
           - dlocate
           - ubuntu-restricted-extras
           - grub-customizer
+          - hplip
+          - hplip-gui
           - golang-1.13
           - golang-golang-x-tools
           - python3-pip
@@ -79,6 +81,8 @@ all:
             become: false
             command: |
               [ -e /etc/hp/hplip.conf ] &&  {
+                # hplip systray does not work in Ubuntu GNOME
+                [ -e /etc/xdg/autostart/hplip-systray.desktop ] && sudo rm -f /etc/xdg/autostart/hplip-systray.desktop
                 HP_LIP_VERSION=$(grep version /etc/hp/hplip.conf | sed -E "s/version=(.+)/\1/")
                 CURRENT_LATEST_HP_LIP_VERSION=$(curl -sL https://developers.hp.com/hp-linux-imaging-and-printing/release_notes |grep -m 1 'HPLIP 3.' | sed -E "s/.+HPLIP (3.+) -.+/\1/")
                 [ "${HP_LIP_VERSION}" = "${CURRENT_LATEST_HP_LIP_VERSION}" ] || {
