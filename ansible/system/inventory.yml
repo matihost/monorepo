@@ -14,13 +14,10 @@ all:
           - name: multiverse
           - name: vscode
             repo: "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main"
-          - name: keepass
-            repo: "deb http://ppa.launchpad.net/jtaylor/keepass/ubuntu {{ ansible_distribution_release }} main"
-          - name: virtualbox
-            repo: "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian {{ ansible_distribution_release }} contrib"
-          - name: libcontainers
-            repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/ /"
-            key_url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/Release.key"
+          #TODO uncomment when focal is supported
+          # - name: libcontainers
+          #   repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/ /"
+          #   key_url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/Release.key"
         packages:
           - dlocate
           - ubuntu-restricted-extras
@@ -49,15 +46,16 @@ all:
           - iftop
           - dosbox
           - steam
-          - virtualbox-6.1
           - virt-manager
           - awscli
           - docker.io
           - conntrack
-          - cri-o-1.17
           - fuse-overlayfs
-          - podman
-          - buildah
+          - virtualbox
+          #TODO uncomment when focal is supported
+          # - cri-o-1.17
+          # - podman
+          # - buildah
         snaps:
           - mc-installer
           - minecraft-server-jdstrand
