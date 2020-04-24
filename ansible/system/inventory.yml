@@ -19,6 +19,8 @@ all:
           #   repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/ /"
           #   key_url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/Release.key"
         packages:
+          - autofs
+          - cifs-utils
           - dlocate
           - ubuntu-restricted-extras
           - grub-customizer
@@ -227,3 +229,10 @@ all:
               precedence  2002::/16     30
               precedence ::/96          20
               precedence ::ffff:0:0/96  100
+          - file: /etc/security/limits.d/open-files-limit.conf
+            content: |
+              *   soft    nofile    32768
+              *   hard    nofile    65536
+          - file: /etc/autofs.conf 
+            content: |
+              logging = verbose
