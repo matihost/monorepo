@@ -25,7 +25,9 @@ master:
     - credentials-binding:1.21
     - git:4.2.2
     - timestamper:1.11.3
-    - github-branch-source:2.6.0
+    - github-branch-source:2.7.1
+    - matrix-auth:2.5
+    - prometheus:2.0.6
 
   resources:
     requests:

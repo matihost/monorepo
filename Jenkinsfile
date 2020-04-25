@@ -1,9 +1,9 @@
 #!/usr/bin/env groovy
-//TODO add kaniko, add ansible, get test artifacts from pytest, golang?
+//TODO add kaniko, get test artifacts from pytest, golang?
 pipeline {
   agent {
     kubernetes {
-      label "learning-${env.BRANCH_NAME}" // subsequent builds from the same branch will reuse pods
+      label validLabel("learning-${env.BRANCH_NAME}") // subsequent builds from the same branch will reuse pods
       idleMinutes 60 // pod will be available to reuse for 1 h
       yaml """
 apiVersion: v1
@@ -47,6 +47,15 @@ spec:
     volumeMounts:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
+  - name: ansible
+    image: quay.io/ansible/molecule:3.0.3
+    command:
+    - sleep
+    args:
+    - infinity
+    volumeMounts:
+    - mountPath: /home/jenkins/agent
+      name: workspace-volume
 """
     }
   }
@@ -77,7 +86,7 @@ spec:
                   sh """
                   mvn -s .mvn/settings.xml clean install
                   """
-                }   
+                }
               }
           }
           post{
@@ -96,8 +105,8 @@ spec:
                 echo "Building ${pwd()}..."
                 sh """
                 mvn -s .mvn/settings.xml clean install
-                """                         
-              }   
+                """
+              }
             }
           }
           post{
@@ -106,7 +115,7 @@ spec:
                 archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
               }
             }
-          }      
+          }
         }
         stage('Build :: Golang') {
           steps {
@@ -117,7 +126,7 @@ spec:
                   curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
                   make build             
                 """
-              }   
+              }
             }
           }
           post{
@@ -136,7 +145,7 @@ spec:
                 sh """
                   make build             
                 """
-              }   
+              }
             }
           }
         }
@@ -152,12 +161,34 @@ spec:
                   make test
                   make run
                 """
+              }
+            }
+          }
+        }
+        stage('Build :: Ansible') {
+          steps {
+            container("ansible"){
+              dir("ansible/learning"){
+                echo "Building ${pwd()}..."
+                sh """
+                  ansible-playbook dictionaries.yaml -v
+                """
               }   
             }
           }
-        }             
+        }
       }
     }
   }
 }
 
+/**
+ * Helper method to ensure label given to pod follow K8S naming rules
+ */
+def validLabel(String str){
+  str = str.replaceAll('[^A-Za-z0-9]','-')
+  if (str.length() > 63){
+    str = str.substring(0, 63)
+  }
+  return str
+}
