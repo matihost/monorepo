@@ -39,7 +39,7 @@ clean: ## clean
 	@find tests/ -type f -name '*.retry' -delete
 
 
-clean-all: clean # clean also virtualenv
+clean-all: clean ## clean also virtualenv
 	@pipenv --rm
 
 init: ## ensure virtualenv contains all dependencies and app is installed in editable mode within virtual env

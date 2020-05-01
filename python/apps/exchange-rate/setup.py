@@ -32,15 +32,15 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Build Tools",
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
     keywords="exchange rate nbp",  # Optional
     # When your source code is in a subdirectory under the project root, e.g.
     # `src/`, it is necessary to specify the `package_dir` argument.
     package_dir={"": "src"},  # Optional
     packages=find_packages(where="src"),  # Required
-    python_requires=">=3.5, <4",
+    python_requires=">=3.7, <4",
     install_requires=[
         "requests>=2.23.0, <3",
     ],  # Optional
