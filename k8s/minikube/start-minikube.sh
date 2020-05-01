@@ -36,23 +36,48 @@ function ensureCrioAndCrictlPresent(){
   [ -e /usr/bin/runc ] || sudo ln -s /usr/sbin/runc /usr/bin/runc
 }
 
+function ensureIstioctlIsPresent() {
+  [ -x ~/.istioctl/bin/istioctl ] || (
+    curl -sL https://istio.io/downloadIstioctl | sh -
+    echo 'export PATH=$PATH:$HOME/.istioctl/bin' >> ~/.bashrc
+    export PATH=$PATH:$HOME/.istioctl/bin
+  )
+}
+
 ensureMinikubePresent
+MODE='docker'
+ADDONS="registry ingress dashboard"
 
 case "$1" in
    --with-crio|crio|c) 
-   ensureCrioAndCrictlPresent
-   EXTRA_PARAMS='--container-runtime=cri-o'
    MODE='crio'
    ;; 
-   --with-docker|docker|d|*) 
-   ensureDockerCGroupSystemD
-   EXTRA_PARAMS='--extra-config=kubelet.cgroup-driver=systemd'
+   --with-docker|docker|d)
    MODE='docker'
-   ;; 
+   ;;
+   --with-istio|istio)
+   ADDONS="${ADDONS} istio"
+   ;;
 esac
+
+case "${MODE}" in
+  crio)
+    ensureCrioAndCrictlPresent
+    EXTRA_PARAMS='--container-runtime=cri-o'
+    ;;
+  docker)
+    ensureDockerCGroupSystemD
+    EXTRA_PARAMS='--extra-config=kubelet.cgroup-driver=systemd'
+esac
+
 
 minikube status &>/dev/null
 if [ $? -ne 0  ]; then
+  #TODO remmove when https://github.com/kubernetes/minikube/issues/6391 is fixed
+  [ "$(sudo sysctl -en fs.protected_regular)" != '0' ] \
+  && sudo sysctl fs.protected_regular=0 && echo "Disabled fs.protected_regular to allow running Minikube in none mode"
+  
+
   export MINIKUBE_WANTUPDATENOTIFICATION=false
   export MINIKUBE_WANTREPORTERRORPROMPT=false
   export MINIKUBE_HOME=$HOME
@@ -73,12 +98,19 @@ if [ $? -ne 0  ]; then
 
   sudo chmod -R a+rwx /etc/kubernetes && \
   minikube update-context &>/dev/null && \
-  minikube addons enable registry && \
-  minikube addons enable ingress && \
-  minikube addons enable dashboard && \
   { minikube tunnel &>/tmp/minikube-tunnel.log & } && \
-  [ "$(sudo systemctl is-enabled kubelet)" == 'enabled' ] && sudo systemctl disable kubelet && \
   echo "Minikube has been started"
+
+  [ "$(sudo systemctl is-enabled kubelet)" == 'enabled' ] \
+  && sudo systemctl disable kubelet && echo "Disabled Minikube from auto startup on boot"
+
+  for ADDON in ${ADDONS}; do
+    if [ "${ADDON}" == 'istio' ]; then
+      ensureIstioctlIsPresent
+      istioctl operator init
+    fi
+    minikube addons enable ${ADDON}
+  done  
 else
   echo "Minikube already started"
 fi
