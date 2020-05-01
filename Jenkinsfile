@@ -32,6 +32,7 @@ spec:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
   - name: python
+    #TODO switch to 3.8 or latest when available: gcloud container images list-tags mirror.gcr.io/library/python
     image: mirror.gcr.io/library/python:3.7
     command:
     - cat
@@ -48,7 +49,8 @@ spec:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
   - name: ansible
-    image: quay.io/ansible/molecule:3.0.3
+    #TODO use latest image when https://github.com/ansible-community/molecule/issues/2656 is fixed
+    image: quay.io/ansible/molecule:3.0.4
     command:
     - sleep
     args:
