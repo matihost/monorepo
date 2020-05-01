@@ -1,6 +1,6 @@
-# Setuop AutoFS Mount
+# Tools
 
-Creates autofs mount point 
+Contains CLI Python made tools: setup-autofs
 
 ## Usage
 
