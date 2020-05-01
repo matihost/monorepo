@@ -14,10 +14,9 @@ all:
           - name: multiverse
           - name: vscode
             repo: "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main"
-          #TODO uncomment when focal is supported
-          # - name: libcontainers
-          #   repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/ /"
-          #   key_url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/Release.key"
+          - name: libcontainers
+            repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/ /"
+            key_url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/Release.key"
         packages:
           - autofs
           - cifs-utils
@@ -47,6 +46,7 @@ all:
           - openssh-server
           - iftop
           - dosbox
+          - calibre
           - steam
           - virt-manager
           - awscli
@@ -54,10 +54,9 @@ all:
           - conntrack
           - fuse-overlayfs
           - virtualbox
-          #TODO uncomment when focal is supported
-          # - cri-o-1.17
-          # - podman
-          # - buildah
+          - cri-o-1.17
+          - podman
+          - buildah
         snaps:
           - mc-installer
           - minecraft-server-jdstrand
@@ -220,6 +219,13 @@ all:
                 cd ~/bin &&
                 wget -qO- https://storage.googleapis.com/shellcheck/shellcheck-stable.linux.x86_64.tar.xz | tar -xJv -o shellcheck-stable/shellcheck &&
                 mv shellcheck-stable/shellcheck . && rmdir shellcheck-stable
+              )
+          - name: istioctl
+            become: false
+            command: |
+              [ -x ~/.istioctl/bin/istioctl ] || (
+                curl -sL https://istio.io/downloadIstioctl | sh -
+                echo 'export PATH=$PATH:$HOME/.istioctl/bin' >> ~/.bashrc
               )
         files_config:
           - file: /etc/gai.conf
