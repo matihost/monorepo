@@ -41,7 +41,7 @@ jobs:
       directories:
       - $TRAVIS_BUILD_DIR/go/vendor
   - language: python
-    python: "3.7"
+    python: "3.8"
     before_install: cd python/apps/exchange-rate
     install:
     - pip3 install pipenv
