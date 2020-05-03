@@ -23,7 +23,7 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 setup(
     name="tools",  # Required
     version=git_version(),  # Required
-    description="Project with CLI tools: setup-autofs",  # Optional
+    description="Project with CLI tools: setup-opendns, automount-cifs",  # Optional
     long_description=long_description,  # Optional
     long_description_content_type="text/markdown",  # Optional (see note above)
     url="https://github.com/matihost/learning",  # Optional
@@ -37,10 +37,16 @@ setup(
         "Programming Language :: Python :: 3.8",
     ],
     keywords="exchange rate nbp",  # Optional
+    
     # When your source code is in a subdirectory under the project root, e.g.
     # `src/`, it is necessary to specify the `package_dir` argument.
     package_dir={"": "src"},  # Optional
     packages=find_packages(where="src"),  # Required
+
+    # Ensures that non .py files are included in package
+    setup_requires=['setuptools_scm'],
+    include_package_data=True,
+
     python_requires=">=3.7, <4",
     install_requires=[
         "Jinja2>=2.11.2, <3",

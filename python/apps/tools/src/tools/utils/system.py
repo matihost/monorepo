@@ -7,7 +7,7 @@ def reexecute_self_as_root():
     """
     Re-execute current process as root.
     It breaks current process and run it again as root, hence
-    it SHOULD be run at the begginning of the program.
+    it SHOULD be run at the beginning of the program.
     """
     if os.geteuid() != 0:
         os.execvp('sudo', ['python3'] + sys.argv)

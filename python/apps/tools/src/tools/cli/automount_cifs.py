@@ -4,7 +4,11 @@ Mount SAMBA/CIFS 1.0 resource to be automatically mounted when available and rea
 (using system autofs service)
 """
 import argparse
+
 from tools.utils.version import package_version
+from tools.utils.system import reexecute_self_as_root
+
+reexecute_self_as_root()
 
 _DESCRIPTION = "Ensure SAMBA/CIFS 1.0 url is mounted as autofs resource"
 _EPILOG = """
@@ -16,9 +20,9 @@ automount-cifs //192.168.1.1/all /mnt/nas/router/all -u admin -p passwordForReso
 def _parse_program_argv():
     parser = argparse.ArgumentParser(description=_DESCRIPTION, epilog=_EPILOG,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('server_url', metavar='server_url', nargs='?', type=str,
+    parser.add_argument('server_url', metavar='server_url', type=str,
                         help='the url to mount, for example: //192.168.1.1/all')
-    parser.add_argument('mount_path', metavar='domain', nargs='?', type=str,
+    parser.add_argument('mount_path', metavar='mount_path', type=str,
                         help='mount path, example: /mnt/nas/router/all')
     parser.add_argument('-u', '--user', metavar='user', nargs='?', type=str,
                         help='user')
@@ -28,7 +32,7 @@ def _parse_program_argv():
     parser.add_argument('-v', '--version', action='version',
                         version=package_version('tools'))
     args = parser.parse_args()
-    return args
+    return args.server_url
 
 
 def main():

@@ -3,7 +3,7 @@ import pkg_resources
 
 def git_version():
     try:
-        version = subprocess.check_output(["git", "describe", "--long"], 
+        version = subprocess.check_output(["git", "describe", "--long"],
                                           encoding='UTF-8', stderr=subprocess.DEVNULL)\
           .strip().replace('-', '.')
     except subprocess.CalledProcessError:

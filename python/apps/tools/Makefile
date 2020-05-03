@@ -1,5 +1,8 @@
-run: init ## run application ensuring all deps are in place
+run-automount-cifs: init ## run application ensuring all deps are in place
 	@pipenv run automount-cifs
+
+run-setup-open-dns: init ## run application ensuring all deps are in place
+	@pipenv run setup-opendns
 
 lint: init ## linter source code
 	@pipenv run pylint src/ tests/
@@ -13,7 +16,10 @@ build: ## create distribution
 test: init ## run tests
 	@pipenv run pytest tests
 
-install: ## install locally in editable mode
+install: build ## install globally to make cli switchable to root working
+	sudo pip3 install .
+
+install-user: ## install locally in editable mode (apps switching to root internally may stop working)
 	pip3 install --user -e .
 
 uninstall: ## install locally
