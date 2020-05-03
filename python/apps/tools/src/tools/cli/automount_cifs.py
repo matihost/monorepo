@@ -6,12 +6,12 @@ Mount SAMBA/CIFS 1.0 resource to be automatically mounted when available and rea
 import argparse
 from tools.utils.version import package_version
 
-
 _DESCRIPTION = "Ensure SAMBA/CIFS 1.0 url is mounted as autofs resource"
 _EPILOG = """
 Example:
 automount-cifs //192.168.1.1/all /mnt/nas/router/all -u admin -p passwordForResource
 """
+
 
 def _parse_program_argv():
     parser = argparse.ArgumentParser(description=_DESCRIPTION, epilog=_EPILOG,
@@ -25,9 +25,8 @@ def _parse_program_argv():
     parser.add_argument('-p', '--pass', metavar='pass', nargs='?', type=str,
                         help='name to mount')
 
-
     parser.add_argument('-v', '--version', action='version',
-                        version=package_version('setup_autofs'))
+                        version=package_version('tools'))
     args = parser.parse_args()
     return args
 
@@ -37,7 +36,7 @@ def main():
     Main program method
     """
     args = _parse_program_argv()
-    #TODO implement
+    # TODO implement
     print('{0}'.format(args))
 
 

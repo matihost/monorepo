@@ -1,5 +1,5 @@
 run: init ## run application ensuring all deps are in place
-	@pipenv run setup-autofs
+	@pipenv run automount-cifs
 
 lint: init ## linter source code
 	@pipenv run pylint src/ tests/

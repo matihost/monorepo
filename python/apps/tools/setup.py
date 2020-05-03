@@ -42,8 +42,15 @@ setup(
     package_dir={"": "src"},  # Optional
     packages=find_packages(where="src"),  # Required
     python_requires=">=3.7, <4",
-    install_requires=[],  # Optional
+    install_requires=[
+        "Jinja2>=2.11.2, <3",
+    ], 
     dependency_links=[],
-    entry_points={"console_scripts": ["automount-cifs=tools.cli.automount_cifs:main",],},
+    entry_points={
+        "console_scripts": [
+            "automount-cifs=tools.cli.automount_cifs:main",
+            "setup-opendns=tools.cli.setup_opendns:main",
+        ],
+    },
     project_urls={"Source": "https://github.com/matihost/learning/",},  # Optional
 )

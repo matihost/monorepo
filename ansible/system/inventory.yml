@@ -25,6 +25,7 @@ all:
           - grub-customizer
           - hplip
           - hplip-gui
+          - ddclient
           - golang-1.13
           - golang-golang-x-tools
           - python3-pip
