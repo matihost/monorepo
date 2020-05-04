@@ -1,5 +1,7 @@
 ---
 - hosts: local
+  collections:
+    - community.kubernetes
   tasks:
   - name: Check mandatory variables
     fail:
@@ -49,7 +51,7 @@
     no_log: true
 
   - name: Deploy latest version of Jenkins chart inside {{ namespace }} namespace
-    helm_cli:
+    helm:
       name: "{{ namespace }}"
       chart_ref: stable/jenkins
       release_namespace: "{{ namespace }}"

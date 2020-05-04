@@ -7,6 +7,20 @@ Playbooks:
 * `deploy-jenkins.sh` - deploys Jenkins
 * `ensure-job.sh` - ensure Jenkins jobs are present
 
+## Prerequisites
+
+* Ansible
+
+  `pip3 install --user ansible`
+
+* OpenShift module
+
+  `pip3 install --user openshift kubernetes`
+
+* K8S and Helm modules
+
+  `ansible-galaxy collection install community.kubernetes`
+
 ## Running
 
 Samples:

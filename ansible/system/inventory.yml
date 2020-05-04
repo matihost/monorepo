@@ -82,6 +82,11 @@ all:
             become: false
             command: |
               [ "$(groups |grep -c vboxusers)" -eq 0 ] || sudo usermod -aG vboxusers ${USER}
+          - name: ansible-community-kubernetes-collections
+            desc: To ensure Ansible galaxy collection community.kubernetes with k8s, helm modules is present
+            become: false
+            command: |
+              [ "$(ansible-galaxy collection install community.kubernetes |grep -c 'is already installed')" -eq 1 ] || echo "Ansible collection community.kubernetes has been installed"
           - name: ensure-hp-lip
             become: false
             command: |
