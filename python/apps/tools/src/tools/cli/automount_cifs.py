@@ -4,9 +4,11 @@ Mount SAMBA/CIFS 1.0 resource to be automatically mounted when available and rea
 (using system autofs service)
 """
 import argparse
+import subprocess
 
+from tools.utils.file import read_file, write_file
 from tools.utils.version import package_version
-from tools.utils.system import reexecute_self_as_root
+from tools.utils.system import run, reexecute_self_as_root
 
 reexecute_self_as_root()
 
@@ -26,22 +28,67 @@ def _parse_program_argv():
                         help='mount path, example: /mnt/nas/router/all')
     parser.add_argument('-u', '--user', metavar='user', nargs='?', type=str,
                         help='user')
-    parser.add_argument('-p', '--pass', metavar='pass', nargs='?', type=str,
+    parser.add_argument('-p', '--password', metavar='password', nargs='?', type=str,
                         help='name to mount')
 
     parser.add_argument('-v', '--version', action='version',
                         version=package_version('tools'))
     args = parser.parse_args()
-    return args.server_url
+    return args.server_url, args.mount_path, args.user, args.password
 
 
 def main():
     """
     Main program method
     """
-    args = _parse_program_argv()
-    # TODO implement
-    print('{0}'.format(args))
+    url, mount_path, user, password = _parse_program_argv()
+    ensure_autofs_present()
+    ensure_direct_mapping_present()
+    if ensure_mapping2url_present(url, mount_path, user, password):
+        ensure_autofs_running_and_enabled()
+
+
+def is_automount_installed():
+    try:
+        run('command -v automount')
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+
+def ensure_autofs_present():
+    if not is_automount_installed():
+        print('Installing autofs')
+        run('apt-get -y install autofs')
+
+
+def ensure_direct_mapping_present():
+    desired_config = "/-  /etc/auto.direct\n"
+    direct_mapping_filename = '/etc/auto.master.d/direct.autofs'
+    current_config = read_file(direct_mapping_filename, ignore_error=True)
+    if current_config != desired_config:
+        write_file(direct_mapping_filename, desired_config)
+
+
+def ensure_mapping2url_present(url, mount_path, user, password):
+    desired_line = "{1} -fstype=cifs,user={2},password={3},rw,vers=1.0 :{0}\n"\
+        .format(url, mount_path, user, password)
+    direct_filename = '/etc/auto.direct'
+    current_config = read_file(direct_filename, ignore_error=True)
+    # TODO what is file mapping is already there
+    if desired_line not in current_config:
+        # TODO ensure mount directory is present except the last directory
+        print('Writing {0} with {1} mapping to {2}'.format(direct_filename, url, mount_path))
+        write_file(direct_filename, desired_line, mode='a')
+        return True
+    return False
+
+
+def ensure_autofs_running_and_enabled():
+    print('Restarting autofs service')
+    run('systemctl restart autofs')
+    print('Enabling autofs service')
+    run('systemctl enable autofs')
 
 
 if __name__ == "__main__":

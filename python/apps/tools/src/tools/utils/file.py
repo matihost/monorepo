@@ -16,6 +16,6 @@ def read_file(file_path, ignore_error=False):
         raise err
 
 
-def write_file(file_path, content):
-    with open(file_path, 'w', encoding="utf-8") as file:
+def write_file(file_path, content, mode='w'):
+    with open(file_path, mode, encoding="utf-8") as file:
         return file.write(content)
