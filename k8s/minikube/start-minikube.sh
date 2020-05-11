@@ -31,6 +31,12 @@ function ensureCrioAndCrictlPresent(){
     sudo apt-get update -qq;\
     sudo apt-get install -y cri-o-${CRIO_VERSION} podman buildah;\
   )
+  [ -x /opt/cni/bin/bridge ] || (
+    sudo apt -y install containernetworking-plugins
+    sudo mkdir -p /opt/cni
+    #TODO remove when kubelet will support cni-bin-dir flag for non-docer runtimes
+    sudo ln -s /usr/lib/cni /opt/cni/bin
+  )
 
   #TODO remove when fixed https://github.com/cri-o/cri-o/issues/1767
   [ -e /usr/bin/runc ] || sudo ln -s /usr/sbin/runc /usr/bin/runc
@@ -63,11 +69,11 @@ esac
 case "${MODE}" in
   crio)
     ensureCrioAndCrictlPresent
-    EXTRA_PARAMS='--container-runtime=cri-o'
+    EXTRA_PARAMS='--container-runtime=cri-o --enable-default-cni --extra-config=kubelet.cni-bin-dir=/usr/lib/cni'
     ;;
   docker)
     ensureDockerCGroupSystemD
-    EXTRA_PARAMS='--extra-config=kubelet.cgroup-driver=systemd'
+    EXTRA_PARAMS=''
 esac
 
 
@@ -94,6 +100,7 @@ if [ $? -ne 0  ]; then
   sudo -E minikube start --vm-driver=none --apiserver-ips 127.0.0.1 --apiserver-name localhost \
     --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook" \
     --extra-config=kubelet.resolv-conf=/run/systemd/resolve/resolv.conf \
+    --extra-config=kubelet.cgroup-driver=systemd \
     ${EXTRA_PARAMS}
 
   sudo chmod -R a+rwx /etc/kubernetes && \

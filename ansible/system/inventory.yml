@@ -55,6 +55,7 @@ all:
           - conntrack
           - fuse-overlayfs
           - virtualbox
+          - containernetworking-plugins
           - cri-o-1.17
           - podman
           - buildah
@@ -237,6 +238,17 @@ all:
               [ -x ~/.istioctl/bin/istioctl ] || (
                 curl -sL https://istio.io/downloadIstioctl | sh -
                 echo 'export PATH=$PATH:$HOME/.istioctl/bin' >> ~/.bashrc
+              )
+          - name: cni-k8s-workaround
+            become: true
+            desc: |
+              CNI needed by Crio based Minikube
+              K8S requires that cni plugin binaries are at /opt/cni/bin 
+              and kubelet does not respect cni-bin-dir flag yet for non-docker container runtimes.
+            command: |
+              [ -x /opt/cni/bin/bridge ] || (
+                sudo mkdir -p /opt/cni
+                sudo ln -s /usr/lib/cni /opt/cni/bin
               )
         files_config:
           - file: /etc/gai.conf
