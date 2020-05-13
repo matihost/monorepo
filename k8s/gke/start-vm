@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function usage(){
-echo -e "Usage: `basename $0` <instance-name> [--public] [-m instance-type] [-p gcp-project-name] [-r region] [-z zone]  
+echo -e "Usage: $(basename "$0") <instance-name> [--public] [-m instance-type] [-p gcp-project-name] [-r region] [-z zone]  
 
 Creates VM with name 'instance-name' being private instance (unless --public requested) in project '-p gcp-project-name' (default: current one) 
 being '-m instance-type' (default: f1-micro) in region (default: current one) and zone (default current one)
@@ -37,10 +37,10 @@ GCP_ZONE=${GCP_ZONE:-$(gcloud config get-value compute/zone)}
 GCP_ZONE=${GCP_ZONE:-${GCP_REGION}-a}
 
 gcloud beta compute instances create \
-${1:?Instance name is mandatory} \
---project=${GCP_PROJECT} \
---zone=${GCP_ZONE} \
---machine-type=${MACHINE_TYPE} \
+"${1:?Instance name is mandatory}" \
+--project="${GCP_PROJECT}" \
+--zone="${GCP_ZONE}" \
+--machine-type="${MACHINE_TYPE}" \
 --subnet=default \
 --network-tier=STANDARD \
 --maintenance-policy=MIGRATE \
@@ -51,11 +51,11 @@ ${1:?Instance name is mandatory} \
 --boot-disk-size=10GB \
 --boot-disk-type=pd-standard \
 --boot-disk-device-name=boot-disk-1 \
-$([ -z "${PUBLIC}" ] && echo -n '--no-address')
+"$([ -z "${PUBLIC}" ] && echo -n '--no-address')"
 
-if [ -n "${PUBLIC}" -a -z "$(gcloud compute --project=${GCP_PROJECT} firewall-rules list --filter="
+if [ -n "${PUBLIC}" ] && [ -z "$(gcloud compute --project="${GCP_PROJECT}" firewall-rules list --filter="
 name=(default-allow-https)" --format="value(name)")" ]; then
-  gcloud compute --project=${GCP_PROJECT} firewall-rules create default-allow-https \
+  gcloud compute --project="${GCP_PROJECT}" firewall-rules create default-allow-https \
   --direction=INGRESS --priority=1000 \
   --network=default \
   --action=ALLOW \

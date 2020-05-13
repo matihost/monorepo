@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
+BASEDIR=$(dirname "$0")
 
 function usage(){
-echo -e "Usage: `basename $0` <cluster-name> [-p gcp-project-name] [-r region] [-z zone]  
+echo -e "Usage: $(basename "${0}") <cluster-name> [-p gcp-project-name] [-r region] [-z zone]  
 
-Creates private GKE cluster with name 'cluster-name' in project '-p gcp-project-name' (default: current one) in region (default: current one) and zone (default current one)
+Creates zonal private GKE cluster with name 'cluster-name' in project '-p gcp-project-name' (default: current one) in region (default: current one) and zone (default current one)
 Only master is available via external interncet facing IP.
 
 The private GKE cluster compute nodes do not have external IP assigned and has no access to internet, to allow it run 'create-nat-gateway'.
@@ -21,10 +22,11 @@ set -- "${PARAMS[@]}" # restore positional parameters
 
 
 if [[ -z "${PARAMS[0]}" ]]; then 
-usage
-exit 1 
+  usage
+  exit 1 
 fi 
 
+CLUSTER_NAME=${PARAMS[0]}
 GCP_PROJECT=${GCP_PROJECT:-$(gcloud config get-value project)}
 GCP_REGION=${GCP_REGION:-$(gcloud config get-value compute/region)}
 GCP_ZONE=${GCP_ZONE:-$(gcloud config get-value compute/zone)}
@@ -32,34 +34,48 @@ GCP_ZONE=${GCP_ZONE:-${GCP_REGION}-a}
 
 MAINTENANCE_DATE=$(date -d "+1 day" -u +%Y-%m-%d)
 
-echo "Starting cluster ${GCP_PROJECT} in zone ${ZONE}..."
-set -x
-gcloud beta container \
-  --project "${GCP_PROJECT}" \
-  clusters create "${1:?Cluster name is mandatory}" \
-  --zone "${GCP_ZONE}" \
-  --no-enable-master-authorized-networks \
-  --no-enable-basic-auth \
-  --release-channel  "rapid" \
-  --machine-type  "e2-medium" \
-  --image-type "COS" \
-  --disk-type "pd-standard" \
-  --disk-size "20" \
-  --metadata disable-legacy-endpoints=true \
-  --scopes default,bigquery,cloud-platform,compute-rw,datastore,storage-full,taskqueue,userinfo-email,sql-admin \
-  --num-nodes  "1" \
-  --no-enable-stackdriver-kubernetes \
-  --enable-private-nodes \
-  --master-ipv4-cidr "172.16.0.0/28" \
-  --enable-ip-alias \
-  --network "projects/${GCP_PROJECT}/global/networks/default" \
-  --subnetwork "projects/${GCP_PROJECT}/regions/${GCP_REGION}/subnetworks/default" \
-  --default-max-pods-per-node "50"  \
-  --enable-autoscaling \
-  --min-nodes "1" \
-  --max-nodes "4" \
-  --addons HorizontalPodAutoscaling,HttpLoadBalancing \
-  --enable-autoupgrade \
-  --enable-autorepair \
-  --maintenance-window-start "${MAINTENANCE_DATE}T02:00:00Z" --maintenance-window-end "${MAINTENANCE_DATE}T07:00:00Z" \
-  --maintenance-window-recurrence "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU"
+if [ -z "$(gcloud container clusters list --filter="name=(${CLUSTER_NAME})" --format="value(name)")" ]; then
+  echo "Starting cluster ${GCP_PROJECT} in zone ${ZONE}..."
+  set -x
+  gcloud beta container \
+    --project "${GCP_PROJECT}" \
+    clusters create "${CLUSTER_NAME}" \
+    --zone "${GCP_ZONE}" \
+    --enable-master-authorized-networks \
+    --master-authorized-networks=0.0.0.0/0 \
+    --no-enable-basic-auth \
+    --release-channel  "rapid" \
+    --machine-type  "e2-medium" \
+    --image-type "COS" \
+    --disk-type "pd-standard" \
+    --disk-size "20" \
+    --metadata disable-legacy-endpoints=true \
+    --scopes default,bigquery,cloud-platform,compute-rw,datastore,storage-full,taskqueue,userinfo-email,sql-admin \
+    --num-nodes  "1" \
+    --no-enable-stackdriver-kubernetes \
+    --enable-private-nodes \
+    --master-ipv4-cidr "172.16.0.0/28" \
+    --enable-ip-alias \
+    --network "projects/${GCP_PROJECT}/global/networks/default" \
+    --subnetwork "projects/${GCP_PROJECT}/regions/${GCP_REGION}/subnetworks/default" \
+    --default-max-pods-per-node "50"  \
+    --enable-autoscaling \
+    --min-nodes "1" \
+    --max-nodes "4" \
+    --addons HorizontalPodAutoscaling,HttpLoadBalancing \
+    --enable-autoupgrade \
+    --enable-autorepair \
+    --maintenance-window-start "${MAINTENANCE_DATE}T02:00:00Z" --maintenance-window-end "${MAINTENANCE_DATE}T07:00:00Z" \
+    --maintenance-window-recurrence "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU"
+else
+  if [ -z "$(gcloud container clusters list --filter="name=(${CLUSTER_NAME})" --format="value(currentNodeCount)"|xargs)" ]; then
+    echo  "Cluster $CLUSTER_NAME is present, but scaled down, scaling it up..."
+    gcloud container clusters resize "${CLUSTER_NAME}" --num-nodes=1 --zone "${GCP_ZONE}" --quiet && \
+      echo "Cluster $CLUSTER_NAME is up and ready"
+  else
+    echo  "Cluster $CLUSTER_NAME is up and ready"
+  fi
+fi
+
+echo "Ensure private GKE cluster has access to internet via GCP Nat Gateway"
+"${BASEDIR}"/create-nat-gateway -r "${GCP_REGION}"
