@@ -37,7 +37,7 @@
       shell:
         yum clean all
       args:
-        warn: false 
+        warn: false
       register: yum_result
       changed_when: '"0 files removed" not in yum_result.stdout'
     when: ansible_os_family == "RedHat"
@@ -59,7 +59,6 @@
       shell: "bash -ic 'sdk selfupdate && sdk update && sdk ug'"
       register: sdk_result
       ignore_errors: true
-      changed_when:  
+      changed_when:
         - sdk_result.stdout is regex('Installing')
     become: false
-    

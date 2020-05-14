@@ -7,10 +7,10 @@
     msg: No file_config variable provided
   when: file_config is not defined or file_config.content is not defined or file_config.file is not defined
 
-- name: Ensure {{ file_config.file }} content 
+- name: Ensure {{ file_config.file }} content
   blockinfile:
     path: "{{ file_config.file }}"
-    block: "{{ file_config.content }}"    
+    block: "{{ file_config.content }}"
     create: true
   register: blockinfile_result
 

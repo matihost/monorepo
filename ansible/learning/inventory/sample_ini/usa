@@ -1,31 +1,31 @@
-[atlanta] 
-host1 
-host2 
- 
+[atlanta]
+host1
+host2
 
-[raleigh] 
+
+[raleigh]
 host[2:3]
- 
 
-[southeast:children] 
-atlanta 
-raleigh 
- 
 
-[southeast:vars] 
-some_server=foo.southeast.example.com 
-halon_system_timeout=30 
-self_destruct_countdown=60 
-escape_pods=2 
- 
+[southeast:children]
+atlanta
+raleigh
+
+
+[southeast:vars]
+some_server=foo.southeast.example.com
+halon_system_timeout=30
+self_destruct_countdown=60
+escape_pods=2
+
 [northeast]
 
 [northwest]
 
 [southwest]
 
-[usa:children] 
-southeast 
-northeast 
-southwest 
-northwest 
+[usa:children]
+southeast
+northeast
+southwest
+northwest

@@ -18,7 +18,7 @@ install-metrics-subsystem: requires-rhel-root ## install metrics subsystem (Heap
 	ansible-playbook -i ../../matihost.inventory playbooks/openshift-metrics/config.yml -e openshift_metrics_install_metrics=true
 
 requires-rhel-root:
-	test `whoami` == root -a -e /etc/redhat-release	
+	test `whoami` == root -a -e /etc/redhat-release
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))

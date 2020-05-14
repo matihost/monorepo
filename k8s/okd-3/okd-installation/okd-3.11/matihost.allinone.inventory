@@ -1,70 +1,70 @@
-[masters] 
-localhost ansible_connection=local 
- 
-[etcd] 
-localhost ansible_connection=local 
- 
-[nodes] 
+[masters]
+localhost ansible_connection=local
+
+[etcd]
+localhost ansible_connection=local
+
+[nodes]
 localhost  ansible_connection=local openshift_node_group_name="node-config-all-in-one"
- 
- 
-[nfs] 
-localhost ansible_connection=local 
- 
-[OSEv3:children] 
-masters 
-nodes 
-etcd 
-nfs 
- 
+
+
+[nfs]
+localhost ansible_connection=local
+
+[OSEv3:children]
+masters
+nodes
+etcd
+nfs
+
 [OSEv3:vars]
 openshift_node_groups=[{'name': 'node-config-all-in-one', 'labels': ['node-role.kubernetes.io/master=true', 'node-role.kubernetes.io/infra=true', 'node-role.kubernetes.io/compute=true']}]
-ansible_user=root 
- 
-openshift_deployment_type=origin 
+ansible_user=root
+
+openshift_deployment_type=origin
 openshift_release=v3.11
-openshift_rolling_restart_mode=system 
+openshift_rolling_restart_mode=system
 openshift_master_default_subdomain=allinone.matihost
 # when master is behind load balancer
 #openshift_master_cluster_public_hostname=openshift-master.allinone.matihost
-os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant' 
+os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
 
- 
+
 openshift_disable_check=memory_availability,disk_availability,package_version
 
-debug_level=2 
- 
-openshift_install_examples=true 
- 
-openshift_hosted_router_force_subdomain='${name}-${namespace}.allinone.matihost' 
- 
-osm_cluster_network_cidr=10.128.0.0/14 
-openshift_portal_net=172.30.0.0/16 
-osm_host_subnet_length=9 
- 
- 
- 
-# sudo htpasswd /etc/origin/master/htpasswd userName 
-openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}] 
- 
+debug_level=2
+
+openshift_install_examples=true
+
+openshift_hosted_router_force_subdomain='${name}-${namespace}.allinone.matihost'
+
+osm_cluster_network_cidr=10.128.0.0/14
+openshift_portal_net=172.30.0.0/16
+osm_host_subnet_length=9
+
+
+
+# sudo htpasswd /etc/origin/master/htpasswd userName
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+
 openshift_master_htpasswd_users={'admin': '$apr1$ooNjJEID$BX9/WuzOUVJcpiRTO4uFu0', 'mati': '$apr1$LwyT5llr$f5/fMrQ9/CoezFUZmRtG00','user': '$apr1$BoCnZ.7Z$1jI4yAysxhs0CL1p4lm/J/'}
- 
- 
-# nfs for registry storage, w/o it it is ephemeral 
-openshift_hosted_registry_storage_kind=nfs 
-openshift_hosted_registry_storage_access_modes=['ReadWriteMany'] 
-openshift_hosted_registry_storage_nfs_directory=/exports 
-openshift_hosted_registry_storage_nfs_options='*(rw,root_squash)' 
-openshift_hosted_registry_storage_volume_name=registry 
-openshift_hosted_registry_storage_volume_size=10Gi 
- 
-# must be enabled, b/c NFS is unsupported for RegistryStorage 
-openshift_enable_unsupported_configurations=True 
- 
+
+
+# nfs for registry storage, w/o it it is ephemeral
+openshift_hosted_registry_storage_kind=nfs
+openshift_hosted_registry_storage_access_modes=['ReadWriteMany']
+openshift_hosted_registry_storage_nfs_directory=/exports
+openshift_hosted_registry_storage_nfs_options='*(rw,root_squash)'
+openshift_hosted_registry_storage_volume_name=registry
+openshift_hosted_registry_storage_volume_size=10Gi
+
+# must be enabled, b/c NFS is unsupported for RegistryStorage
+openshift_enable_unsupported_configurations=True
+
 # install metrics subsystem in openshift-infra namespace
 # default is false
 #
-# When there is not sufficient memory or lack of CPU, 
+# When there is not sufficient memory or lack of CPU,
 # it may fail as there is a very short timeout between Hawkular / Cassandra during table creation
 # it cannot be changed https://github.com/openshift/origin-metrics/issues/413 and it will be not fixed as Hawkular/Cassandra stack will vanish in 3.11
 # when Hawkular Metrics fails with timeout issue, terminate the pod, rc will spawn new one and it will try again...

@@ -1,14 +1,14 @@
 package org.matihost.algorithms.euler;
 
 /**
- * 
- * 
+ *
+ *
  * A Pythagorean triplet is a set of three natural numbers, a < b < c, for which, a_2 + b_2 = c_2
- * 
+ *
  * For example, 3_2 + 4_2 = 9 + 16 = 25 = 52.
- * 
+ *
  * There exists exactly one Pythagorean triplet for which a + b + c = 1000. Find the product abc.
- * 
+ *
  */
 public class Problem9 {
 

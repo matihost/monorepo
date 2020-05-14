@@ -14,11 +14,11 @@
       host: "{{ item }}"
       port: 22
       state: started
-      timeout: 90         
+      timeout: 90
     loop: "{{ groups['okd'] }}"
   - name: pause 60 seconds (for lazy init services startup)
     pause:
-      seconds: 60  
+      seconds: 60
 - hosts: okd
   remote_user: student
   become: yes
@@ -28,4 +28,4 @@
       name: origin*
       state: started
     tags:
-    - origin    
+    - origin

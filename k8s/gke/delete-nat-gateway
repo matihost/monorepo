@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+if [[ "$1" =~ ^(--help)|(help)|(-h)$ ]]; then
+  echo -e "
+Usage: $(basename "$0") [region]
+
+Deletes router in region (default: current one) if it exists
+"
+  exit 1
+fi
+
+GCP_REGION=${1:-$(gcloud config get-value compute/region)}
+
+if [ -n "$(gcloud compute routers list --filter="name=(nat-router)" --format="value(name)")" ]; then
+  gcloud compute routers delete nat-router --quiet --region "${GCP_REGION}"
+fi

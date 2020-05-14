@@ -5,4 +5,3 @@ all:
         localhost:
       vars:
         update_cache_timeout: 300
-

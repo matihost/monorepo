@@ -2,59 +2,59 @@
 
 set -x
 
-pushd /tmp/src
-
+pushd /tmp/src || exit 1
 
 INSTALL_URL=${INSTALL_URL:-$IMPORT_URL}
 
-if [[ ! -z "$IMPORT_URL" ]]; then
+if [[ -n "${IMPORT_URL}" ]]; then
 
-    popd
+  popd || exit 1
 
-    echo "Assembling GOPATH"
+  echo "Assembling GOPATH"
 
-    export GOPATH=`realpath $HOME/go`
+  GOPATH=$(realpath "${HOME}/go")
+  export GOPATH
 
-    mkdir -p $GOPATH/src/$IMPORT_URL
+  mkdir -p "$GOPATH/src/$IMPORT_URL"
 
-    mv /tmp/src/* $GOPATH/src/$IMPORT_URL
+  mv /tmp/src/* "$GOPATH/src/$IMPORT_URL"
 
-    if [[ -d /tmp/artifacts/pkg ]]; then
+  if [[ -d /tmp/artifacts/pkg ]]; then
 
-        echo "Restoring previous build artifacts"
+    echo "Restoring previous build artifacts"
 
-        mv /tmp/artifacts/pkg $GOPATH
+    mv /tmp/artifacts/pkg "${GOPATH}"
 
-    fi
+  fi
 
-    # Resolve dependencies, ignore if vendor present
+  # Resolve dependencies, ignore if vendor present
 
-    if [[ ! -d $GOPATH/src/$IMPORT_URL/vendor ]]; then
+  if [[ ! -d $GOPATH/src/$IMPORT_URL/vendor ]]; then
 
-        echo "Resolving dependencies"
+    echo "Resolving dependencies"
 
-        pushd $GOPATH/src/$INSTALL_URL
+    pushd "${GOPATH}/src/${INSTALL_URL}" || exit 1
 
-        go get
+    go get
 
-        popd
+    popd || exit 1
 
-    fi
+  fi
 
-    # lets build
+  # lets build
 
-    pushd $GOPATH/src/$INSTALL_URL
+  pushd "${GOPATH}/src/${INSTALL_URL}" || exit 1
 
-    echo "Building"
+  echo "Building"
 
-    go install -i $INSTALL_URL
+  go install -i "${INSTALL_URL}"
 
-    mv $GOPATH/bin/* /opt/app-root/gobinary
+  mv "${GOPATH}/bin/*" /opt/app-root/gobinary
 
-    popd
+  popd || exit
 
-    exit
+  exit
 
 fi
 
-exec /$STI_SCRIPTS_PATH/usage
+exec "/${STI_SCRIPTS_PATH}/usage"

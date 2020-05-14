@@ -37,7 +37,7 @@ setup(
         "Programming Language :: Python :: 3.8",
     ],
     keywords="exchange rate nbp",  # Optional
-    
+
     # When your source code is in a subdirectory under the project root, e.g.
     # `src/`, it is necessary to specify the `package_dir` argument.
     package_dir={"": "src"},  # Optional
@@ -50,7 +50,7 @@ setup(
     python_requires=">=3.7, <4",
     install_requires=[
         "Jinja2>=2.11.2, <3",
-    ], 
+    ],
     dependency_links=[],
     entry_points={
         "console_scripts": [

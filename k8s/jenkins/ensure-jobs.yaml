@@ -14,12 +14,11 @@
       depth: 1
       extensions:
       - yaml
-      - yml  
+      - yml
 
   - name: Process Jobs
     include_role:
       name: setup_job
-    loop: "{{ jenkins_jobs|default([]) }}" 
-    loop_control: 
+    loop: "{{ jenkins_jobs|default([]) }}"
+    loop_control:
       loop_var: job
- 

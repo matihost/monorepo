@@ -78,7 +78,7 @@ func ShowBasicTypes() {
 
 	// converting number to string will result in creating one character string
 	// number is Unicode number
-	// if number is invalid, then it so called "replacement character" It’s a replacement character (\uFFFD)
+	// if number is invalid, then it so called "replacement character" It's a replacement character (\uFFFD)
 	s = string(322)
 
 	// the * operator denotes the pointer's underlying value
@@ -86,10 +86,10 @@ func ShowBasicTypes() {
 
 	// converting between slices of bytes, runes and strings
 	// 3 characters string is in fact 4 characters slice
-	bytes := []byte("abł")
+	bytes := []byte("abl")
 	text := string(bytes)
 	fmt.Printf("%#v\n", bytes) // []byte{0x61, 0x62, 0xc5, 0x82}
-	fmt.Printf("%#v\n", text)  // "abł"
+	fmt.Printf("%#v\n", text)  // "abl"
 
 	// inline multiline strings
 	clob := `
@@ -106,10 +106,10 @@ func ShowBasicTypes() {
 	`
 
 	// 3 characters string is ... 3 character aka runes slice
-	runes := []rune("abł")
+	runes := []rune("abl")
 	fmt.Printf("%#v\n", runes)         // []int32{97, 98, 322}
 	fmt.Printf("%+q\n", runes)         // ['a' 'b' '\u0142']
-	fmt.Printf("%#v\n", string(runes)) // "abł"
+	fmt.Printf("%#v\n", string(runes)) // "abl"
 
 	fmt.Println(strings.TrimSpace(clob)) // "<sizes>..."
 

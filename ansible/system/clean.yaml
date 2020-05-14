@@ -2,9 +2,9 @@
 - hosts: local
   gather_facts: true
   tasks:
-      #TODO ensure SystemMaxUse=1G RuntimeMaxUse=1G are set in /etc/systemd/journald.conf 
+      #TODO ensure SystemMaxUse=1G RuntimeMaxUse=1G are set in /etc/systemd/journald.conf
     - name: Clean systemd journal /var/log/journal logs
-      shell: 
+      shell:
         journalctl --vacuum-size={{ systemd_journal.max_size }} --vacuum-time={{ systemd_journal.max_duration }} --rotate
       register: journal_clean
       changed_when:
@@ -17,7 +17,7 @@
           force_apt_get: yes
           cache_valid_time: "{{ update_cache_timeout }}"
       - name: Remove dependencies that are no longer required
-        apt:     
+        apt:
           autoremove: yes
           force_apt_get: yes
       - name: Remove useless packages from the cache
@@ -25,10 +25,10 @@
           autoclean: yes
           force_apt_get: yes
       - name: Clean apt-get
-        shell: 
+        shell:
           apt-get clean
         args:
-          warn: false 
+          warn: false
         register: apt_clean_result
         changed_when: apt_clean_result.stdout
       - name: Remove old kernels
@@ -43,12 +43,12 @@
         shell:
           yum clean all
         args:
-          warn: false 
+          warn: false
         register: yum_result
         changed_when: '"0 files removed" not in yum_result.stdout'
       when: ansible_os_family == "RedHat"
     - name: Clean /var/log rotated logs and dist upgrade logs
-      shell: 
+      shell:
         find /var/log -type f -regex ".*\.gz$" -delete -print && \
         find /var/log -type f -regex ".*[-,\.][0-9]*$" -delete -print && \
         find /var/log -type f -regex ".*\.old$" -delete -print && \
@@ -65,7 +65,7 @@
         }
         command -v docker 1>/dev/null 2>/dev/null && {
           ITEMS=$(docker container ls --all -q)
-          [ -n "${ITEMS}" ] && docker container rm ${ITEMS} --force          
+          [ -n "${ITEMS}" ] && docker container rm ${ITEMS} --force
           ITEMS=$(docker images --all -q)
           [ -n "${ITEMS}" ] && docker image rm ${ITEMS} --force
         }

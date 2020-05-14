@@ -25,4 +25,4 @@ subjects:
   namespace: "{{ namespace }}"
 - kind: ServiceAccount
   name: "{{ namespace }}-jenkins"
-  namespace: "{{ namespace }}"  
+  namespace: "{{ namespace }}"

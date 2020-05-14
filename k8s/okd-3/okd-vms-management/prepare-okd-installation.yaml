@@ -23,7 +23,7 @@
     rhsm_repository:
       name:
       - rhel-7-server-rpms
-      - rhel-7-server-extras-rpms 
+      - rhel-7-server-extras-rpms
       state: present
     when: ansible_os_family == "RedHat" and ansible_distribution == "RedHat"
   - name: Install Epel and CentOS repos
@@ -55,9 +55,8 @@
     user:
       name: student
       groups: dockerroot
-      append: yes  
+      append: yes
   - name: Make dockerroot group able to use docker cli
     file:
       path: /var/run/docker.sock
       group: dockerroot
-

@@ -62,7 +62,7 @@ algorithm is:
 
 You only need to start crossing out multiples at stem:[\frac{p}{2}], because any smaller multiple
 of p has a prime divisor less than p and has already been crossed out as a multiple
-of that. This is also the reason why we can stop after we’ve reached stem:[\sqrt{N}].
+of that. This is also the reason why we can stop after we've reached stem:[\sqrt{N}].
 
 ### Largest prime factor
 

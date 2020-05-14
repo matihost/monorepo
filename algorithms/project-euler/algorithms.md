@@ -38,19 +38,19 @@ End Function
 The basic idea behind this ancient method is that instead of looking for divisors d of n, we mark multiples of d as composites. Since every composite has a prime divisor, the marking of multiples need only be done for primes. The classical
 algorithm is:
 
-1. Make a list of all numbers from 2 to N.
+* Make a list of all numbers from 2 to N.
 
-2. Find the next number p not yet crossed out. This is a prime. If it is greater than $\sqrt{N}$ go to 5.
+* Find the next number p not yet crossed out. This is a prime. If it is greater than $\sqrt{N}$ go to 5.
 
-3. Cross out all multiples of p which are not yet crossed out.
+* Cross out all multiples of p which are not yet crossed out.
 
-4. Go to 2.
+* Go to 2.
 
-5. The numbers not crossed out are the primes not exceeding $N$.
+* The numbers not crossed out are the primes not exceeding $N$.
 
 You only need to start crossing out multiples at $\frac{p}{2}$, because any smaller multiple
 of p has a prime divisor less than p and has already been crossed out as a multiple
-of that. This is also the reason why we can stop after we’ve reached $\sqrt{N}$.
+of that. This is also the reason why we can stop after we've reached $\sqrt{N}$.
 
 ### Largest prime factor
 

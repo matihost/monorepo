@@ -1,27 +1,26 @@
 #!/usr/bin/env bash
 
-if [[ "$1" =~ ^(--help)|(help)|(-h)$ ]]; then 
-echo -e "
+if [[ "$1" =~ ^(--help)|(help)|(-h)$ ]]; then
+  echo -e "
 Usage: $(basename "$0") [region]
 
 Creates router in region (default: current one) and attach NAT allowing VM with private node access internet
-"  
-exit 1 
-fi 
+"
+  exit 1
+fi
 
 GCP_REGION=${1:-$(gcloud config get-value compute/region)}
 
 if [ -z "$(gcloud compute routers list --filter="name=(nat-router)" --format="value(name)")" ]; then
-gcloud compute routers create nat-router \
+  gcloud compute routers create nat-router \
     --network default \
     --region "${GCP_REGION}"
 fi
 
-
 if [ -z "$(gcloud compute routers nats list --router="nat-router" --format='value(name)')" ]; then
-gcloud compute routers nats create nat-config \
+  gcloud compute routers nats create nat-config \
     --router-region "${GCP_REGION}" \
     --router nat-router \
     --nat-all-subnet-ip-ranges \
-    --auto-allocate-nat-external-ips 
+    --auto-allocate-nat-external-ips
 fi

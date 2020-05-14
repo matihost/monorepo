@@ -27,7 +27,7 @@
         strict: true
 
   - name: Ensure Jenkins CN={{ jenkins_ingress }} is present
-    block:    
+    block:
     - name: Ensure Jenkins CN={{ jenkins_ingress }} is present
       include_role:
         name: create_certificate
@@ -69,7 +69,7 @@
 
   - name: Ensure Jenkins Ingress DNS is resolvable locally
     shell: |
-      while [ -z "$(kubectl get ingress {{ namespace }}-jenkins -n {{ namespace }} -o jsonpath="{.status..ip}" | xargs)"  ]; do 
+      while [ -z "$(kubectl get ingress {{ namespace }}-jenkins -n {{ namespace }} -o jsonpath="{.status..ip}" | xargs)"  ]; do
         sleep 1;
         echo "Awaiting for LoadBalancer for Ingress..."
       done

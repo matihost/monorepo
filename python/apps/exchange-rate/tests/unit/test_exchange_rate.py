@@ -9,7 +9,7 @@ exchange_rates = ExchangeRateToPLN()
     [
       ("USD", (2,6)),
       ("EUR", (2,7)),
-      ("CHF", (2,7)),      
+      ("CHF", (2,7)),
     ],
 )
 def test_exchange_rate(currency, range):

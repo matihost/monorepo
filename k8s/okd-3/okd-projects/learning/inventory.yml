@@ -5,4 +5,3 @@ all:
         localhost:
       vars:
         files: "{{ playbook_dir }}/files"
-

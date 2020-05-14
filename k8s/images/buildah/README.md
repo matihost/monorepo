@@ -2,7 +2,7 @@
 
 ```bash
 
-# build buildah image 
+# build buildah image
 BASE_OS=centos make build
 BASE_OS=ubuntu make build
 

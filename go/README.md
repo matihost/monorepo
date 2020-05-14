@@ -12,9 +12,8 @@ Directories and files:  `Gopkg.toml`, `Gopkg.lock`, and `vendor/` are generated 
 S2I
 
 ```bash
-mkdir -p ~/bin && cd ~/bin && curl -Lso- https://github.com/openshift/source-to-image/releases/download/v1.2.0/source-to-image-v1.2.0-2a579ecd-linux-386.tar.gz |tar -zx 
+mkdir -p ~/bin && cd ~/bin && curl -Lso- https://github.com/openshift/source-to-image/releases/download/v1.2.0/source-to-image-v1.2.0-2a579ecd-linux-386.tar.gz |tar -zx
 ```
-
 
 Go lang 1.13.x+
 
@@ -25,7 +24,9 @@ sudo apt -y install golang-1.13
 sudo apt -y install golang-golang-x-tools
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 ```
+
 Or slightly older versions:
+
 ```bash
 # install golang and dep tools from Ubuntu packages (older versions)
 #sudo apt install golang-go

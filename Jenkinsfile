@@ -12,7 +12,7 @@ metadata:
   labels:
     purpose: ci
 spec:
-  containers:    
+  containers:
   - name: maven-jdk11
     image: maven:3-jdk-11
     command:
@@ -95,7 +95,7 @@ spec:
             always {
               dir("java"){
                 archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
-                junit '**/target/surefire-reports/*.xml'     
+                junit '**/target/surefire-reports/*.xml'
               }
             }
           }
@@ -126,7 +126,7 @@ spec:
                 echo "Building ${pwd()}..."
                 sh """
                   curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-                  make build             
+                  make build
                 """
               }
             }
@@ -145,7 +145,7 @@ spec:
               dir("rust/guessing_game"){
                 echo "Building ${pwd()}..."
                 sh """
-                  make build             
+                  make build
                 """
               }
             }
@@ -175,7 +175,7 @@ spec:
                 sh """
                   ansible-playbook dictionaries.yaml -v
                 """
-              }   
+              }
             }
           }
         }

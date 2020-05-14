@@ -1,7 +1,7 @@
 BASE_OS?=ubuntu
-ifeq ($(BASE_OS),original) 
+ifeq ($(BASE_OS),original)
 IMAGE := quay.io/buildah/stable
-else 
+else
 IMAGE=buildah:$(BASE_OS)
 endif
 
@@ -23,7 +23,7 @@ run-user: ## run buildah container as user (does no work)
 
 docher-run: ## run buildah from official image
 	mkdir -p /tmp/buildah
-	docker run --security-opt seccomp:unconfined -it --device /dev/fuse:rw -v /tmp/buildah:/var/lib/buildah:Z quay.io/buildah/stable 
+	docker run --security-opt seccomp:unconfined -it --device /dev/fuse:rw -v /tmp/buildah:/var/lib/buildah:Z quay.io/buildah/stable
 
 test-build-image: # build sample image with VFS as storage driver
 	echo -e "FROM mirror.gcr.io/library/centos\nRUN echo test" | buildah bud -f - --storage-driver vfs -t alamakota .

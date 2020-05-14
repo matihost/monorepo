@@ -9,7 +9,7 @@
       apt_repo: "{{ item }}"
     loop: "{{ repositories }}"
 
-  - name: Ensure required packages are latest 
+  - name: Ensure required packages are latest
     apt:
       name: "{{ packages }}"
       state: latest
@@ -22,7 +22,7 @@
       name: "{{ snaps }}"
   - name: Install required classic snaps
     snap:
-      name: "{{ item }}"    
+      name: "{{ item }}"
       classic: true
     loop: "{{ classic_snaps }}"
   - name: Update snap packages

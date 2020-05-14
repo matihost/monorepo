@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 /**
  * For table of integers like [ 3, 9, 6, 0, 1, 2, 5]
- * 
+ *
  * Order them following the below rule:
- * 
+ *
  * a1 >= a2 <= a3 >= a4 ...
  */
 public class SwappingOrder {

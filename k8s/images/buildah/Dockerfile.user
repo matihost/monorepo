@@ -9,11 +9,11 @@ RUN mkdir -p /etc/cni/net.d /usr/libexec/cni /usr/lib/cni /usr/local/lib/cni /op
 # since OCP 4.x it is not needed to add random user definition in /etc/password in dockerfile ENTRYPOINT
 # https://docs.openshift.com/container-platform/4.3/openshift_images/create-images.html#images-create-guide-openshift_create-images
 # vs
-# https://docs.openshift.com/container-platform/3.11/creating_images/guidelines.html#openshift-specific-guidelines    
-RUN mkdir -p /home/buildah && chgrp -R 0 /home/buildah && chmod -R g=u /home/buildah 
+# https://docs.openshift.com/container-platform/3.11/creating_images/guidelines.html#openshift-specific-guidelines
+RUN mkdir -p /home/buildah && chgrp -R 0 /home/buildah && chmod -R g=u /home/buildah
 USER 1001
 ENV HOME /home/buildah
-ENV _BUILDAH_STARTED_IN_USERNS="" 
+ENV _BUILDAH_STARTED_IN_USERNS=""
 ENV BUILDAH_ISOLATION=chroot
 WORKDIR ${HOME}
 COPY uid_entrypoint .
@@ -24,4 +24,3 @@ CMD [ "/usr/bin/env", "bash"]
 
 # FROM gcr.io/distroless/base-debian10:debug
 # COPY --from=builder /usr/bin/buildah /usr/bin/buildah
-

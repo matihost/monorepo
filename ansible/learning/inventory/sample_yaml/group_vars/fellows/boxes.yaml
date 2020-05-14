@@ -1,5 +1,5 @@
-server: 
-  address: some1.example.com 
-proxy: 
-  address: some2.example.com 
-  port: 8080 
+server:
+  address: some1.example.com
+proxy:
+  address: some2.example.com
+  port: 8080

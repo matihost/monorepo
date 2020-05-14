@@ -10,7 +10,7 @@ Supported Ubuntu distribution: **20.04 LTS (focal)**
 # make sure Ansible is installed from pip3
 pip3 install ansible --user
 ```
-  
+
 then:
 
 ```bash

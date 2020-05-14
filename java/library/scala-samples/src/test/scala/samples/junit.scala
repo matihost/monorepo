@@ -13,5 +13,3 @@ class AppTest {
 //    def testKO() = assertTrue(false)
 
 }
-
-

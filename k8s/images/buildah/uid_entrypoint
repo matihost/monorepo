@@ -1,10 +1,10 @@
 #!/bin/sh
 #TODO check whether it is working under OCP
-if ! whoami &> /dev/null; then
+if ! whoami >/dev/null 2>&1; then
   if [ -w /etc/passwd ]; then
-    echo "${USER_NAME:-buildah}:x:$(id -u):0:${USER_NAME:-buildah} user:${HOME}:/sbin/nologin" >> /etc/passwd
+    echo "${USER_NAME:-buildah}:x:$(id -u):0:${USER_NAME:-buildah} user:${HOME}:/sbin/nologin" >>/etc/passwd
   fi
-  echo "$(whoami):100000:65536" >> /etc/subuid
-  echo "$(whoami):100000:65536" >> /etc/subgid
+  echo "$(whoami):100000:65536" >>/etc/subuid
+  echo "$(whoami):100000:65536" >>/etc/subgid
 fi
 exec "$@"

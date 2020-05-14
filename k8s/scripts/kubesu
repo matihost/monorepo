@@ -1,31 +1,31 @@
-#!/usr/bin/env bash 
-set -e 
+#!/usr/bin/env bash
+set -e
 
-if [[ -z "$1" ]]; then 
- echo -e "Usage: `basename $0` <service_account_name> [namespace]\n" 
- echo "Creates kube context for service_account_name from namespace and switch to it. When namespace is not defined, it assumes current namespace." 
- exit 1 
-fi 
+if [[ -z "$1" ]]; then
+  echo -e "Usage: $(basename "$0") <service_account_name> [namespace]\n"
+  echo "Creates kube context for service_account_name from namespace and switch to it. When namespace is not defined, it assumes current namespace."
+  exit 1
+fi
 
-CURRENT_CONTEXT=`kubectl config current-context` 
-CLUSTER=`kubectl config view -o jsonpath="{.contexts[?(@.name == \"${CURRENT_CONTEXT}\")].context.cluster}"`
-SERVICE_ACCOUNT_NAME=${1:?ServiceAccount is mandatory} 
+CURRENT_CONTEXT=$(kubectl config current-context)
+CLUSTER=$(kubectl config view -o jsonpath="{.contexts[?(@.name == \"${CURRENT_CONTEXT}\")].context.cluster}")
+SERVICE_ACCOUNT_NAME=${1:?ServiceAccount is mandatory}
 
 NAMESPACE=${2:-$(kubectl config view -o jsonpath="{.contexts[?(@.name == \"${CURRENT_CONTEXT}\")].context.namespace}")}
-SECRET_NAME=$(kubectl get serviceaccount ${SERVICE_ACCOUNT_NAME} \
-  -n ${NAMESPACE} \
+SECRET_NAME=$(kubectl get serviceaccount "${SERVICE_ACCOUNT_NAME}" \
+  -n "${NAMESPACE}" \
   -o jsonpath='{.secrets[?("token" in @.name)].name}')
 
-TOKEN=$(kubectl get secret ${SECRET_NAME} \
-  -n ${NAMESPACE} \
+TOKEN=$(kubectl get secret "${SECRET_NAME}" \
+  -n "${NAMESPACE}" \
   -o jsonpath='{.data.token}' | base64 -d)
 
-CONFIG_NAME="sa:${NAMESPACE}:${SERVICE_ACCOUNT_NAME}:${CLUSTER}" 
+CONFIG_NAME="sa:${NAMESPACE}:${SERVICE_ACCOUNT_NAME}:${CLUSTER}"
 
-kubectl config set-credentials ${CONFIG_NAME} --token=${TOKEN}
-kubectl config set-context ${CONFIG_NAME} \
-   --cluster=$CLUSTER \
-   --namespace=${NAMESPACE} \
-   --user=${CONFIG_NAME}
+kubectl config set-credentials "${CONFIG_NAME}" --token="${TOKEN}"
+kubectl config set-context "${CONFIG_NAME}" \
+  --cluster="$CLUSTER" \
+  --namespace="${NAMESPACE}" \
+  --user="${CONFIG_NAME}"
 
-kubectl config use-context ${CONFIG_NAME}
+kubectl config use-context "${CONFIG_NAME}"

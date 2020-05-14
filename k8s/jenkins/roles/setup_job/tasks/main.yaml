@@ -11,7 +11,7 @@
   set_fact:
     job_definition: "{{ lookup('template', role_path + '/files/' + job.type + '-job.template.xml') }}"
 
-- name: Prepare script 
+- name: Prepare script
   set_fact:
     script_value: "{{ lookup('template', role_path + '/files/ensure-job.template.groovy') }}"
 

@@ -33,12 +33,12 @@ all:
           - openjdk-8-jdk
           - openjdk-8-source
           - openjdk-11-jdk
-          - openjdk-11-source          
+          - openjdk-11-source
           - dos2unix
           - guake
           - mono-complete
           - jq
-          - curl      
+          - curl
           - keepass2
           - code
           - youtube-dl
@@ -73,6 +73,7 @@ all:
           - "molecule[docker]"
           - ansible-lint
           - requests
+          - pre-commit
           - pylint
           - pytest
           - pipenv
@@ -104,7 +105,7 @@ all:
           - name: nss-order
             become: true
             command: |
-              sed -i -E "s/^hosts: .+$/hosts:          myhostname files mdns4_minimal [NOTFOUND=return] dns/" /etc/nsswitch.conf 
+              sed -i -E "s/^hosts: .+$/hosts:          myhostname files mdns4_minimal [NOTFOUND=return] dns/" /etc/nsswitch.conf
           - name: docker-config
             become: true
             command: |
@@ -232,6 +233,14 @@ all:
                 wget -qO- https://storage.googleapis.com/shellcheck/shellcheck-stable.linux.x86_64.tar.xz | tar -xJv -o shellcheck-stable/shellcheck &&
                 mv shellcheck-stable/shellcheck . && rmdir shellcheck-stable
               )
+          - name: shfmt
+            become: false
+            command: |
+              GO111MODULE=on go get mvdan.cc/sh/v3/cmd/shfmt
+          - name: markdownlinter
+            become: true
+            command: |
+              gem list -i --silent mdl || gem install mdl
           - name: istioctl
             become: false
             command: |
@@ -243,7 +252,7 @@ all:
             become: true
             desc: |
               CNI needed by Crio based Minikube
-              K8S requires that cni plugin binaries are at /opt/cni/bin 
+              K8S requires that cni plugin binaries are at /opt/cni/bin
               and kubelet does not respect cni-bin-dir flag yet for non-docker container runtimes.
             command: |
               [ -x /opt/cni/bin/bridge ] || (
@@ -262,6 +271,6 @@ all:
             content: |
               *   soft    nofile    32768
               *   hard    nofile    65536
-          - file: /etc/autofs.conf 
+          - file: /etc/autofs.conf
             content: |
               logging = verbose

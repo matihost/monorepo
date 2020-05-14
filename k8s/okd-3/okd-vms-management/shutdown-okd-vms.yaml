@@ -12,7 +12,7 @@
     tags:
     - origin
 - hosts: localhost
-  gather_facts: False  
+  gather_facts: False
   tasks:
   - name: acpi power off OKD node
     command: VBoxManage controlvm "{{ hostvars[item].vm_name }}" acpipowerbutton
@@ -20,13 +20,13 @@
 
   - name: pause 60 seconds
     pause:
-      seconds: 60    
+      seconds: 60
   - name: wait for OKD nodes SSH port down
     wait_for:
       host: "{{ item }}"
       port: 22
       state: stopped
-      timeout: 90         
+      timeout: 90
     loop: "{{ groups['okd'] }}"
   - name: get still running OKD VMs
     shell: VBoxManage list runningvms
@@ -34,7 +34,7 @@
   - name: power off OKD node
     command: VBoxManage controlvm "{{ hostvars[item].vm_name }}" poweroff
     when: runningvms.stdout is search(hostvars[item].vm_name)
-    ignore_errors: true 
+    ignore_errors: true
     loop: "{{ groups['okd'] }}"
   - name: get still running OKD VMs
     shell: VBoxManage list runningvms

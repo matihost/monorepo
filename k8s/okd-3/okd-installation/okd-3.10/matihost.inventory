@@ -31,11 +31,11 @@ ansible_user=root
 
 openshift_deployment_type=origin
 openshift_release=v3.10
-openshift_rolling_restart_mode=system 
+openshift_rolling_restart_mode=system
 openshift_master_default_subdomain=apps.matihost
 # when master is behind load balancer
 #openshift_master_cluster_public_hostname=openshift-master.allinone.matihost
-os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant' 
+os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
 
 openshift_disable_check=memory_availability,disk_availability,package_version
 
@@ -49,7 +49,7 @@ openshift_hosted_router_force_subdomain='${name}-${namespace}.apps.matihost'
 # install httpasswd tool on master node - to generate authentication files
 #
 # sudo yum install httpd-tools
-# sudo htpasswd /etc/origin/master/htpasswd userName 
+# sudo htpasswd /etc/origin/master/htpasswd userName
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
 
 # normally htpasswd_file option encrypted with Ansible vault, but this is for learning only
@@ -77,7 +77,7 @@ openshift_enable_unsupported_configurations=True
 # install metrics subsystem in openshift-infra namespace
 # default is false
 #
-# When there is not sufficient memory or lack of CPU, 
+# When there is not sufficient memory or lack of CPU,
 # it may fail as there is a very short timeout between Hawkular / Cassandra during table creation
 # it cannot be changed https://github.com/openshift/origin-metrics/issues/413 and it will be not fixed as Hawkular/Cassandra stack will vanish in 3.11
 # when Hawkular Metrics fails with timeout issue, terminate the pod, rc will spawn new one and it will try again...

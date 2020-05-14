@@ -22,7 +22,7 @@ setup-opendns -u opendns@user.com -p password Home1
 """
 
 _NETWORK_LABEL_HELP = """label given to the network you're updating in your OpenDNSaccount.
-You can find the network label in the Settings Tab of the OpenDNS Dashboard. 
+You can find the network label in the Settings Tab of the OpenDNS Dashboard.
 If you have spaces in your network label, replace them with an underscore ( _ )"""
 
 

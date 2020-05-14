@@ -15,7 +15,7 @@ build:  ## build app language
 	mv ${CMD_PACKAGE_NAME} ${DIR} && \
 	cd ${DIR} && ${MAKE} test && \
 	echo "Application ${CMD_PACKAGE_NAME} has been build"
-	
+
 
 test:  ## run go tests
 	@cd ${GOPATH}/src/${PROJECT}/${REPOSITORY}/pkg/language && \
@@ -28,7 +28,7 @@ get-dependencies: prepare-gopath ## download dependencies to vendor using dep to
 
 get-dependencies-to-gopath: ## download dependencies to GOPATH, old style, works when vendor directory is empty
 	cd ${GOPATH}/src/${PROJECT}/${REPOSITORY} && \
-	go get -v ./...	
+	go get -v ./...
 
 clean: ## removes compiled application and vendor directory
 	@rm -rf ${DIR}/${CMD_PACKAGE_NAME} && rm -rf vendor
@@ -53,7 +53,3 @@ help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
 .PHONY: help build prepare-gopath clean ensure-dep init-dep clean-independent-before clean-independent-after build-s2i run-container build-image
-
-
-
-

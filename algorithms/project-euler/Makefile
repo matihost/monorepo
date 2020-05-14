@@ -4,11 +4,11 @@ clean: ## clean build results
 build: ## builds the project
 	mvn -s .mvn/settings.xml clean install
 
-ALGORITHMS := $(shell ls src/main/java/org/matihost/algorithms/euler |cut -d'.' -f1)  
+ALGORITHMS := $(shell ls src/main/java/org/matihost/algorithms/euler |cut -d'.' -f1)
 ${ALGORITHMS}: ## run ProblemX
 	java -cp target/project-euler-1.0.0-SNAPSHOT.jar org.matihost.algorithms.euler.$@
 
-docs: ## generate html/pdf from *.ad in target directory 
+docs: ## generate html/pdf from *.ad in target directory
 	asciidoctor -r asciidoctor-diagram,asciidoctor-mathematical -b html -D target *.ad
 	asciidoctor -r asciidoctor-pdf,asciidoctor-diagram,asciidoctor-mathematical -b pdf -D target *.ad
 

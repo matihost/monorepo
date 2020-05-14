@@ -4,9 +4,9 @@ kind: PersistentVolume
 metadata:
   name: pv-{{item}}
 spec:
-  accessModes: 
+  accessModes:
   - ReadWriteMany
-  - ReadWriteOnce    
+  - ReadWriteOnce
   capacity:
     storage: 10Gi
   nfs:

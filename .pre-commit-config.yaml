@@ -1,0 +1,25 @@
+---
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.5.0
+    hooks:
+    - id: trailing-whitespace
+    - id: end-of-file-fixer
+    - id: check-xml
+    - id: check-yaml
+      args:  ['--allow-multiple-documents', '--unsafe']
+    - id: check-toml
+    - id: check-json
+    - id: check-added-large-files
+    - id: check-case-conflict
+    - id: detect-aws-credentials
+    - id: detect-private-key
+- repo: https://github.com/jumanjihouse/pre-commit-hooks
+  rev: 2.0.2
+  hooks:
+    - id: forbid-binary
+    - id: git-check
+    - id: markdownlint
+    - id: require-ascii
+    - id: shellcheck
+    - id: shfmt

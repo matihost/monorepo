@@ -1,5 +1,5 @@
 FROM mirror.gcr.io/library/centos
-RUN mkdir /home/buildah && chgrp -R 0 /home/buildah && chmod -R g=u /home/buildah 
+RUN mkdir /home/buildah && chgrp -R 0 /home/buildah && chmod -R g=u /home/buildah
 RUN yum -y update && yum -y install buildah
 # uncommenting #mount_program = "/usr/bin/fuse-overlayfs" breaks CentOS based image run unver Ubuntu
 #RUN sed -i -e 's|^#mount_program|mount_program|g' -e '/additionalimage.*/a "/var/lib/shared",' /etc/containers/storage.conf

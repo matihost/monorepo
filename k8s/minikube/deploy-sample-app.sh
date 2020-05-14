@@ -22,15 +22,14 @@ spec:
       - path: /
         backend:
           serviceName: echoserver
-          servicePort: 80" | \
-          kubectl apply -f - -n learning
+          servicePort: 80" |
+    kubectl apply -f - -n learning
 
-  while [ -z "$(kubectl get ingress echoserver -n learning -o jsonpath="{.status..ip}" | xargs)"  ]; do 
-  sleep 1;
-  echo "Awaiting for LoadBalancer for Ingress..."
+  while [ -z "$(kubectl get ingress echoserver -n learning -o jsonpath="{.status..ip}" | xargs)" ]; do
+    sleep 1
+    echo "Awaiting for LoadBalancer for Ingress..."
   done
   INGRESS_IP="$(kubectl get ingress echoserver -n learning -o jsonpath="{.status..ip}")"
   CHANGED=$(grep -c "${INGRESS_IP} echoserver.learning.minikube" /etc/hosts)
-  [ "${CHANGED}" -eq 0 ]  && echo "update hosts" && sudo -E sh -c "echo \"${INGRESS_IP} echoserver.learning.minikube\" >> /etc/hosts" || echo "hosts already present"      
+  [ "${CHANGED}" -eq 0 ] && echo "update hosts" && sudo -E sh -c "echo \"${INGRESS_IP} echoserver.learning.minikube\" >> /etc/hosts" || echo "hosts already present"
 }
-

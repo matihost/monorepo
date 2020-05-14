@@ -9,7 +9,7 @@
       mode: "777"
       owner: nfsnobody
       group: nfsnobody
-      state: directory  
+      state: directory
   - name: Create pv directories
     file:
       path: /exports/pv/{{ item }}
@@ -32,7 +32,7 @@
     loop: "{{pvs}}"
   - name: Reload NFS server
     shell: exportfs -ra
-# it could be run on master as well, because root is system:admin, 
+# it could be run on master as well, because root is system:admin,
 # but it requires proper pip and, openshift module on master as well
 - hosts: localhost
   become: false
@@ -43,5 +43,3 @@
       state: present
       definition: "{{ lookup('template', files + 'pv.yaml.j2') | from_yaml }}"
     loop: "{{hostvars['master'].pvs}}"
-
-

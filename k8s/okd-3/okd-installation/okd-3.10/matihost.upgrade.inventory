@@ -45,7 +45,7 @@ openshift_hosted_router_force_subdomain='${name}-${namespace}.apps.matihost'
 # install httpasswd tool on master node - to generate authentication files
 #
 # sudo yum install httpd-tools
-# sudo htpasswd /etc/origin/master/htpasswd userName 
+# sudo htpasswd /etc/origin/master/htpasswd userName
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
 
 # normally htpasswd_file option encrypted with Ansible vault, but this is for learning only

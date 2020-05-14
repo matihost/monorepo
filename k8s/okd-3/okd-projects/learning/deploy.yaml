@@ -21,5 +21,3 @@
       state: present
       src: "{{ files }}/rbac.yaml"
       namespace: learning
-    
-

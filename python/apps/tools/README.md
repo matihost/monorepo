@@ -1,6 +1,7 @@
 # Tools
 
 Contains CLI Python made tools:
+
 * `automount-cifs` - to mount home's router NAS disk automatically (or any SAMBA/CIFS 1 endpoint)
 * `setup-opendns` - to publish periodically home's network public IP to OpenDNS
 

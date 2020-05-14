@@ -4,7 +4,7 @@
     msg: No file_config variable provided
   when: apt_repo is not defined or apt_repo.name is not defined
 
-- name: Ensure apt key is present 
+- name: Ensure apt key is present
   apt_key:
     url: "{{ apt_repo.key_url }}"
     state: present
@@ -20,6 +20,6 @@
 - name: Ensure package {{ apt_repo.name }} repositories when is external
   apt_repository:
     repo: "{{ apt_repo.repo }}"
-    update_cache: false 
+    update_cache: false
     filename: "{{ apt_repo.name }}"
   when: apt_repo.repo is defined and apt_repo.repo
