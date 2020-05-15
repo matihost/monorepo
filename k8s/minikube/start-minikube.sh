@@ -41,7 +41,6 @@ function ensureCrioAndCrictlPresent() {
   [ -x /opt/cni/bin/bridge ] || (
     sudo apt -y install containernetworking-plugins
     sudo mkdir -p /opt/cni
-    #TODO remove when kubelet will support cni-bin-dir flag for non-docer runtimes
     sudo ln -s /usr/lib/cni /opt/cni/bin
   )
 
@@ -76,7 +75,7 @@ esac
 case "${MODE}" in
 crio)
   ensureCrioAndCrictlPresent
-  EXTRA_PARAMS='--container-runtime=cri-o --enable-default-cni --extra-config=kubelet.cni-bin-dir=/usr/lib/cni'
+  EXTRA_PARAMS='--container-runtime=cri-o --enable-default-cni'
   ;;
 docker)
   ensureDockerCGroupSystemD
@@ -84,7 +83,7 @@ docker)
   ;;
 esac
 
-if minikube status &>/dev/null; then
+if ! minikube status &>/dev/null; then
   #TODO remmove when https://github.com/kubernetes/minikube/issues/6391 is fixed
   [ "$(sudo sysctl -en fs.protected_regular)" != '0' ] &&
     sudo sysctl fs.protected_regular=0 && echo "Disabled fs.protected_regular to allow running Minikube in none mode"
