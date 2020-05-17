@@ -4,7 +4,27 @@
   exit 1
 }
 
-CRIO_VERSION=1.17
+function usage() {
+  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-crio|crio|c] [--with-docker | docker | d] [--with-istio | istio]
+
+Starts Minikube in bare / none mode. Assume latest Ubuntu.
+
+Samples:
+# start Minikube with docker
+$(basename "$0") --with-docker
+
+# start Minikube with docker and Istio enabled
+$(basename "$0") --with-docker --with-istio
+or
+$(basename "$0") docker istio
+
+# start with Crio as container engine
+$(basename "$0") --with-crio
+
+# start with Crio as container engine with Istio
+$(basename "$0") --with-crio --with-istio
+"
+}
 
 function ensureMinikubePresent() {
   [ ! -x /usr/bin/minikube ] &&
@@ -22,6 +42,7 @@ function ensureDockerCGroupSystemD() {
 }
 
 function ensureCrioAndCrictlPresent() {
+  CRIO_VERSION=1.17
   [ -x /usr/local/bin/crictl ] || (
     CRICTL_VERSION=$(git ls-remote -t https://github.com/kubernetes-sigs/cri-tools.git | cut -d'/' -f3 | sort -n | tail -n 1)
     wget "https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz"
@@ -30,6 +51,7 @@ function ensureCrioAndCrictlPresent() {
   )
 
   [ -x /usr/bin/crio ] || (
+    # shellcheck disable=SC1091
     . /etc/os-release
     sudo sh -c "echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x${NAME}_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list"
     wget -nv "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x${NAME}_${VERSION_ID}/Release.key" -O Release.key
@@ -40,8 +62,6 @@ function ensureCrioAndCrictlPresent() {
   )
   [ -x /opt/cni/bin/bridge ] || (
     sudo apt -y install containernetworking-plugins
-    sudo mkdir -p /opt/cni
-    sudo ln -s /usr/lib/cni /opt/cni/bin
   )
 
   #TODO remove when fixed https://github.com/cri-o/cri-o/issues/1767
@@ -57,20 +77,29 @@ function ensureIstioctlIsPresent() {
 }
 
 ensureMinikubePresent
-MODE='docker'
+MODE=''
 ADDONS="registry ingress dashboard"
 
-case "$1" in
---with-crio | crio | c)
-  MODE='crio'
-  ;;
---with-docker | docker | d)
-  MODE='docker'
-  ;;
---with-istio | istio)
-  ADDONS="${ADDONS} istio"
-  ;;
-esac
+while [[ "$#" -gt 0 ]]; do
+  case $1 in
+  -h | --help | help)
+    usage
+    exit 1
+    ;;
+  --with-crio | crio | c)
+    MODE='crio'
+    ;;
+  --with-docker | docker | d)
+    MODE='docker'
+    ;;
+  --with-istio | istio)
+    ADDONS="${ADDONS} istio"
+    ;;
+  *) PARAMS+=("$1") ;; # save it in an array for later
+  esac
+  shift
+done
+set -- "${PARAMS[@]}" # restore positional parameters
 
 case "${MODE}" in
 crio)
@@ -81,10 +110,14 @@ docker)
   ensureDockerCGroupSystemD
   EXTRA_PARAMS=''
   ;;
+*)
+  usage
+  exit 1
+  ;;
 esac
 
 if ! minikube status &>/dev/null; then
-  #TODO remmove when https://github.com/kubernetes/minikube/issues/6391 is fixed
+  #TODO remove when https://github.com/kubernetes/minikube/issues/6391 is fixed
   [ "$(sudo sysctl -en fs.protected_regular)" != '0' ] &&
     sudo sysctl fs.protected_regular=0 && echo "Disabled fs.protected_regular to allow running Minikube in none mode"
 
@@ -109,7 +142,7 @@ if ! minikube status &>/dev/null; then
 
   sudo chmod -R a+rwx /etc/kubernetes &&
     minikube update-context &>/dev/null &&
-    { minikube tunnel &>/tmp/minikube-tunnel.log & } &&
+    { minikube tunnel -c &>/tmp/minikube-tunnel.log & } &&
     echo "Minikube has been started"
 
   [ "$(sudo systemctl is-enabled kubelet)" == 'enabled' ] &&
