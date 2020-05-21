@@ -66,6 +66,7 @@ all:
           - google-cloud-sdk
           - kubectl
         pips:
+          - pip
           - openshift
           - kubernetes
           - kubernetes-validate
@@ -90,6 +91,9 @@ all:
             command: |
               [ "$(ansible-galaxy collection install community.kubernetes |grep -c 'is already installed')" -eq 1 ] || echo "Ansible collection community.kubernetes has been installed"
           - name: ensure-hp-lip
+            desc: |
+              Ensure the latest hplip is installed from source
+              TODO the latest 3.20.5 cannot be installed on Ubuntu 20.04 yet: https://bugs.launchpad.net/hplip/+bug/1879353
             become: false
             command: |
               [ -e /etc/hp/hplip.conf ] &&  {
