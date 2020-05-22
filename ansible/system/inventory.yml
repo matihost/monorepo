@@ -168,11 +168,12 @@ all:
           - name: crictl
             become: false
             command: |
-              [ -x /usr/local/bin/crictl ] || (\
-              VERSION=`git ls-remote -t https://github.com/kubernetes-sigs/cri-tools.git | cut -d'/' -f3 |sort -n |tail -n 1`;\
-              wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz ;\
-              sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin;\
-              rm -f crictl-$VERSION-linux-amd64.tar.gz)
+              VERSION=$(git ls-remote -t https://github.com/kubernetes-sigs/cri-tools.git | cut -d'/' -f3 |sort -n |tail -n 1)
+              [[ -x /usr/local/bin/crictl && "$(/usr/local/bin/crictl --version)" =~ ${VERSION} ]] || {
+                wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz
+                sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin
+                rm -f crictl-$VERSION-linux-amd64.tar.gz
+              }
           - name: helm
             become: false
             command: |
@@ -189,24 +190,25 @@ all:
           - name: krew
             become: false
             command: |
-              [ -h ~/.krew/bin/kubectl-krew ] || (
+              KREW_VERSION=$(git ls-remote -t https://github.com/kubernetes-sigs/krew.git | grep -v '\^{}' | cut -d'/' -f3 |sort -n |tail -n 1)
+              [[ -e ~/.krew/bin/kubectl-krew && "$(kubectl krew version 2>/dev/null |grep GitTag)" =~ ${KREW_VERSION} ]] || {
                 [ "$(grep -c 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' ~/.bashrc)" -eq 0 ] && echo 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' >> ~/.bashrc
-                KREW_VERSION=`git ls-remote -t https://github.com/kubernetes-sigs/krew.git | grep -v '\^{}' | cut -d'/' -f3 |sort -n |tail -n 1` &&
                 cd "$(mktemp -d)" &&
-                curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/download/v0.3.4/krew.{tar.gz,yaml}" &&
+                curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/download/${KREW_VERSION}/krew.{tar.gz,yaml}" &&
                 tar zxvf krew.tar.gz &&
                 KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" &&
                 "$KREW" install --manifest=krew.yaml --archive=krew.tar.gz &&
                 "$KREW" install change-ns ctx whoami &&
-                "$KREW" update
-              )
+                "$KREW" update &&
+                "$KREW" upgrade
+              }
           - name: k9s
             become: false
             command: |
-              [ -x /usr/local/bin/k9s ] || (
-                K9S_VERSION=`git ls-remote -t https://github.com/derailed/k9s.git | grep -v '\^{}' | cut -d'/' -f3 |sort -n |tail -n 1` &&
+              K9S_VERSION=$(git ls-remote -t https://github.com/derailed/k9s.git | grep -v '\^{}' | cut -d'/' -f3 |sort -n |tail -n 1 | cut -d'v' -f2)
+              [[ -x /usr/local/bin/k9s && "$(k9s version -s |grep Version)" =~ ${K9S_VERSION} ]] || (
                 cd "$(mktemp -d)" &&
-                curl -fsSLO "https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_Linux_x86_64.tar.gz" &&
+                curl -fsSLO "https://github.com/derailed/k9s/releases/download/v${K9S_VERSION}/k9s_Linux_x86_64.tar.gz" &&
                 tar -zxvf k9s_Linux_x86_64.tar.gz -o k9s &&
                 sudo mv k9s /usr/local/bin
               )
