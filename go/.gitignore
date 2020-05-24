@@ -1,0 +1,7 @@
+# Go build files
+go.sum
+vendor
+
+# Executables in the project
+language
+http-server

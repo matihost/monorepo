@@ -1,13 +1,17 @@
-# for Docker >= 17.5, it uses multistage build
 FROM golang:1.13 as builder
-WORKDIR /go/src/github.com/matihost/learning/go
-COPY . .
-WORKDIR cmd/language
-RUN CGO_ENABLED=0 GOOS=linux go install -a -installsuffix cgo
+COPY . /tmp/build
+WORKDIR /tmp/build
+RUN go build -o . ./cmd/language
 
 FROM gcr.io/distroless/base
 USER 1001
-COPY --from=builder /go/bin/language .
+COPY --from=builder /tmp/build/language .
 ENTRYPOINT ["./language"]
 LABEL Name=language Version=0.0.1
-# EXPOSE 3000
+
+# The GOPATH version of build, has to be first build step, executable in /go/bin/language
+# FROM golang:1.13 as builder
+# WORKDIR /go/src/github.com/matihost/learning/go
+# COPY . .
+# WORKDIR cmd/language
+# RUN CGO_ENABLED=0 GOOS=linux go install -a -installsuffix cgo

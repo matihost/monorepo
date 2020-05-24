@@ -30,7 +30,6 @@
 
 # Build files
 .build-workspace
-/go/language
 galaxy
 target
 vendor
