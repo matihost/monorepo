@@ -40,7 +40,7 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
-    <spring.boot.version>2.2.6.RELEASE</spring.boot.version>
+    <spring.boot.version>2.3.0.RELEASE</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -49,13 +49,14 @@
     <enforce.maven.version>3.6</enforce.maven.version>
 
     <!-- Groovy -->
+    <!-- TODO update groovy to 3.0.4 when testng:7.2.0 released -->
     <groovy.version>3.0.3</groovy.version>
     <spock.version>2.0-M2-groovy-3.0</spock.version>
 
     <!-- Scala -->
     <scala.compat.version>2.13</scala.compat.version>
-    <scala.version>${scala.compat.version}.1</scala.version>
-    <!-- TODO update scala.spec2.version 4.9.3 when compatible with latest scala.test 3.3.0.x -->
+    <scala.version>${scala.compat.version}.2</scala.version>
+    <!-- TODO update scala.spec2.version 4.9.4 when compatible with latest scala.test 3.3.0.x -->
     <scala.spec2.version>4.9.2</scala.spec2.version>
     <scala.test.version>3.3.0-SNAP2</scala.test.version>
     <scala.test.plus.version>3.3.0.0-SNAP2</scala.test.plus.version>
