@@ -125,7 +125,6 @@ spec:
               dir("go"){
                 echo "Building ${pwd()}..."
                 sh """
-                  curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
                   make build
                 """
               }

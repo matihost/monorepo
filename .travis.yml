@@ -29,9 +29,6 @@ jobs:
   - language: go
     go: "1.13"
     before_install: cd go
-    install:
-    - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-    - dep ensure
     script:
     - go build github.com/matihost/learning/go/cmd/http-server
     - go build github.com/matihost/learning/go/cmd/language
