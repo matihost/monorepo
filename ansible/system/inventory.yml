@@ -72,6 +72,7 @@ all:
           - kubernetes-validate
           - "molecule[lint]"
           - "molecule[docker]"
+          - ansible
           - ansible-lint
           - requests
           - pre-commit

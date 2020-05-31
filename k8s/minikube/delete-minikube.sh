@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 pkill -f 'minikube tunnel'
-minikube tunnel -c
 
 minikube delete
 if [ "$(kubectl config current-context 2>/dev/null)" = "minikube" ]; then
