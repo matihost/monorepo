@@ -14,6 +14,8 @@ all:
           - name: multiverse
           - name: vscode
             repo: "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main"
+          - name: virtualbox
+            repo: "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian {{ ansible_distribution_release }} contrib"
           - name: libcontainers
             repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/ /"
             key_url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/Release.key"
@@ -54,7 +56,7 @@ all:
           - docker.io
           - conntrack
           - fuse-overlayfs
-          - virtualbox
+          - virtualbox-6.1
           - containernetworking-plugins
           - cri-o-1.17
           - podman
