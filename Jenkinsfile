@@ -32,8 +32,7 @@ spec:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
   - name: python
-    #TODO switch to 3.8 or latest when available: gcloud container images list-tags mirror.gcr.io/library/python
-    image: mirror.gcr.io/library/python:3.7
+    image: mirror.gcr.io/library/python:3.8
     command:
     - cat
     tty: true
