@@ -17,9 +17,16 @@ Playbooks:
 
   `pip3 install --user openshift kubernetes`
 
+* Helm with latest charts
+
+  `helm repo update`
+
 * K8S and Helm modules
 
-  `ansible-galaxy collection install community.kubernetes`
+  ```bash
+  rm -rf ~/.ansible/collections/ansible_collections/community/kubernetes && \
+  ansible-galaxy collection install community.kubernetes
+  ```
 
 ## Running
 

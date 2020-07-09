@@ -19,17 +19,16 @@ master:
         - {{ jenkins_ingress }}
 
   installPlugins:
-    - kubernetes:1.25.4
-    - workflow-job:2.38
+    - kubernetes:1.26.3
+    - workflow-job:2.39
     - workflow-aggregator:2.6
     - credentials-binding:1.23
-    - git:4.2.2
+    - git:4.3.0
+    - configuration-as-code:1.41
     - timestamper:1.11.3
-    - github-branch-source:2.7.1
+    - github-branch-source:2.8.2
     - matrix-auth:2.6.1
-    - prometheus:2.0.6
-    - configuration-as-code:1.40
-
+    - prometheus:2.0.7
   resources:
     requests:
       cpu: "50m"
@@ -38,15 +37,20 @@ master:
       cpu: "{{ jenkins_max_cpu|default('2000m') }}"
       memory: "{{ jenkins_max_memory|default('2Gi') }}"
 
+  enableXmlConfig: true
   securityRealm: |-
     <securityRealm class="hudson.security.HudsonPrivateSecurityRealm">
-    <disableSignup>true</disableSignup>
-    <enableCaptcha>false</enableCaptcha>
+      <disableSignup>true</disableSignup>
+      <enableCaptcha>false</enableCaptcha>
     </securityRealm>
-  scriptApproval:
-  - 'method groovy.json.JsonSlurperClassic parseText java.lang.String'
+
+  # TODO Helm chart starts failing on added script approval
+  # scriptApproval:
+  #   - "method groovy.json.JsonSlurperClassic parseText java.lang.String"
+  #   - "new groovy.json.JsonSlurperClassic"
+
   initScripts:
-    create-admin-account: |
+    - |
       import jenkins.model.*
       import hudson.security.*
       def instance = Jenkins.getInstance()
@@ -58,7 +62,7 @@ master:
 
 agent:
   image: "mirror.gcr.io/jenkins/jnlp-slave"
-  tag: "lts"
+  tag: "alpine"
   resources:
     requests:
       cpu: "50m"
