@@ -65,6 +65,7 @@ all:
         snaps:
           - mc-installer
           - minecraft-server-jdstrand
+          - notepad-plus-plus
         classic_snaps:
           - google-cloud-sdk
           - kubectl
