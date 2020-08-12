@@ -19,6 +19,9 @@ all:
           - name: libcontainers
             repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/ /"
             key_url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/Release.key"
+          - name: terraform
+            repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+            key_url: "https://apt.releases.hashicorp.com/gpg"
         packages:
           - brasero
           - autofs
@@ -62,6 +65,7 @@ all:
           - cri-o-1.17
           - podman
           - buildah
+          - terraform
         snaps:
           - mc-installer
           - minecraft-server-jdstrand
@@ -259,6 +263,10 @@ all:
                 curl -sL https://istio.io/downloadIstioctl | sh -
                 echo 'export PATH=$PATH:$HOME/.istioctl/bin' >> ~/.bashrc
               )
+          - name: terraform-autocomplete
+            become: false
+            command: |
+              [ "$(grep -c 'complete -C /usr/bin/terraform terraform' ~/.bashrc)" -ne 0 ] || terraform -install-autocomplete
         files_config:
           - file: /etc/gai.conf
             content: |

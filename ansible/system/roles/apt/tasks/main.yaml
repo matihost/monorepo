@@ -21,5 +21,6 @@
   apt_repository:
     repo: "{{ apt_repo.repo }}"
     update_cache: false
+    mode: "0644"
     filename: "{{ apt_repo.name }}"
   when: apt_repo.repo is defined and apt_repo.repo
