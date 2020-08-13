@@ -111,7 +111,7 @@ all:
                 HP_LIP_VERSION=$(grep version /etc/hp/hplip.conf | sed -E "s/version=(.+)/\1/")
                 CURRENT_LATEST_HP_LIP_VERSION=$(curl -sL https://developers.hp.com/hp-linux-imaging-and-printing/release_notes |grep -m 1 'HPLIP 3.' | sed -E "s/.+HPLIP (3.+) -.+/\1/")
                 [ "${HP_LIP_VERSION}" = "${CURRENT_LATEST_HP_LIP_VERSION}" ] || {
-                  echo "Installed hp-lip is not the latest, follow https://developers.hp.com/hp-linux-imaging-and-printing/gethplip to install latest version"
+                  echo -e "Installed hp-lip is not the latest, follow https://developers.hp.com/hp-linux-imaging-and-printing/gethplip to install latest version\nIn case of problem use advanced mode: https://developers.hp.com/hp-linux-imaging-and-printing/KnowledgeBase/InstallHPLIPwithqt5.html"
                   exit 1
                 }
               }
