@@ -14,6 +14,13 @@ repos:
     - id: check-case-conflict
     - id: detect-aws-credentials
     - id: detect-private-key
+    - id: check-executables-have-shebangs
+- repo: https://github.com/gruntwork-io/pre-commit
+  rev: v0.1.9
+  hooks:
+    - id: terraform-fmt
+    - id: terraform-validate
+    - id: tflint
 - repo: https://github.com/jumanjihouse/pre-commit-hooks
   rev: 2.1.4
   hooks:
