@@ -1,7 +1,8 @@
 # Prerequisites:
 # master has to be accessible and has correct network configuration
 # On master:
-#  sudo nmcli c mod enp0s8 ipv4.method manual ipv4.dns 172.25.250.1 ipv4.addresses 172.25.250.10/24 ipv4.gateway 172.25.250.1 ipv4.dns-search "matihost"
+#  sudo nmcli c mod enp0s8 ipv4.method manual ipv4.dns 172.25.250.1 \
+#    ipv4.addresses 172.25.250.10/24 ipv4.gateway 172.25.250.1 ipv4.dns-search "matihost"
 #  sudo hostnamectl set-hostname master.matihost
 #  sudo ssh-copy-id root@nodeX # for each node, master should be able to ssh directly to other nodes
 #
@@ -29,8 +30,8 @@
   - name: Install Epel and CentOS repos
     yum:
       name:
-        - 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm'
-        - 'https://centos7.iuscommunity.org/ius-release.rpm'
+      - 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm'
+      - 'https://centos7.iuscommunity.org/ius-release.rpm'
       state: present
   - name: Remove git avoid conflict with git2u
     yum:
@@ -39,8 +40,8 @@
   - name: Install nice to have packages
     yum:
       name:
-        - bind-utils
-        - python2-pip
+      - bind-utils
+      - python2-pip
       state: present
   - name: Install openshift-ansible required
     yum:

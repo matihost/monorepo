@@ -1,7 +1,8 @@
 ---
 # Cannot be used for JSON configs
 # - Uses Ansible blockinfile module requires usage of markers while JSON files cannot accept comments
-# - Ansible proactively converts JSON like string to dict making multiline queries problematic for JSON files (https://stackoverflow.com/questions/41144922/ansible-passing-json-string-in-environment-to-shell-module)
+# - Ansible proactively converts JSON like string to dict making multiline queries problematic for JSON files
+# (https://stackoverflow.com/questions/41144922/ansible-passing-json-string-in-environment-to-shell-module)
 - name: Check file_config variable
   fail:
     msg: No file_config variable provided

@@ -5,31 +5,31 @@ metadata:
   name: buildah
 spec:
   containers:
-    - name: buildah
-      image: ${IMAGE:-quay.io/buildah/stable}
-      imagePullPolicy: IfNotPresent
-      command: ["/bin/bash"]
-      args:
-      - -c
-      - sleep infinity
-      resources:
-        limits:
-          cpu: "2"
-          memory: 4Gi
-        requests:
-          cpu: "1"
-          memory: 1Gi
-      volumeMounts:
-      - name: devfuse
-        mountPath: /dev/fuse
-      - name: varlibcontainers
-        mountPath: /var/lib/containers
-      securityContext:
-        runAsUser: 0
+  - name: buildah
+    image: ${IMAGE:-quay.io/buildah/stable}
+    imagePullPolicy: IfNotPresent
+    command: [ "/bin/bash" ]
+    args:
+    - -c
+    - sleep infinity
+    resources:
+      limits:
+        cpu: "2"
+        memory: 4Gi
+      requests:
+        cpu: "1"
+        memory: 1Gi
+    volumeMounts:
+    - name: devfuse
+      mountPath: /dev/fuse
+    - name: varlibcontainers
+      mountPath: /var/lib/containers
+    securityContext:
+      runAsUser: 0
   restartPolicy: Never
   volumes:
   - name: varlibcontainers
-    emptyDir: {}
+    emptyDir: { }
   - name: devfuse
     hostPath:
       path: /dev/fuse

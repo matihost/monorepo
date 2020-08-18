@@ -1,32 +1,37 @@
 ---
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
-    hooks:
-    - id: trailing-whitespace
-    - id: end-of-file-fixer
-    - id: check-xml
-    - id: check-yaml
-      args:  ['--allow-multiple-documents', '--unsafe']
-    - id: check-toml
-    - id: check-json
-    - id: check-added-large-files
-    - id: check-case-conflict
-    - id: detect-aws-credentials
-    - id: detect-private-key
-    - id: check-executables-have-shebangs
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v3.2.0
+  hooks:
+  - id: trailing-whitespace
+  - id: end-of-file-fixer
+  - id: check-xml
+  - id: check-yaml
+    args: [ '--allow-multiple-documents', '--unsafe' ]
+  - id: check-toml
+  - id: check-json
+  - id: check-added-large-files
+  - id: check-case-conflict
+  - id: detect-aws-credentials
+  - id: detect-private-key
+  - id: check-executables-have-shebangs
 - repo: https://github.com/gruntwork-io/pre-commit
   rev: v0.1.10
   hooks:
-    - id: terraform-fmt
-    - id: terraform-validate
-    - id: tflint
+  - id: terraform-fmt
+  - id: terraform-validate
+  - id: tflint
 - repo: https://github.com/jumanjihouse/pre-commit-hooks
   rev: 2.1.4
   hooks:
-    - id: forbid-binary
-    - id: git-check
-    - id: markdownlint
-    - id: require-ascii
-    - id: shellcheck
-    - id: shfmt
+  - id: forbid-binary
+  - id: git-check
+  - id: markdownlint
+  - id: require-ascii
+  - id: shellcheck
+  - id: shfmt
+- repo: https://github.com/adrienverge/yamllint.git
+  rev: v1.24.2
+  hooks:
+  - id: yamllint
+    entry: yamllint --strict

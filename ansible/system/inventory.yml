@@ -10,275 +10,282 @@ all:
           max_size: 1G
           max_duration: 10days
         repositories:
-          - name: universe
-          - name: multiverse
-          - name: vscode
-            repo: "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main"
-          - name: virtualbox
-            repo: "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian {{ ansible_distribution_release }} contrib"
-          - name: libcontainers
-            repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/ /"
-            key_url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/Release.key"
-          - name: terraform
-            repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
-            key_url: "https://apt.releases.hashicorp.com/gpg"
+        - name: universe
+        - name: multiverse
+        - name: vscode
+          repo: "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main"
+        - name: virtualbox
+          repo: >-
+            deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian {{ ansible_distribution_release }} contrib
+        - name: libcontainers
+          repo: >-
+            deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/ /
+          key_url: >-
+            https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/Release.key
+        - name: terraform
+          repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+          key_url: "https://apt.releases.hashicorp.com/gpg"
         packages:
-          - brasero
-          - autofs
-          - cifs-utils
-          - dlocate
-          - ubuntu-restricted-extras
-          - grub-customizer
-          - hplip
-          - hplip-gui
-          - ddclient
-          - golang-1.13
-          - golang-golang-x-tools
-          - python3-pip
-          - ruby
-          - openjdk-8-jdk
-          - openjdk-8-source
-          - openjdk-11-jdk
-          - openjdk-11-source
-          - dos2unix
-          - guake
-          - mono-complete
-          - jq
-          - curl
-          - keepass2
-          - code
-          - youtube-dl
-          - onedrive
-          - nautilus-dropbox
-          - openssh-server
-          - iftop
-          - dosbox
-          - calibre
-          - steam
-          - virt-manager
-          - awscli
-          - docker.io
-          - conntrack
-          - fuse-overlayfs
-          - virtualbox-6.1
-          - containernetworking-plugins
-          - cri-o-1.17
-          - podman
-          - buildah
-          - terraform
+        - brasero
+        - autofs
+        - cifs-utils
+        - dlocate
+        - ubuntu-restricted-extras
+        - grub-customizer
+        - hplip
+        - hplip-gui
+        - ddclient
+        - golang-1.13
+        - golang-golang-x-tools
+        - python3-pip
+        - ruby
+        - openjdk-8-jdk
+        - openjdk-8-source
+        - openjdk-11-jdk
+        - openjdk-11-source
+        - dos2unix
+        - guake
+        - mono-complete
+        - jq
+        - curl
+        - keepass2
+        - code
+        - youtube-dl
+        - onedrive
+        - nautilus-dropbox
+        - openssh-server
+        - iftop
+        - dosbox
+        - calibre
+        - steam
+        - virt-manager
+        - awscli
+        - docker.io
+        - conntrack
+        - fuse-overlayfs
+        - virtualbox-6.1
+        - containernetworking-plugins
+        - cri-o-1.17
+        - podman
+        - buildah
+        - terraform
         snaps:
-          - mc-installer
-          - minecraft-server-jdstrand
-          - notepad-plus-plus
+        - mc-installer
+        - minecraft-server-jdstrand
+        - notepad-plus-plus
         classic_snaps:
-          - google-cloud-sdk
-          - kubectl
+        - google-cloud-sdk
+        - kubectl
         pips:
-          - pip
-          - openshift
-          - kubernetes
-          - kubernetes-validate
-          - "molecule[lint]"
-          - "molecule[docker]"
-          - ansible
-          - ansible-lint
-          - requests
-          - pre-commit
-          - pylint
-          - pytest
-          - pipenv
-          - pipenv-setup
+        - pip
+        - openshift
+        - kubernetes
+        - kubernetes-validate
+        - "molecule[lint]"
+        - "molecule[docker]"
+        - ansible
+        - ansible-lint
+        - requests
+        - pre-commit
+        - pylint
+        - pytest
+        - pipenv
+        - pipenv-setup
+        - yamllint
         clis:
-          - name: vboxuser
-            desc: To ensure VBox can see host USB
-            become: false
-            command: |
-              [ "$(groups |grep -c vboxusers)" -eq 0 ] || sudo usermod -aG vboxusers ${USER}
-          - name: ansible-community-kubernetes-collections
-            desc: To ensure Ansible galaxy collection community.kubernetes with k8s, helm modules is present
-            become: false
-            command: |
-              [ "$(ansible-galaxy collection install community.kubernetes |grep -c 'is already installed')" -eq 1 ] || echo "Ansible collection community.kubernetes has been installed"
-          - name: ensure-hp-lip
-            desc: |
-              Ensure the latest hplip is installed from source
-              TODO the latest 3.20.5 cannot be installed on Ubuntu 20.04 yet: https://bugs.launchpad.net/hplip/+bug/1879353
-            become: false
-            command: |
-              [ -e /etc/hp/hplip.conf ] &&  {
-                # hplip systray does not work in Ubuntu GNOME
-                [ -e /etc/xdg/autostart/hplip-systray.desktop ] && sudo rm -f /etc/xdg/autostart/hplip-systray.desktop
-                HP_LIP_VERSION=$(grep version /etc/hp/hplip.conf | sed -E "s/version=(.+)/\1/")
-                CURRENT_LATEST_HP_LIP_VERSION=$(curl -sL https://developers.hp.com/hp-linux-imaging-and-printing/release_notes |grep -m 1 'HPLIP 3.' | sed -E "s/.+HPLIP (3.+) -.+/\1/")
-                [ "${HP_LIP_VERSION}" = "${CURRENT_LATEST_HP_LIP_VERSION}" ] || {
-                  echo -e "Installed hp-lip is not the latest, follow https://developers.hp.com/hp-linux-imaging-and-printing/gethplip to install latest version\nIn case of problem use advanced mode: https://developers.hp.com/hp-linux-imaging-and-printing/KnowledgeBase/InstallHPLIPwithqt5.html"
-                  exit 1
-                }
+        - name: vboxuser
+          desc: To ensure VBox can see host USB
+          become: false
+          command: |
+            [ "$(groups |grep -c vboxusers)" -eq 0 ] || sudo usermod -aG vboxusers ${USER}
+        - name: ansible-community-kubernetes-collections
+          desc: To ensure Ansible galaxy collection community.kubernetes with k8s, helm modules is present
+          become: false
+          command: |
+            [ "$(ansible-galaxy collection install community.kubernetes |grep -c 'is already installed')" -eq 1 ] || \
+            echo "Ansible collection community.kubernetes has been installed"
+        - name: ensure-hp-lip
+          desc: |
+            Ensure the latest hplip is installed from source
+            TODO the latest 3.20.5 cannot be installed on Ubuntu 20.04 yet: https://bugs.launchpad.net/hplip/+bug/1879353
+          become: false
+          command: |
+            [ -e /etc/hp/hplip.conf ] &&  {
+              # hplip systray does not work in Ubuntu GNOME
+              [ -e /etc/xdg/autostart/hplip-systray.desktop ] && sudo rm -f /etc/xdg/autostart/hplip-systray.desktop
+              HP_LIP_VERSION=$(grep version /etc/hp/hplip.conf | sed -E "s/version=(.+)/\1/")
+              CURRENT_LATEST_HP_LIP_VERSION=$(curl -sL https://developers.hp.com/hp-linux-imaging-and-printing/release_notes |grep -m 1 'HPLIP 3.' | \
+                sed -E "s/.+HPLIP (3.+) -.+/\1/")
+              [ "${HP_LIP_VERSION}" = "${CURRENT_LATEST_HP_LIP_VERSION}" ] || {
+                echo -e "Installed hp-lip is not the latest, follow https://developers.hp.com/hp-linux-imaging-and-printing/gethplip to install latest version\nIn case of problem use advanced mode: https://developers.hp.com/hp-linux-imaging-and-printing/KnowledgeBase/InstallHPLIPwithqt5.html"
+                exit 1
               }
-          - name: nss-order
-            become: true
-            command: |
-              sed -i -E "s/^hosts: .+$/hosts:          myhostname files mdns4_minimal [NOTFOUND=return] dns/" /etc/nsswitch.conf
-          - name: docker-config
-            become: true
-            command: |
-              export DESIRED_DAEMON_CONFIG='{
-                "exec-opts": ["native.cgroupdriver=systemd"],
-                "log-driver": "json-file",
-                "log-opts": {
-                  "max-size": "100m"
-                },
-                "storage-driver": "overlay2",
-                "insecure-registries": [
-                  "192.168.0.0/16",
-                  "172.16.0.0/12",
-                  "10.0.0.0/8"
-                ]
-              }'
-              [ "$(grep -c systemd /etc/docker/daemon.json 2>/dev/null || echo 0)" -eq 1 ] || (\
-              echo -n "${DESIRED_DAEMON_CONFIG}" > /etc/docker/daemon.json; \
-              systemctl restart docker && \
-              systemctl is-enabled docker &>/dev/null || systemctl enable docker)
+            }
+        - name: nss-order
+          become: true
+          command: |
+            sed -i -E "s/^hosts: .+$/hosts:          myhostname files mdns4_minimal [NOTFOUND=return] dns/" /etc/nsswitch.conf
+        - name: docker-config
+          become: true
+          command: |
+            export DESIRED_DAEMON_CONFIG='{
+              "exec-opts": ["native.cgroupdriver=systemd"],
+              "log-driver": "json-file",
+              "log-opts": {
+                "max-size": "100m"
+              },
+              "storage-driver": "overlay2",
+              "insecure-registries": [
+                "192.168.0.0/16",
+                "172.16.0.0/12",
+                "10.0.0.0/8"
+              ]
+            }'
+            [ "$(grep -c systemd /etc/docker/daemon.json 2>/dev/null || echo 0)" -eq 1 ] || (\
+            echo -n "${DESIRED_DAEMON_CONFIG}" > /etc/docker/daemon.json; \
+            systemctl restart docker && \
+            systemctl is-enabled docker &>/dev/null || systemctl enable docker)
 
-              [ "$(grep -c systemd /etc/docker/daemon.json 2>/dev/null || echo 0)" -eq 1 ] && \
-              systemctl is-enabled docker &>/dev/null && systemctl is-active docker &>/dev/null
-          - name: python-alternatives
-            become: true
-            command: |
-              [ $(update-alternatives --display python 2>/dev/null |grep -c priority) -eq 2 ] || (\
-                update-alternatives --debug --install /usr/bin/python python /usr/bin/python3 10;\
-                update-alternatives --debug --install /usr/bin/python python /usr/bin/python2 11;\
-                update-alternatives --set python /usr/bin/python2)
-              [ $(update-alternatives --display python 2>/dev/null |grep -c priority) -eq 2 ]
-          - name: asciidoctor
-            become: false
-            command: |
-              [ $(gem list asciidoctor --no-verbose |grep -cE 'diagram|pdf') -eq 2 ] || (\
-                gem install prawn asciidoctor asciidoctor-diagram rouge --user-install && \
-                gem install asciidoctor-pdf --pre --user-install)
-              [ $(gem list asciidoctor --no-verbose |grep -cE 'diagram|pdf') -eq 2 ]
-          - name: sdkman
-            become: false
-            command: |
-              [ $(bash -ic "sdk c 2>/dev/null" |grep -cE 'groovy|maven|scala|java') -eq 4 ] || (\
-              curl -s "https://get.sdkman.io" | bash
-              bash -ic "sdk i java 8-openjdk /usr/lib/jvm/java-8-openjdk-amd64;\
-              sdk i java 11-openjdk /usr/lib/jvm/java-11-openjdk-amd64;\
-              sdk d java 11-openjdk;\
-              sdk i maven;\
-              sdk i groovy;\
-              sdk i scala")
-              [ $(bash -ic "sdk c 2>/dev/null" |grep -cE 'groovy|maven|scala|java') -eq 4 ]
-          - name: runc-fix
-            desc: TODO remove when fixed https://github.com/cri-o/cri-o/issues/1767
-            become: true
-            command: |
-              [ -e /usr/bin/runc ] || { ln -s /usr/sbin/runc /usr/bin/runc; echo "runc path fixed"; }
-          - name: crictl
-            become: false
-            command: |
-              VERSION=$(git ls-remote -t https://github.com/kubernetes-sigs/cri-tools.git | cut -d'/' -f3 |sort -n |tail -n 1)
-              [[ -x /usr/local/bin/crictl && "$(/usr/local/bin/crictl --version)" =~ ${VERSION} ]] || {
-                wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz
-                sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin
-                rm -f crictl-$VERSION-linux-amd64.tar.gz
-              }
-          - name: helm
-            become: false
-            command: |
-              [ -x /usr/local/bin/helm ] || (\
-              curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash; \
-              helm repo add stable https://kubernetes-charts.storage.googleapis.com/)
-          - name: minikube
-            become: false
-            command: |
-              [ -x /usr/bin/minikube ] || (
-              curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64  &&
-              chmod a+x minikube && sudo mv minikube /usr/bin/ && echo "minikube installed"
-              )
-          - name: krew
-            become: false
-            command: |
-              KREW_VERSION=$(git ls-remote -t https://github.com/kubernetes-sigs/krew.git | grep -v '\^{}' | cut -d'/' -f3 |sort -n |tail -n 1)
-              [[ -e ~/.krew/bin/kubectl-krew && "$(kubectl krew version 2>/dev/null |grep GitTag)" =~ ${KREW_VERSION} ]] || {
-                [ "$(grep -c 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' ~/.bashrc)" -eq 0 ] && echo 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' >> ~/.bashrc
-                cd "$(mktemp -d)" &&
-                curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/download/${KREW_VERSION}/krew.{tar.gz,yaml}" &&
-                tar zxvf krew.tar.gz &&
-                KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" &&
-                "$KREW" install --manifest=krew.yaml --archive=krew.tar.gz &&
-                "$KREW" install change-ns ctx whoami &&
-                "$KREW" update &&
-                "$KREW" upgrade
-              }
-          - name: k9s
-            become: false
-            command: |
-              K9S_VERSION=$(git ls-remote -t https://github.com/derailed/k9s.git | grep -v '\^{}' | cut -d'/' -f3 |sort -n |tail -n 1 | cut -d'v' -f2)
-              [[ -x /usr/local/bin/k9s && "$(k9s version -s |grep Version)" =~ ${K9S_VERSION} ]] || (
-                cd "$(mktemp -d)" &&
-                curl -fsSLO "https://github.com/derailed/k9s/releases/download/v${K9S_VERSION}/k9s_Linux_x86_64.tar.gz" &&
-                tar -zxvf k9s_Linux_x86_64.tar.gz -o k9s &&
-                sudo mv k9s /usr/local/bin
-              )
-          - name: kubectx-ns
-            become: false
-            command: |
-              [ -h ~/bin/kubectx -o -h ~/bin/kubens ] || (
-                git clone https://github.com/ahmetb/kubectx.git ~/.kubectx
-                COMPDIR=$(pkg-config --variable=completionsdir bash-completion)
-                ln -sf ~/.kubectx/kubectx ~/bin/kubectx
-                ln -sf ~/.kubectx/kubens ~/bin/kubens
-                sudo ln -sf ~/.kubectx/completion/kubens.bash $COMPDIR/kubens
-                sudo ln -sf ~/.kubectx/completion/kubectx.bash $COMPDIR/kubectx
-                echo kubectx and kubens enabled
-              )
-          - name: kubectl plugins
-            become: true
-            command: |
-              [ -h /usr/local/bin/kubectl-su ] || (
-                ln -s {{ playbook_dir }}/../../k8s/scripts/kubesu /usr/local/bin/kubectl-su
-                echo "kubectl su enabled"
-              )
-          - name: shellcheck
-            become: false
-            command: |
-              [ -x ~/bin/shellcheck ] || (
-                cd ~/bin &&
-                wget -qO- https://storage.googleapis.com/shellcheck/shellcheck-stable.linux.x86_64.tar.xz | tar -xJv -o shellcheck-stable/shellcheck &&
-                mv shellcheck-stable/shellcheck . && rmdir shellcheck-stable
-              )
-          - name: shfmt
-            become: false
-            command: |
-              GO111MODULE=on go get mvdan.cc/sh/v3/cmd/shfmt
-          - name: markdownlinter
-            become: true
-            command: |
-              gem list -i --silent mdl || gem install mdl
-          - name: istioctl
-            become: false
-            command: |
-              [ -x ~/.istioctl/bin/istioctl ] || (
-                curl -sL https://istio.io/downloadIstioctl | sh -
-                echo 'export PATH=$PATH:$HOME/.istioctl/bin' >> ~/.bashrc
-              )
-          - name: terraform-autocomplete
-            become: false
-            command: |
-              [ "$(grep -c 'complete -C /usr/bin/terraform terraform' ~/.bashrc)" -ne 0 ] || terraform -install-autocomplete
+            [ "$(grep -c systemd /etc/docker/daemon.json 2>/dev/null || echo 0)" -eq 1 ] && \
+            systemctl is-enabled docker &>/dev/null && systemctl is-active docker &>/dev/null
+        - name: python-alternatives
+          become: true
+          command: |
+            [ $(update-alternatives --display python 2>/dev/null |grep -c priority) -eq 2 ] || (\
+              update-alternatives --debug --install /usr/bin/python python /usr/bin/python3 10;\
+              update-alternatives --debug --install /usr/bin/python python /usr/bin/python2 11;\
+              update-alternatives --set python /usr/bin/python2)
+            [ $(update-alternatives --display python 2>/dev/null |grep -c priority) -eq 2 ]
+        - name: asciidoctor
+          become: false
+          command: |
+            [ $(gem list asciidoctor --no-verbose |grep -cE 'diagram|pdf') -eq 2 ] || (\
+              gem install prawn asciidoctor asciidoctor-diagram rouge --user-install && \
+              gem install asciidoctor-pdf --pre --user-install)
+            [ $(gem list asciidoctor --no-verbose |grep -cE 'diagram|pdf') -eq 2 ]
+        - name: sdkman
+          become: false
+          command: |
+            [ $(bash -ic "sdk c 2>/dev/null" |grep -cE 'groovy|maven|scala|java') -eq 4 ] || (\
+            curl -s "https://get.sdkman.io" | bash
+            bash -ic "sdk i java 8-openjdk /usr/lib/jvm/java-8-openjdk-amd64;\
+            sdk i java 11-openjdk /usr/lib/jvm/java-11-openjdk-amd64;\
+            sdk d java 11-openjdk;\
+            sdk i maven;\
+            sdk i groovy;\
+            sdk i scala")
+            [ $(bash -ic "sdk c 2>/dev/null" |grep -cE 'groovy|maven|scala|java') -eq 4 ]
+        - name: runc-fix
+          desc: TODO remove when fixed https://github.com/cri-o/cri-o/issues/1767
+          become: true
+          command: |
+            [ -e /usr/bin/runc ] || { ln -s /usr/sbin/runc /usr/bin/runc; echo "runc path fixed"; }
+        - name: crictl
+          become: false
+          command: |
+            VERSION=$(git ls-remote -t https://github.com/kubernetes-sigs/cri-tools.git | cut -d'/' -f3 |sort -n |tail -n 1)
+            [[ -x /usr/local/bin/crictl && "$(/usr/local/bin/crictl --version)" =~ ${VERSION} ]] || {
+              wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz
+              sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin
+              rm -f crictl-$VERSION-linux-amd64.tar.gz
+            }
+        - name: helm
+          become: false
+          command: |
+            [ -x /usr/local/bin/helm ] || (\
+            curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash; \
+            helm repo add stable https://kubernetes-charts.storage.googleapis.com/)
+        - name: minikube
+          become: false
+          command: |
+            [ -x /usr/bin/minikube ] || (
+            curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64  &&
+            chmod a+x minikube && sudo mv minikube /usr/bin/ && echo "minikube installed"
+            )
+        - name: krew
+          become: false
+          command: |
+            KREW_VERSION=$(git ls-remote -t https://github.com/kubernetes-sigs/krew.git | grep -v '\^{}' | cut -d'/' -f3 |sort -n |tail -n 1)
+            [[ -e ~/.krew/bin/kubectl-krew && "$(kubectl krew version 2>/dev/null |grep GitTag)" =~ ${KREW_VERSION} ]] || {
+              [ "$(grep -c 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' ~/.bashrc)" -eq 0 ] && \
+              echo 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' >> ~/.bashrc
+              cd "$(mktemp -d)" &&
+              curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/download/${KREW_VERSION}/krew.{tar.gz,yaml}" &&
+              tar zxvf krew.tar.gz &&
+              KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" &&
+              "$KREW" install --manifest=krew.yaml --archive=krew.tar.gz &&
+              "$KREW" install change-ns ctx whoami &&
+              "$KREW" update &&
+              "$KREW" upgrade
+            }
+        - name: k9s
+          become: false
+          command: |
+            K9S_VERSION=$(git ls-remote -t https://github.com/derailed/k9s.git | grep -v '\^{}' | cut -d'/' -f3 |sort -n |tail -n 1 | cut -d'v' -f2)
+            [[ -x /usr/local/bin/k9s && "$(k9s version -s |grep Version)" =~ ${K9S_VERSION} ]] || (
+              cd "$(mktemp -d)" &&
+              curl -fsSLO "https://github.com/derailed/k9s/releases/download/v${K9S_VERSION}/k9s_Linux_x86_64.tar.gz" &&
+              tar -zxvf k9s_Linux_x86_64.tar.gz -o k9s &&
+              sudo mv k9s /usr/local/bin
+            )
+        - name: kubectx-ns
+          become: false
+          command: |
+            [ -h ~/bin/kubectx -o -h ~/bin/kubens ] || (
+              git clone https://github.com/ahmetb/kubectx.git ~/.kubectx
+              COMPDIR=$(pkg-config --variable=completionsdir bash-completion)
+              ln -sf ~/.kubectx/kubectx ~/bin/kubectx
+              ln -sf ~/.kubectx/kubens ~/bin/kubens
+              sudo ln -sf ~/.kubectx/completion/kubens.bash $COMPDIR/kubens
+              sudo ln -sf ~/.kubectx/completion/kubectx.bash $COMPDIR/kubectx
+              echo kubectx and kubens enabled
+            )
+        - name: kubectl plugins
+          become: true
+          command: |
+            [ -h /usr/local/bin/kubectl-su ] || (
+              ln -s {{ playbook_dir }}/../../k8s/scripts/kubesu /usr/local/bin/kubectl-su
+              echo "kubectl su enabled"
+            )
+        - name: shellcheck
+          become: false
+          command: |
+            [ -x ~/bin/shellcheck ] || (
+              cd ~/bin &&
+              wget -qO- https://storage.googleapis.com/shellcheck/shellcheck-stable.linux.x86_64.tar.xz | tar -xJv -o shellcheck-stable/shellcheck &&
+              mv shellcheck-stable/shellcheck . && rmdir shellcheck-stable
+            )
+        - name: shfmt
+          become: false
+          command: |
+            GO111MODULE=on go get mvdan.cc/sh/v3/cmd/shfmt
+        - name: markdownlinter
+          become: true
+          command: |
+            gem list -i --silent mdl || gem install mdl
+        - name: istioctl
+          become: false
+          command: |
+            [ -x ~/.istioctl/bin/istioctl ] || (
+              curl -sL https://istio.io/downloadIstioctl | sh -
+              echo 'export PATH=$PATH:$HOME/.istioctl/bin' >> ~/.bashrc
+            )
+        - name: terraform-autocomplete
+          become: false
+          command: |
+            [ "$(grep -c 'complete -C /usr/bin/terraform terraform' ~/.bashrc)" -ne 0 ] || terraform -install-autocomplete
         files_config:
-          - file: /etc/gai.conf
-            content: |
-              precedence  ::1/128       50
-              precedence  ::/0          40
-              precedence  2002::/16     30
-              precedence ::/96          20
-              precedence ::ffff:0:0/96  100
-          - file: /etc/security/limits.d/open-files-limit.conf
-            content: |
-              *   soft    nofile    32768
-              *   hard    nofile    65536
-          - file: /etc/autofs.conf
-            content: |
-              logging = verbose
+        - file: /etc/gai.conf
+          content: |
+            precedence  ::1/128       50
+            precedence  ::/0          40
+            precedence  2002::/16     30
+            precedence ::/96          20
+            precedence ::ffff:0:0/96  100
+        - file: /etc/security/limits.d/open-files-limit.conf
+          content: |
+            *   soft    nofile    32768
+            *   hard    nofile    65536
+        - file: /etc/autofs.conf
+          content: |
+            logging = verbose

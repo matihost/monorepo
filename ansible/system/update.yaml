@@ -60,5 +60,5 @@
       register: sdk_result
       ignore_errors: true
       changed_when:
-        - sdk_result.stdout is regex('Installing')
+      - sdk_result.stdout is regex('Installing')
     become: false

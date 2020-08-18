@@ -2,73 +2,73 @@
 - hosts: local
   gather_facts: true
   tasks:
-      #TODO ensure SystemMaxUse=1G RuntimeMaxUse=1G are set in /etc/systemd/journald.conf
-    - name: Clean systemd journal /var/log/journal logs
+  #TODO ensure SystemMaxUse=1G RuntimeMaxUse=1G are set in /etc/systemd/journald.conf
+  - name: Clean systemd journal /var/log/journal logs
+    shell:
+      journalctl --vacuum-size={{ systemd_journal.max_size }} --vacuum-time={{ systemd_journal.max_duration }} --rotate
+    register: journal_clean
+    changed_when:
+    - not(journal_clean.stderr is search('freed 0B'))
+    - journal_clean.stdout
+  - block:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+        cache_valid_time: "{{ update_cache_timeout }}"
+    - name: Remove dependencies that are no longer required
+      apt:
+        autoremove: yes
+        force_apt_get: yes
+    - name: Remove useless packages from the cache
+      apt:
+        autoclean: true
+        force_apt_get: yes
+    - name: Clean apt-get
       shell:
-        journalctl --vacuum-size={{ systemd_journal.max_size }} --vacuum-time={{ systemd_journal.max_duration }} --rotate
-      register: journal_clean
-      changed_when:
-      - not(journal_clean.stderr is search('freed 0B'))
-      - journal_clean.stdout
-    - block:
-      - name: Update apt cache
-        apt:
-          update_cache: yes
-          force_apt_get: yes
-          cache_valid_time: "{{ update_cache_timeout }}"
-      - name: Remove dependencies that are no longer required
-        apt:
-          autoremove: yes
-          force_apt_get: yes
-      - name: Remove useless packages from the cache
-        apt:
-          autoclean: yes
-          force_apt_get: yes
-      - name: Clean apt-get
-        shell:
-          apt-get clean
-        args:
-          warn: false
-        register: apt_clean_result
-        changed_when: apt_clean_result.stdout
-      - name: Remove old kernels
-        include_role:
-          name: remove-old-kernels
-      when: ansible_os_family == "Debian"
-    - block:
-      - name: Remove dependencies that are no longer required from RHEL based system
-        yum:
-          autoremove: yes
-      - name: Remove useless packages from the cache from RHEL based system
-        shell:
-          yum clean all
-        args:
-          warn: false
-        register: yum_result
-        changed_when: '"0 files removed" not in yum_result.stdout'
-      when: ansible_os_family == "RedHat"
-    - name: Clean /var/log rotated logs and dist upgrade logs
+        apt-get clean
+      args:
+        warn: false
+      register: apt_clean_result
+      changed_when: apt_clean_result.stdout
+    - name: Remove old kernels
+      include_role:
+        name: remove-old-kernels
+    when: ansible_os_family == "Debian"
+  - block:
+    - name: Remove dependencies that are no longer required from RHEL based system
+      yum:
+        autoremove: yes
+    - name: Remove useless packages from the cache from RHEL based system
       shell:
-        find /var/log -type f -regex ".*\.gz$" -delete -print && \
-        find /var/log -type f -regex ".*[-,\.][0-9]*$" -delete -print && \
-        find /var/log -type f -regex ".*\.old$" -delete -print && \
-        for i in `find /var/log/dist-upgrade -mindepth 1 -type d 2>/dev/null` ; do echo $i && rm -rf $i; done
-      register: log_clean
-      changed_when: log_clean.stdout
-    - name: Clean all podman and docker containers and images
-      shell: |
-        command -v podman 1>/dev/null 2>/dev/null && {
-          podman container rm --all --force
-          podman image rm --all --force
-          sudo podman container rm --all --force
-          sudo podman image rm --all --force
-        }
-        command -v docker 1>/dev/null 2>/dev/null && {
-          ITEMS=$(docker container ls --all -q)
-          [ -n "${ITEMS}" ] && docker container rm ${ITEMS} --force
-          ITEMS=$(docker images --all -q)
-          [ -n "${ITEMS}" ] && docker image rm ${ITEMS} --force
-        }
-      register: clean_out
-      changed_when: clean_out.stdout
-      failed_when: false
+        yum clean all
+      args:
+        warn: false
+      register: yum_result
+      changed_when: '"0 files removed" not in yum_result.stdout'
+    when: ansible_os_family == "RedHat"
+  - name: Clean /var/log rotated logs and dist upgrade logs
+    shell:
+      find /var/log -type f -regex ".*\.gz$" -delete -print && \
+      find /var/log -type f -regex ".*[-,\.][0-9]*$" -delete -print && \
+      find /var/log -type f -regex ".*\.old$" -delete -print && \
+      for i in `find /var/log/dist-upgrade -mindepth 1 -type d 2>/dev/null` ; do echo $i && rm -rf $i; done
+    register: log_clean
+    changed_when: log_clean.stdout
+  - name: Clean all podman and docker containers and images
+    shell: |
+      command -v podman 1>/dev/null 2>/dev/null && {
+        podman container rm --all --force
+        podman image rm --all --force
+        sudo podman container rm --all --force
+        sudo podman image rm --all --force
+      }
+      command -v docker 1>/dev/null 2>/dev/null && {
+        ITEMS=$(docker container ls --all -q)
+        [ -n "${ITEMS}" ] && docker container rm ${ITEMS} --force
+        ITEMS=$(docker images --all -q)
+        [ -n "${ITEMS}" ] && docker image rm ${ITEMS} --force
+      }
+    register: clean_out
+    changed_when: clean_out.stdout
+    failed_when: false
