@@ -12,4 +12,4 @@
   tasks:
     - name: "Include show_books"
       include_role:
-        name: "show-books"
+        name: "show_books"

@@ -21,7 +21,7 @@
     url: "https://{{ jenkins_ingress }}//crumbIssuer/api/xml?xpath=concat(//crumbRequestField,\":\",//crumb)"
     validate_certs: no
     force_basic_auth: yes
-    user: "{{ jenkins_admin_user|default('admin')}}"
+    user: "{{ jenkins_admin_user|default('admin') }}"
     password: "{{ jenkins_admin_pass|mandatory }}"
     method: GET
     status_code: 200
@@ -34,14 +34,14 @@
     url: https://{{ jenkins_ingress }}/scriptText
     validate_certs: no
     force_basic_auth: yes
-    user: "{{ jenkins_admin_user|default('admin')}}"
+    user: "{{ jenkins_admin_user|default('admin') }}"
     password: "{{ jenkins_admin_pass|mandatory }}"
     method: POST
     body_format: form-urlencoded
     body:
       script: "{{ script_value }}"
     headers:
-      Jenkins-Crumb: "{{crump_result.content.split(':')[1]}}"
+      Jenkins-Crumb: "{{ crump_result.content.split(':')[1] }}"
       Cookie: "{{ crump_result.set_cookie }}"
     status_code: 200
     return_content: true

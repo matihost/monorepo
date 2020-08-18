@@ -61,7 +61,7 @@
 
   - name: Ensure files config is desired
     include_role:
-      name: file-config
+      name: file_config
     vars:
       file_config: "{{ item }}"
     loop: "{{ files_config|default([])}}"

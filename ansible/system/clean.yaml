@@ -33,7 +33,7 @@
       changed_when: apt_clean_result.stdout
     - name: Remove old kernels
       include_role:
-        name: remove-old-kernels
+        name: remove_old_kernels
     when: ansible_os_family == "Debian"
   - block:
     - name: Remove dependencies that are no longer required from RHEL based system

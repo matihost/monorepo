@@ -25,6 +25,6 @@
 
     - name: Show all books
       include_role:
-        name: show-books
+        name: show_books
       vars:
         books: "{{ some_books }}"
