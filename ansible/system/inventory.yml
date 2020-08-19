@@ -78,6 +78,9 @@ all:
         - kubectl
         pips:
         - pip
+        - flake8
+        - flake8-docstrings
+        - flake8-2020
         - openshift
         - kubernetes
         - kubernetes-validate

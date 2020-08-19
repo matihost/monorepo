@@ -1,0 +1,5 @@
+[flake8]
+# ignoring
+# E501 line too long
+# D104 Missing docstring in public package
+ignore = E501,D104

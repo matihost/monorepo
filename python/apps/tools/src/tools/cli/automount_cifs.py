@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Mount SAMBA/CIFS 1.0 resource to be automatically mounted when available and reached
+Mount SAMBA/CIFS 1.0 resource to be automatically mounted when available and reached.
+
 (using system autofs service)
 """
 import argparse
@@ -38,9 +39,7 @@ def _parse_program_argv():
 
 
 def main():
-    """
-    Main program method
-    """
+    """Enter the program."""
     url, mount_path, user, password = _parse_program_argv()
     ensure_autofs_present()
     ensure_direct_mapping_present()
@@ -49,6 +48,7 @@ def main():
 
 
 def is_automount_installed():
+    """Check whether automout is present in the system."""
     try:
         run('command -v automount')
         return True
@@ -57,12 +57,14 @@ def is_automount_installed():
 
 
 def ensure_autofs_present():
+    """Ensure autofs package is installed."""
     if not is_automount_installed():
         print('Installing autofs')
         run('apt-get -y install autofs')
 
 
 def ensure_direct_mapping_present():
+    """Ensure automount diract mappiint to router CIFS is present."""
     desired_config = "/-  /etc/auto.direct\n"
     direct_mapping_filename = '/etc/auto.master.d/direct.autofs'
     current_config = read_file(direct_mapping_filename, ignore_error=True)
@@ -71,6 +73,7 @@ def ensure_direct_mapping_present():
 
 
 def ensure_mapping2url_present(url, mount_path, user, password):
+    """Convert mount data to autofs mapping."""
     desired_line = "{1} -fstype=cifs,user={2},password={3},rw,vers=1.0 :{0}\n"\
         .format(url, mount_path, user, password)
     direct_filename = '/etc/auto.direct'
@@ -85,6 +88,7 @@ def ensure_mapping2url_present(url, mount_path, user, password):
 
 
 def ensure_autofs_running_and_enabled():
+    """Ensure autofs is running and enabled."""
     print('Restarting autofs service')
     run('systemctl restart autofs')
     print('Enabling autofs service')

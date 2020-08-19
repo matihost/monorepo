@@ -1,0 +1,1 @@
+"""Helper funtion for ExchangeRate."""

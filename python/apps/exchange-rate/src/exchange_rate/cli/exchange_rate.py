@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-Shows Foreign Currency/PLN pair based on Polish Central Bank (NBP) fixing exchange rate.
+Show Foreign Currency/PLN pair.
+
+It is based on Polish Central Bank (NBP) fixing exchange rate.
 """
 import argparse
 from exchange_rate.helpers.version import package_version
@@ -21,9 +23,7 @@ def _parse_program_argv():
 
 
 def main():
-    """
-    Main program method
-    """
+    """Enter the program."""
     currency = _parse_program_argv()
     rate_to_pln = ExchangeRateToPLN().get_exchange_rate_to_pln(currency)
     print('1 {0} = {1} PLN'.format(currency, rate_to_pln))

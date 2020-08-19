@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Ensure OpenDNS is updated with router's public ip regularly
-"""
+"""Ensure OpenDNS is updated with router's public ip regularly."""
 import argparse
 import subprocess
 
@@ -42,9 +40,7 @@ def _parse_program_argv():
 
 
 def main():
-    """
-    Main program method
-    """
+    """Enter the program."""
     opendns_network_label, user, password = _parse_program_argv()
 
     ensure_ddclient_installed()
@@ -53,6 +49,7 @@ def main():
 
 
 def is_ddclient_installed():
+    """Check whether ddclient is present in the system."""
     try:
         run('command -v ddclient')
         return True
@@ -61,12 +58,14 @@ def is_ddclient_installed():
 
 
 def ensure_ddclient_installed():
+    """Ensure ddclient is installed."""
     if not is_ddclient_installed():
         print('Installing ddclient')
         run('apt-get -y install ddclient')
 
 
 def ensure_ddclient_config_setup(opendns_network_label, user, password):
+    """Ensure ddclient configuration is present in the system."""
     template = Template(read_file(relative_path(__file__, '..', 'files', 'ddclient.conf.j2')))
     desired_config = template.render(opendns_network_label=opendns_network_label,
                                      user_email=user, password=password)
@@ -86,6 +85,7 @@ def ensure_ddclient_config_setup(opendns_network_label, user, password):
 
 
 def ensure_ddclient_service_is_running_and_enabled():
+    """Ensure ddclient systemd service is running starting upon system boot."""
     print('Restarting ddclient service')
     run('systemctl restart ddclient')
     print('Enabling ddclient service')

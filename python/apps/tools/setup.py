@@ -13,7 +13,7 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 sys.path.append(path.join(here, "src"))
 
-from tools.utils.version import git_version
+from tools.utils.version import git_version  # noqa: E402
 
 # Get the long description from the README file
 with open(path.join(here, "README.md"), encoding="utf-8") as f:
@@ -58,5 +58,5 @@ setup(
             "setup-opendns=tools.cli.setup_opendns:main",
         ],
     },
-    project_urls={"Source": "https://github.com/matihost/learning/",},  # Optional
+    project_urls={"Source": "https://github.com/matihost/learning/", },  # Optional
 )
