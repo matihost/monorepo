@@ -76,9 +76,21 @@ function ensureIstioctlIsPresent() {
   )
 }
 
+# minikube addons enable ingress - stopped working for "none" minikue driver
+# ingress controlles needs to be installed manually
+function addNginxIngress() {
+  [ "$(helm repo list | grep -c nginx)" -eq 0 ] && {
+    helm repo add nginx-stable https://helm.nginx.com/stable
+    helm repo update
+  }
+  [ "$(kubectl config current-context)" == "minikube" ] && {
+    helm install nginx-ingress nginx-stable/nginx-ingress
+  }
+}
+
 ensureMinikubePresent
 MODE=''
-ADDONS="registry ingress dashboard"
+ADDONS="registry dashboard"
 
 while [[ "$#" -gt 0 ]]; do
   case $1 in
@@ -135,6 +147,7 @@ if ! minikube status &>/dev/null; then
   # because under Ubuntu systemd-resolved service conflicts create a loop between CodeDNS and systemc DNS wrapper systemd-resolved.
   # TODO replace usage of /run/systemd/resolve/resolv.conf with some temporary file withot any 127.0.0.x entries ,because CRC add dnsmasq
   sudo -E minikube start --vm-driver=none --apiserver-ips 127.0.0.1 --apiserver-name localhost \
+    --kubernetes-version='latest' \
     --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook" \
     --extra-config=kubelet.resolv-conf=/run/systemd/resolve/resolv.conf \
     --extra-config=kubelet.cgroup-driver=systemd \
@@ -155,6 +168,8 @@ if ! minikube status &>/dev/null; then
     fi
     minikube addons enable "${ADDON}"
   done
+
+  addNginxIngress
 else
   echo "Minikube already started"
 fi
