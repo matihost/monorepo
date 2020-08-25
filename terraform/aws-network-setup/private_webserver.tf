@@ -1,0 +1,63 @@
+resource "random_id" "webserver_instance_id" {
+  byte_length = 8
+}
+
+resource "aws_security_group" "internal_access" {
+  name        = "internal_access"
+  description = "Allow HTTP & SSH access from internal VPC only"
+
+  tags = {
+    Name = "internal_access"
+  }
+
+  ingress {
+    description = "HTTP from default VPC"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.default.cidr_block]
+  }
+  ingress {
+    description = "SSH from default VPC"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.default.cidr_block]
+  }
+
+  # Terraform removed default egress ALLOW_ALL rule
+  # It has to be explicitely added
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+
+resource "aws_instance" "webserver" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t2.micro"
+  subnet_id     = aws_subnet.private_a.id
+  # Terraform ignores associate_public_ip_address = false when subnet_id is not provided
+  # and chosen subnet assigns Public Ips (aka map_public_ip_on_launch = true on aws_subnet)
+  associate_public_ip_address = false
+  key_name                    = aws_key_pair.vm_key.key_name
+  vpc_security_group_ids      = [aws_security_group.internal_access.id]
+  user_data                   = file("private_webserver.cloud-init.yaml")
+  tags = {
+    Name = "webserver-${random_id.webserver_instance_id.hex}"
+  }
+}
+
+
+output "webserver_ip" {
+  value = aws_instance.webserver.private_ip
+}
+
+
+output "connect_via_bastion_proxy" {
+  description = "Assuming bastion_proxy is exposed locally, connects to websever"
+  value       = format("http_proxy=localhost:8888 curl http://%s", aws_instance.webserver.private_ip)
+}
