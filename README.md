@@ -12,3 +12,4 @@ Various technology code, snippets, home tools.
 * [Python](python)
 * [Rust](rust)
 * [K8S, OpenShift](k8s)
+* [Terraform](terraform)

@@ -70,6 +70,13 @@ resource "aws_instance" "vm" {
   instance_type          = "t2.micro"
   key_name               = aws_key_pair.vm_key.key_name
   vpc_security_group_ids = [aws_security_group.private_access.id]
+  # to use cloud-init and bash script
+  # use https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/cloudinit_config
+  user_data = templatefile("ec2.cloud-init.tpl", {
+    ssh_key = filebase64("~/.ssh/id_rsa.aws.vm"),
+    ssh_pub = filebase64("~/.ssh/id_rsa.aws.vm.pub"),
+    }
+  )
   tags = {
     Name = "vm-${random_id.instance_id.hex}"
   }
@@ -81,10 +88,11 @@ resource "aws_instance" "vm" {
     host        = self.public_ip
   }
 
+  # demonstrate provisioner usage
+  # use user_data and script or cloud-init config instead
   provisioner "remote-exec" {
     inline = [
-      "sudo apt -y install nginx",
-      "sudo systemctl enable --now nginx"
+      "sudo apt -y install mlocate",
     ]
   }
 }
@@ -92,4 +100,23 @@ resource "aws_instance" "vm" {
 variable "external_access_ip" {
   type        = string
   description = "The public IP which is allowed to access instance"
+}
+
+
+output "ec2_ip" {
+  value = aws_instance.vm.public_ip
+}
+
+output "ec2_dns" {
+  value = aws_instance.vm.public_dns
+}
+
+output "ec2_ssh" {
+  description = "Connect to bastion to be able to connect to other private only servers"
+  value       = format("ssh -i ~/.ssh/id_rsa.aws.vm ubuntu@%s", aws_instance.vm.public_dns)
+}
+
+output "ec2_user_data" {
+  description = "Intance user_data (aka init config)"
+  value       = format("aws ec2 describe-instance-attribute --instance-id %s --attribute userData --output text --query \"UserData.Value\" | base64 --decode", aws_instance.vm.id)
 }

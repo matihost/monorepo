@@ -4,12 +4,19 @@ apply: prepare ## setup free-tier eliglible Ubuntu instance
 	export TF_VAR_external_access_ip=$(WHOAMI) && \
 	terraform init -upgrade=true && \
 	terraform validate && \
-	terraform plan && \
-	terraform apply -auto-approve
+	terraform plan -lock=false && \
+	terraform apply -auto-approve -lock=false
+
+ssh: ## ssh to EC2 instance
+	eval "$(shell terraform output ec2_ssh)"
+
+test: ## test Nginx instance
+	curl http://$(shell terraform output ec2_dns):80
 
 show-state: ## show terraform.state
 	terraform state list
 	terraform show
+	eval "$(shell terraform output ec2_user_data)"
 
 destroy: ## destroy ec2 instance
 	export TF_PLUGIN_CACHE_DIR=$(HOME)/.cache/terraform/plugins && \
