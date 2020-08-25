@@ -195,16 +195,24 @@ all:
         - name: helm
           become: false
           command: |
-            [ -x /usr/local/bin/helm ] || (\
-            curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash; \
-            helm repo add stable https://kubernetes-charts.storage.googleapis.com/)
+            CURRENT_VERSION="$(curl -Ls https://github.com/helm/helm/releases | grep 'href="/helm/helm/releases/tag/v3.[0-9]*.[0-9]*\"' | \
+              grep -v no-underline | head -n 1 | cut -d '"' -f 2 | awk '{n=split($NF,a,"/");print a[n]}' | awk 'a !~ $0{print}; {a=$0}')"
+            INSTALLED_VERSION="$(helm version 2>/dev/null | sed -E 's/.*\{Version:"([^"]+)".*/\1/')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+              helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+              helm repo add nginx-stable https://helm.nginx.com/stable
+              helm repo update
+            }
         - name: minikube
           become: false
           command: |
-            [ -x /usr/bin/minikube ] || (
-            curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64  &&
-            chmod a+x minikube && sudo mv minikube /usr/bin/ && echo "minikube installed"
-            )
+            CURRENT_VERSION="$(curl -s "https://api.github.com/repos/kubernetes/minikube/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"v([^"]+)".*/\1/')"
+            INSTALLED_VERSION="$(minikube version 2>/dev/null | grep version: | sed -E 's/.*version: v([^"]+)/\1/')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64  &&
+              chmod a+x minikube && sudo mv minikube /usr/bin/ && echo "minikube installed"
+            }
         - name: krew
           become: false
           command: |
@@ -269,14 +277,26 @@ all:
         - name: istioctl
           become: false
           command: |
-            [ -x ~/.istioctl/bin/istioctl ] || (
+            CURRENT_VERSION="$(curl -L -s https://api.github.com/repos/istio/istio/releases | \
+              grep tag_name | sed "s/ *\"tag_name\": *\"\\(.*\\)\",*/\\1/" | \
+              grep -v -E "(alpha|beta|rc)\.[0-9]$" | sort -t"." -k 1,1 -k 2,2 -k 3,3 -k 4,4 | tail -n 1)"
+            INSTALLED_VERSION=$(istioctl version 2>/dev/null | grep -E '^([0-9]+.){2,3}[0-9]+$')
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl -sL https://istio.io/downloadIstioctl | sh -
               echo 'export PATH=$PATH:$HOME/.istioctl/bin' >> ~/.bashrc
-            )
+            }
         - name: terraform-autocomplete
           become: false
           command: |
             [ "$(grep -c 'complete -C /usr/bin/terraform terraform' ~/.bashrc)" -ne 0 ] || terraform -install-autocomplete
+        - name: tflint
+          become: false
+          command: |
+            CURRENT_VERSION="$(curl -s "https://api.github.com/repos/terraform-linters/tflint/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"v([^"]+)".*/\1/')"
+            INSTALLED_VERSION="$(tflint --version 2>/dev/null |  sed -E 's/.*version ([^"]+)/\1/')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh |bash
+            }
         files_config:
         - file: /etc/gai.conf
           content: |

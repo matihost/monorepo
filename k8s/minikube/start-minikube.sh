@@ -79,6 +79,12 @@ function ensureIstioctlIsPresent() {
 # minikube addons enable ingress - stopped working for "none" minikue driver
 # ingress controlles needs to be installed manually
 function addNginxIngress() {
+  [ -x /usr/local/bin/helm ] || {
+    curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+    helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+    helm repo add nginx-stable https://helm.nginx.com/stable
+    helm repo update
+  }
   [ "$(helm repo list | grep -c nginx)" -eq 0 ] && {
     helm repo add nginx-stable https://helm.nginx.com/stable
     helm repo update
