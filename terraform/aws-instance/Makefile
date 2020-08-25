@@ -5,7 +5,7 @@ apply: prepare ## setup free-tier eliglible Ubuntu instance
 	terraform init -upgrade=true && \
 	terraform validate && \
 	terraform plan -lock=false && \
-	terraform apply -auto-approve -lock=false
+	terraform apply -auto-approve
 
 ssh: ## ssh to EC2 instance
 	eval "$(shell terraform output ec2_ssh)"
