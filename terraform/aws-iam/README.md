@@ -1,0 +1,46 @@
+# Terraform :: Minimal set of IAM
+
+Setup minimal IAM resources:
+
+* Policy: _AllowPassingInstanceProfileToEC2_ to be able to pass instance profile to EC2 instance
+
+* Policy: _AllowDecodeAuthorizationMessages_ tp be able to decode encoded authorization errors
+
+* Group : _LimitedAdmin_ - it contains above policies, plus ViewOnlyAccess, network and system admin
+  It does not allow IAM modifications - except IAMUserChangePassword (ability for an IAM user to change their own password).
+
+  IAM modifications are assumed to be performed only by root account or temporarily granted AdministratorAccess IAM User.
+
+* Roles and Instance Profiles: _s3all_ and _s3readers_.
+
+Users management is not part of this setup.
+
+## Prerequisites
+
+* Logged to AWS Account allowing to modifty IAM.
+
+On fresh AWS root acccount it is recommeded to first create: IAM user and attach directly AdministratorAccess policy.
+
+Then run this terraform script.
+
+After running this terraform - assing the user to LimitedAdmin group and remove AdministratorAccess policy attachment.
+
+```bash
+aws configure
+```
+
+After that it is recommended to create IAM User and assing him LimitedAdmin user and relogin to it with `aws configure`.
+
+* Latest Terraform installed
+
+## Usage
+
+```bash
+# setup IAM resources
+make apply
+
+# show Terraform state along with current EC2 instance user_date startup script
+make show-state
+
+# make destroy task is commented out for safety
+```
