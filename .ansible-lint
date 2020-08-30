@@ -1,5 +1,6 @@
 ---
 skip_list:
+- '208'  # File permissions not mentioned'
 - '305'
 - '306'
 - '503'
