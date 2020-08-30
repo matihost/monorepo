@@ -102,6 +102,7 @@ resource "aws_subnet" "private_a" {
   map_public_ip_on_launch = false
   tags = {
     Name = "private for ${var.zone}"
+    Tier = "private"
   }
 }
 

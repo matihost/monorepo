@@ -285,10 +285,16 @@ all:
               curl -sL https://istio.io/downloadIstioctl | sh -
               echo 'export PATH=$PATH:$HOME/.istioctl/bin' >> ~/.bashrc
             }
-        - name: terraform-autocomplete
+        - name: terraform-config
+          desc: |
+            additional terraform cli configuration, added autocomplete and plugins caching
           become: false
           command: |
             [ "$(grep -c 'complete -C /usr/bin/terraform terraform' ~/.bashrc)" -ne 0 ] || terraform -install-autocomplete
+            [ "$(grep -c 'plugin_cache_dir' ~/.terraformrc 2>/dev/null || echo 0)" -ne 0 ] || {
+              mkdir -p ~/.terraform.d/plugin-cache
+              echo 'plugin_cache_dir = "$HOME/.terraform.d/plugin-cache"' >> ~/.terraformrc
+            }
         - name: tflint
           become: false
           command: |

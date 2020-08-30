@@ -1,6 +1,5 @@
 WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
 apply: prepare ## setup free-tier eliglible Ubuntu instance
-	export TF_PLUGIN_CACHE_DIR=$(HOME)/.cache/terraform/plugins && \
 	export TF_VAR_external_access_ip=$(WHOAMI) && \
 	terraform init -upgrade=true && \
 	terraform validate && \
@@ -19,7 +18,6 @@ show-state: ## show terraform.state
 	eval "$(shell terraform output ec2_user_data)"
 
 destroy: ## destroy ec2 instance
-	export TF_PLUGIN_CACHE_DIR=$(HOME)/.cache/terraform/plugins && \
 	export TF_VAR_external_access_ip=$(WHOAMI) && \
 	terraform plan && terraform destroy -auto-approve
 

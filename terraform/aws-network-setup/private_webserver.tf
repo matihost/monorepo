@@ -37,6 +37,7 @@ resource "aws_security_group" "internal_access" {
 
 
 resource "aws_instance" "webserver" {
+  count         = var.create_sample_instance ? 1 : 0
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
   subnet_id     = aws_subnet.private_a.id
@@ -53,11 +54,11 @@ resource "aws_instance" "webserver" {
 
 
 output "webserver_ip" {
-  value = aws_instance.webserver.private_ip
+  value = var.create_sample_instance ? aws_instance.webserver[0].private_ip : "N/A"
 }
 
 
 output "connect_via_bastion_proxy" {
   description = "Assuming bastion_proxy is exposed locally, connects to websever"
-  value       = format("http_proxy=localhost:8888 curl http://%s", aws_instance.webserver.private_ip)
+  value       = var.create_sample_instance ? format("http_proxy=localhost:8888 curl http://%s", aws_instance.webserver[0].private_ip) : "N/A"
 }

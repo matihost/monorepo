@@ -3,11 +3,6 @@ provider "aws" {
   region  = var.region
 }
 
-resource "aws_key_pair" "vm_key" {
-  key_name   = "vm"
-  public_key = file("~/.ssh/id_rsa.aws.vm.pub")
-}
-
 data "aws_ami" "ubuntu" {
   most_recent = true
 
@@ -23,6 +18,25 @@ data "aws_ami" "ubuntu" {
 
   owners = ["099720109477"] # Canonical
 }
+
+
+data "aws_vpc" "default" {
+  default = true
+}
+
+data "aws_subnet" "private_subnet" {
+  vpc_id = data.aws_vpc.default.id
+  tags = {
+    Tier = "private"
+  }
+}
+
+data "aws_security_group" "internal_access" {
+  tags = {
+    Name = "internal_access"
+  }
+}
+
 
 
 variable "zone" {
@@ -41,9 +55,8 @@ variable "external_access_ip" {
   description = "The public IP which is allowed to access instance"
 }
 
-
-variable "create_sample_instance" {
-  type        = bool
-  default     = false
-  description = "Whether to span single instance in private subnet"
+variable "instance_profile" {
+  default     = ""
+  type        = string
+  description = "The name of instance_profile (dynamically provisioning access to role)"
 }

@@ -1,24 +1,27 @@
 WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
-apply: prepare ## setup IAM resources
+apply: prepare ## setup free-tier eliglible Ubuntu instances via Launch Template, ASG and attache ALB on it
 	export TF_VAR_external_access_ip=$(WHOAMI) && \
 	terraform init -upgrade=true && \
 	terraform validate && \
 	terraform plan -lock=false && \
 	terraform apply -auto-approve
 
+ssh: ## ssh to first EC2 instance form ASG
+	eval "$(shell terraform output ec2_ssh)"
+
+test: ## test Nginx instance
+	curl http://$(shell terraform output ec2_dns):80
 
 show-state: ## show terraform.state
 	terraform state list
 	terraform show
 
-# destroy task likely not needed
-# removal of IAM resource will effectively make users unable to do nothing
-# and root accout login would be required to fix issues.
+destroy: ## destroy resourced created via apply
+	export TF_VAR_external_access_ip=$(WHOAMI) && \
+	terraform plan && terraform destroy -auto-approve
 
-# destroy: ## destroy IAM resources
-# 	export TF_PLUGIN_CACHE_DIR=$(HOME)/.cache/terraform/plugins && \
-# 	export TF_VAR_external_access_ip=$(WHOAMI) && \
-# 	terraform plan && terraform destroy -auto-approve
+prepare:
+	@[ -e "$(HOME)/.ssh/id_rsa.aws.vm" ] || { cd ~/.ssh && ssh-keygen -t rsa -N '' -f id_rsa.aws.vm; }
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))

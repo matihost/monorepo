@@ -1,11 +1,16 @@
 WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
+
+
+ifeq ($(WITH_SAMPLE_INSTANCE),true)
+ENABLE_SAMPLE_INSTANCE :=-var 'create_sample_instance=true'
+endif
+
 apply: prepare shutdown_local_bastion_proxy ## setup minimal AWS setup, bastion, nas, private network and webservr in private network
-	export TF_PLUGIN_CACHE_DIR=$(HOME)/.cache/terraform/plugins && \
 	export TF_VAR_external_access_ip=$(WHOAMI) && \
 	terraform init -upgrade=true && \
 	terraform validate && \
-	terraform plan && \
-	terraform apply -auto-approve
+	terraform plan $(ENABLE_SAMPLE_INSTANCE) && \
+	terraform apply $(ENABLE_SAMPLE_INSTANCE) -auto-approve
 
 show-state: ## show terraform.state
 	terraform state list
@@ -28,7 +33,6 @@ test: expose_bastion_proxy_locally ## test private  webeserver
 	eval "$(shell terraform output connect_via_bastion_proxy)"
 
 destroy: shutdown_local_bastion_proxy ## destroy applied setup
-	export TF_PLUGIN_CACHE_DIR=$(HOME)/.cache/terraform/plugins && \
 	export TF_VAR_external_access_ip=$(WHOAMI) && \
 	terraform plan && terraform destroy -auto-approve
 

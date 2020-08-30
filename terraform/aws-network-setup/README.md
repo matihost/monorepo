@@ -9,7 +9,7 @@ Terraform scripts creating:
 - NAT instance in public subnet to allow private subnet access internet.
   In production NAT Gateway should be used. NAT instance is AWS free-tier eliglibe version of NAT Gateway.
 
-- plus sample webserver instance in private subnet.
+- (Optionally) plus sample webserver instance in private subnet.
 
 Bastion node exposes only SSH to computer which execute Terraform script.
 
@@ -31,8 +31,11 @@ aws configure
 
 ```bash
 
-# deploy resources
+# deploy resources, w/o sample webserver in private subnetwork, only networking resources
 make apply
+
+# deploy resources along with sample webserver in private subnetwork
+make apply WITH_SAMPLE_INSTANCE=true
 
 # ssh to bastion EC2 instance
 make bastion-ssh

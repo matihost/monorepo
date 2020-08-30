@@ -1,5 +1,4 @@
 apply: ## run Ngnix on host port 8000
-	export TF_PLUGIN_CACHE_DIR=$(HOME)/.cache/terraform/plugins && \
 	terraform init -upgrade=true && \
 	terraform validate && \
 	terraform plan && \

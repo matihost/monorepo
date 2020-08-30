@@ -70,7 +70,7 @@ resource "aws_instance" "vm" {
   instance_type          = "t2.micro"
   key_name               = aws_key_pair.vm_key.key_name
   vpc_security_group_ids = [aws_security_group.private_access.id]
-  iam_instance_profile   = ""
+  iam_instance_profile   = var.instance_profile
   # to use cloud-init and bash script
   # use https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/cloudinit_config
   user_data = templatefile("ec2.cloud-init.tpl", {

@@ -49,10 +49,60 @@ resource "aws_iam_policy" "decodeAuthorizedMessages" {
   EOF
 }
 
+# Required to create AutoScalingGroup and ALB
+resource "aws_iam_policy" "createASGAndALB" {
+  name        = "AllowCreateAutoScalingGroupAndApplicationLoadBalancer"
+  path        = "/"
+  description = "Allow to create linked role for ASG and ALB"
+
+  policy = <<-EOF
+  {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Effect": "Allow",
+              "Action": "iam:CreateServiceLinkedRole",
+              "Resource": "arn:aws:iam::*:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling*",
+              "Condition": {"StringLike": {"iam:AWSServiceName": "autoscaling.amazonaws.com"}}
+          },
+          {
+              "Effect": "Allow",
+              "Action": "iam:CreateServiceLinkedRole",
+              "Resource": "arn:aws:iam::*:role/aws-service-role/elasticloadbalancing.amazonaws.com/AWSServiceRoleForElasticLoadBalancing*",
+              "Condition": {"StringLike": {"iam:AWSServiceName": "elasticloadbalancing.amazonaws.com"}}
+          },
+          {
+              "Effect": "Allow",
+              "Action": [
+                  "iam:AttachRolePolicy",
+                  "iam:PutRolePolicy"
+              ],
+              "Resource": "arn:aws:iam::*:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling*"
+          },
+          {
+              "Effect": "Allow",
+              "Action": [
+                  "iam:AttachRolePolicy",
+                  "iam:PutRolePolicy"
+              ],
+              "Resource": "arn:aws:iam::*:role/aws-service-role/elasticloadbalancing.amazonaws.com/AWSServiceRoleForElasticLoadBalancing*"
+          }
+      ]
+  }
+  EOF
+}
+
+
+
 # Admin group will limited admin privilidges
 resource "aws_iam_group" "limitedAdmin" {
   name = "LimitedAdmin"
   path = "/"
+}
+
+resource "aws_iam_group_policy_attachment" "createASGAndALB" {
+  group      = aws_iam_group.limitedAdmin.name
+  policy_arn = aws_iam_policy.createASGAndALB.arn
 }
 
 resource "aws_iam_group_policy_attachment" "decodeAuthorizedMessagesToAdminGroup" {
@@ -117,6 +167,9 @@ resource "aws_iam_role_policy_attachment" "s3all-attach" {
 }
 
 # Only roles exposed as instance_profile can be assigned to EC2
+# EC2 instance can obtain the credentials via:
+# curl http://169.254.169.254/latest/meta-data/iam/security-credentials/s3all
+# AWS CLI inherits them automatically
 resource "aws_iam_instance_profile" "s3all" {
   name = "s3all"
   role = aws_iam_role.s3all.name
