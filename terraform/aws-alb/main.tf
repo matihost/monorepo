@@ -25,10 +25,24 @@ data "aws_vpc" "default" {
 }
 
 data "aws_subnet" "private_subnet" {
-  vpc_id = data.aws_vpc.default.id
+  vpc_id            = data.aws_vpc.default.id
+  availability_zone = var.zone
   tags = {
     Tier = "private"
   }
+}
+
+
+data "aws_subnet" "public_subnet_1" {
+  vpc_id            = data.aws_vpc.default.id
+  availability_zone = var.zone
+  default_for_az    = true
+}
+
+data "aws_subnet" "public_subnet_2" {
+  vpc_id            = data.aws_vpc.default.id
+  availability_zone = "us-east-1b"
+  default_for_az    = true
 }
 
 data "aws_security_group" "internal_access" {

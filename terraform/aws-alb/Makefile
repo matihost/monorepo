@@ -6,11 +6,18 @@ apply: prepare ## setup free-tier eliglible Ubuntu instances via Launch Template
 	terraform plan -lock=false && \
 	terraform apply -auto-approve
 
-ssh: ## ssh to first EC2 instance form ASG
-	eval "$(shell terraform output ec2_ssh)"
+test: ## test ALB Nginx instance
+	curl http://$(shell terraform output alb_dns):80
 
-test: ## test Nginx instance
-	curl http://$(shell terraform output ec2_dns):80
+show-auto-scalling-group-state: ## show AutoScalingGroup state(see DesiredCapacity for current amount of instances)
+	aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name webserver
+
+scale-up-manually: ## scale Auto Scaling Group up by single instance
+	aws autoscaling set-desired-capacity --auto-scaling-group-name webserver --desired-capacity $$(( `aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name webserver | jq  '..|.DesiredCapacity?'|grep -v null` + 1 ))
+
+scale-down-manually: ## scale Auto Scaling Group down by single instance
+	aws autoscaling set-desired-capacity --auto-scaling-group-name webserver --desired-capacity $$(( `aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name webserver | jq  '..|.DesiredCapacity?'|grep -v null` - 1 ))
+
 
 show-state: ## show terraform.state
 	terraform state list
