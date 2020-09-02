@@ -1,5 +1,6 @@
 ---
-# Default values for jenkins: https://raw.githubusercontent.com/helm/charts/master/stable/jenkins/values.yaml
+# Default values for jenkinsci/jenkins chart:
+# helm show values jenkinsci/jenkins
 namespaceOverride: ci
 
 master:
@@ -19,16 +20,20 @@ master:
       - {{ jenkins_ingress }}
 
   installPlugins:
-  - kubernetes:1.26.3
+  - kubernetes:1.27.0
   - workflow-job:2.39
   - workflow-aggregator:2.6
   - credentials-binding:1.23
-  - git:4.3.0
-  - configuration-as-code:1.41
-  - timestamper:1.11.3
-  - github-branch-source:2.8.2
-  - matrix-auth:2.6.1
+  - git:4.4.1
+  - configuration-as-code:1.43
+  - timestamper:1.11.5
+  - github-branch-source:2.9.0
+  - matrix-auth:2.6.2
   - prometheus:2.0.7
+  - simple-theme-plugin:0.6
+
+  initializeOnce: true
+
   resources:
     requests:
       cpu: "50m"
@@ -44,10 +49,9 @@ master:
       <enableCaptcha>false</enableCaptcha>
     </securityRealm>
 
-  # TODO Helm chart starts failing on added script approval
-  # scriptApproval:
-  #   - "method groovy.json.JsonSlurperClassic parseText java.lang.String"
-  #   - "new groovy.json.JsonSlurperClassic"
+  scriptApproval:
+  - "method groovy.json.JsonSlurperClassic parseText java.lang.String"
+  - "new groovy.json.JsonSlurperClassic"
 
   initScripts:
   - |
@@ -60,9 +64,23 @@ master:
     }
     instance.save()
 
+  JCasC:
+    enabled: true
+    defaultConfig: true
+    configScripts:
+      welcome-message: |
+        jenkins:
+          systemMessage: Welcome to the Matihost CI\CD server.
+      neo-theme: |
+        unclassified:
+          simple-theme-plugin:
+            elements:
+              - cssUrl:
+                  url: "https://tobix.github.io/jenkins-neo2-theme/dist/neo-light.css"
+
 agent:
-  image: "mirror.gcr.io/jenkins/jnlp-slave"
-  tag: "alpine"
+  image: "mirror.gcr.io/jenkins/inbound-agent"
+  tag: "4.3-4"
   resources:
     requests:
       cpu: "50m"

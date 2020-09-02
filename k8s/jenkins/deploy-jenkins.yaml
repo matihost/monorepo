@@ -53,7 +53,7 @@
   - name: Deploy latest version of Jenkins chart inside {{ namespace }} namespace
     helm:
       name: "{{ namespace }}"
-      chart_ref: stable/jenkins
+      chart_ref: jenkinsci/jenkins
       release_namespace: "{{ namespace }}"
       values: "{{ lookup('template', '{{ files }}/jenkins_helm.template.yaml') | from_yaml }}"
 
@@ -76,8 +76,7 @@
       INGRESS_IP=`kubectl get ingress {{ namespace }}-jenkins -n {{ namespace }} -o jsonpath="{.status..ip}"`
       CHANGED=`grep -c "${INGRESS_IP} {{ jenkins_ingress }}" /etc/hosts`
       [ "${CHANGED}" -eq 0 ] && {
-        echo "update hosts" && sudo -E sh -c "echo \"${INGRESS_IP} {{ jenkins_ingress }}\" >> /etc/hosts" \
-        || echo "hosts already present"
-      }
+        echo "update hosts" && sudo -E sh -c "echo \"${INGRESS_IP} {{ jenkins_ingress }}\" >> /etc/hosts"
+      } || echo "hosts already present"
     register: hosts_result
     changed_when: '"update hosts" in hosts_result.stdout'

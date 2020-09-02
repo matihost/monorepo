@@ -110,7 +110,8 @@ all:
         - name: ensure-hp-lip
           desc: |
             Ensure the latest hplip is installed from source
-            TODO the latest 3.20.5 cannot be installed on Ubuntu 20.04 yet: https://bugs.launchpad.net/hplip/+bug/1879353
+            TODO the latest 3.20.6 cannot be installed on Ubuntu 20.04 out of the box yet: https://bugs.launchpad.net/hplip/+bug/1879353
+            To install latest HPLIP in advanced mode (without GUI): https://developers.hp.com/hp-linux-imaging-and-printing/KnowledgeBase/InstallHPLIPwithqt5.html
           become: false
           command: |
             [ -e /etc/hp/hplip.conf ] &&  {
@@ -202,6 +203,7 @@ all:
               curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
               helm repo add stable https://kubernetes-charts.storage.googleapis.com/
               helm repo add nginx-stable https://helm.nginx.com/stable
+              helm repo add jenkinsci https://charts.jenkins.io
               helm repo update
             }
         - name: minikube

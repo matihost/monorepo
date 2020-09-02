@@ -49,7 +49,7 @@ spec:
       name: workspace-volume
   - name: ansible
     #TODO use latest image when https://github.com/ansible-community/molecule/issues/2656 is fixed
-    image: quay.io/ansible/molecule:3.0.4
+    image: quay.io/ansible/molecule:3.0.8
     command:
     - sleep
     args:

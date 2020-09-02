@@ -17,9 +17,12 @@ Playbooks:
 
   `pip3 install --user openshift kubernetes`
 
-* Helm with latest charts
+* Helm with Jenkins charts
 
-  `helm repo update`
+  ```bash
+  helm repo add jenkinsci https://charts.jenkins.io
+  helm repo update
+  ```
 
 * K8S and Helm modules
 
