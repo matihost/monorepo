@@ -42,42 +42,87 @@ master:
       cpu: "{{ jenkins_max_cpu|default('2000m') }}"
       memory: "{{ jenkins_max_memory|default('2Gi') }}"
 
-  enableXmlConfig: true
-  securityRealm: |-
-    <securityRealm class="hudson.security.HudsonPrivateSecurityRealm">
-      <disableSignup>true</disableSignup>
-      <enableCaptcha>false</enableCaptcha>
-    </securityRealm>
-
-  scriptApproval:
-  - "method groovy.json.JsonSlurperClassic parseText java.lang.String"
-  - "new groovy.json.JsonSlurperClassic"
-
-  initScripts:
-  - |
-    import jenkins.model.*
-    import hudson.security.*
-    def instance = Jenkins.getInstance()
-    def hudsonRealm = new HudsonPrivateSecurityRealm(false)
-    if (!hudsonRealm.getUser("admin")){
-      hudsonRealm.createAccount("{{ jenkins_admin_username|default('admin') }}", "{{ jenkins_admin_pass|mandatory }}")
-    }
-    instance.save()
-
   JCasC:
     enabled: true
     defaultConfig: true
     configScripts:
+      iam: |
+        jenkins:
+          securityRealm:
+            local:
+              allowsSignup: false
+              enableCaptcha: false
+              users:
+              - id: "admin"
+                name: "{{ jenkins_admin_username|default('admin') }}"
+                password: "{{ jenkins_admin_pass|mandatory }}"
+              - id: "user"
+                name: "user"
+                password: "{{ jenkins_admin_pass|mandatory }}"
+          authorizationStrategy:
+            projectMatrix:
+              permissions:
+              - "Agent/Build:admin"
+              - "Agent/Configure:admin"
+              - "Agent/Connect:admin"
+              - "Agent/Create:admin"
+              - "Agent/Delete:admin"
+              - "Agent/Disconnect:admin"
+              - "Agent/ExtendedRead:admin"
+              - "Agent/ExtendedRead:authenticated"
+              - "Credentials/Create:admin"
+              - "Credentials/Delete:admin"
+              - "Credentials/ManageDomains:admin"
+              - "Credentials/Update:admin"
+              - "Credentials/View:admin"
+              - "Job/Build:admin"
+              - "Job/Cancel:admin"
+              - "Job/Configure:admin"
+              - "Job/Create:admin"
+              - "Job/Delete:admin"
+              - "Job/Discover:admin"
+              - "Job/Discover:authenticated"
+              - "Job/ExtendedRead:admin"
+              - "Job/Move:admin"
+              - "Job/Read:admin"
+              - "Job/Read:authenticated"
+              - "Job/Workspace:admin"
+              - "Lockable Resources/Reserve:admin"
+              - "Lockable Resources/Unlock:admin"
+              - "Lockable Resources/View:admin"
+              - "Lockable Resources/View:authenticated"
+              - "Metrics/HealthCheck:admin"
+              - "Metrics/ThreadDump:admin"
+              - "Metrics/View:admin"
+              - "Metrics/View:authenticated"
+              - "Overall/Administer:admin"
+              - "Overall/Read:admin"
+              - "Overall/Read:authenticated"
+              - "Overall/SystemRead:admin"
+              - "Run/Delete:admin"
+              - "Run/Replay:admin"
+              - "Run/Update:admin"
+              - "SCM/Tag:admin"
+              - "View/Configure:admin"
+              - "View/Create:admin"
+              - "View/Delete:admin"
+              - "View/Read:admin"
+              - "View/Read:authenticated"
       welcome-message: |
         jenkins:
           systemMessage: Welcome to the Matihost CI\CD server.
+      script-approval: |
+        security:
+          scriptApproval:
+            approvedSignatures:
+            - "method groovy.json.JsonSlurperClassic parseText java.lang.String"
+            - "new groovy.json.JsonSlurperClassic"
       neo-theme: |
         unclassified:
           simple-theme-plugin:
             elements:
               - cssUrl:
                   url: "https://tobix.github.io/jenkins-neo2-theme/dist/neo-light.css"
-
 agent:
   image: "mirror.gcr.io/jenkins/inbound-agent"
   tag: "4.3-4"
