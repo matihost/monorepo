@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Creates ~/.kube/config in case it is missing
+# It works only within K8S cluster when ServiceAccount is injected to
+# /var/run/secrets/kubernetes.io/serviceaccount directory
+
+set -e
+
+# shellcheck disable=SC2015
+[ -f ~/.kube/config ] && echo "$HOME/.kube/config is already present, do nothing" || {
+  if [ -d /run/secrets/kubernetes.io/serviceaccount ]; then
+    K8S_ADDRESS='https://kubernetes.default.svc:443'
+    TOKEN="$(</run/secrets/kubernetes.io/serviceaccount/token)"
+    NAMESPACE="$(</run/secrets/kubernetes.io/serviceaccount/namespace)"
+
+    kubectl config set-cluster current --server="${K8S_ADDRESS}" --insecure-skip-tls-verify=true
+    kubectl config set-credentials sa --token="${TOKEN}"
+    kubectl config set-context current --cluster=current --namespace="${NAMESPACE}" --user="sa"
+    kubectl config use-context current
+  else
+    echo "not run within K8S cluster"
+  fi
+}
