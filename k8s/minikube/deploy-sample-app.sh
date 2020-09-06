@@ -2,7 +2,7 @@
 kubectl config use-context minikube || echo "Minikube not present in kube context" && {
   kubectl create ns learning
   kubectl config set-context --current --namespace learning
-  # TODO do no use privilege psp here
+  # EchoServer has to run as root hence it requires psp:privileged
   echo "---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

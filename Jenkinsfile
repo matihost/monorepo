@@ -1,5 +1,7 @@
 #!/usr/bin/env groovy
 //TODO add kaniko, get test artifacts from pytest, golang?
+//Ensuring all containers use the same user id as jnlp container to mitigate issue
+//https://github.com/jenkinsci/kubernetes-plugin#pipeline-sh-step-hangs-when-multiple-containers-are-used
 pipeline {
   agent {
     kubernetes {
@@ -12,11 +14,8 @@ metadata:
   labels:
     purpose: ci
 spec:
-  # When PodSecurityPolicy is enabled
-  # https://github.com/jenkinsci/kubernetes-plugin#pipeline-sh-step-hangs-when-multiple-containers-are-used
-  # Ensuring all container use same user id as jnlp container and adds implicitely
   securityContext:
-    runAsUser: 1000 # default UID of jenkins user in default jnlp image
+    runAsUser: 1000
   containers:
   - name: maven-jdk11
     image: maven:3-jdk-11
