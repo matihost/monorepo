@@ -13,11 +13,10 @@ metadata:
     purpose: ci
 spec:
   # When PodSecurityPolicy is enabled
-  # Jenkins Pod automatically tries to mitigate
   # https://github.com/jenkinsci/kubernetes-plugin#pipeline-sh-step-hangs-when-multiple-containers-are-used
-  # by ensuring all container use same user id as jnlp container and adds implicitely
-  # securityContext:
-  #   runAsUser: 1000 # default UID of jenkins user in default jnlp image
+  # Ensuring all container use same user id as jnlp container and adds implicitely
+  securityContext:
+    runAsUser: 1000 # default UID of jenkins user in default jnlp image
   containers:
   - name: maven-jdk11
     image: maven:3-jdk-11
