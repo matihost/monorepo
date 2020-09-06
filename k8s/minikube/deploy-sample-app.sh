@@ -2,6 +2,21 @@
 kubectl config use-context minikube || echo "Minikube not present in kube context" && {
   kubectl create ns learning
   kubectl config set-context --current --namespace learning
+  # TODO do no use privilege psp here
+  echo "---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: learning:privileged
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: psp:privileged
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: learning
+  " | kubectl apply -f -
   kubectl create deployment echoserver --image=k8s.gcr.io/echoserver:1.4
   kubectl expose deployment echoserver --type=NodePort --port=80 --target-port=8080
   openssl req -x509 -sha256 -nodes -days 365 -subj "/CN=echoserver.learning.minikube" -newkey rsa:2048 -keyout /tmp/echoserver.learning.minikube.key -out /tmp/echoserver.learning.minikube.crt

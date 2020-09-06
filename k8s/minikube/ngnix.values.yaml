@@ -1,0 +1,6 @@
+# default values:  helm show values nginx-stable/nginx-ingress
+controller:
+  # serviceAccount has to be overriden for PodSecurityPolicy to work
+  # https://kubernetes.github.io/ingress-nginx/examples/psp/
+  serviceAccount:
+    name: ingress-nginx

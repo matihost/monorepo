@@ -90,7 +90,9 @@ function addNginxIngress() {
     helm repo update
   }
   [ "$(kubectl config current-context)" == "minikube" ] && {
-    helm install nginx-ingress nginx-stable/nginx-ingress
+    # start Nginx ingress with PodSecurityPolicy: https://kubernetes.github.io/ingress-nginx/examples/psp/
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/docs/examples/psp/psp.yaml
+    helm install -f ngnix.values.yaml ingress-nginx nginx-stable/nginx-ingress -n ingress-nginx
   }
 }
 
@@ -154,9 +156,10 @@ if ! minikube status &>/dev/null; then
   # TODO replace usage of /run/systemd/resolve/resolv.conf with some temporary file withot any 127.0.0.x entries ,because CRC add dnsmasq
   sudo -E minikube start --vm-driver=none --apiserver-ips 127.0.0.1 --apiserver-name localhost \
     --kubernetes-version='latest' \
-    --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook" \
+    --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook,PodSecurityPolicy" \
     --extra-config=kubelet.resolv-conf=/run/systemd/resolve/resolv.conf \
     --extra-config=kubelet.cgroup-driver=systemd \
+    --addons=pod-security-policy \
     ${EXTRA_PARAMS}
 
   sudo chmod -R a+rwx /etc/kubernetes &&
