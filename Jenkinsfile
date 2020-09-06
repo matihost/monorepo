@@ -1,12 +1,11 @@
 #!/usr/bin/env groovy
-//TODO add kaniko, get test artifacts from pytest, golang?
-//Ensuring all containers use the same user id as jnlp container to mitigate issue
-//https://github.com/jenkinsci/kubernetes-plugin#pipeline-sh-step-hangs-when-multiple-containers-are-used
 pipeline {
   agent {
     kubernetes {
       label validLabel("learning-${env.BRANCH_NAME}") // subsequent builds from the same branch will reuse pods
       idleMinutes 60 // pod will be available to reuse for 1 h
+      //Ensures all containers use the same user id as jnlp container to mitigate issue
+      //https://github.com/jenkinsci/kubernetes-plugin#pipeline-sh-step-hangs-when-multiple-containers-are-used
       yaml """
 apiVersion: v1
 kind: Pod
@@ -36,7 +35,7 @@ spec:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
   - name: python
-    image: mirror.gcr.io/library/python:3.8
+    image: quay.io/matihost/ansible:latest
     command:
     - cat
     tty: true
@@ -51,17 +50,15 @@ spec:
     volumeMounts:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
-# TODO fix to work under user id 1000 in Jenkins CI
-#  - name: ansible
-#    #TODO use latest image when https://github.com/ansible-community/molecule/issues/2656 is fixed
-#    image: quay.io/ansible/molecule:3.0.8
-#    command:
-#    - sleep
-#    args:
-#    - infinity
-#    volumeMounts:
-#    - mountPath: /home/jenkins/agent
-#      name: workspace-volume
+  - name: ansible
+    image: quay.io/matihost/ansible:latest
+    command:
+    - sleep
+    args:
+    - infinity
+    volumeMounts:
+    - mountPath: /home/jenkins/agent
+      name: workspace-volume
   - name: kubectl
     image: mirror.gcr.io/bitnami/kubectl:latest
     command:
@@ -167,33 +164,30 @@ spec:
         stage('Build :: Python') {
           steps {
             container("python"){
-              // TODO make python image with pipenv
               dir("python/apps/exchange-rate"){
                 echo "Building ${pwd()}..."
                 sh """
-                  export HOME=/home/jenkins/agent/workspace/.pythonhome
-                  pip3 install pipenv --user
-                  /home/jenkins/agent/workspace/.pythonhome/.local/bin/pipenv install --dev -e .
-                  /home/jenkins/agent/workspace/.pythonhome/.local/bin/pipenv run pylint src/ tests/
+                  pipenv install --dev -e .
+                  pipenv run pylint src/ tests/
                   python3 setup.py build
-                  /home/jenkins/agent/workspace/.pythonhome/.local/bin/pipenv run exchange-rate CHF
+                  pipenv run exchange-rate CHF
                 """
               }
             }
           }
         }
-        // stage('Build :: Ansible') {
-        //   steps {
-        //     container("ansible"){
-        //       dir("ansible/learning"){
-        //         echo "Building ${pwd()}..."
-        //         sh """
-        //           ansible-playbook dictionaries.yaml -v
-        //         """
-        //       }
-        //     }
-        //   }
-        // }
+        stage('Build :: Ansible') {
+          steps {
+            container("ansible"){
+              dir("ansible/learning"){
+                echo "Building ${pwd()}..."
+                sh """
+                  ansible-playbook dictionaries.yaml -v
+                """
+              }
+            }
+          }
+        }
         stage('Build :: Kubectl') {
           steps {
             container("kubectl"){
