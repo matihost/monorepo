@@ -20,8 +20,8 @@ master:
       - {{ jenkins_ingress }}
 
   installPlugins:
-  - kubernetes:1.27.0
-  - workflow-job:2.39
+  - kubernetes:1.27.1
+  - workflow-job:2.40
   - workflow-aggregator:2.6
   - credentials-binding:1.23
   - git:4.4.1
@@ -124,8 +124,11 @@ master:
               - cssUrl:
                   url: "https://tobix.github.io/jenkins-neo2-theme/dist/neo-light.css"
 agent:
-  image: "mirror.gcr.io/jenkins/inbound-agent"
-  tag: "4.3-4"
+  #TODO jenkins/inbound-agent mirrored image dissapeared from mirror.gcr.io
+  # image: "mirror.gcr.io/jenkins/inbound-agent"
+  # tag: "4.3-4"
+  image: "jenkins/inbound-agent"
+  tag: "alpine"
   resources:
     requests:
       cpu: "50m"

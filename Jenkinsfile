@@ -57,6 +57,15 @@ spec:
     volumeMounts:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
+  - name: kubectl
+    image: mirror.gcr.io/bitnami/kubectl:latest
+    command:
+    - sleep
+    args:
+    - infinity
+    volumeMounts:
+    - mountPath: /home/jenkins/agent
+      name: workspace-volume
 """
     }
   }
@@ -174,6 +183,16 @@ spec:
                   ansible-playbook dictionaries.yaml -v
                 """
               }
+            }
+          }
+        }
+        stage('Build :: Kubectl') {
+          steps {
+            container("kubectl"){
+              echo "Running kubectl ${pwd()}..."
+              sh """
+                kubectl version
+              """
             }
           }
         }
