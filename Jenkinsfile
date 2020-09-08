@@ -85,7 +85,17 @@ spec:
   stages {
     stage('Checkout sources') {
       steps {
-        checkout scm
+        // when no tags info is required
+        // checkout scm
+
+        // checkout with tags info so that git describe is able to work
+        checkout([
+          $class                           : 'GitSCM',
+          branches                         : scm.branches,
+          doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
+          extensions                       : scm.extensions + [[$class: 'CloneOption', noTags: false]],
+          userRemoteConfigs                : scm.userRemoteConfigs,
+        ])
       }
     }
     stage('Build') {
