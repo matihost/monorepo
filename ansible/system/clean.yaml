@@ -55,20 +55,36 @@
       for i in `find /var/log/dist-upgrade -mindepth 1 -type d 2>/dev/null` ; do echo $i && rm -rf $i; done
     register: log_clean
     changed_when: log_clean.stdout
-  - name: Clean all podman and docker containers and images
+  - name: Clean all podman (root) and docker containers, images and volumes
     shell: |
       command -v podman 1>/dev/null 2>/dev/null && {
-        podman container rm --all --force
-        podman image rm --all --force
-        sudo podman container rm --all --force
-        sudo podman image rm --all --force
+        PODMAN_PRUNE_OUTPUT="$(podman system prune --all --volumes --force |grep -v "Deleted [PCVI]")"
+        if [ -n "${PODMAN_PRUNE_OUTPUT}" ]; then
+          echo "${PODMAN_PRUNE_OUTPUT}"
+        fi
       }
       command -v docker 1>/dev/null 2>/dev/null && {
         ITEMS=$(docker container ls --all -q)
         [ -n "${ITEMS}" ] && docker container rm ${ITEMS} --force
-        ITEMS=$(docker images --all -q)
-        [ -n "${ITEMS}" ] && docker image rm ${ITEMS} --force
+
+        DOCKER_PRUNE_OUTPUT="$(docker system prune --all --volumes --force)"
+        [ "${DOCKER_PRUNE_OUTPUT}"  != "Total reclaimed space: 0B" ] && {
+          echo "${DOCKER_PRUNE_OUTPUT}"
+        }
       }
     register: clean_out
     changed_when: clean_out.stdout
     failed_when: false
+  - block:
+    - name: Clean all podman (user) containers, images and volumes
+      shell: |
+        command -v podman 1>/dev/null 2>/dev/null && {
+          PODMAN_PRUNE_OUTPUT="$(podman system prune --all --volumes --force |grep -v "Deleted [PCVI]")"
+          if [ -n "${PODMAN_PRUNE_OUTPUT}" ]; then
+            echo "${PODMAN_PRUNE_OUTPUT}"
+          fi
+        }
+      register: clean_out
+      changed_when: clean_out.stdout
+      failed_when: false
+    become: false
