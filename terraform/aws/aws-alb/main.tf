@@ -51,6 +51,11 @@ data "aws_security_group" "internal_access" {
   }
 }
 
+data "aws_security_group" "http_from_single_computer" {
+  tags = {
+    Name = "http_from_single_computer"
+  }
+}
 
 
 variable "zone" {

@@ -127,6 +127,32 @@ resource "aws_route_table_association" "private_a" {
 }
 
 
+resource "aws_security_group" "http_from_single_computer" {
+  name        = "http_from_single_computer"
+  description = "Allow HTTP access only from single computer"
+
+  tags = {
+    Name = "http_from_single_computer"
+  }
+
+  ingress {
+    description = "HTTP from laptop only"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["${var.external_access_ip}/32"]
+  }
+
+  # Terraform removed default egress ALLOW_ALL rule
+  # It has to be explicitely added
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 output "nat_id" {
   value = aws_instance.nat.id
 }

@@ -64,32 +64,6 @@ resource "aws_autoscaling_policy" "webserver" {
   autoscaling_group_name = aws_autoscaling_group.webserver.name
 }
 
-resource "aws_security_group" "alb_access" {
-  name        = "alb_access"
-  description = "Allow HTTP access only from single computer"
-
-  tags = {
-    Name = "alb_access"
-  }
-
-  ingress {
-    description = "HTTP from laptop only"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["${var.external_access_ip}/32"]
-  }
-
-  # Terraform removed default egress ALLOW_ALL rule
-  # It has to be explicitely added
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 
 # Exposes  public-facing ALB to EC2 instances that have private IP addresses only.
 # It works by setting up ALB to public subnets in the same Availability Zones as the private subnets that are used by your private instances.
@@ -102,7 +76,7 @@ resource "aws_lb" "webserver" {
   name               = "webserver"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.alb_access.id]
+  security_groups    = [data.aws_security_group.http_from_single_computer.id]
   subnets            = [data.aws_subnet.public_subnet_1.id, data.aws_subnet.public_subnet_2.id]
 }
 

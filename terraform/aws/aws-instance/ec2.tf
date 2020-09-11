@@ -24,6 +24,13 @@ resource "aws_security_group" "private_access" {
     cidr_blocks = ["${var.external_access_ip}/32"]
   }
   ingress {
+    description = "HTTP 8080 from laptop"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["${var.external_access_ip}/32"]
+  }
+  ingress {
     description = "SSH"
     from_port   = 22
     to_port     = 22
