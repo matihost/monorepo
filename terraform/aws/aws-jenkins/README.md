@@ -21,10 +21,15 @@ aws configure
 # deploy Jenkins EC2 instance and related resources
 make apply
 
-# connects to Jenkins instance
-make connect
+# recreate Jenkins VM instance to ensure its latest LaunchTemplate is used
+# use it when make apply was run for the next time - as it is manager LaunchTemplate and AutoScalling Group
+# make apply will not recrete VM automatically when it is run for the second time - it has to be triggered manually
+make recreate-instance
 
-# ssh to EC2 instance
+# tests enkins instance
+make test
+
+# ssh to Jenkins EC2 instance
 make ssh
 
 # show Terraform state along with current EC2 instance user_date startup script

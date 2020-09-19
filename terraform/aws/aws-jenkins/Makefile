@@ -6,16 +6,24 @@ apply: prepare ## setup free-tier eliglible Ubuntu instance
 	terraform plan -lock=false && \
 	terraform apply -auto-approve
 
+JENKINS_INSTANCE_PUBLIC_IP = $(shell aws ec2 describe-instances --filters 'Name=tag:Name,Values=jenkins' --output json --region us-east-1 | jq -r '.Reservations[].Instances[] | select(.State.Name == "running") | .PublicIpAddress')
 ssh: ## ssh to EC2 instance
-	eval "$(shell terraform output ec2_ssh)"
+	ssh -i ~/.ssh/id_rsa.aws.vm ubuntu@$(JENKINS_INSTANCE_PUBLIC_IP)
 
-test: ## test Nginx instance
-	curl http://$(shell terraform output ec2_dns):8080
+#TODO scale up when old instance state is no more running
+recreate-instance: ## recreate Jenkins VM instance to ensure its latest LaunchTemplate is used
+	aws autoscaling set-desired-capacity --auto-scaling-group-name jenkins --desired-capacity 0
+	sleep 15
+	aws autoscaling set-desired-capacity --auto-scaling-group-name jenkins --desired-capacity 1
+
+
+test: ## test Jenkins instance
+	curl http://$(JENKINS_INSTANCE_PUBLIC_IP):8080
 
 show-state: ## show terraform.state
 	terraform state list
 	terraform show
-	eval "$(shell terraform output ec2_user_data)"
+	@echo "Jenkins public IP: $(JENKINS_INSTANCE_PUBLIC_IP)"
 
 destroy: ## destroy ec2 instance
 	export TF_VAR_external_access_ip=$(WHOAMI) && \

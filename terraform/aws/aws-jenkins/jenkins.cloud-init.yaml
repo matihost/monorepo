@@ -70,7 +70,3 @@ repo_upgrade: all
 
 packages:
   - openjdk-8-jdk
-  - jenkins
-
-runcmd:
-  - systemctl enable --now jenkins
