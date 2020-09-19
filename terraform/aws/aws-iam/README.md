@@ -11,7 +11,11 @@ Setup minimal IAM resources:
 
   IAM modifications are assumed to be performed only by root account or temporarily granted AdministratorAccess IAM User.
 
-* Roles and Instance Profiles: _s3all_ and _s3readers_.
+* Roles and Instance Profiles:
+
+** _s3all_ and _s3readers_ - to access S3 from EC2
+
+**  _jenkins-master_ - should be applied to EC2 with Jenkins Master - so that Jenkins can spawn Jenkins Agent EC2.
 
 Users management is not part of this setup.
 

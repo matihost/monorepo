@@ -37,7 +37,11 @@ function restart_jenkins() {
   echo "Jenkins is back online"
 }
 
-function add_admin_user() {
+function init_config() {
+  # need to perfom init configuration
+  # similar to https://github.com/jenkinsci/docker/issues/310
+  # and restart jenkins
+  sed -i -E "s/^(JAVA_ARGS=).+/\1\"${JENKINS_JAVA_ARGS}\"/" /etc/default/jenkins
   mkdir -p /var/lib/jenkins/init.groovy.d
   script="#!groovy
 
@@ -58,6 +62,11 @@ instance.setInstallState(InstallState.INITIAL_SETUP_COMPLETED)
 instance.save()
 "
   echo -n "${script}" >/var/lib/jenkins/init.groovy.d/basic.groovy
+
+  restart_jenkins
+
+  # init configuration is not required after being applied after restart
+  rm -rf /var/lib/jenkins/init.groovy.d/basic.groovy
 }
 
 function download_jenkins_cli() {
@@ -161,6 +170,14 @@ function install_plugins() {
   # TODO use Admin token instead (create it via /configure/me )
   # jenkins-cli uses JENKINS_URL, JENKINS_USER_ID and JENKINS_API_TOKEN env variables
   export JENKINS_API_TOKEN="${ADMIN_PASS}"
+
+  # Fixes possible error:
+  # ec2 is neither a valid file, URL, nor a plugin artifact name in the update center
+  # No update center data is retrieved yet from: https://updates.jenkins.io/update-center.json
+  mkdir -p /var/lib/jenkins/updates
+  wget http://updates.jenkins-ci.org/update-center.json -qO- | sed '1d;$d' >/var/lib/jenkins/updates/default.json
+  chmod 666 /var/lib/jenkins/updates/default.json
+
   # shellcheck disable=SC2086
   java -jar /var/lib/jenkins-cli.jar install-plugin ${JENKINS_PLUGINS}
   configure_casc
@@ -173,16 +190,9 @@ apt update
 # that will run Jenkins immediately after installation
 apt -y install jenkins
 
-# need to perfom init configuration
-# similar to https://github.com/jenkinsci/docker/issues/310
-# and restart jenkins
-sed -i -E "s/^(JAVA_ARGS=).+/\1\"${JENKINS_JAVA_ARGS}\"/" /etc/default/jenkins
-add_admin_user
-restart_jenkins
-systemctl enable jenkins
+init_config
 
-# init configuration is not required
-rm -rf /var/lib/jenkins/init.groovy.d/basic.groovy
+systemctl enable jenkins
 
 download_jenkins_cli
 install_plugins

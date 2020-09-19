@@ -3,12 +3,12 @@ provider "aws" {
   region  = "us-east-1"
 }
 
-resource "aws_security_group" "jenkins_access" {
-  name        = "jenkins_access"
+resource "aws_security_group" "jenkins_master" {
+  name        = "jenkins_master"
   description = "Allow HTTP access from single computer and opens SSH"
 
   tags = {
-    Name = "jenkins_access"
+    Name = "jenkins_master"
   }
 
   ingress {
@@ -75,12 +75,12 @@ data "template_cloudinit_config" "config" {
   part {
     filename     = "init.cfg"
     content_type = "text/cloud-config"
-    content      = file("jenkins.cloud-init.yaml")
+    content      = file("jenkins-master.cloud-init.yaml")
   }
 
   part {
     content_type = "text/x-shellscript"
-    content      = file("jenkins-startup.sh")
+    content      = file("jenkins-master.startup.sh")
   }
 
 }
@@ -99,7 +99,7 @@ resource "aws_launch_template" "jenkins" {
 
   key_name = aws_key_pair.jenkins_key.key_name
 
-  vpc_security_group_ids = [aws_security_group.jenkins_access.id]
+  vpc_security_group_ids = [aws_security_group.jenkins_master.id]
 
   tag_specifications {
     resource_type = "instance"
@@ -161,7 +161,7 @@ variable "external_access_ip" {
 }
 
 variable "instance_profile" {
-  default     = ""
+  default     = "jenkins-master"
   type        = string
-  description = "The name of instance_profile (dynamically provisioning access to role)"
+  description = "The name of instance_profile to be assigned to EC2 with Jenkins. The role "
 }
