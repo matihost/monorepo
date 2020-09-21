@@ -21,16 +21,16 @@ aws configure
 
 ```bash
 
-# deploy Jenkins EC2 instance and related resources
-make apply
+# deploy Jenkins EC2 instance and related resources, usage: make apply PASS=passwordForJenkinsMaster
+make apply PASS=passwordToJenkinsMaster
 
 # recreate Jenkins VM instance to ensure its latest LaunchTemplate is used
 # use it when make apply was run for the next time - as it is manager LaunchTemplate and AutoScalling Group
 # make apply will not recrete VM automatically when it is run for the second time - it has to be triggered manually
 make recreate-instance
 
-# tests enkins instance
-make test
+# open web browser with Jenkins instance
+make open-jenkins
 
 # ssh to Jenkins EC2 instance
 make ssh

@@ -75,12 +75,19 @@ data "template_cloudinit_config" "config" {
   part {
     filename     = "init.cfg"
     content_type = "text/cloud-config"
-    content      = file("jenkins-master.cloud-init.yaml")
+    content = templatefile("jenkins-master.cloud-init.tpl", {
+      ssh_key = filebase64("~/.ssh/id_rsa.aws.vm"),
+      ssh_pub = filebase64("~/.ssh/id_rsa.aws.vm.pub"),
+    })
   }
 
   part {
     content_type = "text/x-shellscript"
-    content      = file("jenkins-master.startup.sh")
+    content = templatefile("jenkins-master.startup.sh.tpl", {
+      ami            = data.aws_ami.ubuntu.id,
+      zone           = var.zone,
+      admin_password = var.admin_password,
+    })
   }
 
 }
@@ -119,7 +126,7 @@ resource "aws_autoscaling_group" "jenkins" {
     id      = aws_launch_template.jenkins.id
     version = "$Latest"
   }
-  availability_zones = ["us-east-1a"]
+  availability_zones = [var.zone]
 
   max_size         = 1
   desired_capacity = 1
@@ -164,4 +171,16 @@ variable "instance_profile" {
   default     = "jenkins-master"
   type        = string
   description = "The name of instance_profile to be assigned to EC2 with Jenkins. The role "
+}
+
+variable "zone" {
+  default     = "us-east-1a"
+  type        = string
+  description = "Preffered AWS AZ where resources need to placed, has to be compatible with region used"
+}
+
+
+variable "admin_password" {
+  type        = string
+  description = "Password to be used for Jenkins Master"
 }

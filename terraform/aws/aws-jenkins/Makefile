@@ -1,6 +1,10 @@
 WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
-apply: prepare ## setup free-tier eliglible Ubuntu instance
-	export TF_VAR_external_access_ip=$(WHOAMI) && \
+apply: prepare ## deploy Jenkins EC2 instance and related resources, usage: make apply PASS=passwordForJenkinsMaster
+ifndef PASS
+	$(error Env PASS is not defined. Provider password for Jenkins admin to provision.)
+endif
+	@export TF_VAR_external_access_ip=$(WHOAMI) && \
+	export TF_VAR_admin_password=$(PASS) && \
 	terraform init -upgrade=true && \
 	terraform validate && \
 	terraform plan -lock=false && \
@@ -13,12 +17,13 @@ ssh: ## ssh to EC2 instance
 #TODO scale up when old instance state is no more running
 recreate-instance: ## recreate Jenkins VM instance to ensure its latest LaunchTemplate is used
 	aws autoscaling set-desired-capacity --auto-scaling-group-name jenkins --desired-capacity 0
-	sleep 15
+	sleep 20
 	aws autoscaling set-desired-capacity --auto-scaling-group-name jenkins --desired-capacity 1
 
+JENKINS_INSTANCE_URL="http://$(JENKINS_INSTANCE_PUBLIC_IP):8080"
+open-jenkins: ## open Jenkins Master instance
+	xdg-open $(JENKINS_INSTANCE_URL) || sensible-browser $(JENKINS_INSTANCE_URL) || x-www-browser $(JENKINS_INSTANCE_URL) || gnome-open $(JENKINS_INSTANCE_URL)
 
-test: ## test Jenkins instance
-	curl http://$(JENKINS_INSTANCE_PUBLIC_IP):8080
 
 show-state: ## show terraform.state
 	terraform state list
