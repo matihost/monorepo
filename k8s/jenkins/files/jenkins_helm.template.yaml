@@ -20,15 +20,15 @@ master:
       - {{ jenkins_ingress }}
 
   installPlugins:
-  - kubernetes:1.27.1
+  - kubernetes:1.27.1.1
   - workflow-job:2.40
   - workflow-aggregator:2.6
   - credentials-binding:1.23
-  - git:4.4.2
+  - git:4.4.3
   - configuration-as-code:1.43
   - timestamper:1.11.5
   - github-branch-source:2.9.0
-  - matrix-auth:2.6.2
+  - matrix-auth:2.6.3
   - prometheus:2.0.7
   - simple-theme-plugin:0.6
   - jdk-tool:1.4
