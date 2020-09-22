@@ -165,6 +165,8 @@ jenkins:
       - \"View/Read:authenticated\"
 "
   echo -n "$${config_data}" >/var/lib/jenkins/casc_configs/iam.yaml
+
+  chown -R jenkins:jenkins /var/lib/jenkins/casc_configs
 }
 
 
@@ -186,6 +188,7 @@ credentials:
           username: \"jenkins\"
 "
   echo -n "$${config_data}" >/var/lib/jenkins/casc_configs/jenkins_credentials.yaml
+  chown jenkins:jenkins /var/lib/jenkins/casc_configs/jenkins_credentials.yaml
 
 # Use ACCEPT-NEW strategy because of https://issues.jenkins-ci.org/browse/JENKINS-62724
 # (it takes 5-10 min to connect to instance)
@@ -244,6 +247,7 @@ jenkins:
       useInstanceProfileForCredentials: true
 "
   echo -n "$${config_data}" >/var/lib/jenkins/casc_configs/ec2.yaml
+  chown jenkins:jenkins /var/lib/jenkins/casc_configs/ec2.yaml
 }
 
 
@@ -258,7 +262,7 @@ function install_plugins() {
   mkdir -p /var/lib/jenkins/updates
   wget http://updates.jenkins-ci.org/update-center.json -qO- | sed '1d;$d' >/var/lib/jenkins/updates/default.json
   chmod 666 /var/lib/jenkins/updates/default.json
-
+  chown -R jenkins:jenkins /var/lib/jenkins/updates
   # shellcheck disable=SC2086
   java -jar /var/lib/jenkins-cli.jar install-plugin $${JENKINS_PLUGINS}
   configure_common_casc
@@ -268,13 +272,15 @@ function install_plugins() {
 
 # Main
 
-apt update
-# that will run Jenkins immediately after installation
-apt -y install jenkins
+[ -d /var/lib/jenkins/casc_configs ] || {
+  apt update
+  # that will run Jenkins immediately after installation
+  apt -y install jenkins
 
-init_config
+  init_config
 
-systemctl enable jenkins
+  systemctl enable jenkins
 
-download_jenkins_cli
-install_plugins
+  download_jenkins_cli
+  install_plugins
+}

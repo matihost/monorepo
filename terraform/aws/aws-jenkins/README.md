@@ -24,20 +24,28 @@ aws configure
 # deploy Jenkins EC2 instance and related resources, usage: make apply PASS=passwordForJenkinsMaster
 make apply PASS=passwordToJenkinsMaster
 
-# recreate Jenkins VM instance to ensure its latest LaunchTemplate is used
-# use it when make apply was run for the next time - as it is manager LaunchTemplate and AutoScalling Group
-# make apply will not recrete VM automatically when it is run for the second time - it has to be triggered manually
-make recreate-instance
-
 # open web browser with Jenkins instance
+# use login: admin and password: the one you provided to PASS variable during make apply
 make open-jenkins
 
 # ssh to Jenkins EC2 instance
 make ssh
 
+
+# recreate Jenkins VM instance to ensure its latest LaunchTemplate is used
+# use it when you run 'make apply' for the second and next time
+# make apply manages LaunchTemplate and AutoScalling Group resources - so it does not recreate VMs directly
+# scaling down/up has to be triggered manually
+# this task scaled down ASG to 0 (aka destroy VM with Jenkisn Master)
+# and then scale up - to spin new fresh Jenkins VM instance
+make recreate-instance
+
 # show Terraform state along with current EC2 instance user_date startup script
 make show-state
 
 # terminates all AWS resource created with apply task
+# Warning: it does not destroy Jenkins Agents VMs
+# So before running remove Jenkins Agents VMs first
+# The easiest way is to 'Delete Agent' from Jenkins UI or Terminate all 'jenkins-agent' EC2 from AWS console
 make destroy
 ```

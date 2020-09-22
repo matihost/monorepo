@@ -70,10 +70,3 @@ repo_upgrade: all
 
 packages:
   - openjdk-8-jdk
-
-runcmd:
- - echo -n "${ssh_pub}" |base64 -d > /home/ubuntu/.ssh/id_rsa.pub
- - echo -n "${ssh_key}" |base64 -d > /home/ubuntu/.ssh/id_rsa
- - cat /home/ubuntu/.ssh/id_rsa.pub >> /home/ubuntu/.ssh/authorized_keys
- - 'chown ubuntu:ubuntu /home/ubuntu/.ssh/id_rsa*'
- - chmod 400 /home/ubuntu/.ssh/id_rsa

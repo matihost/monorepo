@@ -75,7 +75,12 @@ data "template_cloudinit_config" "config" {
   part {
     filename     = "init.cfg"
     content_type = "text/cloud-config"
-    content = templatefile("jenkins-master.cloud-init.tpl", {
+    content      = file("jenkins-master.cloud-init.yaml")
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    content = templatefile("jenkins-master.ssh.sh.tpl", {
       ssh_key = filebase64("~/.ssh/id_rsa.aws.vm"),
       ssh_pub = filebase64("~/.ssh/id_rsa.aws.vm.pub"),
     })
@@ -181,6 +186,7 @@ variable "zone" {
 
 
 variable "admin_password" {
+  default     = "admin"
   type        = string
   description = "Password to be used for Jenkins Master"
 }

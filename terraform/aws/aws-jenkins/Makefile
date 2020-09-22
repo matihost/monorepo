@@ -30,9 +30,16 @@ show-state: ## show terraform.state
 	terraform show
 	@echo "Jenkins public IP: $(JENKINS_INSTANCE_PUBLIC_IP)"
 
-destroy: ## destroy ec2 instance
+destroy: destroy-jenkins-agents ## terminates all AWS resource created with apply task, it also proactively terminate all EC2 jenkins-agent instances
 	export TF_VAR_external_access_ip=$(WHOAMI) && \
 	terraform plan && terraform destroy -auto-approve
+
+JENKINS_AGENTS=$(shell aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --filters "Name=tag:Name,Values=jenkins-agent" --output text 2>/dev/null)
+destroy-jenkins-agents:
+ifdef JENKINS_AGENTS
+	aws ec2 terminate-instances --instance-ids $(JENKINS_AGENTS)
+endif
+
 
 prepare:
 	@[ -e "$(HOME)/.ssh/id_rsa.aws.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.aws.vm; }
