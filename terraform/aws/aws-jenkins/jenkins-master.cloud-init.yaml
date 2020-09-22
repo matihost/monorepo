@@ -69,4 +69,4 @@ repo_update: true
 repo_upgrade: all
 
 packages:
-  - openjdk-8-jdk
+  - openjdk-11-jdk

@@ -103,6 +103,8 @@ jenkins:
 
   config_data="
 jenkins:
+  remotingSecurity:
+    enabled: true
   securityRealm:
     local:
       allowsSignup: false
@@ -223,7 +225,7 @@ jenkins:
           #!/usr/bin/env bash
 
           sudo apt update
-          sudo apt -y install openjdk-8-jdk
+          sudo apt -y install openjdk-11-jdk
         labelString: \"aws-ubuntu\"
         launchTimeoutStr: \"900\"
         maxTotalUses: -1

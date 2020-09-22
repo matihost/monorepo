@@ -12,7 +12,7 @@ endif
 
 JENKINS_INSTANCE_PUBLIC_IP = $(shell aws ec2 describe-instances --filters 'Name=tag:Name,Values=jenkins' --output json --region us-east-1 | jq -r '.Reservations[].Instances[] | select(.State.Name == "running") | .PublicIpAddress')
 ssh: ## ssh to EC2 instance
-	ssh -i ~/.ssh/id_rsa.aws.vm ubuntu@$(JENKINS_INSTANCE_PUBLIC_IP)
+	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(JENKINS_INSTANCE_PUBLIC_IP)
 
 #TODO scale up when old instance state is no more running
 recreate-instance: ## recreate Jenkins VM instance to ensure its latest LaunchTemplate is used
