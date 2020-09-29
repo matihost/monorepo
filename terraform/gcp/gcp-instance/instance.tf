@@ -23,8 +23,8 @@ resource "google_compute_instance" "vm" {
   }
 
   metadata_startup_script = templatefile("instance.init.sh.tpl", {
-    ssh_key = filebase64("~/.ssh/id_rsa.aws.vm"),
-    ssh_pub = filebase64("~/.ssh/id_rsa.aws.vm.pub"),
+    ssh_key = filebase64("~/.ssh/id_rsa.cloud.vm"),
+    ssh_pub = filebase64("~/.ssh/id_rsa.cloud.vm.pub"),
   })
 
   metadata = {
