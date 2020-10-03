@@ -50,7 +50,6 @@ all:
         - curl
         - keepass2
         - code
-        - youtube-dl
         - onedrive
         - nautilus-dropbox
         - openssh-server
@@ -95,6 +94,7 @@ all:
         - pipenv
         - pipenv-setup
         - yamllint
+        - youtube-dl
         clis:
         - name: vboxuser
           desc: To ensure VBox can see host USB

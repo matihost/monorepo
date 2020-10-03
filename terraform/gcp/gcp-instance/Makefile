@@ -10,7 +10,7 @@ apply: prepare ## setup free-tier eliglible Ubuntu instance
 
 CURRENT_ACCOUNT_SSH_USER := $(shell gcloud config get-value account | sed -E "s/[.@]/_/g")
 ssh: ## ssh to VM instance using ssh client via ssh key added to OS login
-	ssh -i ~/.ssh/id_rsa.cloud.vm $(CURRENT_ACCOUNT_SSH_USER)@$(shell terraform output public_ip)
+	ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=accept-new $(CURRENT_ACCOUNT_SSH_USER)@$(shell terraform output public_ip)
 
 gssh: ## ssh to VM instance using gcloud
 	gcloud compute ssh $(shell terraform output instance_name)
