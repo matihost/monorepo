@@ -307,6 +307,23 @@ all:
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh |bash
             }
+        - name: awsp
+          become: false
+          command: |
+            [ -e ~/bin/awsp_functions.sh  ] || {
+              cd ~/bin && curl -sSLO https://raw.githubusercontent.com/antonbabenko/awsp/master/awsp_functions.sh && chmod u+x awsp_functions.sh
+              AWSP_BASHRC='#AWS Profile Switcher (awsp)
+              source ~/bin/awsp_functions.sh
+              alias awsall="_awsListProfile"
+              alias awsp="_awsSetProfile"
+              alias awswho="aws configure list"
+              alias awswhoami="aws sts get-caller-identity"
+              alias awsgettoken="aws sts get-session-token"
+              complete -W "$(cat $HOME/.aws/credentials | grep -Eo '\[.*\]' | tr -d '[]')" _awsSwitchProfile
+              complete -W "$(cat $HOME/.aws/config | grep -Eo '\[.*\]' | tr -d '[]' | cut -d " " -f 2)" _awsSetProfile'
+              echo "${AWSP_BASHRC}" >> ~/.bashrc
+              echo "AWSP Installed"
+            }
         files_config:
         - file: /etc/gai.conf
           content: |
