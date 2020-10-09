@@ -11,9 +11,8 @@ apply: prepare ## setup user IAM roles and binding
 show-state: ## show terraform.state
 	terraform state list
 	terraform show
-	eval "$(shell terraform output ec2_user_data)"
 
-destroy: ## destroy ec2 instance
+destroy: ## destroy resources
 	export TF_VAR_project=$(CURRENT_PROJECT) && \
 	terraform plan && terraform destroy -auto-approve
 
