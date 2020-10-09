@@ -1,6 +1,4 @@
-WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
-apply: prepare ## setup IAM resources
-	export TF_VAR_external_access_ip=$(WHOAMI) && \
+apply: ## setup IAM resources
 	terraform init -upgrade=true && \
 	terraform validate && \
 	terraform plan -lock=false && \

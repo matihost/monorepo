@@ -1,6 +1,5 @@
 provider "aws" {
-  profile = "default"
-  region  = var.region
+  region = var.region
 }
 
 resource "aws_key_pair" "vm_key" {

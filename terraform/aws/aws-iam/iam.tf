@@ -1,6 +1,5 @@
 provider "aws" {
-  profile = "default"
-  region  = "us-east-1"
+  region = "us-east-1"
 }
 
 # Required to be able to set instance_profile on EC2 instance
@@ -33,7 +32,7 @@ resource "aws_iam_policy" "passInstanceProfile" {
 resource "aws_iam_policy" "decodeAuthorizedMessages" {
   name        = "AllowDecodeAuthorizationMessages"
   path        = "/"
-  description = "Allow to execute aws sts decode-authorization-message"
+  description = "Allow to execute aws sts decode-authorization-message "
 
   policy = <<-EOF
   {
@@ -138,6 +137,19 @@ resource "aws_iam_group_policy_attachment" "systemAdminPolicyToAdminGroup" {
 resource "aws_iam_group_policy_attachment" "networkAdminPolicyToAdminGroup" {
   group      = aws_iam_group.limitedAdmin.name
   policy_arn = "arn:aws:iam::aws:policy/job-function/NetworkAdministrator"
+}
+
+
+# IAM Admin group allow to define priviledges
+resource "aws_iam_group" "iamAdmin" {
+  name = "IamAdmin"
+  path = "/"
+}
+
+
+resource "aws_iam_group_policy_attachment" "iamFullAccessToIamAdminGroup" {
+  group      = aws_iam_group.iamAdmin.name
+  policy_arn = "arn:aws:iam::aws:policy/IAMFullAccess"
 }
 
 
