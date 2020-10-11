@@ -4,12 +4,11 @@ Setup minimal IAM resources:
 
 * Policy: _AllowPassingInstanceProfileToEC2_ to be able to pass instance profile to EC2 instance
 
-* Policy: _AllowDecodeAuthorizationMessages_ tp be able to decode encoded authorization errors
+* Policy: _AllowDecodeAuthorizationMessages_ to be able to decode encoded authorization errors
 
-* Group : _LimitedAdmin_ - it contains above policies, plus ViewOnlyAccess, network and system admin
+* Group : _IamAdmin_ - group allowing IAM modification, user and policies management
+* Group : _LimitedAdmin_ - it contains above policies, plus ViewOnlyAccess, network, lambda and system admin
   It does not allow IAM modifications - except IAMUserChangePassword (ability for an IAM user to change their own password).
-
-  IAM modifications are assumed to be performed only by root account or temporarily granted AdministratorAccess IAM User.
 
 * Roles and Instance Profiles:
 
@@ -17,6 +16,7 @@ Setup minimal IAM resources:
 
 **  _jenkins-master_ - should be applied to EC2 with Jenkins Master - so that Jenkins can spawn Jenkins Agent EC2.
 
+** _lambda-basic_ - role to be applied to Lambda, allowing accessing VPC resources
 Users management is not part of this setup.
 
 ## Prerequisites
