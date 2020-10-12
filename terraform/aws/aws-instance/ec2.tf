@@ -7,6 +7,10 @@ resource "random_id" "instance_id" {
   byte_length = 8
 }
 
+data "aws_vpc" "default" {
+  default = true
+}
+
 resource "aws_security_group" "private_access" {
   name        = "private_access"
   description = "Allow HTTP access from single computer and opens SSH"
@@ -16,21 +20,21 @@ resource "aws_security_group" "private_access" {
   }
 
   ingress {
-    description = "HTTP from laptop"
+    description = "HTTP from laptop or from within VPC"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["${var.external_access_ip}/32"]
+    cidr_blocks = ["${var.external_access_ip}/32", data.aws_vpc.default.cidr_block]
   }
   ingress {
-    description = "HTTP 8080 from laptop"
+    description = "HTTP 8080 from laptop or from within VPC"
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    cidr_blocks = ["${var.external_access_ip}/32"]
+    cidr_blocks = ["${var.external_access_ip}/32", data.aws_vpc.default.cidr_block]
   }
   ingress {
-    description = "SSH"
+    description = "SSH from anywhere"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -124,9 +128,8 @@ output "ec2_dns" {
   value = aws_instance.vm.public_dns
 }
 
-output "ec2_ssh" {
-  description = "Connect to bastion to be able to connect to other private only servers"
-  value       = format("ssh -i ~/.ssh/id_rsa.aws.vm ubuntu@%s", aws_instance.vm.public_dns)
+output "ec2_private_dns" {
+  value = aws_instance.vm.private_dns
 }
 
 output "ec2_user_data" {

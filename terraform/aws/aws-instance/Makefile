@@ -7,7 +7,7 @@ apply: prepare ## setup free-tier eliglible Ubuntu instance
 	terraform apply -auto-approve
 
 ssh: ## ssh to EC2 instance
-	eval "$(shell terraform output ec2_ssh)"
+	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(shell terraform output ec2_dns)
 
 test: ## test Nginx instance
 	curl http://$(shell terraform output ec2_dns):80
