@@ -55,7 +55,6 @@ all:
         - openssh-server
         - iftop
         - dosbox
-        - calibre
         - steam
         - virt-manager
         - awscli
@@ -255,6 +254,12 @@ all:
               sudo ln -sf ~/.kubectx/completion/kubectx.bash $COMPDIR/kubectx
               echo kubectx and kubens enabled
             )
+        - name: calibre
+          become: true
+          command: |
+            [ -x /usr/bin/calibre ] || {
+              wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | bash
+            }
         - name: kubectl plugins
           become: true
           command: |
