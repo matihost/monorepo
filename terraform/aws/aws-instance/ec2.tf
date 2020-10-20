@@ -13,7 +13,7 @@ data "aws_vpc" "default" {
 
 resource "aws_security_group" "private_access" {
   name        = "private_access"
-  description = "Allow HTTP access from single computer and opens SSH"
+  description = "Allow HTTP access from single computer or VPC and opens SSH"
 
   tags = {
     Name = "private_access"
@@ -133,6 +133,6 @@ output "ec2_private_dns" {
 }
 
 output "ec2_user_data" {
-  description = "Intance user_data (aka init config)"
+  description = "Instance user_data (aka init config)"
   value       = format("aws ec2 describe-instance-attribute --instance-id %s --attribute userData --output text --query \"UserData.Value\" | base64 --decode", aws_instance.vm.id)
 }

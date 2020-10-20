@@ -1,14 +1,16 @@
 VERSION := 1.0.0
-apply: ## setup cron triggered Lambda function
+apply: ## setup Lambda function testing EC2 instance HTTP port
+	export TF_VAR_lambda_version="$(VERSION)" && \
 	terraform init -upgrade=true && \
 	terraform validate && \
 	terraform plan -lock=false && \
 	terraform apply -auto-approve
 
 test: ## invoke Lambda programatically
-	//TODO
+	aws lambda invoke --function-name=synthetic-ec2-tester response.json && cat response.json
+	@-rm -rf response.json
 
-show-state: ## show terraform.state
+show-state: ## show terraform state
 	terraform state list
 	terraform show
 
