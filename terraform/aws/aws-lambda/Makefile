@@ -1,6 +1,8 @@
 VERSION := 1.0.0
+ENABLE_EVENTRULE_TRIGGER := true
 apply: ## setup Lambda function testing EC2 instance HTTP port
 	export TF_VAR_lambda_version="$(VERSION)" && \
+	export TF_VAR_enable_eventrule_lambda_trigger="$(ENABLE_EVENTRULE_TRIGGER)" && \
 	terraform init -upgrade=true && \
 	terraform validate && \
 	terraform plan -lock=false && \

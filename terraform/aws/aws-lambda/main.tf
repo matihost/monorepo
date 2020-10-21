@@ -12,7 +12,6 @@ variable "region" {
   description = "Preffered AWS region where resource need to be placed"
 }
 
-
 variable "lambda_version" {
   default     = "1.0.0"
   description = "Version of lambda code"
@@ -21,4 +20,10 @@ variable "lambda_version" {
 variable "lambda_function_name" {
   default     = "synthetic-ec2-tester"
   description = "Name of lambda function"
+}
+
+variable "enable_eventrule_lambda_trigger" {
+  default     = true
+  description = "If set to true, the lambda is triggered every minute via CloudWatch Event Rule"
+  type        = bool
 }
