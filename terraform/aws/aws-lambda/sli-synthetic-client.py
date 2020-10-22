@@ -31,8 +31,12 @@ def lambda_handler(event, context):
     """Entrypoint to AWS lambda execution."""
     ip_to_test = os.environ["IP_TO_TEST"]
     status, code, text = test_ec2_via_http(ip_to_test)
+    # Lamda response should follow:
+    # https://aws.amazon.com/premiumsupport/knowledge-center/malformed-502-api-gateway/
+    # in order to be consumable via API Gateway
     return {
-        'statusCode': status,
+        'statusCode': code,
+        'isBase64Encoded': False,
         'body': json.dumps({'status': status, 'text': text})
     }
 

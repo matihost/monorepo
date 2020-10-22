@@ -12,6 +12,9 @@ test: ## invoke Lambda programatically
 	aws lambda invoke --function-name=synthetic-ec2-tester response.json && cat response.json
 	@-rm -rf response.json
 
+test-api: ## invoke Lambda via API Gateway endpoint
+	curl `terraform output base_url`
+
 show-state: ## show terraform state
 	terraform state list
 	terraform show
@@ -24,8 +27,10 @@ build: ## prepare compressed Lambda function ready to be upload to s3
 	mkdir -p build
 	zip build/sli-synthetic-client.zip sli-synthetic-client.py
 
+update-lambda: build ## build new code for lambda and update it to s3
+	aws s3 cp build/sli-synthetic-client.zip s3://`cd prerequisites && terraform output lambda_bucket`/lambda/sli-synthetic-client/$(VERSION)/sli-synthetic-client.zip
 
-prepare: build ## prepare S3 bucket required by Lambda
+prepare: build ## prepare S3 bucket required by Lambda and upload lambda code to s3
 	@cd prerequisites && \
 	terraform init -upgrade=true && \
 	terraform validate && \
@@ -44,4 +49,4 @@ destroy-prerequisites:
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help apply destroy
+.PHONY: help apply destroy build

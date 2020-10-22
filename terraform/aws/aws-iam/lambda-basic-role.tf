@@ -29,9 +29,3 @@ resource "aws_iam_role_policy_attachment" "lambda-basic-vpc-access" {
   role       = aws_iam_role.lambda-basic.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
-
-# Add Lambda Admin role to LimitedAdmin
-resource "aws_iam_group_policy_attachment" "lambdaFullAccessToLimiteAdmin" {
-  group      = aws_iam_group.limitedAdmin.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSLambdaFullAccess"
-}

@@ -2,7 +2,11 @@
 
 Setup a Lambda Function in default VPC (us-east-1) emulating a client hitting EC2 instance.
 
-Optionally the Lambda is automatically triggered every minute via CloudWatch Event Rule Trigger.
+Optionally setup the Lambda triggers:
+
+* CloudWatch Event Rule Trigger - invoke lamda every minute
+
+* API Gateway - expose lambda as REST endpoint
 
 Use AWS resources eliglible to AWS Free Tier __only__.
 
@@ -29,12 +33,12 @@ aws configure
 # prepare S3 bucket required by Lambda
 make prepare
 
-# setup Lambda function testing EC2 instance HTTP port triggered every minute periodically
+# setup Lambda function testing EC2 instance HTTP port triggered by CloudWatch EventRule every minute and via API Gateway
 make apply
 # same as above
 make apply ENABLE_EVENTRULE_TRIGGER=true
 
-# setup Lambda function w/o CloudWatch Event Rule trigger
+# setup Lambda function w/o CloudWatch Event Rule trigger (API Gateway exposure still enabled)
 make apply ENABLE_EVENTRULE_TRIGGER=false
 
 # invoke Lambda programatically
@@ -43,8 +47,8 @@ make test
 # show Terraform state
 make show-state
 
-# to rebuild lambda .zip file (to redeploy new version of sli-synthetic-client.py)
-make build && make apply
+# to rebuild lambda .zip file, upload it to s3 and redeploy lamda to new version
+make update-lambda && make apply
 
 # terminates all AWS resource created with apply task, it also terminates S3 bucket done by make prepare
 make destroy
