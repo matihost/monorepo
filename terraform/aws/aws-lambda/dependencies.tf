@@ -2,6 +2,9 @@
 data "aws_iam_role" "lambda-basic" {
   name = "lambda-basic"
 }
+data "aws_iam_role" "apigateway-cloudwatch" {
+  name = "apigateway-cloudwatch"
+}
 
 # assumes aws-instance was run
 data "aws_security_group" "private_access" {
