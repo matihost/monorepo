@@ -196,7 +196,8 @@ if ! minikube status &>/dev/null; then
   # do no use --cni=cilium as it breaks network connectivity
   # it is more robust to setup network-plugin to cni and install CNI driver itself
   if [[ "${EXTRA_PARAMS}" == *'network-plugin'* ]]; then
-    helm install cilium cilium/cilium --namespace kube-system "$([ "${MODE}" == 'crio' ] && echo '--set global.containerRuntime.integration=crio')"
+    # shellcheck disable=SC2046
+    helm install cilium cilium/cilium --namespace kube-system $([ "${MODE}" == 'crio' ] && echo '--set global.containerRuntime.integration=crio')
   fi
 
   for ADDON in ${ADDONS}; do
