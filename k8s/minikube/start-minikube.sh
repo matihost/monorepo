@@ -42,7 +42,7 @@ function ensureDockerCGroupSystemD() {
 }
 
 function ensureCrioAndCrictlPresent() {
-  CRIO_VERSION=1.17
+  CRIO_VERSION=1.19
   [ -x /usr/local/bin/crictl ] || (
     CRICTL_VERSION=$(git ls-remote -t https://github.com/kubernetes-sigs/cri-tools.git | cut -d'/' -f3 | sort -n | tail -n 1)
     wget "https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz"
@@ -53,19 +53,34 @@ function ensureCrioAndCrictlPresent() {
   [ -x /usr/bin/crio ] || (
     # shellcheck disable=SC1091
     . /etc/os-release
-    sudo sh -c "echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x${NAME}_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list"
+
+    sudo sh -c "echo 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x${NAME}_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list"
     wget -nv "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x${NAME}_${VERSION_ID}/Release.key" -O Release.key
     sudo apt-key add Release.key
     rm -f Release.key
+
+    sudo sh -c "echo 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/${CRIO_VERSION}/x${NAME}_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:crio:stable.list"
+    wget -nv "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/${CRIO_VERSION}/x${NAME}_${VERSION_ID}/Release.key" -O Release.key
+    sudo apt-key add Release.key
+    rm -f Release.key
+
     sudo apt-get update -qq
-    sudo apt-get install -y cri-o-${CRIO_VERSION} podman buildah
+    sudo apt-get install -y cri-o cri-o-runc podman buildah
   )
   [ -x /opt/cni/bin/bridge ] || (
     sudo apt -y install containernetworking-plugins
   )
 
-  #TODO remove when fixed https://github.com/cri-o/cri-o/issues/1767
+  # ensure runc and conmon binaries for CRIO are on sysmte path
+  # related to https://github.com/cri-o/cri-o/issues/1767
   [ -e /usr/bin/runc ] || sudo ln -s /usr/sbin/runc /usr/bin/runc
+  [ -e /usr/bin/conmon ] || sudo ln -s /usr/libexec/podman/conmon /usr/bin/conmon
+
+  # minikube uses cilium as CNI provider when crio mode is enabled
+  [ "$(helm repo list | grep -c cilium)" -eq 0 ] && {
+    helm repo add cilium https://helm.cilium.io/
+    helm repo update
+  }
 }
 
 function ensureIstioctlIsPresent() {
@@ -76,7 +91,7 @@ function ensureIstioctlIsPresent() {
   )
 }
 
-# minikube addons enable ingress - stopped working for "none" minikue driver
+# minikube addons enable ingress - stopped working for "none" minikube driver
 # ingress controlles needs to be installed manually
 function addNginxIngress() {
   [ -x /usr/local/bin/helm ] || {
@@ -124,7 +139,7 @@ set -- "${PARAMS[@]}" # restore positional parameters
 case "${MODE}" in
 crio)
   ensureCrioAndCrictlPresent
-  EXTRA_PARAMS='--container-runtime=cri-o --enable-default-cni'
+  EXTRA_PARAMS='--container-runtime=cri-o --network-plugin=cilium'
   ;;
 docker)
   ensureDockerCGroupSystemD
@@ -170,6 +185,10 @@ if ! minikube status &>/dev/null; then
   [ "$(sudo systemctl is-enabled kubelet)" == 'enabled' ] &&
     sudo systemctl disable kubelet && echo "Disabled Minikube from auto startup on boot"
 
+  # install Cilium daemon set for CRIO
+  if [ "${MODE}" == 'crio' ]; then
+    helm install cilium cilium/cilium --namespace kube-system --set global.containerRuntime.integration=crio
+  fi
   for ADDON in ${ADDONS}; do
     if [ "${ADDON}" == 'istio' ]; then
       ensureIstioctlIsPresent

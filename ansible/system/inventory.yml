@@ -215,6 +215,7 @@ all:
               helm repo add stable https://kubernetes-charts.storage.googleapis.com/
               helm repo add nginx-stable https://helm.nginx.com/stable
               helm repo add jenkinsci https://charts.jenkins.io
+              helm repo add cilium https://helm.cilium.io/
               helm repo update
             }
         - name: minikube

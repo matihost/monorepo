@@ -31,7 +31,7 @@ data:
   tls.key: $(base64 -w 0 /tmp/echoserver.learning.minikube.key)
 type: kubernetes.io/tls
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: echoserver
@@ -47,9 +47,12 @@ spec:
     http:
       paths:
       - path: /
+        pathType: Prefix
         backend:
-          serviceName: echoserver
-          servicePort: 80" |
+          service:
+            name: echoserver
+            port:
+              number: 80" |
     kubectl apply -f - -n learning
 
   while [ -z "$(kubectl get ingress echoserver -n learning -o jsonpath="{.status..ip}" | xargs)" ]; do
