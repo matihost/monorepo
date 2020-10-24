@@ -5,7 +5,7 @@
 }
 
 function usage() {
-  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-crio|crio|c] [--with-docker | docker | d] [--with-istio | istio]
+  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-crio|crio|c] [--with-docker | docker | d] [--with-cni] [--with-istio | istio]
 
 Starts Minikube in bare / none mode. Assume latest Ubuntu.
 
@@ -13,12 +13,15 @@ Samples:
 # start Minikube with docker
 $(basename "$0") --with-docker
 
+# start Minikube with docker with CNI (enables NetworkPolicy)
+$(basename "$0") --with-docker --with-cni
+
 # start Minikube with docker and Istio enabled
 $(basename "$0") --with-docker --with-istio
 or
 $(basename "$0") docker istio
 
-# start with Crio as container engine
+# start with Crio as container engine (implies CNI aka enables NetworkPolicy)
 $(basename "$0") --with-crio
 
 # start with Crio as container engine with Istio
@@ -114,6 +117,7 @@ function addNginxIngress() {
 ensureMinikubePresent
 MODE=''
 ADDONS="registry dashboard"
+EXTRA_PARAMS=''
 
 while [[ "$#" -gt 0 ]]; do
   case $1 in
@@ -126,6 +130,9 @@ while [[ "$#" -gt 0 ]]; do
     ;;
   --with-docker | docker | d)
     MODE='docker'
+    ;;
+  --with-cni)
+    EXTRA_PARAMS='--network-plugin=cni'
     ;;
   --with-istio | istio)
     ADDONS="${ADDONS} istio"
@@ -143,7 +150,6 @@ crio)
   ;;
 docker)
   ensureDockerCGroupSystemD
-  EXTRA_PARAMS=''
   ;;
 *)
   usage
@@ -169,6 +175,7 @@ if ! minikube status &>/dev/null; then
   # Added --extra-config=kubelet.resolv-conf=/run/systemd/resolve/resolv.conf due to  https://coredns.io/plugins/loop/
   # because under Ubuntu systemd-resolved service conflicts create a loop between CodeDNS and systemc DNS wrapper systemd-resolved.
   # TODO replace usage of /run/systemd/resolve/resolv.conf with some temporary file withot any 127.0.0.x entries ,because CRC add dnsmasq
+  # shellcheck disable=SC2086
   sudo -E minikube start --vm-driver=none --apiserver-ips 127.0.0.1 --apiserver-name localhost \
     --kubernetes-version='latest' \
     --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook,PodSecurityPolicy" \
@@ -185,10 +192,13 @@ if ! minikube status &>/dev/null; then
   [ "$(sudo systemctl is-enabled kubelet)" == 'enabled' ] &&
     sudo systemctl disable kubelet && echo "Disabled Minikube from auto startup on boot"
 
-  # install Cilium daemon set for CRIO
-  if [ "${MODE}" == 'crio' ]; then
-    helm install cilium cilium/cilium --namespace kube-system --set global.containerRuntime.integration=crio
+  # install Cilium daemon set for CRIO or CNI mode
+  # do no use --cni=cilium as it breaks network connectivity
+  # it is more robust to setup network-plugin to cni and install CNI driver itself
+  if [[ "${EXTRA_PARAMS}" == *'network-plugin'* ]]; then
+    helm install cilium cilium/cilium --namespace kube-system "$([ "${MODE}" == 'crio' ] && echo '--set global.containerRuntime.integration=crio')"
   fi
+
   for ADDON in ${ADDONS}; do
     if [ "${ADDON}" == 'istio' ]; then
       ensureIstioctlIsPresent
