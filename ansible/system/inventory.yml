@@ -5,6 +5,7 @@ all:
       hosts:
         localhost:
       vars:
+        virtual_interface_ip: 192.168.10.1
         update_cache_timeout: 300
         systemd_journal:
           max_size: 1G
@@ -37,6 +38,7 @@ all:
         packages:
         - brasero
         - autofs
+        - bind9
         - cifs-utils
         - dlocate
         - ubuntu-restricted-extras
@@ -104,6 +106,19 @@ all:
         - yamllint
         - youtube-dl
         clis:
+        - name: virtual-network-interface
+          desc: To ensure there is a virtual interface with stable IP
+          become: true
+          command: |
+            [[ "$(nmcli -f ip4.address c s br0 2>/dev/null)" =~ {{ virtual_interface_ip }} ]] || {
+              nmcli conn add type bridge con-name br0 ifname br0
+              nmcli conn modify br0 ipv4.addresses '{{ virtual_interface_ip }}/24'
+              nmcli conn modify br0 ipv4.gateway '{{ virtual_interface_ip }}'
+              nmcli conn modify br0 ipv4.dns '{{ virtual_interface_ip }}'
+              nmcli conn modify br0 ipv4.method manual
+              nmcli conn modify br0 ipv4.never-default yes
+              nmcli conn modify br0 connection.autoconnect yes
+            }
         - name: vboxuser
           desc: To ensure VBox can see host USB
           become: false
