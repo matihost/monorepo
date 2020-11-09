@@ -99,7 +99,7 @@ function ensureIstioctlIsPresent() {
 function addNginxIngress() {
   [ -x /usr/local/bin/helm ] || {
     curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
-    helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+    helm repo add stable https://charts.helm.sh/stable
     helm repo add nginx-stable https://helm.nginx.com/stable
     helm repo update
   }
@@ -196,8 +196,10 @@ if ! minikube status &>/dev/null; then
   # do no use --cni=cilium as it breaks network connectivity
   # it is more robust to setup network-plugin to cni and install CNI driver itself
   if [[ "${EXTRA_PARAMS}" == *'network-plugin'* ]]; then
+    # Set cilium/cilium help config: operator.numReplicas=1
+    # because there is antiAffinity rule so that minikube cannot run 2 instances on single node
     # shellcheck disable=SC2046
-    helm install cilium cilium/cilium --namespace kube-system $([ "${MODE}" == 'crio' ] && echo '--set global.containerRuntime.integration=crio')
+    helm install cilium cilium/cilium --namespace kube-system --set operator.numReplicas=1 $([ "${MODE}" == 'crio' ] && echo '--set global.containerRuntime.integration=crio')
   fi
 
   for ADDON in ${ADDONS}; do
