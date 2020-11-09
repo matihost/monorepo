@@ -1,7 +1,7 @@
 data "google_container_engine_versions" "rapid" {
   provider = google-beta
   // version differ per region or zonal cluster
-  location       = var.regional_cluster ? var.region : local.zone
+  location       = local.location
   version_prefix = "1.18."
 
   project = var.project
@@ -14,7 +14,7 @@ resource "google_container_cluster" "gke" {
   description = "GKE Cluster ${local.gke_name}"
   # When zone, provided cluster is zonal, when region provider cluster is redional.
   # Regional cluster has a charge fee.
-  location = var.regional_cluster ? var.region : local.zone
+  location = local.location
 
   // network and subnetwork, for Shared VPC, set this to the self link of the shared network.
   network    = google_compute_network.private-gke.name
@@ -60,13 +60,19 @@ resource "google_container_cluster" "gke" {
     enabled = true
     resource_limits {
       resource_type = "cpu"
-      minimum       = 1
-      maximum       = 1
+      minimum       = 2
+      maximum       = 24
     }
     resource_limits {
       resource_type = "memory"
-      minimum       = 1
-      maximum       = 1
+      minimum       = 4
+      maximum       = 48
+    }
+    auto_provisioning_defaults {
+      oauth_scopes = [
+        "https://www.googleapis.com/auth/cloud-platform"
+      ]
+      service_account = google_service_account.gke-sa.email
     }
   }
 
@@ -143,7 +149,6 @@ resource "google_container_cluster" "gke" {
   # default_snat_status {
   #   disabled = false
   # }
-  # TODO finished here  -
 
   maintenance_policy {
     daily_maintenance_window {
@@ -153,12 +158,19 @@ resource "google_container_cluster" "gke" {
 }
 
 resource "google_container_node_pool" "gke_nodes" {
-  name    = "compute"
-  cluster = google_container_cluster.gke.name
+  name       = "compute"
+  location   = local.location
+  cluster    = google_container_cluster.gke.name
+  node_count = 1
 
   node_config {
     # preemptible  = true
-    machine_type = "e2-medium"
+    # use 4cores and 16 GB ram, e2-medium - 2 cores and 4 GB RAM is too small for all apps running on node
+    machine_type = "e2-standard-4"
+    # machine_type = "e2-medium"
+
+    # valid image types: gcloud container get-server-config
+    image_type = "UBUNTU"
 
     metadata = {
       disable-legacy-endpoints = "true"
@@ -172,11 +184,13 @@ resource "google_container_node_pool" "gke_nodes" {
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]
+
+    service_account = google_service_account.gke-sa.email
   }
 
   autoscaling {
     min_node_count = 1
-    max_node_count = 3
+    max_node_count = 5
   }
 }
 

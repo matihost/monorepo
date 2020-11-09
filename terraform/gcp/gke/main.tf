@@ -8,6 +8,7 @@ provider "google" {
 locals {
   zone     = "${var.region}-${var.zone_letter}"
   gke_name = "${var.cluster_name}-${var.env}"
+  location = var.regional_cluster ? var.region : local.zone
 }
 
 variable "region" {
