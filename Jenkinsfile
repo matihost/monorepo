@@ -60,7 +60,7 @@ spec:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
   - name: kubectl
-    image: mirror.gcr.io/bitnami/kubectl:latest
+    image: bitnami/kubectl:latest
     command:
     - sleep
     args:
