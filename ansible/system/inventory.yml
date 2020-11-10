@@ -31,10 +31,9 @@ all:
             deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.19/x{{ ansible_distribution }}_20.04/ /
           key_url: >-
             https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.19/x{{ ansible_distribution }}_20.04/Release.key
-        # TODO reenable when 20.10 Ubuntu is supported
-        # - name: terraform
-        #   repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
-        #   key_url: "https://apt.releases.hashicorp.com/gpg"
+        - name: terraform
+          repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+          key_url: "https://apt.releases.hashicorp.com/gpg"
         packages:
         - brasero
         - autofs
