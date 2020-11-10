@@ -1,4 +1,6 @@
 ---
+# Helm chart config: helm show chart jenkinsci/jenkins
+# Current chart version: 2.17.1
 # Default values for jenkinsci/jenkins chart:
 # helm show values jenkinsci/jenkins
 namespaceOverride: ci
@@ -20,21 +22,22 @@ master:
       - {{ jenkins_ingress }}
 
   installPlugins:
-  - kubernetes:1.27.1.1
+  # kubernetes:1.18.0 requires Jenkins 2.263 (aka weekly), while LTS is 2.249
+  - kubernetes:1.27.5
   - workflow-job:2.40
   - workflow-aggregator:2.6
-  - credentials-binding:1.23
-  - git:4.4.3
-  - configuration-as-code:1.43
-  - timestamper:1.11.5
-  - github-branch-source:2.9.0
-  - matrix-auth:2.6.3
-  - prometheus:2.0.7
+  - credentials-binding:1.24
+  - git:4.4.5
+  - configuration-as-code:1.46
+  - timestamper:1.11.8
+  - github-branch-source:2.9.1
+  - matrix-auth:2.6.4
+  - prometheus:2.0.8
   - simple-theme-plugin:0.6
   - jdk-tool:1.4
-  - command-launcher:1.4
+  - command-launcher:1.5
 
-  initializeOnce: true
+  initializeOnce: false
 
   resources:
     requests:

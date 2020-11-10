@@ -91,7 +91,8 @@ all:
         - flake8-docstrings
         - flake8-2020
         - openshift
-        - kubernetes
+        # do not update kubernetes itself to latest as it is not compatible with openhishift / k8s module
+        # - kubernetes
         - kubernetes-validate
         - "molecule[lint]"
         - "molecule[docker]"
