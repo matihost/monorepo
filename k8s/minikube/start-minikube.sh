@@ -199,7 +199,7 @@ if ! minikube status &>/dev/null; then
     # Set cilium/cilium help config: operator.numReplicas=1
     # because there is antiAffinity rule so that minikube cannot run 2 instances on single node
     # shellcheck disable=SC2046
-    helm install cilium cilium/cilium --namespace kube-system --set operator.numReplicas=1 $([ "${MODE}" == 'crio' ] && echo '--set global.containerRuntime.integration=crio')
+    helm install cilium cilium/cilium --namespace kube-system --set operator.replicas=1 $([ "${MODE}" == 'crio' ] && echo '--set global.containerRuntime.integration=crio')
   fi
 
   for ADDON in ${ADDONS}; do
