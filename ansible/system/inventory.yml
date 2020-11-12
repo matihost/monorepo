@@ -15,6 +15,11 @@ all:
         - name: multiverse
         - name: vscode
           repo: "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main"
+        - name: teams
+          repo: "deb [arch=amd64] https://packages.microsoft.com/repos/ms-teams stable main"
+        - name: skype
+          repo: "deb [arch=amd64] https://repo.skype.com/deb stable main"
+          key_url: https://repo.skype.com/data/SKYPE-GPG-KEY
         # TODO reenable when 20.10 Ubuntu is supported
         # - name: virtualbox
         #   repo: >-
@@ -41,6 +46,7 @@ all:
         - cifs-utils
         - dlocate
         - ubuntu-restricted-extras
+        - gnome-shell-extensions
         - grub-customizer
         - hplip
         - hplip-gui
@@ -77,6 +83,9 @@ all:
         - podman
         - buildah
         - terraform
+        - notepadqq
+        - teams
+        - skypeforlinux
         snaps:
         - mc-installer
         - minecraft-server-jdstrand
