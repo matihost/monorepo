@@ -60,14 +60,17 @@ resource "google_container_cluster" "gke" {
     enabled = true
     resource_limits {
       resource_type = "cpu"
-      minimum       = 2
+      minimum       = 0
       maximum       = 24
     }
     resource_limits {
       resource_type = "memory"
-      minimum       = 4
+      minimum       = 0
       maximum       = 48
     }
+    # whether the cluster autoscaler should optimize for resource utilization (OPTIMIZE_UTILIZATION)
+    # or resource availability (BALANCED) when deciding to remove nodes from a cluster
+    autoscaling_profile = "OPTIMIZE_UTILIZATION"
     auto_provisioning_defaults {
       oauth_scopes = [
         "https://www.googleapis.com/auth/cloud-platform"
@@ -76,7 +79,8 @@ resource "google_container_cluster" "gke" {
     }
   }
 
-  # Binary Authorization (requires anthos addon) - a system providing policy control for images deployed to Kubernetes Engine clusters.
+  # Binary Authorization (requires anthos addon) - a system providing policy control for images
+  # deployed to Kubernetes Engine clusters.
   # enable_binary_authorization = true
 
   enable_shielded_nodes = true
