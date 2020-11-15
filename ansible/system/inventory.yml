@@ -347,6 +347,17 @@ all:
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh |bash
             }
+        - name: gnome-dark-theme
+          become: false
+          desc: To ensure Ubuntu is fully in dark theme
+          command: |
+            CURRENT_VALUE="$(gsettings get org.gnome.shell.extensions.user-theme name 2>/dev/null)"
+            [ "${CURRENT_VALUE}" = "'Yaru-dark'" ] || {
+              gsettings set org.gnome.shell enabled-extensions "['desktop-icons@csoriano', 'user-theme@gnome-shell-extensions.gcampax.github.com']"
+              gsettings set org.gnome.shell.extensions.user-theme name 'Yaru-dark'
+              gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark'
+              echo "Dark theme for Ubuntu Gnome has bee set"
+            }
         - name: awsp
           become: false
           command: |
