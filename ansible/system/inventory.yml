@@ -17,9 +17,12 @@ all:
           repo: "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main"
         - name: teams
           repo: "deb [arch=amd64] https://packages.microsoft.com/repos/ms-teams stable main"
-        - name: skype
+        - name: skype-stable
           repo: "deb [arch=amd64] https://repo.skype.com/deb stable main"
           key_url: https://repo.skype.com/data/SKYPE-GPG-KEY
+        - name: google-chrome
+          repo: "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main"
+          key_url: https://dl.google.com/linux/linux_signing_key.pub
         # TODO reenable when 20.10 Ubuntu is supported
         # - name: virtualbox
         #   repo: >-
@@ -85,7 +88,9 @@ all:
         - terraform
         - notepadqq
         - teams
-        - skypeforlinux
+        # Skipped packages:
+        # - skypeforlinux
+        # - google-chrome-stable
         snaps:
         - mc-installer
         - minecraft-server-jdstrand
