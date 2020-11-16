@@ -30,7 +30,7 @@
     </dependency>
     <dependency>
       <groupId>org.scalatestplus</groupId>
-      <artifactId>junit-4-12_${scala.compat.version}</artifactId>
+      <artifactId>junit-4-13_${scala.compat.version}</artifactId>
       <version>${scala.test.plus.version}</version>
       <scope>test</scope>
     </dependency>
