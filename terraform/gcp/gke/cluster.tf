@@ -85,11 +85,20 @@ resource "google_container_cluster" "gke" {
 
   enable_shielded_nodes = true
 
+  # Allocate IPs in our subnetwork
   ip_allocation_policy {
+    cluster_secondary_range_name  = google_compute_subnetwork.private-gke.secondary_ip_range.0.range_name
+    services_secondary_range_name = google_compute_subnetwork.private-gke.secondary_ip_range.1.range_name
   }
   networking_mode = "VPC_NATIVE"
 
+  # Disable basic authentication and cert-based authentication.
+  # Empty fields for username and password are how to "disable" the
+  # credentials from being generated.
   master_auth {
+    username = ""
+    password = ""
+
     client_certificate_config {
       issue_client_certificate = false
     }
@@ -159,6 +168,17 @@ resource "google_container_cluster" "gke" {
       start_time = "03:00"
     }
   }
+
+  // Allow plenty of time for each operation to finish (default was 10m)
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "30m"
+  }
+
+  depends_on = [
+    google_compute_router_nat.nat,
+  ]
 }
 
 resource "google_container_node_pool" "gke_nodes" {
@@ -167,16 +187,28 @@ resource "google_container_node_pool" "gke_nodes" {
   cluster    = google_container_cluster.gke.name
   node_count = 1
 
+  # Repair any issues but don't auto upgrade node versions
+  management {
+    auto_repair = true
+    # Auto_upgrade cannot be false when release_channel RAPID is set
+    auto_upgrade = true
+  }
+
   node_config {
     # preemptible  = true
     # use 4cores and 16 GB ram, e2-medium - 2 cores and 4 GB RAM is too small for all apps running on node
     machine_type = "e2-standard-4"
     # machine_type = "e2-medium"
+    # disk_type    = "pd-ssd"
+    disk_size_gb = 30
 
     # valid image types: gcloud container get-server-config
     image_type = "UBUNTU"
 
     metadata = {
+      // Set metadata on the VM to supply more entropy
+      google-compute-enable-virtio-rng = "true"
+      // Explicitly remove GCE legacy metadata API endpoint
       disable-legacy-endpoints = "true"
     }
 
@@ -190,6 +222,11 @@ resource "google_container_node_pool" "gke_nodes" {
     ]
 
     service_account = google_service_account.gke-sa.email
+
+    // Enable workload identity on this node pool
+    workload_metadata_config {
+      node_metadata = "GKE_METADATA_SERVER"
+    }
   }
 
   autoscaling {
@@ -198,7 +235,15 @@ resource "google_container_node_pool" "gke_nodes" {
   }
 }
 
+output "gke_name" {
+  value = google_container_cluster.gke.name
+}
 
 output "gke_master_endpoint" {
   value = google_container_cluster.gke.endpoint
+}
+
+
+output "gke_connect_cmd" {
+  value = format("gcloud container clusters get-credentials %s --zone %s --internal-ip", google_container_cluster.gke.name, local.zone)
 }

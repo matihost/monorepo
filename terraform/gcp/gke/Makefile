@@ -5,8 +5,8 @@ apply: ## setup GKE cluster
 	terraform init -upgrade=true && \
 	terraform validate && \
 	terraform plan -lock=false && \
-	terraform apply -auto-approve
-
+	terraform apply -auto-approve && \
+	echo "Run 'source access-gke.sh' to setup GKE access for kubectl etc. commands in current shell"
 
 show-state: ## show terraform.state
 	terraform state list
