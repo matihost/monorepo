@@ -5,21 +5,16 @@
 }
 
 function usage() {
-  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-crio|crio|c] [--with-docker | docker | d] [--with-cni] [--with-istio | istio]
+  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-crio|crio|c] [--with-docker | docker | d] [--with-cni] [--with-istio | istio] [--with-gatekeeper | gatekeeper]
 
-Starts Minikube in bare / none mode. Assume latest Ubuntu.
+Starts Minikube in bare / none mode. Assumes latest Ubuntu.
 
 Samples:
-# start Minikube with docker
+# start Minikube with docker minimum set of features (PSP, Nginx Ingress)
 $(basename "$0") --with-docker
 
-# start Minikube with docker with CNI (enables NetworkPolicy)
-$(basename "$0") --with-docker --with-cni
-
-# start Minikube with docker and Istio enabled
-$(basename "$0") --with-docker --with-istio
-or
-$(basename "$0") docker istio
+# start Minikube with docker maxmimum set of features (PSP, Nginx Ingress, NetworkPolicy via CNI/Cilium, Istio, Gatekeeper)
+$(basename "$0")-
 
 # start with Crio as container engine (implies CNI aka enables NetworkPolicy)
 $(basename "$0") --with-crio
@@ -94,6 +89,15 @@ function ensureIstioctlIsPresent() {
   )
 }
 
+function installGatekeeper() {
+  [ "$(helm repo list | grep -c gatekeeper)" -eq 0 ] && {
+    helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
+    helm repo update
+  }
+  # Set replicas to 1 as for minikube HA for gatekeeper is less important than memory usage
+  helm install gatekeeper gatekeeper/gatekeeper --namespace kube-system --set replicas=1
+}
+
 # minikube addons enable ingress - stopped working for "none" minikube driver
 # ingress controlles needs to be installed manually
 function addNginxIngress() {
@@ -111,6 +115,18 @@ function addNginxIngress() {
     # start Nginx ingress with PodSecurityPolicy: https://kubernetes.github.io/ingress-nginx/examples/psp/
     kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/docs/examples/psp/psp.yaml
     helm install -f ngnix.values.yaml ingress-nginx nginx-stable/nginx-ingress -n ingress-nginx
+    # TODO workaound, remove when Nginx chart > 0.7.0 is released
+    echo '
+apiVersion: networking.k8s.io/v1beta1
+kind: IngressClass
+metadata:
+  name: nginx
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true"
+spec:
+  controller: nginx.org/ingress-controller
+' | kubectl apply -f -
+
   }
 }
 
@@ -136,6 +152,9 @@ while [[ "$#" -gt 0 ]]; do
     ;;
   --with-istio | istio)
     ADDONS="${ADDONS} istio"
+    ;;
+  --with-gatekeeper | gatekeeper)
+    ADDONS="${ADDONS} gatekeeper"
     ;;
   *) PARAMS+=("$1") ;; # save it in an array for later
   esac
@@ -206,11 +225,18 @@ if ! minikube status &>/dev/null; then
     if [ "${ADDON}" == 'istio' ]; then
       ensureIstioctlIsPresent
       istioctl operator init
+      minikube addons enable istio
+    elif [ "${ADDON}" != 'gatekeeper' ]; then # skip gatekeeper, as it needs to be installer last
+      minikube addons enable "${ADDON}"
     fi
-    minikube addons enable "${ADDON}"
   done
 
   addNginxIngress
+
+  # OPA Gatekeeper should be last as its installation make API timeouting for next calls for short period of time
+  if [[ "${ADDONS}" == *'gatekeeper'* ]]; then
+    installGatekeeper
+  fi
 else
   echo "Minikube already started"
 fi
