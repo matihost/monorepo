@@ -54,7 +54,7 @@
 
     <!-- Scala -->
     <scala.compat.version>2.13</scala.compat.version>
-    <scala.version>${scala.compat.version}.3</scala.version>
+    <scala.version>${scala.compat.version}.4</scala.version>
     <!-- TODO fix scala.spec2.version and scata.test.version incompatibilities in transitive dependencies-->
     <scala.spec2.version>4.10.5</scala.spec2.version>
     <scala.test.version>3.2.3</scala.test.version>
