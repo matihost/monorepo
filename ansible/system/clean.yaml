@@ -2,7 +2,6 @@
 - hosts: local
   gather_facts: true
   tasks:
-  #TODO ensure SystemMaxUse=1G RuntimeMaxUse=1G are set in /etc/systemd/journald.conf
   - name: Clean systemd journal /var/log/journal logs
     shell:
       journalctl --vacuum-size={{ systemd_journal.max_size }} --vacuum-time={{ systemd_journal.max_duration }} --rotate

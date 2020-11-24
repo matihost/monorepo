@@ -361,7 +361,30 @@ all:
               gsettings set org.gnome.shell enabled-extensions "['desktop-icons@csoriano', 'user-theme@gnome-shell-extensions.gcampax.github.com']"
               gsettings set org.gnome.shell.extensions.user-theme name 'Yaru-dark'
               gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark'
-              echo "Dark theme for Ubuntu Gnome has bee set"
+              echo "Dark theme for Ubuntu Gnome has been set"
+            }
+        - name: gnome-config
+          become: false
+          desc: To ensure Gnome config is optimal one
+          command: |
+            CURRENT_VALUE="$(gsettings get org.gnome.desktop.thumbnail-cache maximum-age 2>/dev/null)"
+            [ "${CURRENT_VALUE}" -eq 30 ] || {
+              gsettings set org.gnome.desktop.thumbnail-cache maximum-age 30
+              gsettings set org.gnome.desktop.thumbnail-cache maximum-size 128
+              echo "Ubuntu Gnome thumbnail cache settings have been set"
+            }
+        - name: log-rotate-config
+          become: true
+          desc: To ensure Ubuntu has not too much system logs
+          command: |
+            CURRENT_VALUE="$(grep -c 'rotate [2-9]' /etc/logrotate.d/rsyslog 2>/dev/null)"
+            [ "${CURRENT_VALUE}" -eq 0 ] || {
+              sed -i 's/rotate .$/rotate 1/g' /etc/logrotate.d/rsyslog /etc/logrotate.conf
+              sed -i 's/weekly/daily/g' /etc/logrotate.d/rsyslog /etc/logrotate.conf
+              sed -i 's/#SystemMaxFiles=.*$/SystemMaxFiles=7/g' /etc/systemd/journald.conf
+              sed -i 's/#SystemMaxUse=.*$/SystemMaxUse={{ systemd_journal.max_size }}/g' /etc/systemd/journald.conf
+              sed -i 's/#RuntimeMaxUse=.*$/RuntimeMaxUse={{ systemd_journal.max_size }}/g' /etc/systemd/journald.conf
+              echo "Ubuntu log rotate config has been changed"
             }
         - name: awsp
           become: false
