@@ -32,9 +32,10 @@ spec:
   # EchoServer has to run as root hence it requires psp:privileged
   echo "---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
   name: learning:privileged
+  namespace: learning
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

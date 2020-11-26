@@ -1,6 +1,6 @@
 ---
 # Helm chart config: helm show chart jenkinsci/jenkins
-# Current chart version: 2.17.1
+# Current chart version: 2.19.0
 # Default values for jenkinsci/jenkins chart:
 # helm show values jenkinsci/jenkins
 namespaceOverride: ci
@@ -23,7 +23,7 @@ master:
 
   installPlugins:
   # kubernetes:1.18.0 requires Jenkins 2.263 (aka weekly), while LTS is 2.249
-  - kubernetes:1.27.5
+  - kubernetes:1.27.6
   - workflow-job:2.40
   - workflow-aggregator:2.6
   - credentials-binding:1.24
@@ -131,7 +131,7 @@ master:
 agent:
   #TODO jenkins/inbound-agent mirrored image dissapeared from mirror.gcr.io
   # image: "mirror.gcr.io/jenkins/inbound-agent"
-  # tag: "4.3-4"
+  # tag: "4.6-1"
   image: "jenkins/inbound-agent"
   tag: "alpine"
   resources:

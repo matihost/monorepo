@@ -14,7 +14,7 @@ Samples:
 $(basename "$0") --with-docker
 
 # start Minikube with docker maxmimum set of features (PSP, Nginx Ingress, NetworkPolicy via CNI/Cilium, Istio, Gatekeeper)
-$(basename "$0")-
+$(basename "$0") --with-docker --with-cni --with-gatekeeper --with-istio
 
 # start with Crio as container engine (implies CNI aka enables NetworkPolicy)
 $(basename "$0") --with-crio
@@ -115,18 +115,6 @@ function addNginxIngress() {
     # start Nginx ingress with PodSecurityPolicy: https://kubernetes.github.io/ingress-nginx/examples/psp/
     kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/docs/examples/psp/psp.yaml
     helm install -f ngnix.values.yaml ingress-nginx nginx-stable/nginx-ingress -n ingress-nginx
-    # TODO workaound, remove when Nginx chart > 0.7.0 is released
-    echo '
-apiVersion: networking.k8s.io/v1beta1
-kind: IngressClass
-metadata:
-  name: nginx
-  annotations:
-    ingressclass.kubernetes.io/is-default-class: "true"
-spec:
-  controller: nginx.org/ingress-controller
-' | kubectl apply -f -
-
   }
 }
 

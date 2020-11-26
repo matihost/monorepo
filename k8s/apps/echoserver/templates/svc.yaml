@@ -1,0 +1,20 @@
+# yamllint disable-file
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "app.fullname" . }}
+  namespace: {{ include "app.namespace" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  ports:
+  - protocol: TCP
+    #port - exposes the Kubernetes service on the specified port within the cluster. Other pods within the cluster can communicate with this server on the specified port.
+    port: 80
+    #targetPort - is the port on which the service will send requests to, that your pod will be listening on. Your application in the container will need to be listening on this port also.
+    targetPort: {{ .Values.pod.port }}
+  selector:
+    {{- include "app.selectorLabels" . | nindent 6 }}
+  sessionAffinity: None
+  type: NodePort

@@ -1,0 +1,83 @@
+# yamllint disable-file
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "app.fullname" . }}
+  namespace: {{ include "app.namespace" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "app.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "app.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name | default "default" }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
+          ports:
+            - name: app-port
+              containerPort: {{ .Values.pod.port }}
+              protocol: TCP
+            - name: health-port
+              containerPort: {{ .Values.pod.health.port | default .Values.pod.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.pod.health.livePath | default "/" }}
+              port: health-port
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.pod.health.readyPath | default "/" }}
+              port: health-port
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      # example of usage of nodeSelector
+      nodeSelector:
+        kubernetes.io/os: linux
+      affinity:
+        {{- if .Values.affinity.nodeAffinity.enabled }}
+        # Example to limit which zones app can be deployed on
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: failure-domain.beta.kubernetes.io/zone
+                operator: In
+                values:
+                  {{- with .Values.affinity.nodeAffinity.zones }}
+                    {{- toYaml . | nindent 20 }}
+                  {{- end }}
+        {{- end }}
+        {{- if .Values.affinity.podAntiAffinity.enabled }}
+        # To ensure pods are not deployed on the node (zone)
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                - {{ include "app.name" . }}
+            topologyKey: {{ .Values.affinity.podAntiAffinity.topologyKey }}
+        {{- end }}
+      terminationGracePeriodSeconds: 30

@@ -1,0 +1,23 @@
+# yamllint disable-file
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  namespace: {{ include "app.namespace" . }}
+  name: deny-all
+spec:
+  podSelector: {}
+  ingress: []
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  namespace: {{ include "app.namespace" . }}
+  name: {{ include "app.name" . }}-allow-from-all-namespaces
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "app.selectorLabels" . | nindent 6 }}
+  ingress:
+  - from:
+    - namespaceSelector: {}
