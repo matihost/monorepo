@@ -1,11 +1,11 @@
 ---
 # Helm chart config: helm show chart jenkinsci/jenkins
-# Current chart version: 2.19.0
+# Current chart version: 3.0.2
 # Default values for jenkinsci/jenkins chart:
 # helm show values jenkinsci/jenkins
 namespaceOverride: ci
 
-master:
+controller:
   image: "mirror.gcr.io/jenkins/jenkins"
   tag: "lts"
 

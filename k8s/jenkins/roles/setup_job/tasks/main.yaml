@@ -29,7 +29,7 @@
   register: crump_result
 
 
-- name: Endsure Job {{ job.name }} is present
+- name: Ensure Job {{ job.name }} is present
   uri:
     url: https://{{ jenkins_ingress }}/scriptText
     validate_certs: no
