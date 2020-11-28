@@ -28,6 +28,16 @@ helm template  echoserver . -n learning --debug --set ingress.tls.crt=$(base64 -
 ```
 
 ```bash
-# actual deployment in namespace learning
-helm install  echoserver . -n learning --set ingress.tls.crt=$(base64 -w 0 /tmp/echoserver.learning.testing.crt) --set ingress.tls.key=$(base64 -w 0 /tmp/echoserver.learning.testing.key)
+# actual deployment (install or upgrade) in namespace learning
+helm upgrade --install  echoserver . -n learning --set ingress.tls.crt=$(base64 -w 0 /tmp/echoserver.learning.testing.crt) --set ingress.tls.key=$(base64 -w 0 /tmp/echoserver.learning.testing.key)
+```
+
+### Local development under Minikube
+
+```bash
+# deploy echoserver on minikube
+make deploy-minikube
+
+# smoke test echoserver app deployment on minikube
+make test-minikube
 ```
