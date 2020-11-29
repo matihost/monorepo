@@ -1,4 +1,5 @@
----
+# yamllint disable-file
+#
 # Helm chart config: helm show chart jenkinsci/jenkins
 # Current chart version: 3.0.2
 # Default values for jenkinsci/jenkins chart:
@@ -6,24 +7,17 @@
 namespaceOverride: ci
 
 controller:
+{% if use_prebuild_jenkins_image is sameas true %}
+  image: "quay.io/matihost/jenkins"
+  tag: "lts"
+  imagePullPolicy: IfNotPresent
+  installPlugins: []
+{% else %}
   image: "mirror.gcr.io/jenkins/jenkins"
   tag: "lts"
-
-  servicePort: 80
-  serviceType: {{ jenkins_service_type|default("NodePort") }}
-
-  ingress:
-    enabled: true
-    apiVersion: "networking.k8s.io/v1beta1"
-    hostName: {{ jenkins_ingress }}
-    tls:
-    - secretName: {{ jenkins_ingress }}
-      hosts:
-      - {{ jenkins_ingress }}
-
   installPlugins:
   # kubernetes:1.18.0 requires Jenkins 2.263 (aka weekly), while LTS is 2.249
-  - kubernetes:1.27.6
+  - kubernetes:1.27.7
   - workflow-job:2.40
   - workflow-aggregator:2.6
   - credentials-binding:1.24
@@ -36,6 +30,18 @@ controller:
   - simple-theme-plugin:0.6
   - jdk-tool:1.4
   - command-launcher:1.5
+{% endif %}
+  servicePort: 80
+  serviceType: {{ jenkins_service_type|default("NodePort") }}
+
+  ingress:
+    enabled: true
+    apiVersion: "networking.k8s.io/v1beta1"
+    hostName: {{ jenkins_ingress }}
+    tls:
+    - secretName: {{ jenkins_ingress }}
+      hosts:
+      - {{ jenkins_ingress }}
 
   initializeOnce: false
 

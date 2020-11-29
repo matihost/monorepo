@@ -10,7 +10,8 @@ repos:
     args: [ '--allow-multiple-documents', '--unsafe' ]
     exclude: |
       (?x)^(
-          .*/templates/.*.yaml
+          .*/templates/.*.yaml|
+          .*.template.yaml
       )$
   - id: check-toml
   - id: check-json

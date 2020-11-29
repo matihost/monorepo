@@ -7,3 +7,4 @@ all:
         files: "{{ playbook_dir }}/files"
         namespace: ci
         jenkins_service_type: NodePort
+        use_prebuild_jenkins_image: true
