@@ -26,13 +26,21 @@ podAnnotations: {}
 # this image cannot work not as root
 # that's why clusterrolebinding.yaml is to allow sa running this pod to run such containers
 # as by default psp:restricted is used
+pspPrivilegedClusterRole: psp:privileged # in GKE use: gce:podsecuritypolicy:privileged
 podSecurityContext:
   runAsUser: 0
 
+networkPolicy:
+  enabled: true
+
 ingress:
+  version: v1
+  class: "" # assume default impl, use gce-internal for GKE Internal LoadBalancer
   annotations:
+    # required in case GKE Ingress as it does not support both http and https on the same ip
+    kubernetes.io/ingress.allow-http: "false"
+    # for NGINX ingress to rewrite urls to ensure last slash is added
     nginx.ingress.kubernetes.io/rewrite-target: /
-    # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   host: echoserver.learning.testing
   tls:
@@ -66,3 +74,4 @@ affinity:
     enabled: true
     topologyKey: kubernetes.io/hostname
     # topologyKey: failure-domain.beta.kubernetes.io/zone
+    # topologyKey: topology.kubernetes.io/zone

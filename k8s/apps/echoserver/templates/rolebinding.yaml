@@ -9,7 +9,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: psp:privileged
+  name: {{ .Values.pspPrivilegedClusterRole }}
 subjects:
 - kind: ServiceAccount
   name: {{ .Values.serviceAccount.name | default "default" }}

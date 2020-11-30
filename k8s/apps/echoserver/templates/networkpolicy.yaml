@@ -1,4 +1,5 @@
 # yamllint disable-file
+{{- if .Values.networkPolicy.enabled }}
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
@@ -21,3 +22,4 @@ spec:
   ingress:
   - from:
     - namespaceSelector: {}
+{{- end }}
