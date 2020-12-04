@@ -9,11 +9,28 @@ function usage() {
 
 Starts Minikube in bare / none mode. Assumes latest Ubuntu.
 
+Mandatory option:
+- Container runtime selection (--with-docker, --with-crio)
+
+Minimum set of features enabled in every Minikube:
+- PodSecurityPolicy,
+-  Minikube Tunnel Loadbalancer along with Nginx Ingress
+- VolumeSnaphots via csi-hostpath-driver.
+The csi-hostpath-driver addon sets up a dedicated storage class called csi-hostpath-sc
+that needs to be referenced in PVCs. The driver itself is created under the name:
+hostpath.csi.k8s.io - to be used for e.g. snapshot class definitions.
+- Registry, Dashboard
+
+Optional features:
+- NetworkPolicy via CNI/Cilium (--with-cni)
+- Istio (--with-istio)
+- OPA Gatekeeper (--with-gatekeeper)
+
 Samples:
-# start Minikube with docker minimum set of features (PSP, Nginx Ingress)
+# start Minikube with docker minimum set of features
 $(basename "$0") --with-docker
 
-# start Minikube with docker maxmimum set of features (PSP, Nginx Ingress, NetworkPolicy via CNI/Cilium, Istio, Gatekeeper)
+# start Minikube with docker maximum set of features
 $(basename "$0") --with-docker --with-cni --with-gatekeeper --with-istio
 
 # start with Crio as container engine (implies CNI aka enables NetworkPolicy)
@@ -120,7 +137,7 @@ function addNginxIngress() {
 
 ensureMinikubePresent
 MODE=''
-ADDONS="registry dashboard"
+ADDONS="registry dashboard volumesnapshots csi-hostpath-driver"
 EXTRA_PARAMS=''
 
 while [[ "$#" -gt 0 ]]; do
