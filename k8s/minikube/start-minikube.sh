@@ -5,20 +5,16 @@
 }
 
 function usage() {
-  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-crio|crio|c] [--with-docker | docker | d] [--with-cni] [--with-istio | istio] [--with-gatekeeper | gatekeeper]
+  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-containder|containerd|c] [--with-crio|crio] [--with-docker | docker | d] [--with-cni] [--with-istio | istio] [--with-gatekeeper | gatekeeper]
 
 Starts Minikube in bare / none mode. Assumes latest Ubuntu.
 
 Mandatory option:
-- Container runtime selection (--with-docker, --with-crio)
+- Container runtime selection (--with-containerd, --with-crio, --with-docker (deprecated since k8s 1.20))
 
 Minimum set of features enabled in every Minikube:
 - PodSecurityPolicy,
 -  Minikube Tunnel Loadbalancer along with Nginx Ingress
-- VolumeSnaphots via csi-hostpath-driver.
-The csi-hostpath-driver addon sets up a dedicated storage class called csi-hostpath-sc
-that needs to be referenced in PVCs. The driver itself is created under the name:
-hostpath.csi.k8s.io - to be used for e.g. snapshot class definitions.
 - Registry, Dashboard
 
 Optional features:
@@ -56,14 +52,16 @@ function ensureDockerCGroupSystemD() {
   }
 }
 
-function ensureCrioAndCrictlPresent() {
-  CRIO_VERSION=1.19
+function ensureCrictlPresent() {
   [ -x /usr/local/bin/crictl ] || (
     CRICTL_VERSION=$(git ls-remote -t https://github.com/kubernetes-sigs/cri-tools.git | cut -d'/' -f3 | sort -n | tail -n 1)
     wget "https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz"
     sudo tar zxvf "crictl-${CRICTL_VERSION}-linux-amd64.tar.gz" -C /usr/local/bin
     rm -f "crictl-${CRICTL_VERSION}-linux-amd64.tar.gz"
   )
+}
+function ensureCrioPresent() {
+  CRIO_VERSION=1.19
 
   [ -x /usr/bin/crio ] || (
     # shellcheck disable=SC1091
@@ -137,7 +135,14 @@ function addNginxIngress() {
 
 ensureMinikubePresent
 MODE=''
-ADDONS="registry dashboard volumesnapshots csi-hostpath-driver"
+
+# TODO csi-hostpath-driver faild with containerd
+# - VolumeSnaphots via csi-hostpath-driver.
+# The csi-hostpath-driver addon sets up a dedicated storage class called csi-hostpath-sc
+# that needs to be referenced in PVCs. The driver itself is created under the name:
+# hostpath.csi.k8s.io - to be used for e.g. snapshot class definitions.
+# ADDONS="registry dashboard volumesnapshots csi-hostpath-driver"
+ADDONS="registry dashboard"
 EXTRA_PARAMS=''
 
 while [[ "$#" -gt 0 ]]; do
@@ -146,8 +151,11 @@ while [[ "$#" -gt 0 ]]; do
     usage
     exit 1
     ;;
-  --with-crio | crio | c)
+  --with-crio | crio)
     MODE='crio'
+    ;;
+  --with-containerd | containerd | c)
+    MODE='containerd'
     ;;
   --with-docker | docker | d)
     MODE='docker'
@@ -169,8 +177,13 @@ set -- "${PARAMS[@]}" # restore positional parameters
 
 case "${MODE}" in
 crio)
-  ensureCrioAndCrictlPresent
+  ensureCrictlPresent
+  ensureCrioPresent
   EXTRA_PARAMS='--container-runtime=cri-o --network-plugin=cilium'
+  ;;
+containerd)
+  ensureCrictlPresent
+  EXTRA_PARAMS='--container-runtime=containerd --network-plugin=cilium'
   ;;
 docker)
   ensureDockerCGroupSystemD
@@ -223,7 +236,7 @@ if ! minikube status &>/dev/null; then
     # Set cilium/cilium help config: operator.numReplicas=1
     # because there is antiAffinity rule so that minikube cannot run 2 instances on single node
     # shellcheck disable=SC2046
-    helm install cilium cilium/cilium --namespace kube-system --set operator.replicas=1 $([ "${MODE}" == 'crio' ] && echo '--set global.containerRuntime.integration=crio')
+    helm install cilium cilium/cilium --namespace kube-system --set operator.replicas=1 $([ "${MODE}" == 'crio' ] && echo '--set global.containerRuntime.integration=crio') $([ "${MODE}" == 'containerd' ] && echo '--set global.containerRuntime.integration=containerd')
   fi
 
   for ADDON in ${ADDONS}; do
