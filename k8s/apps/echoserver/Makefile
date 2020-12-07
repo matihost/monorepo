@@ -2,10 +2,13 @@ deploy-minikube: ## deploys echoserver on minikube
 	scripts/deploy-on-minikube.sh
 
 deploy-gke: ## deploys echoserver on gke (requires current context on some GKE cluster and access to GKE API server, if private prexix with export HTTPS_PROXY=localhost:8888)
-	export HTTPS_PROXY=8888 && scripts/deploy-on-minikube.sh
+	export HTTPS_PROXY=localhost:8888 && scripts/deploy-on-gke.sh
 
 test-minikube: ## smoke test echoserver app deployment on minikube
 	curl -ksSL https://echoserver.learning.testing
+
+test-gke: ## smoke test echoserver app deployment on gke
+	curl -x http://localhost:8888 -ksSL https://echoserver.learning.gke
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))

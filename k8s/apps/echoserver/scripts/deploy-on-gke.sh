@@ -23,5 +23,5 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
   INGRESS_IP="$(kubectl get ingress echoserver -n learning -o jsonpath="{.status..ip}")"
   CHANGED=$(grep -c "${INGRESS_IP} echoserver.learning.gke" /etc/hosts)
   [ "${CHANGED}" -eq 0 ] && echo "update hosts" && sudo -E sh -c "echo \"${INGRESS_IP} echoserver.learning.gke\" >> /etc/hosts" || echo "hosts already present"
-  echo "To test call: curl -k https://echoserver.learning.gke/"
+  echo -e "To test call: 'curl -x http://localhost:8888-k https://echoserver.learning.gke/' \nafter ensuring proxy on bastion has: '${INGRESS_IP} echoserver.learning.gke' in /etc/hosts"
 }
