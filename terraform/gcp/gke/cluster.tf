@@ -202,8 +202,9 @@ resource "google_container_node_pool" "gke_nodes" {
     # disk_type    = "pd-ssd"
     disk_size_gb = 30
 
+    # since 1.20 usage of docker as container engine is deprecated
     # valid image types: gcloud container get-server-config
-    image_type = "UBUNTU"
+    image_type = "UBUNTU_CONTAINERD"
 
     metadata = {
       // Set metadata on the VM to supply more entropy
@@ -213,8 +214,11 @@ resource "google_container_node_pool" "gke_nodes" {
     }
 
     labels = {
-      node-owner   = "gke-${google_container_cluster.gke.name}"
-      node-purpose = "compute"
+      node-owner = "gke-${google_container_cluster.gke.name}"
+      # kubernetes.io/role - cannot be used, because kubernetes.io/ and k8s.io/ prefixes
+      # are reserved by Kubernetes Core components and cannot be specified anymore on node
+      # use nodeSelector: cloud.google.com/gke-nodepool to select placement on particual node pool
+      node-role = "compute"
     }
 
     oauth_scopes = [

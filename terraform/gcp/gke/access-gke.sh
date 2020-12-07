@@ -9,9 +9,9 @@ enable_gke_access() {
   alias ansible-playbook="HTTPS_PROXY=localhost:8888 ansible-playbook"
   alias helm="HTTPS_PROXY=localhost:8888 helm"
   echo "SSH to bastion vm: $(terraform output bastion_instance_name) and opening tunnel to proxy on bastion..." &&
-    eval "$(terraform output bastion_tunnel_to_proxy)" &&
+    eval "$(terraform output bastion_tunnel_to_proxy | cut -d\" -f2)" &&
     echo "Get kubernetes credentials with internal ip for kube-apiserver in kubeconfig" &&
-    eval "$(terraform output gke_connect_cmd)" &&
+    eval "$(terraform output gke_connect_cmd | cut -d\" -f2)" &&
     echo "Commands kube[ctl|ns|ctx], k9s, ansible-playbook use tunnel in this shell to reach GKE API server" ||
     echo "Unable to connect to GKE..."
 }
