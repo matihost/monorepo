@@ -85,6 +85,7 @@ all:
         - cri-o
         - podman
         - buildah
+        - skopeo
         - terraform
         - notepadqq
         - teams
