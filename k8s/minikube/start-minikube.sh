@@ -14,26 +14,29 @@ Mandatory option:
 
 Minimum set of features enabled in every Minikube:
 - PodSecurityPolicy,
--  Minikube Tunnel Loadbalancer along with Nginx Ingress
+- Minikube Tunnel Loadbalancer along with Nginx Ingress
 - Registry, Dashboard
+- NetworkPolicy via CNI/Cilium (--with-cni - for docker container engine it has to be explicitely defined)
 
 Optional features:
-- NetworkPolicy via CNI/Cilium (--with-cni)
 - Istio (--with-istio)
 - OPA Gatekeeper (--with-gatekeeper)
 
 Samples:
-# start Minikube with docker minimum set of features
-$(basename "$0") --with-docker
+# start Minikube with containerd minimum set of features
+$(basename "$0") --with-containerd
 
-# start Minikube with docker maximum set of features
-$(basename "$0") --with-docker --with-cni --with-gatekeeper --with-istio
+# start Minikube with docker maximum set of features (implies CNI aka enables NetworkPolicy)
+$(basename "$0") --with-containerd --with-gatekeeper --with-istio
 
 # start with Crio as container engine (implies CNI aka enables NetworkPolicy)
 $(basename "$0") --with-crio
 
 # start with Crio as container engine with Istio
 $(basename "$0") --with-crio --with-istio
+
+# Deprecated: start Minikube with docker maximum set of features
+$(basename "$0") --with-docker --with-cni --with-gatekeeper --with-istio
 "
 }
 
