@@ -1,7 +1,8 @@
 # yamllint disable-file
 #
 # Helm chart config: helm show chart jenkinsci/jenkins
-# Current chart version: 3.0.2
+# Current chart version: 3.0.4
+# Current Jenkins LTS version: 2.263.1 on JDK 11
 # Default values for jenkinsci/jenkins chart:
 # helm show values jenkinsci/jenkins
 namespaceOverride: ci
@@ -13,23 +14,24 @@ controller:
   imagePullPolicy: IfNotPresent
   installPlugins: []
 {% else %}
-  image: "mirror.gcr.io/jenkins/jenkins"
-  tag: "lts"
+  image: "jenkins/jenkins"
+  tag: "lts-jdk11"
   installPlugins:
-  # kubernetes:1.18.0 requires Jenkins 2.263 (aka weekly), while LTS is 2.249
-  - kubernetes:1.27.7
+  - kubernetes:1.28.3
   - workflow-job:2.40
   - workflow-aggregator:2.6
   - credentials-binding:1.24
-  - git:4.4.5
+  - git:4.5.0
   - configuration-as-code:1.46
   - timestamper:1.11.8
-  - github-branch-source:2.9.1
+  - github-branch-source:2.9.2
   - matrix-auth:2.6.4
   - prometheus:2.0.8
   - simple-theme-plugin:0.6
   - jdk-tool:1.4
   - command-launcher:1.5
+  # required by lts-jdk11 - which for some reason is using 2.3.0
+  - jaxb:2.3.0.1
 {% endif %}
   servicePort: 80
   serviceType: {{ jenkins_service_type|default("NodePort") }}
@@ -139,7 +141,7 @@ agent:
   # image: "mirror.gcr.io/jenkins/inbound-agent"
   # tag: "4.6-1"
   image: "jenkins/inbound-agent"
-  tag: "alpine"
+  tag: "latest-jdk11"
   resources:
     requests:
       cpu: "50m"
