@@ -24,7 +24,7 @@
     snap:
       name: "{{ item }}"
       classic: true
-    loop: "{{ classic_snaps }}"
+    loop: "{{ classic_snaps|default([]) }}"
   - name: Update snap packages
     shell: snap refresh
     register: snap_result

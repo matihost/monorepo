@@ -39,9 +39,9 @@ all:
             deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.19/x{{ ansible_distribution }}_20.04/ /
           key_url: >-
             https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.19/x{{ ansible_distribution }}_20.04/Release.key
-        - name: terraform
-          repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
-          key_url: "https://apt.releases.hashicorp.com/gpg"
+        - name: google-cloud-sdk
+          repo: "deb [arch=amd64] https://packages.cloud.google.com/apt cloud-sdk main"
+          key_url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
         packages:
         - brasero
         - autofs
@@ -89,16 +89,20 @@ all:
         - terraform
         - notepadqq
         - teams
+        - google-chrome-stable
+        - google-cloud-sdk
+        - google-cloud-sdk-cloud-build-local
+        - kubectl
         # Skipped packages:
         # - skypeforlinux
-        # - google-chrome-stable
         snaps:
         - mc-installer
         - minecraft-server-jdstrand
         - notepad-plus-plus
-        classic_snaps:
-        - google-cloud-sdk
-        - kubectl
+        # Uncomment to use snap packages for gcloud sdk
+        # classic_snaps:
+        # - google-cloud-sdk
+        # - kubectl
         pips:
         - pip
         - flake8
@@ -269,7 +273,7 @@ all:
               tar zxvf krew.tar.gz &&
               KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" &&
               "$KREW" install --manifest=krew.yaml --archive=krew.tar.gz &&
-              "$KREW" install change-ns ctx whoami &&
+              "$KREW" install change-ns ctx whoami cilium unused-volumes apparmor-manager advise-psp np-viewer view-webhook &&
               "$KREW" update &&
               "$KREW" upgrade
             }
