@@ -29,7 +29,7 @@ resource "google_compute_instance" "bastion" {
   metadata_startup_script = <<EOT
   #!/usr/bin/env bash
   sudo apt-get update -y
-  sudo apt-get install -y vim bind9-dnsutils tinyproxy
+  sudo apt-get install -y bash-completion vim bind9-dnsutils kubectl tinyproxy
   sudo snap install kubectl --classic
   EOT
 
