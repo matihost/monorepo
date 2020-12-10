@@ -1,0 +1,72 @@
+# Run locally:
+# cloud-build-local --dryrun=false --bind-mount-source --write-workspace=/tmp/cloud-build .
+steps:
+- name: maven:3-jdk-11
+  entrypoint: 'bash'
+  args:
+  - '-eEuo'
+  - 'pipefail'
+  - '-c'
+  - |-
+    cd java && mvn -s .mvn/settings.xml clean install
+- name: maven:3-jdk-11
+  waitFor: ['-']
+  entrypoint: 'bash'
+  args:
+  - '-eEuo'
+  - 'pipefail'
+  - '-c'
+  - |-
+    cd algorithms/project-euler && mvn -s .mvn/settings.xml clean install
+- name: mirror.gcr.io/library/golang:latest
+  waitFor: ['-']
+  entrypoint: 'bash'
+  args:
+  - '-eEuo'
+  - 'pipefail'
+  - '-c'
+  - |-
+    cd go && GOCACHE=/go make build
+    ./language
+- name: rust
+  waitFor: ['-']
+  entrypoint: 'bash'
+  args:
+  - '-eEuo'
+  - 'pipefail'
+  - '-c'
+  - |-
+    cd rust/guessing_game && make build
+# - name: quay.io/matihost/ansible:latest
+#   waitFor: ['-']
+#   entrypoint: 'bash'
+#   args:
+#   - '-eEuo'
+#   - 'pipefail'
+#   - '-c'
+#   - |-
+#     # cloud build assume workspace is home directory (/home/builder) and it is mounted as volume with sources
+#     # making python user libraries gone
+#     export HOME=/home/default
+#     cd python/apps/exchange-rate
+#     python3 setup.py build
+#     pip3 install --user -e .
+#     exchange-rate CHF
+- name: quay.io/matihost/ansible:latest
+  waitFor: ['-']
+  entrypoint: 'bash'
+  args:
+  - '-eEuo'
+  - 'pipefail'
+  - '-c'
+  - |-
+    # cloud build assume workspace is home directory (/home/builder) and it is mounted as volume with sources
+    # making python user libraries gone
+    export HOME=/home/default
+    cd ansible/learning && ansible-playbook dictionaries.yaml -v
+options:
+  volumes:
+  - name: go-modules
+    path: /go
+  - name: mvn-local-repository-cache
+    path: /root/.m2
