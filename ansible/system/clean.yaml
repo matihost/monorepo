@@ -76,9 +76,9 @@
     failed_when: false
   - name: Clean all containerd images
     shell: |
+      # When minikube runs on containerd it overrding config with own, fix config to default one.
       command -v crictl 1>/dev/null 2>/dev/null && {
         CRICTL_PRUNE_OUTPUT="$(crictl rmi -a -q 2>&1 | grep -v 'No images to remove')"
-        # when minikube runs on containerd it overrding config with own, fix config to default one
         if [[ "${CRICTL_PRUNE_OUTPUT}" == *"unknown service"* ]]; then
           containerd config default > /etc/containerd/config.toml
           systemctl restart containerd --wait
@@ -91,6 +91,8 @@
     register: clean_out
     changed_when: clean_out.stdout
     failed_when: false
+    args:
+      executable: /bin/bash
   - block:
     - name: Clean all podman (user) containers, images and volumes
       shell: |
