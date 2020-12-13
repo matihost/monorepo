@@ -1,72 +1,99 @@
-# Run locally:
-# cloud-build-local --dryrun=false --bind-mount-source --write-workspace=/tmp/cloud-build .
+# Run locally in place (mount . to as workspace):
+# cloud-build-local --dryrun=false --bind-mount-source .
+# or perfom the build in a copied workspace, the result workspace will be copied to build/cloud-build after the build
+# (the directory need to be within source dir: https://github.com/GoogleCloudPlatform/cloud-build-local/issues/83)
+# cloud-build-local --dryrun=false --write-workspace=build/cloud-build .
+substitutions:
+  _MVN_SETTINGS: ".mvn/settings.xml"
 steps:
-- name: maven:3-jdk-11
-  entrypoint: 'bash'
-  args:
-  - '-eEuo'
-  - 'pipefail'
-  - '-c'
-  - |-
-    cd java && mvn -s .mvn/settings.xml clean install
-- name: maven:3-jdk-11
-  waitFor: ['-']
-  entrypoint: 'bash'
-  args:
-  - '-eEuo'
-  - 'pipefail'
-  - '-c'
-  - |-
-    cd algorithms/project-euler && mvn -s .mvn/settings.xml clean install
-- name: mirror.gcr.io/library/golang:latest
-  waitFor: ['-']
-  entrypoint: 'bash'
-  args:
-  - '-eEuo'
-  - 'pipefail'
-  - '-c'
-  - |-
-    cd go && GOCACHE=/go make build
-    ./language
-- name: rust
-  waitFor: ['-']
-  entrypoint: 'bash'
-  args:
-  - '-eEuo'
-  - 'pipefail'
-  - '-c'
-  - |-
-    cd rust/guessing_game && make build
-# - name: quay.io/matihost/ansible:latest
-#   waitFor: ['-']
+# - id: algorithms
+#   name: maven:3-jdk-11
 #   entrypoint: 'bash'
+#   dir: "algorithms/project-euler"
 #   args:
 #   - '-eEuo'
 #   - 'pipefail'
 #   - '-c'
 #   - |-
-#     # cloud build assume workspace is home directory (/home/builder) and it is mounted as volume with sources
-#     # making python user libraries gone
-#     export HOME=/home/default
-#     cd python/apps/exchange-rate
-#     python3 setup.py build
-#     pip3 install --user -e .
-#     exchange-rate CHF
-- name: quay.io/matihost/ansible:latest
+#     mvn -s ${_MVN_SETTINGS} clean install
+# - name: maven:3-jdk-11
+#   waitFor: ['algorithms']
+#   entrypoint: 'bash'
+#   dir: "java"
+#   args:
+#   - '-eEuo'
+#   - 'pipefail'
+#   - '-c'
+#   - |-
+#     mvn -s ${_MVN_SETTINGS} clean install
+- name: mirror.gcr.io/library/golang:latest
   waitFor: ['-']
   entrypoint: 'bash'
+  dir: "go"
+  env: ["GOCACHE=/go"]
   args:
   - '-eEuo'
   - 'pipefail'
   - '-c'
   - |-
-    # cloud build assume workspace is home directory (/home/builder) and it is mounted as volume with sources
-    # making python user libraries gone
-    export HOME=/home/default
-    cd ansible/learning && ansible-playbook dictionaries.yaml -v
+    make build
+    ./language
+- name: rust
+  waitFor: ['-']
+  entrypoint: 'bash'
+  dir: "rust/guessing_game"
+  args:
+  - '-eEuo'
+  - 'pipefail'
+  - '-c'
+  - |-
+    make build
+- name: quay.io/matihost/ansible:latest
+  waitFor: ['-']
+  entrypoint: 'bash'
+  dir: "ansible/learning"
+  # cloud build assume workspace is home directory (/home/builder) and it is mounted as volume with sources
+  env: ["HOME=/home/default"]
+  args:
+  - '-eEuo'
+  - 'pipefail'
+  - '-c'
+  - |-
+    ansible-playbook dictionaries.yaml -v
+- name: quay.io/matihost/ansible:latest
+  waitFor: ['-']
+  entrypoint: 'bash'
+  dir: "python/apps/exchange-rate"
+  # cloud build assume workspace is home directory (/home/builder) and it is mounted as volume with sources
+  # making python user libraries gone
+  env: ["HOME=/home/default"]
+  args:
+  - '-eEuo'
+  - 'pipefail'
+  - '-c'
+  - |-
+    python3 setup.py build
+    pip3 install --user -e .
+    exchange-rate CHF
 options:
+  # store the logs only in Cloud Storage (do no use CloudLogging) and push logs during build (not at the end)
+  logging: GCS_ONLY
+  logStreamingOption: STREAM_ON
+  #  build will not return an error if there's a missing substitution variable or a missing substitution
+  substitution_option: 'ALLOW_LOOSE'
+  # mount volumes to each build step to reuse data between steps
   volumes:
   - name: go-modules
     path: /go
   - name: mvn-local-repository-cache
     path: /root/.m2
+tags: ['matihost', 'learning']
+# timeout for entire build
+timeout: "600s"
+# saves build artifacts - only gs:// is supporte for now
+# artifacts:
+#   objects:
+#     location: "gs://$PROJECT_ID-learning/artifacts/$REPO_NAME/$SHORT_SHA"
+#     paths:
+#     - "*.jar"
+#     - "language"
