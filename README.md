@@ -11,5 +11,6 @@ Various technology code, snippets, home tools.
 * [Java, Groovy, Scala](java)
 * [Python](python)
 * [Rust](rust)
-* [K8S, OpenShift](k8s)
-* [Terraform](terraform)
+* [Docker, K8S, Minikube, Helm, GKE, OpenShift](k8s)
+* [Terraform deployments to AWS, GCP](terraform)
+* CI with Jenkins, CloudBuild, Travis

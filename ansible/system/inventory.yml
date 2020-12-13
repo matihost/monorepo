@@ -71,6 +71,7 @@ all:
         - code
         - onedrive
         - nautilus-dropbox
+        - ffmpeg
         - openssh-server
         - iftop
         - dosbox
