@@ -77,7 +77,6 @@ all:
         - dosbox
         - steam
         - virt-manager
-        - awscli
         - docker.io
         - conntrack
         - fuse-overlayfs
@@ -391,6 +390,21 @@ all:
               sed -i 's/#SystemMaxUse=.*$/SystemMaxUse={{ systemd_journal.max_size }}/g' /etc/systemd/journald.conf
               sed -i 's/#RuntimeMaxUse=.*$/RuntimeMaxUse={{ systemd_journal.max_size }}/g' /etc/systemd/journald.conf
               echo "Ubuntu log rotate config has been changed"
+            }
+        - name: awscli2
+          become: true
+          desc: To install awscli2
+          command: |
+            # TODO create /etc/bash_completion.d/aws_bash_completer file with content "complete -C aws_completer aws"
+            # TODO compare current vesion with latest tag from github
+            CURRENT_VERSION="$(git ls-remote -t https://github.com/aws/aws-cli.git | grep -v '{}'|cut -d'/' -f3 |sort -n |tail -n 1)"
+            [ -e /usr/local/bin/aws ] || {
+              rm -rf /tmp/awscli-installer && mkdir -p /tmp/awscli-installer && cd /tmp/awscli-installer
+              curl -sSLO "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+              unzip awscli-exe-linux-x86_64.zip
+              sudo aws/install --update
+              rm -rf /tmp/awscli-installer
+              echo "AWC CLI Installed"
             }
         - name: awsp
           become: false
