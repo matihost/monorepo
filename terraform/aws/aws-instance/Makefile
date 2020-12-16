@@ -9,6 +9,9 @@ apply: prepare ## setup free-tier eliglible Ubuntu instance
 ssh: ## ssh to EC2 instance
 	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(shell terraform output ec2_dns)
 
+show-instance-startup-logs: # show EC2 cloud-init statup logs
+	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(shell terraform output ec2_dns) cat /var/log/cloud-init-output.log
+
 test: ## test Nginx instance
 	curl http://$(shell terraform output ec2_dns):80
 

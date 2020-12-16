@@ -8,18 +8,19 @@ export JENKINS_USER_ID=admin
 export ADMIN_PASS='${admin_password}'
 export JENKINS_JAVA_ARGS="-Djava.awt.headless=true -Xmx356m -Djava.net.preferIPv4Stack=true -Djenkins.install.runSetupWizard=false -Dcasc.jenkins.config=\/var\/lib\/jenkins\/casc_configs"
 export JENKINS_PLUGINS="ec2 \
-  workflow-job \
-  workflow-aggregator \
-  credentials-binding \
-  git \
-  configuration-as-code \
-  timestamper \
-  github-branch-source \
-  matrix-auth \
-  prometheus \
-  simple-theme-plugin \
-  jdk-tool \
-  command-launcher"
+  workflow-job:2.40 \
+  workflow-aggregator:2.6 \
+  credentials-binding:1.24 \
+  git:4.5.0 \
+  configuration-as-code:1.46 \
+  timestamper:1.11.8 \
+  github-branch-source:2.9.2 \
+  matrix-auth:2.6.4 \
+  prometheus:2.0.8 \
+  simple-theme-plugin:0.6 \
+  jdk-tool:1.4 \
+  command-launcher:1.5 \
+  branch-api:2.6.2"
 
 function check_for_jenkins() {
   # shellcheck disable=SC2091
@@ -265,8 +266,11 @@ function install_plugins() {
   wget http://updates.jenkins-ci.org/update-center.json -qO- | sed '1d;$d' >/var/lib/jenkins/updates/default.json
   chmod 666 /var/lib/jenkins/updates/default.json
   chown -R jenkins:jenkins /var/lib/jenkins/updates
-  # shellcheck disable=SC2086
-  java -jar /var/lib/jenkins-cli.jar install-plugin $${JENKINS_PLUGINS}
+  for plugin in $${JENKINS_PLUGINS}; do
+    # do not install-plugins as one list as jenkins-cli may change version of the particular dependent plugins
+    # shellcheck disable=SC2086
+    java -jar /var/lib/jenkins-cli.jar install-plugin $${plugin}
+  done
   configure_common_casc
   configure_ec2_plugin
   restart_jenkins

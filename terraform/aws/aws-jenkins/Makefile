@@ -11,8 +11,11 @@ endif
 	terraform apply -auto-approve
 
 JENKINS_INSTANCE_PUBLIC_IP = $(shell aws ec2 describe-instances --filters 'Name=tag:Name,Values=jenkins' --output json --region us-east-1 | jq -r '.Reservations[].Instances[] | select(.State.Name == "running") | .PublicIpAddress')
-ssh: ## ssh to EC2 instance
+ssh: ## ssh to Jenkins EC2 instance
 	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(JENKINS_INSTANCE_PUBLIC_IP)
+
+show-instance-startup-logs: # show Jenkins EC2 cloud-init statup logs
+	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(JENKINS_INSTANCE_PUBLIC_IP) cat /var/log/cloud-init-output.log
 
 #TODO scale up when old instance state is no more running
 recreate-instance: ## recreate Jenkins VM instance to ensure its latest LaunchTemplate is used
@@ -36,7 +39,7 @@ destroy: destroy-jenkins-agents ## terminates all AWS resource created with appl
 
 JENKINS_AGENTS=$(shell aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --filters "Name=tag:Name,Values=jenkins-agent" --output text 2>/dev/null)
 destroy-jenkins-agents:
-ifdef JENKINS_AGENTS
+ifneq ($(JENKINS_AGENTS),)
 	aws ec2 terminate-instances --instance-ids $(JENKINS_AGENTS)
 endif
 

@@ -17,7 +17,8 @@ controller:
   image: "jenkins/jenkins"
   tag: "lts-jdk11"
   installPlugins:
-  - kubernetes:1.28.3
+  - branch-api:2.6.2
+  - kubernetes:1.28.4
   - workflow-job:2.40
   - workflow-aggregator:2.6
   - credentials-binding:1.24
