@@ -395,7 +395,6 @@ all:
           become: true
           desc: To install awscli2
           command: |
-            # TODO create /etc/bash_completion.d/aws_bash_completer file with content "complete -C aws_completer aws"
             # TODO compare current vesion with latest tag from github
             CURRENT_VERSION="$(git ls-remote -t https://github.com/aws/aws-cli.git | grep -v '{}'|cut -d'/' -f3 |sort -n |tail -n 1)"
             [ -e /usr/local/bin/aws ] || {
@@ -405,6 +404,10 @@ all:
               sudo aws/install --update
               rm -rf /tmp/awscli-installer
               echo "AWC CLI Installed"
+            }
+            [ -e /etc/bash_completion.d/aws_bash_completer ] || {
+              echo 'complete -C aws_completer aws' > /etc/bash_completion.d/aws_bash_completer
+              echo "AWC CLI Bash completion Enabled"
             }
         - name: awsp
           become: false
