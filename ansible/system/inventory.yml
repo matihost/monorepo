@@ -105,6 +105,7 @@ all:
         # - kubectl
         pips:
         - pip
+        - tox
         - flake8
         - flake8-docstrings
         - flake8-2020

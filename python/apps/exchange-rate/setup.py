@@ -7,8 +7,10 @@ import sys
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
 from os import path
+import site
 
-
+# workaround for https://github.com/pypa/pip/issues/7953
+site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
 here = path.abspath(path.dirname(__file__))
 sys.path.append(path.join(here, 'src'))
 
@@ -40,9 +42,9 @@ setup(
     # `src/`, it is necessary to specify the `package_dir` argument.
     package_dir={"": "src"},  # Optional
     packages=find_packages(where="src"),  # Required
-    python_requires=">=3.7, <4",
+    python_requires=">=3.8, <4",
     install_requires=[
-        "requests>=2.23.0, <3",
+        "requests>=2.25.1, <3",
     ],  # Optional
     dependency_links=[],
     entry_points={

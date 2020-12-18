@@ -18,12 +18,12 @@ exchange-rate CHF
 ## Develop
 
 ```bash
-# install app
+# run tox build
+make build
+
+# install app locally
 make install
 
-# ensure setup.py is synced with Pipfile.lock
-make setup.py
-
-# lint source code
-make lint
+# remove
+make uninstall
 ```
