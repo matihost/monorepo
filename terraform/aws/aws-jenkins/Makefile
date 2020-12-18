@@ -14,7 +14,7 @@ JENKINS_INSTANCE_PUBLIC_IP = $(shell aws ec2 describe-instances --filters 'Name=
 ssh: ## ssh to Jenkins EC2 instance
 	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(JENKINS_INSTANCE_PUBLIC_IP)
 
-show-instance-startup-logs: # show Jenkins EC2 cloud-init statup logs
+show-instance-startup-logs: ## show Jenkins EC2 cloud-init statup logs
 	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(JENKINS_INSTANCE_PUBLIC_IP) cat /var/log/cloud-init-output.log
 
 #TODO scale up when old instance state is no more running

@@ -7,6 +7,7 @@ export JENKINS_USER_ID=admin
 # since AWS Secret Manager is non free-tier eliglible
 export ADMIN_PASS='${admin_password}'
 export JENKINS_JAVA_ARGS="-Djava.awt.headless=true -Xmx356m -Djava.net.preferIPv4Stack=true -Djenkins.install.runSetupWizard=false -Dcasc.jenkins.config=\/var\/lib\/jenkins\/casc_configs"
+export JENKINS_PLUGIN_MANAGER_VERSION="2.5.0"
 export JENKINS_PLUGINS="ec2 \
   workflow-job:2.40 \
   workflow-aggregator:2.6 \
@@ -20,6 +21,7 @@ export JENKINS_PLUGINS="ec2 \
   simple-theme-plugin:0.6 \
   jdk-tool:1.4 \
   command-launcher:1.5 \
+  jaxb:2.3.0.1 \
   branch-api:2.6.2"
 
 function check_for_jenkins() {
@@ -72,6 +74,10 @@ instance.save()
 
 function download_jenkins_cli() {
   curl -sSL -o /var/lib/jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar
+}
+
+function download_jenkins_plugin_manager_cli() {
+  curl -sSL "https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/$${JENKINS_PLUGIN_MANAGER_VERSION}/jenkins-plugin-manager-$${JENKINS_PLUGIN_MANAGER_VERSION}.jar" -o /var/lib/jenkins/jenkins-plugin-manager.jar
 }
 
 function configure_common_casc() {
@@ -266,11 +272,21 @@ function install_plugins() {
   wget http://updates.jenkins-ci.org/update-center.json -qO- | sed '1d;$d' >/var/lib/jenkins/updates/default.json
   chmod 666 /var/lib/jenkins/updates/default.json
   chown -R jenkins:jenkins /var/lib/jenkins/updates
-  for plugin in $${JENKINS_PLUGINS}; do
-    # do not install-plugins as one list as jenkins-cli may change version of the particular dependent plugins
-    # shellcheck disable=SC2086
-    java -jar /var/lib/jenkins-cli.jar install-plugin $${plugin}
-  done
+
+  # dowloadinng using jenkins-cli - make version of plugin too new in some case
+  #
+  # for plugin in $${JENKINS_PLUGINS}; do
+  #   # do not install-plugins as one list as jenkins-cli may change version of the particular dependent plugins
+  #   # shellcheck disable=SC2086
+  #   java -jar /var/lib/jenkins-cli.jar install-plugin $${plugin}
+  # done
+
+  # better to use jenkins-plugin-manager to manager concrete version of plugins
+  rm -rf /var/lib/jenkins/plugins
+  # shellcheck disable=SC2086
+  java -jar /var/lib/jenkins/jenkins-plugin-manager.jar -d /var/lib/jenkins/plugins --plugins $${JENKINS_PLUGINS}
+  chown -R jenkins:jenkins /var/lib/jenkins/plugins
+
   configure_common_casc
   configure_ec2_plugin
   restart_jenkins
@@ -288,5 +304,6 @@ function install_plugins() {
   systemctl enable jenkins
 
   download_jenkins_cli
+  download_jenkins_plugin_manager_cli
   install_plugins
 }
