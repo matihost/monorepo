@@ -41,9 +41,9 @@ jobs:
     python: "3.8"
     before_install: cd python/apps/exchange-rate
     install:
-    - pip3 install tox --user
+    - pip3 install tox
     script:
     - make build
-    - make install
+    - pip3 install -e .
     - exchange-rate
     cache: pip
