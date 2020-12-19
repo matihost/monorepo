@@ -6,26 +6,26 @@
 substitutions:
   _MVN_SETTINGS: ".mvn/settings.xml"
 steps:
-# - id: algorithms
-#   name: maven:3-jdk-11
-#   entrypoint: 'bash'
-#   dir: "algorithms/project-euler"
-#   args:
-#   - '-eEuo'
-#   - 'pipefail'
-#   - '-c'
-#   - |-
-#     mvn -s ${_MVN_SETTINGS} clean install
-# - name: maven:3-jdk-11
-#   waitFor: ['algorithms']
-#   entrypoint: 'bash'
-#   dir: "java"
-#   args:
-#   - '-eEuo'
-#   - 'pipefail'
-#   - '-c'
-#   - |-
-#     mvn -s ${_MVN_SETTINGS} clean install
+- id: algorithms
+  name: maven:3-jdk-11
+  entrypoint: 'bash'
+  dir: "algorithms/project-euler"
+  args:
+  - '-eEuo'
+  - 'pipefail'
+  - '-c'
+  - |-
+    mvn -s ${_MVN_SETTINGS} clean install
+- name: maven:3-jdk-11
+  waitFor: ['algorithms']
+  entrypoint: 'bash'
+  dir: "java"
+  args:
+  - '-eEuo'
+  - 'pipefail'
+  - '-c'
+  - |-
+    mvn -s ${_MVN_SETTINGS} clean install
 - name: mirror.gcr.io/library/golang:latest
   waitFor: ['-']
   entrypoint: 'bash'
@@ -59,7 +59,7 @@ steps:
   - 'pipefail'
   - '-c'
   - |-
-    ansible-playbook dictionaries.yaml -v
+    make dictionaries.yaml
 - name: quay.io/matihost/ansible:latest
   waitFor: ['-']
   entrypoint: 'bash'
@@ -72,9 +72,9 @@ steps:
   - 'pipefail'
   - '-c'
   - |-
-    python3 setup.py build
-    pip3 install --user -e .
-    exchange-rate CHF
+    make build
+    make install
+    exchange-rate
 options:
   # store the logs only in Cloud Storage (do no use CloudLogging) and push logs during build (not at the end)
   logging: GCS_ONLY

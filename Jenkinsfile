@@ -177,10 +177,9 @@ spec:
               dir("python/apps/exchange-rate"){
                 echo "Building ${pwd()}..."
                 sh """
-                  pipenv install --dev -e .
-                  pipenv run pylint src/ tests/
-                  python3 setup.py build
-                  pipenv run exchange-rate CHF
+                  make build
+                  make install
+                  exchange-rate
                 """
               }
             }
@@ -192,7 +191,7 @@ spec:
               dir("ansible/learning"){
                 echo "Building ${pwd()}..."
                 sh """
-                  ansible-playbook dictionaries.yaml -v
+                  make dictionaries.yaml
                 """
               }
             }
