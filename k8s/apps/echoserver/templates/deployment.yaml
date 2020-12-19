@@ -59,7 +59,8 @@ spec:
         {{- if .Values.affinity.nodeAffinity.enabled }}
         # Example to limit which zones app can be deployed on
         nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
             nodeSelectorTerms:
             - matchExpressions:
               - key: failure-domain.beta.kubernetes.io/zone
@@ -72,13 +73,15 @@ spec:
         {{- if .Values.affinity.podAntiAffinity.enabled }}
         # To ensure pods are not deployed on the node (zone)
         podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app.kubernetes.io/name
-                operator: In
-                values:
-                - {{ include "app.name" . }}
-            topologyKey: {{ .Values.affinity.podAntiAffinity.topologyKey }}
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - {{ include "app.name" . }}
+              topologyKey: {{ .Values.affinity.podAntiAffinity.topologyKey }}
         {{- end }}
       terminationGracePeriodSeconds: 30
