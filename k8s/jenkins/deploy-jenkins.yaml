@@ -50,10 +50,11 @@
         type: kubernetes.io/tls
     no_log: true
 
-  - name: Deploy latest version of Jenkins chart inside {{ namespace }} namespace
+  - name: Deploy {{ chart_version }} version of Jenkins chart inside {{ namespace }} namespace
     helm:
       name: "{{ namespace }}"
       chart_ref: jenkinsci/jenkins
+      chart_version: "{{ chart_version }}"
       release_namespace: "{{ namespace }}"
       values: "{{ lookup('template', '{{ files }}/jenkins_helm.template.yaml') | from_yaml }}"
 

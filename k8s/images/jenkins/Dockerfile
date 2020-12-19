@@ -1,6 +1,6 @@
-FROM jenkins/jenkins:lts-jdk11
+FROM jenkins/jenkins:2.263.1-lts-jdk11
 RUN jenkins-plugin-cli --plugins \
-  kubernetes:1.28.3 \
+  kubernetes:1.28.4 \
   workflow-job:2.40 \
   workflow-aggregator:2.6 \
   credentials-binding:1.24 \
