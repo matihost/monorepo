@@ -43,6 +43,9 @@ Users management is not part of this setup.
   After running this terraform - remove the user and its AdministratorAccess attachment and:
 
   * create IAM User and assign it to LimitedAdmin group and relogin to it with `aws configure`.
+  * create AWS profile assuming particular role, for example run `./configure-assume-role.sh ami-builder` to
+  create AWS CLI profile assuming `ami-builder`
+
   * create another IAM User and assign it to IamAdmin group create AWS CLI profile with it `aws configure --profile iam`. Next run of this terraform script can run on user belonging to IAMAdmin group (aka do `awsp iam` to switch to this user before running `make apply`)
 
   * (Optionally) The root AWS account has to follow [this procedure](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_billing.html?icmpid=docs_iam_console#tutorial-billing-step1) to enable billing access to IAM users.
@@ -56,6 +59,10 @@ aws configure --profile iam
 # or to switch to in case you already login
 awsp iam
 awswhoami
+
+# creates AWS CLI profile which assume role
+./configure-assume-role.sh ami-builder
+awsp ami-builder
 
 # setup IAM resources
 make apply
