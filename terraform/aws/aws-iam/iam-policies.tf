@@ -1,6 +1,6 @@
 # Required to be able to set instance_profile on EC2 instance
 resource "aws_iam_policy" "passInstanceProfile" {
-  name        = "AllowPassingInstanceProfileToEC2"
+  name        = "PassInstanceProfileToEC2"
   path        = "/"
   description = "Allow to assing EC2 to InstanceProfile"
 
@@ -12,7 +12,32 @@ resource "aws_iam_policy" "passInstanceProfile" {
               "Effect": "Allow",
               "Action": [
                   "iam:PassRole",
+                  "iam:GetInstanceProfile",
                   "iam:ListInstanceProfiles"
+              ],
+              "Resource": "*"
+          }
+      ]
+  }
+  EOF
+}
+
+
+resource "aws_iam_policy" "assumeRole" {
+  name        = "AssumeRole"
+  path        = "/"
+  description = "Allow assuming role (act as a role)"
+
+  policy = <<-EOF
+  {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Effect": "Allow",
+              "Action": [
+                  "ec2:Describe*",
+                  "iam:ListRoles",
+                  "sts:AssumeRole"
               ],
               "Resource": "*"
           }
@@ -49,7 +74,7 @@ resource "aws_iam_policy" "billingViewAccess" {
 # aws sts decode-authorization-message --encoded-message (encoded error message) --query DecodedMessage --output text | jq '.'
 # to decode encoded authorization error messages
 resource "aws_iam_policy" "decodeAuthorizedMessages" {
-  name        = "AllowDecodeAuthorizationMessages"
+  name        = "DecodeAuthorizationMessages"
   path        = "/"
   description = "Allow to execute aws sts decode-authorization-message "
 
@@ -69,7 +94,7 @@ resource "aws_iam_policy" "decodeAuthorizedMessages" {
 
 # Required to create AutoScalingGroup and ALB
 resource "aws_iam_policy" "createASGAndALB" {
-  name        = "AllowCreateAutoScalingGroupAndApplicationLoadBalancer"
+  name        = "CreateAutoScalingGroupAndApplicationLoadBalancer"
   path        = "/"
   description = "Allow to create linked role for ASG and ALB"
 
@@ -106,6 +131,69 @@ resource "aws_iam_policy" "createASGAndALB" {
               "Resource": "arn:aws:iam::*:role/aws-service-role/elasticloadbalancing.amazonaws.com/AWSServiceRoleForElasticLoadBalancing*"
           }
       ]
+  }
+  EOF
+}
+
+
+
+resource "aws_iam_policy" "amiBuilder" {
+  name        = "AMIBuilder"
+  path        = "/"
+  description = "Allow to create AMI (Minimal Packer requirements)"
+
+  policy = <<-EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ec2:AttachVolume",
+          "ec2:AuthorizeSecurityGroupIngress",
+          "ec2:CopyImage",
+          "ec2:CreateImage",
+          "ec2:CreateKeypair",
+          "ec2:CreateSecurityGroup",
+          "ec2:CreateSnapshot",
+          "ec2:CreateTags",
+          "ec2:CreateVolume",
+          "ec2:DeleteKeyPair",
+          "ec2:DeleteSecurityGroup",
+          "ec2:DeleteSnapshot",
+          "ec2:DeleteVolume",
+          "ec2:DeregisterImage",
+          "ec2:DescribeImageAttribute",
+          "ec2:DescribeImages",
+          "ec2:DescribeInstances",
+          "ec2:DescribeInstanceStatus",
+          "ec2:DescribeRegions",
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeSnapshots",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeTags",
+          "ec2:DescribeVolumes",
+          "ec2:DetachVolume",
+          "ec2:GetPasswordData",
+          "ec2:ModifyImageAttribute",
+          "ec2:ModifyInstanceAttribute",
+          "ec2:ModifySnapshotAttribute",
+          "ec2:RegisterImage",
+          "ec2:RunInstances",
+          "ec2:StopInstances",
+          "ec2:TerminateInstances",
+          "ec2:CreateLaunchTemplate",
+          "ec2:DeleteLaunchTemplate",
+          "ec2:CreateFleet",
+          "ec2:DescribeSpotPriceHistory",
+          "ec2:DescribeVpcs",
+          "iam:PassRole",
+          "iam:GetInstanceProfile",
+          "iam:ListInstanceProfiles"
+        ],
+        "Resource": "*"
+      }
+    ]
   }
   EOF
 }

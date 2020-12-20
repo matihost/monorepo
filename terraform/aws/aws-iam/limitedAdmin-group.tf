@@ -4,6 +4,15 @@ resource "aws_iam_group" "limitedAdmin" {
   path = "/"
 }
 
+# group inline policies
+resource "aws_iam_group_policy" "limitedAdminInlinePolicy" {
+  name   = "AssumeRole"
+  group  = aws_iam_group.limitedAdmin.name
+  policy = aws_iam_policy.assumeRole.policy
+}
+
+# managed policies attachments
+# there is a hard limit of 10 managed policies that can be attached to a group
 resource "aws_iam_group_policy_attachment" "billingViewAccess" {
   group      = aws_iam_group.limitedAdmin.name
   policy_arn = aws_iam_policy.billingViewAccess.arn

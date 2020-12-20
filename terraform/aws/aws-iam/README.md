@@ -2,13 +2,15 @@
 
 Setup minimal IAM resources:
 
-* Policy: _BillingViewAccess_ to be able to see Billing Console content. To take effect root AWS account has to follow [this procedure](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_billing.html?icmpid=docs_iam_console#tutorial-billing-step1) to enable billing access for IAM users.
+* Managed Policy: _BillingViewAccess_ to be able to see Billing Console content. To take effect root AWS account has to follow [this procedure](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_billing.html?icmpid=docs_iam_console#tutorial-billing-step1) to enable billing access for IAM users.
 
-* Policy: _AllowPassingInstanceProfileToEC2_ to be able to pass instance profile to EC2 instance
+* Managed Policy: _PassInstanceProfileToEC2_ to be able to pass instance profile to EC2 instance
 
-* Policy: _AllowDecodeAuthorizationMessages_ to be able to decode encoded authorization errors
+* Managed Policy: _DecodeAuthorizationMessages_ to be able to decode encoded authorization errors
 
-* Group : _LimitedAdmin_ - it contains above policies, plus ViewOnlyAccess, network, lambda and system admin
+* Managed Policy: _AssumeRole_ to be able to switch to Roles
+
+* Group : _LimitedAdmin_ - it contains above policies, plus ViewOnlyAccess, network, lambda and system admin, and ability to assume to Role within Account.
   It does not allow IAM modifications - except IAMUserChangePassword (ability for an IAM user to change their own password).
 
 * Group : _IamAdmin_ - group allowing IAM modification, user and policies management, access to account billing information and tools.
@@ -21,6 +23,8 @@ Setup minimal IAM resources:
 
 ** _lambda-basic_ - role to be applied to Lambda, allowing accessing VPC resources
 Users management is not part of this setup.
+
+** _ami-builder_ - role used to create AMI by Packer. LimitedAdmin group is able to assume this role.
 
 ## Prerequisites
 
