@@ -2,13 +2,16 @@
 
 Setup minimal IAM resources:
 
+* Policy: _BillingViewAccess_ to be able to see Billing Console content. To take effect root AWS account has to follow [this procedure](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_billing.html?icmpid=docs_iam_console#tutorial-billing-step1) to enable billing access for IAM users.
+
 * Policy: _AllowPassingInstanceProfileToEC2_ to be able to pass instance profile to EC2 instance
 
 * Policy: _AllowDecodeAuthorizationMessages_ to be able to decode encoded authorization errors
 
-* Group : _IamAdmin_ - group allowing IAM modification, user and policies management
 * Group : _LimitedAdmin_ - it contains above policies, plus ViewOnlyAccess, network, lambda and system admin
   It does not allow IAM modifications - except IAMUserChangePassword (ability for an IAM user to change their own password).
+
+* Group : _IamAdmin_ - group allowing IAM modification, user and policies management, access to account billing information and tools.
 
 * Roles and Instance Profiles:
 
@@ -21,25 +24,35 @@ Users management is not part of this setup.
 
 ## Prerequisites
 
-* Logged to AWS Account allowing to modifty IAM.
-
-On fresh AWS root acccount it is recommeded to first create: IAM user and attach directly AdministratorAccess policy.
-
-Then run this terraform script.
-
-After running this terraform - assing the user to LimitedAdmin group and remove AdministratorAccess policy attachment.
-
-```bash
-aws configure
-```
-
-After that it is recommended to create IAM User and assing him LimitedAdmin user and relogin to it with `aws configure`.
-
 * Latest Terraform installed
+* [AWS CLI v2](https://github.com/aws/aws-cli/tree/v2)
+* Recommended [awsp](https://github.com/antonbabenko/awsp) to easily switch aws profiles.
+
+* AWS Account. AWS FreeTier Account is ok.
+
+* Logged to AWS Account allowing to modify IAM.
+
+  On fresh AWS root acccount it is recommeded to first create: IAM user and attach directly AdministratorAccess policy.
+
+  Then run this terraform script.
+
+  After running this terraform - remove the user and its AdministratorAccess attachment and:
+
+  * create IAM User and assign it to LimitedAdmin group and relogin to it with `aws configure`.
+  * create another IAM User and assign it to IamAdmin group create AWS CLI profile with it `aws configure --profile iam`. Next run of this terraform script can run on user belonging to IAMAdmin group (aka do `awsp iam` to switch to this user before running `make apply`)
+
+  * (Optionally) The root AWS account has to follow [this procedure](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_billing.html?icmpid=docs_iam_console#tutorial-billing-step1) to enable billing access to IAM users.
 
 ## Usage
 
 ```bash
+# login to AWS Account allowing to modify IAM.
+aws configure --profile iam
+
+# or to switch to in case you already login
+awsp iam
+awswhoami
+
 # setup IAM resources
 make apply
 

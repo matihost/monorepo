@@ -21,6 +21,29 @@ resource "aws_iam_policy" "passInstanceProfile" {
   EOF
 }
 
+resource "aws_iam_policy" "billingViewAccess" {
+  name        = "BillingViewAccess"
+  path        = "/"
+  description = "Allows users to access and view content on the Billing Console."
+
+  policy = <<-EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "aws-portal:ViewPaymentMethods",
+                "aws-portal:ViewAccount",
+                "aws-portal:ViewBilling",
+                "aws-portal:ViewUsage"
+            ],
+            "Resource": "*"
+        }
+    ]
+  }
+  EOF
+}
 
 # Required to run
 # aws sts decode-authorization-message --encoded-message (encoded error message) --query DecodedMessage --output text | jq '.'

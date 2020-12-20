@@ -4,6 +4,11 @@ resource "aws_iam_group" "limitedAdmin" {
   path = "/"
 }
 
+resource "aws_iam_group_policy_attachment" "billingViewAccess" {
+  group      = aws_iam_group.limitedAdmin.name
+  policy_arn = aws_iam_policy.billingViewAccess.arn
+}
+
 resource "aws_iam_group_policy_attachment" "createASGAndALB" {
   group      = aws_iam_group.limitedAdmin.name
   policy_arn = aws_iam_policy.createASGAndALB.arn
@@ -29,10 +34,6 @@ resource "aws_iam_group_policy_attachment" "viewOnlyAccessToAdminGroup" {
   policy_arn = "arn:aws:iam::aws:policy/job-function/ViewOnlyAccess"
 }
 
-resource "aws_iam_group_policy_attachment" "billingToAdminGroup" {
-  group      = aws_iam_group.limitedAdmin.name
-  policy_arn = "arn:aws:iam::aws:policy/job-function/Billing"
-}
 
 resource "aws_iam_group_policy_attachment" "systemAdminPolicyToAdminGroup" {
   group      = aws_iam_group.limitedAdmin.name
