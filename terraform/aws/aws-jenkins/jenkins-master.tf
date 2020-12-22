@@ -49,12 +49,12 @@ resource "aws_key_pair" "jenkins_key" {
 }
 
 
-data "aws_ami" "ubuntu" {
+data "aws_ami" "master" {
   most_recent = true
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    values = ["${var.jenkins_master_name}-*"]
   }
 
   filter {
@@ -62,7 +62,23 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 
-  owners = ["099720109477"] # Canonical
+  owners = ["self"]
+}
+
+data "aws_ami" "agent" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["${var.jenkins_agent_name}-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["self"]
 }
 
 
@@ -74,7 +90,11 @@ data "template_cloudinit_config" "config" {
   part {
     filename     = "init.cfg"
     content_type = "text/cloud-config"
-    content      = file("jenkins-master.cloud-init.yaml")
+    content      = <<-EOF
+    #cloud-config
+    ---
+    repo_upgrade: critical
+    EOF
   }
 
   part {
@@ -88,9 +108,10 @@ data "template_cloudinit_config" "config" {
   part {
     content_type = "text/x-shellscript"
     content = templatefile("jenkins-master.startup.sh.tpl", {
-      ami            = data.aws_ami.ubuntu.id,
-      zone           = var.zone,
-      admin_password = var.admin_password,
+      jenkins_agent_ami  = data.aws_ami.agent.id,
+      jenkins_agent_name = var.jenkins_agent_name,
+      zone               = var.zone,
+      admin_password     = var.admin_password,
     })
   }
 
@@ -104,7 +125,7 @@ resource "aws_launch_template" "jenkins" {
     name = var.instance_profile
   }
 
-  image_id = data.aws_ami.ubuntu.id
+  image_id = data.aws_ami.master.id
 
   instance_type = "t2.micro"
 
@@ -181,6 +202,26 @@ variable "zone" {
   default     = "us-east-1a"
   type        = string
   description = "Preffered AWS AZ where resources need to placed, has to be compatible with region used"
+}
+
+variable "jenkins_master_name" {
+  type        = string
+  description = <<-EOF
+  Prefix of the AMI in the current account to be used as Jenkins Master AMI
+  Default: jenkins-master - which is a build of prerequisites/amis/jenkins-master
+  EOF
+
+  default = "jenkins-master"
+}
+
+variable "jenkins_agent_name" {
+  type        = string
+  description = <<-EOF
+  Prefix of the AMI in the current account to be used as Jenkins Agent AMI
+  Default: jenkins-java-agent - which is a build of prerequisites/amis/jenkins-java-agent
+  EOF
+
+  default = "jenkins-java-agent"
 }
 
 

@@ -1,28 +1,12 @@
 #!/usr/bin/env bash
 
-# Env variables, JENKIS_* are variable used by jenkins-cli as well h
+# Env variables, JENKINS_* are variable used by jenkins-cli as well
 export JENKINS_URL="http://localhost:8080"
 export JENKINS_USER_ID=admin
 # TODO use AWS Secret Manager to retrieve password/secret upon boot
 # since AWS Secret Manager is non free-tier eliglible
 export ADMIN_PASS='${admin_password}'
 export JENKINS_JAVA_ARGS="-Djava.awt.headless=true -Xmx356m -Djava.net.preferIPv4Stack=true -Djenkins.install.runSetupWizard=false -Dcasc.jenkins.config=\/var\/lib\/jenkins\/casc_configs"
-export JENKINS_PLUGIN_MANAGER_VERSION="2.5.0"
-export JENKINS_PLUGINS="ec2 \
-  workflow-job:2.40 \
-  workflow-aggregator:2.6 \
-  credentials-binding:1.24 \
-  git:4.5.0 \
-  configuration-as-code:1.46 \
-  timestamper:1.11.8 \
-  github-branch-source:2.9.2 \
-  matrix-auth:2.6.4 \
-  prometheus:2.0.8 \
-  simple-theme-plugin:0.6 \
-  jdk-tool:1.4 \
-  command-launcher:1.5 \
-  jaxb:2.3.0.1 \
-  branch-api:2.6.2"
 
 function check_for_jenkins() {
   # shellcheck disable=SC2091
@@ -215,7 +199,7 @@ jenkins:
       region: \"us-east-1\"
       sshKeysCredentialsId: \"jenkins-key\"
       templates:
-      - ami: \"${ami}\"
+      - ami: \"${jenkins_agent_ami}\"
         amiType:
           unixData:
             rootCommandPrefix: \"sudo\"
@@ -224,16 +208,15 @@ jenkins:
         connectBySSHProcess: true
         connectionStrategy: PRIVATE_IP
         deleteRootOnTermination: true
-        description: \"ubuntu-basic\"
+        description: \"${jenkins_agent_name}\"
         ebsOptimized: false
         hostKeyVerificationStrategy: ACCEPT_NEW
         idleTerminationMinutes: \"30\"
         initScript: |-
           #!/usr/bin/env bash
 
-          sudo apt update
-          sudo apt -y install openjdk-11-jdk
-        labelString: \"aws-ubuntu\"
+          echo \"Jenkins Agent with label: ${jenkins_agent_name} from AMI: ${jenkins_agent_ami} has been started\"
+        labelString: \"${jenkins_agent_name}\"
         launchTimeoutStr: \"900\"
         maxTotalUses: -1
         minimumNumberOfInstances: 0
@@ -260,7 +243,7 @@ jenkins:
 }
 
 
-function install_plugins() {
+function deploy_plugins() {
   # TODO use Admin token instead (create it via /configure/me )
   # jenkins-cli uses JENKINS_URL, JENKINS_USER_ID and JENKINS_API_TOKEN env variables
   export JENKINS_API_TOKEN="$${ADMIN_PASS}"
@@ -273,7 +256,7 @@ function install_plugins() {
   chmod 666 /var/lib/jenkins/updates/default.json
   chown -R jenkins:jenkins /var/lib/jenkins/updates
 
-  # dowloadinng using jenkins-cli - make version of plugin too new in some case
+  # downloading using jenkins-cli - make version of plugin too new in some case
   #
   # for plugin in $${JENKINS_PLUGINS}; do
   #   # do not install-plugins as one list as jenkins-cli may change version of the particular dependent plugins
@@ -282,9 +265,9 @@ function install_plugins() {
   # done
 
   # better to use jenkins-plugin-manager to manager concrete version of plugins
+  # plugin manager and jenkins itself is moved to base Jenkins Master AMI
   rm -rf /var/lib/jenkins/plugins
-  # shellcheck disable=SC2086
-  java -jar /var/lib/jenkins/jenkins-plugin-manager.jar -d /var/lib/jenkins/plugins --plugins $${JENKINS_PLUGINS}
+  cp -r /usr/share/jenkins/ref/plugins /var/lib/jenkins/plugins
   chown -R jenkins:jenkins /var/lib/jenkins/plugins
 
   configure_common_casc
@@ -295,15 +278,9 @@ function install_plugins() {
 # Main
 
 [ -d /var/lib/jenkins/casc_configs ] || {
-  apt update
-  # that will run Jenkins immediately after installation
-  apt -y install jenkins
-
+  systemctl enable jenkins --now
   init_config
-
   systemctl enable jenkins
-
   download_jenkins_cli
-  download_jenkins_plugin_manager_cli
-  install_plugins
+  deploy_plugins
 }

@@ -1,5 +1,8 @@
 WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
-apply: prepare ## deploy Jenkins EC2 instance and related resources, usage: make apply PASS=passwordForJenkinsMaster
+JENKINS_MASTER_AMI := jenkins-master
+JENKISN_AGENT_AMI := jenkins-java-agent
+
+apply: prepare check-master-ami check-agent-ami ## deploy Jenkins EC2 instance and related resources, usage: make apply PASS=passwordForJenkinsMaster
 ifndef PASS
 	$(error Env PASS is not defined. Provider password for Jenkins admin to provision.)
 endif
@@ -46,6 +49,13 @@ endif
 
 prepare:
 	@[ -e "$(HOME)/.ssh/id_rsa.aws.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.aws.vm; }
+
+
+check-master-ami:
+	@[ -n "`aws ec2 describe-images --owners self --filters "Name=name,Values=$(JENKINS_MASTER_AMI)*" --query 'sort_by(Images, &CreationDate)[].ImageId'`" ] || { echo "Missing Jenkins Master AMI in current AWS account: $(JENKINS_MASTER_AMI), run prerequisites/amis/$(JENKINS_MASTER_AMI) to build AMI first"; exit 1;}
+
+check-agent-ami:
+	@[ -n "`aws ec2 describe-images --owners self --filters "Name=name,Values=$(JENKINS_AGENT_AMI)*" --query 'sort_by(Images, &CreationDate)[].ImageId'`" ] || { echo "Missing Jenkins Master AMI in current AWS account: $(JENKINS_AGENT_AMI), run prerequisites/amis/$(JENKINS_AGENT_AMI) to build AMI first"; exit 1;}
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
