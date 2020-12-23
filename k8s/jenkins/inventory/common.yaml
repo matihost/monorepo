@@ -6,7 +6,7 @@ all:
       vars:
         files: "{{ playbook_dir }}/files"
         namespace: ci
-        chart_version: "3.0.9"
+        chart_version: "3.0.12"
         jenkins_service_type: NodePort
         use_prebuild_jenkins_image: true
-        ingress_version: v1beta1
+        ingress_version: v1

@@ -17,6 +17,8 @@ aws configure
 * The terraform variable: `instance_profile` (default: `jenkins-master`) is already deployed IAM Role.
   The role have to allow acces to create EC2 isntances. It will applied on Jenkins Master EC2 instance so that it can spin Jenkins Agents as EC2 instances. It can be achieved by install `..\aws-iam` terraform script before.
 
+* AMIs for Jenkins Master and Agent are already build. Check and build `prerequisites/amis/...`
+
 ## Usage
 
 ```bash
@@ -43,9 +45,8 @@ make recreate-instance
 # show Terraform state along with current EC2 instance user_date startup script
 make show-state
 
-# terminates all AWS resource created with apply task
-# Warning: it does not destroy Jenkins Agents VMs
-# So before running remove Jenkins Agents VMs first
-# The easiest way is to 'Delete Agent' from Jenkins UI or Terminate all 'jenkins-agent' EC2 from AWS console
+# terminates all AWS resource created with apply task, it also proactively terminate all EC2 jenkins-agent instances.
+# Warning: it does not destroy Jenkins Master nor Agent AMIs!
+# In order to destroy them run `make clean-amis` in `prerequisites/amis/...` directories.
 make destroy
 ```
