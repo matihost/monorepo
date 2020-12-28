@@ -1,18 +1,28 @@
 CURRENT_PROJECT := $(shell gcloud config get-value project)
+WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
+ACCESS_FROM_LAPTOP := true
 
 apply: ## setup GKE cluster
+	@export TF_VAR_external_access_ip=$(WHOAMI) && \
 	export TF_VAR_project=$(CURRENT_PROJECT) && \
+	export TF_VAR_expose_master_via_external_ip=$(ACCESS_FROM_LAPTOP) && \
 	terraform init -upgrade=true && \
 	terraform validate && \
 	terraform plan -lock=false && \
 	terraform apply -auto-approve && \
-	echo "Run 'source access-gke.sh' to setup GKE access for kubectl etc. commands in current shell"
+	[ "$(ACCESS_FROM_LAPTOP)" = "true" ] && \
+    echo "Run 'gcloud container clusters get-credentials shared-dev --zone us-central1-a' to access GKE  from Kubectl" || \
+    echo "Run 'source access-gke.sh' to setup GKE access for kubectl etc. commands in current shell";
+
+setup-tunnel-via-bastion: ## opens tunnel via bastion, export HTTP_PROXY=http://localhost:8888 to use it in the shell
+	gcloud compute ssh shared-dev-bastion -- -o ExitOnForwardFailure=yes -M -S /tmp/sslsock -L8888:127.0.0.1:8888 -f sleep 36000
 
 show-state: ## show terraform.state
 	terraform state list
 	terraform show
 
-destroy: ## destroy VM instance
+destroy: ## destroy GKE resources
+	export TF_VAR_external_access_ip=$(WHOAMI) && \
 	export TF_VAR_project=$(CURRENT_PROJECT) && \
 	terraform plan && terraform destroy -auto-approve
 

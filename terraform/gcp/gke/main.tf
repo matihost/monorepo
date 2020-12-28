@@ -44,9 +44,31 @@ variable "env" {
   description = "Environment"
 }
 
-
 variable "regional_cluster" {
   type        = bool
   default     = false
   description = "Whether to create regional cluster. Default false - which means cluster will be zonal."
+}
+
+variable "expose_master_via_external_ip" {
+  type        = bool
+  default     = false
+  description = "Whether to expose Kube API as ExternalIP. Default false - which means cluster will be available only from internal VPC"
+}
+
+variable "external_access_ip" {
+  type        = string
+  description = "The public IP which is allowed to access Kube API"
+}
+
+variable "external_dns_k8s_namespace" {
+  type        = string
+  default     = "external-dns"
+  description = "GKE Namespace where ExternalDNS is being deployed"
+}
+
+variable "external_dns_k8s_sa_name" {
+  type        = string
+  default     = "external-dns"
+  description = "ExternalDNS  K8S ServiceAccount"
 }

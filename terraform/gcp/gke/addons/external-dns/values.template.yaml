@@ -1,0 +1,52 @@
+# yamllint disable-file
+---
+provider: google
+
+google:
+  project: \"${GCP_PROJECT}\"
+
+
+domainFilters: []
+
+## Adjust the interval for DNS updates
+interval: "1m"
+logFormat: json
+
+## Modify how DNS records are synchronized between sources and providers (options: sync, upsert-only)
+policy: upsert-only
+
+registry: txt
+txtOwnerId: my-identifier
+
+
+## Replica count
+replicas: 1
+
+serviceAccount:
+  create: true
+  name: external-dns
+  ## Annotations for the Service Account - Needed for WorflowIdentityToWork
+  annotations: {
+    iam.gke.io/gcp-service-account: \"${GCP_GSA}@${GCP_PROJECT}.iam.gserviceaccount.com\"
+  }
+
+rbac:
+  create: true
+  clusterRole: true
+  apiVersion: v1
+  pspEnabled: true
+
+securityContext: {}
+podSecurityContext:
+  fsGroup: 1001
+  runAsUser: 1001
+  # runAsNonRoot: true
+
+
+resources:
+ limits:
+   cpu: 50m
+   memory: 50Mi
+ requests:
+   memory: 50Mi
+   cpu: 10m

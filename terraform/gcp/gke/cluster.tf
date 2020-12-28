@@ -108,6 +108,13 @@ resource "google_container_cluster" "gke" {
     cidr_blocks {
       cidr_block = google_compute_subnetwork.private-gke.ip_cidr_range
     }
+    # PublicIP cannot be added as authorized  when enable_private_endpoint is true
+    dynamic "cidr_blocks" {
+      for_each = var.expose_master_via_external_ip ? [1] : []
+      content {
+        cidr_block = "${var.external_access_ip}/32"
+      }
+    }
   }
 
   pod_security_policy_config {
@@ -116,7 +123,7 @@ resource "google_container_cluster" "gke" {
 
   private_cluster_config {
     enable_private_nodes    = true
-    enable_private_endpoint = true
+    enable_private_endpoint = !var.expose_master_via_external_ip
     master_ipv4_cidr_block  = "172.16.0.64/28"
     master_global_access_config {
       enabled = true
