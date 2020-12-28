@@ -8,9 +8,11 @@ It also provisions:
 
 * Bastion VM with TinyProxy to allow access to internal Ingresses resources from laptop (and Kube API in case enable_private_endpoint is se to true).
 
-Use  GCP resources eliglible to [GCP Free Tier](https://cloud.google.com/free/docs/gcp-free-tier#free-tier-usage-limits) __only__.
+* Setup `restricted` PodSecurityPolicty to allow non priviledge deployment out of the box
 
-* Setup Cloud private zone and resources for ExternalDNS deployment
+* Create CloudDNS private `gke.shared.dev.` zone and deploy ExternalDNS for Ingress/Svs auto DNS record provisioning.
+
+Use  GCP resources eliglible to [GCP Free Tier](https://cloud.google.com/free/docs/gcp-free-tier#free-tier-usage-limits) __only__.
 
 ## Prerequisites
 
@@ -29,11 +31,11 @@ make google-authentication
 # but limits access only from this laptop public ip
 make apply
 
-# populate kubecotx with credentials to cluster
-gcloud container clusters get-credentials shared-dev --zone us-central1-a
+# opens tunnel via bastion, export HTTP_PROXY=http://localhost:8888 to use it in the shell
+make open-tunnel
 
-# opens tunnel via bastion hpst, export HTTP_PROXY=http://localhost:8888 to use it in the shell
-make setup-tunnel-via-bastion
+# creates ~/.kube/config context to for GKE cluster
+make setup-kubecontext
 
 # create GKE cluster w/o public IP for Master Kube API
 make ACCESS_FROM_LAPTOP=false
@@ -48,5 +50,7 @@ curl -x http://localhost:8888 -ksSL https://yyyy.gke.shared.dev
 make show-state
 
 # terminates all GCP resources created with apply task
+# Warning: Ensure you shut down all apps and their GCP resources (mainly ingresses, dns record sets)
+# Because it will prevent cluster from build shutdown completely
 make destroy
 ```

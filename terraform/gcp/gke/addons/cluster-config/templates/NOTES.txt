@@ -1,0 +1,2 @@
+Install cluster GKE configurations:
+- PSP restricted

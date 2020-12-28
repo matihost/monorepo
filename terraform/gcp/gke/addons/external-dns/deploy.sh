@@ -6,7 +6,7 @@ export GCP_GSA="edns-sa"
 
 template=$(cat values.template.yaml)
 
-helm install external-dns \
+helm upgrade --install external-dns \
   --namespace=external-dns \
   --create-namespace \
   -f <(eval "echo -e \"${template}\"") \

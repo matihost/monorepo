@@ -3,20 +3,20 @@
 provider: google
 
 google:
-  project: \"${GCP_PROJECT}\"
+  project: '${GCP_PROJECT}'
 
 
 domainFilters: []
 
 ## Adjust the interval for DNS updates
-interval: "1m"
+interval: '1m'
 logFormat: json
 
 ## Modify how DNS records are synchronized between sources and providers (options: sync, upsert-only)
-policy: upsert-only
+policy: sync
 
 registry: txt
-txtOwnerId: my-identifier
+# txtOwnerId: my-identifier
 
 
 ## Replica count
@@ -27,7 +27,7 @@ serviceAccount:
   name: external-dns
   ## Annotations for the Service Account - Needed for WorflowIdentityToWork
   annotations: {
-    iam.gke.io/gcp-service-account: \"${GCP_GSA}@${GCP_PROJECT}.iam.gserviceaccount.com\"
+    iam.gke.io/gcp-service-account: '${GCP_GSA}@${GCP_PROJECT}.iam.gserviceaccount.com'
   }
 
 rbac:
