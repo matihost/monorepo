@@ -78,11 +78,15 @@
     shell: |
       # When minikube runs on containerd it overrding config with own, fix config to default one.
       command -v crictl 1>/dev/null 2>/dev/null && {
-        CRICTL_PRUNE_OUTPUT="$(crictl rmi -a -q 2>&1 | grep -v 'No images to remove')"
+        CRICTL_PRUNE_OUTPUT="$(crictl rmi -a 2>&1 | grep -v 'No images to remove')"
         if [[ "${CRICTL_PRUNE_OUTPUT}" == *"unknown service"* ]]; then
           containerd config default > /etc/containerd/config.toml
-          systemctl restart containerd --wait
-          CRICTL_PRUNE_OUTPUT="$(crictl rmi -a -q 2>&1 | grep -v 'No images to remove')"
+          systemctl restart containerd
+          while [[ "$(systemctl is-active containerd)" != "active" ]]; do
+            printf "."
+            sleep 1
+          done
+          CRICTL_PRUNE_OUTPUT="$(crictl rmi -a 2>&1 | grep -v 'No images to remove')"
         fi
         if [ -n "${CRICTL_PRUNE_OUTPUT}" ]; then
           echo "${CRICTL_PRUNE_OUTPUT}"
