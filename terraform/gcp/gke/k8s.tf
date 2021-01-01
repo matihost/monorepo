@@ -29,6 +29,10 @@ resource "helm_release" "cluster-config" {
 
 # Deploy ExternalDNS addon
 resource "helm_release" "external-dns" {
+  # Ensure deployment starts when GKE Node Pool is provisioned
+  depends_on = [
+    google_container_node_pool.gke_nodes
+  ]
   name       = "external-dns"
   repository = "https://charts.bitnami.com/bitnami"
   chart      = "external-dns"

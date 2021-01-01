@@ -29,6 +29,7 @@ resource "google_compute_instance" "vm" {
 
   metadata = {
     enable-oslogin = "TRUE"
+    # startup-script-url = "gs://bucket/context/path/some-startup-script.sh"
   }
 
   network_interface {
