@@ -7,7 +7,7 @@ Vagrant.configure("2") do |config|
   # boxes at https://vagrantcloud.com/search.
   config.vm.box = "bento/centos-8"
 
-  (0..3).each do |i|
+  (0..4).each do |i|
     config.vm.disk :disk, size: "5GB", name: "disk-#{i}"
   end
 
@@ -27,8 +27,8 @@ Vagrant.configure("2") do |config|
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
   # config.vm.network "private_network", ip: "192.168.33.10"
-  config.vm.network "private_network", type: "dhcp"
-  config.vm.network "private_network", ip: "172.30.250.2", auto_config: false
+  config.vm.network "private_network", ip: "172.28.128.3", netmask: 24, type: "dhcp"
+  config.vm.network "private_network", ip: "172.30.250.3", netmask: 24, auto_config: false
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -61,10 +61,11 @@ Vagrant.configure("2") do |config|
     # install basic edit tools
     yum -y install bash-completion man-pages vim
 
-    # install Logical Volume Manager, XFS Dump/Restore Utility, Virtual Data Optimizer, Stratis
-    yum -y install lvm2 xfsdump vdo stratis-cli stratisd
-    systemctl enable stratisd.service --now
-
     yum -y module install container-tools
   SHELL
+
+  config.vm.provision "shell", run: "once", path: "scripts/networking.sh"
+  config.vm.provision "shell", run: "once", path: "scripts/storage.sh"
+  config.vm.provision "shell", run: "once", path: "scripts/nfs.sh"
+  config.vm.provision "shell", run: "once", path: "scripts/httpd.sh"
 end

@@ -12,10 +12,10 @@ run: ## run VM
 ssh: ## ssh to VM
 	vagrant ssh
 
-reload: ## restart VM with reloading Vagrantfile content w/o enforcing once provisioners
+restart: ## restart VM with reloading Vagrantfile content w/o enforcing once provisioners
 	vagrant reload
 
-restart: ## restart VM with reloading Vagrantfile content and enforce once provisioner to run
+re-provision: ## restart VM with reloading Vagrantfile content and enforce once provisioner to run
 	vagrant reload --provision
 
 stop: ## stop VM
