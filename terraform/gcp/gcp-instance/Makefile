@@ -12,6 +12,9 @@ CURRENT_ACCOUNT_SSH_USER := $(shell gcloud config get-value account | sed -E "s/
 ssh: ## ssh to VM instance using ssh client via ssh key added to OS login
 	ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=accept-new $(CURRENT_ACCOUNT_SSH_USER)@$(shell terraform output public_ip)
 
+check-startup: ## check VM startup script logs
+	ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=accept-new $(CURRENT_ACCOUNT_SSH_USER)@$(shell terraform output public_ip) sudo journalctl -u google-startup-scripts.service
+
 gssh: ## ssh to VM instance using gcloud
 	gcloud compute ssh $(shell terraform output instance_name)
 
