@@ -17,7 +17,8 @@ chown -R nobody:nobody /mnt/storage/share{1..5}
 
 echo '/mnt/storage/share5  *(rw,sync,root_squash)
 /mnt/storage/share4  *(rw,sync,root_squash)
-/mnt/storage/share3  *(rw,sync,root_squash)' >>/etc/exports
+/mnt/storage/share3  *(rw,sync,root_squash)
+/mnt/storage/share2  172.30.250.*(rw,sync,root_squash) 10.*(ro)' >>/etc/exports
 
 # reload NFS exports
 exportfs -rav
