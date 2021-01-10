@@ -8,6 +8,11 @@ yum -y install nfs-utils
 firewall-cmd --add-service={mountd,nfs,rpc-bind}
 firewall-cmd --runtime-to-permanent
 
+# enable NFS flags on SELinux level
+setsebool -P nfs_export_all_rw on
+setsebool -P httpd_use_nfs on
+setsebool -P use_nfs_home_dirs on
+
 systemctl enable nfs-server.service --now
 
 # export sample directories
@@ -33,3 +38,8 @@ exportfs -rav
 
 # or wildcard mount of all exported subdirs of /mtn/storage to /mnt/nas/vm/*
 # echo '* -fstype=nfs,rw 172.30.250.3:/mnt/storage/&' > /etc/auto.vm-nfs
+
+# or direct mount
+# mkdir -p /mnt/nas/vm
+# echo '/- /etc/auto.vm-nfs' > /etc/auto.master.d/vm-nfs.autofs
+# echo '/mnt/nas/vm/share3 -fstype=nfs,rw 172.30.250.3:/mnt/storage/share3' > /etc/auto.vm-nfs

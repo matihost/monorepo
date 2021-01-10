@@ -10,7 +10,7 @@ sed -i -E 's/^#ServerName .*$/ServerName centos:80/g' /etc/httpd/conf/httpd.conf
 sudo firewall-cmd --add-service=http --add-service=https
 sudo firewall-cmd --runtime-to-permanent
 
-# define http VirtualHost for "magic.centos"
+## define http VirtualHost for "magic.centos"
 
 # when any VirtualHost with *:80 appears it overrides the default main config from /etc/httpd/conf/httpd.conf
 # it means that when no ServerName matcher, it will choose the first VirtualHost
@@ -22,20 +22,31 @@ echo '<VirtualHost *:80>
     ServerAlias centos
 </VirtualHost>
 
+<Directory "/usr/local/www">
+    AllowOverride None
+    # Allow open access:
+    Require all granted
+</Directory>
 <VirtualHost *:80>
-    DocumentRoot "/var/www/magic/html"
+    DocumentRoot "/usr/local/www/magic/html"
     ServerName magic.centos
     ServerAlias magic
 </VirtualHost>' >/etc/httpd/conf.d/vhosts.conf
 
-mkdir -p /var/www/magic/html
-echo "magic welcomes" >/var/www/magic/html/index.html
+mkdir -p /usr/local/www/magic/html
+echo "magic welcomes" >/usr/local/www/magic/html/index.html
 echo "default welcomes" >/var/www/html/index.html
-chown -R apache:apache /var/www/magic /var/www/html/index.html
+
+chown -R apache:apache /usr/local/www /var/www/html/index.html
+# ensure SELinux context is set on files so that HTTPD can access them
+# set httpd_sys_content_t type context on /usr/local/www files so that httpd_t can acces them
+semanage fcontext -a -t httpd_sys_content_t '/usr/local/www(/.*)?'
+restorecon -R /usr/local/www
 
 systemctl enable --now httpd
 
-# testing - default VirtualHost
+# testing from other machine
+# # testomg - default VirtualHost
 # curl -H "Host: centos"  -v http://172.30.250.3
 # curl -H "Host: whatever"  -v http://172.30.250.3
 # curl -v http://172.30.250.3
@@ -44,7 +55,7 @@ systemctl enable --now httpd
 # curl -H "Host: magic.centos"  -v http://172.30.250.3
 # curl -H "Host: magic"  -v http://172.30.250.3
 
-# define https VirtualHost for "magic.centos"
+## define https VirtualHost for "magic.centos"
 
 # it contains c_rehash script
 yum -y install openssl-perl
@@ -76,7 +87,7 @@ update-ca-trust
 c_rehash
 
 echo '<VirtualHost 172.30.250.3:443>
-    DocumentRoot "/var/www/magic/html"
+    DocumentRoot "/usr/local/www/magic/html"
     ServerName magic.centos
     ServerAlias magic
     SSLEngine on
@@ -93,3 +104,30 @@ systemctl reload --now httpd
 # curl https://magic.centos
 # from other box:
 # curl -k -H "Host: magic.centos"  https://172.30.250.3
+
+## adding additional port 1180 on which Apache/httpd listens
+
+# open 1180/tcp port on firewall
+firewall-cmd --add-port=1180/tcp
+firewall-cmd --runtime-to-permanent
+
+# allow httpd acceess to port 1180 on SELinux level
+semanage port -a -t http_port_t -p tcp 1180
+
+# and finally configure Apache server
+echo 'Listen 1180
+
+<VirtualHost *:1180>
+    DocumentRoot "/var/www/html"
+    ServerName centos
+    # other Host to be choosen
+    ServerAlias centos
+</VirtualHost>
+
+<VirtualHost *:1180>
+    DocumentRoot "/usr/local/www/magic/html"
+    ServerName magic.centos
+    ServerAlias magic
+</VirtualHost>
+' >>/etc/httpd/conf.d/vhosts.conf
+systemctl reload --now httpd

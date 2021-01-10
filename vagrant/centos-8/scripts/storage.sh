@@ -104,3 +104,10 @@ echo "/mnt/stratis /etc/auto.stratis" >/etc/auto.master.d/stratis.autofs
 echo "sfs1 -fstype=xfs,rw :/stratis/pool1/sfs1" >/etc/auto.stratis
 
 systemctl reload autofs.service
+
+# temporal directory managed and cleaned by systemd-tmpfiles timer
+# items older than 30 seconds are removed
+echo '#Type Path            Mode UID  GID  Age Argument
+d     /run/volatile   0700 root root 30s -
+' >/etc/tmpfiles.d/volatile.conf
+systemd-tmpfiles --create

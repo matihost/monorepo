@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# change timezone
+timedatectl set-timezone Europe/Warsaw
+# maintain the RTC in universal time
+timedatectl set-local-rtc
+
 # make journal persistent in /var/log/journal (instead in /run/log/journal)
 sed -i -E 's/^#Storage=.*$/Storage=persistent/g' /etc/systemd/journald.conf
 systemctl restart systemd-journald.service
@@ -32,3 +37,10 @@ grubby --add-kernel="/boot/vmlinuz-emergency" --title="emergency boot" --initrd=
 cp "${DEFAULT_KERNEL_PATH}" /boot/vmlinuz-rootpasswd
 cp "${DEFAULT_INITRDIMG_PATH}" /boot/initramfs-rootpasswd.img
 grubby --add-kernel="/boot/vmlinuz-rootpasswd" --title="rootpasswd boot" --initrd="/boot/initramfs-rootpasswd.img" --copy-default --args="rd.break"
+
+# increase wait time to 5 seconds
+sed -i -E 's/^GRUB_TIMEOUT=.*$/GRUB_TIMEOUT=5/g' /etc/default/grub
+# rebuild grub config on BIOS/MBR based machines
+grub2-mkconfig -o /boot/grub2/grub.cfg
+# rebuild on UEFI/GPT based machines, VBoxCentos is run as MBR machine
+#grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
