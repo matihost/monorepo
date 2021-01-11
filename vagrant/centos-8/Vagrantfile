@@ -60,8 +60,6 @@ Vagrant.configure("2") do |config|
 
     # install basic edit tools
     yum -y install bash-completion man-pages vim
-
-    yum -y module install container-tools
   SHELL
 
   config.vm.provision "shell", run: "once", path: "scripts/system.sh"
@@ -69,6 +67,9 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", run: "once", path: "scripts/storage.sh"
   config.vm.provision "shell", run: "once", path: "scripts/nfs.sh"
   config.vm.provision "shell", run: "once", path: "scripts/httpd.sh"
+  config.vm.provision "shell", run: "once", path: "scripts/containers.sh"
+  config.vm.provision "shell", run: "once", path: "scripts/user-container-service.sh", privileged: false
+
 
   # Run script after boot completed
   config.trigger.after [:up] do |trigger|
