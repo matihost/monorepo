@@ -12,15 +12,17 @@ EXPOSE 80
 # Start the service
 CMD ["-D", "FOREGROUND"]
 ENTRYPOINT ["/usr/sbin/httpd"]
+# or shell form which prevents usage of CMD params
+#ENTRYPOINT /usr/sbin/httpd && cat
 '
 mkdir -p /tmp/mywebi
 cd /tmp/mywebi || exit 1
 echo "${DOCKERFILE}" >Dockerfile
 # building image
-bud -t vagrant/webi:latest .
+buildah bud -t vagrant/webi:latest .
 
 # create user land systemd directories
-mkdir ~/.config/systemd/user
+mkdir -p ~/.config/systemd/user
 cd ~/.config/systemd/user || exit 1
 rm -rf /tmp/mywebi
 # create container w/o running it,
@@ -28,12 +30,10 @@ rm -rf /tmp/mywebi
 # and ideally expose some port on host on host
 podman create -d --name=webi -it --rm -p 81:80 localhost/vagrant/webi:latest
 # allow user-land systemd services survice user logout
-loginctl enable-linger testing
+loginctl enable-linger vagrant
 
 # generate
-podman generate systemd --new --files webi
-# rename container-ID.service to normal name
-mv container-*.service container-webi.service
+podman generate systemd -n --new --files webi
 # remove container to allow systemd start container with the same name
 podman rm webi
 # enable service on user login and start it now

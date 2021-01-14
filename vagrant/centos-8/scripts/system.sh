@@ -2,8 +2,6 @@
 
 # change timezone
 timedatectl set-timezone Europe/Warsaw
-# maintain the RTC in universal time
-timedatectl set-local-rtc
 
 # make journal persistent in /var/log/journal (instead in /run/log/journal)
 sed -i -E 's/^#Storage=.*$/Storage=persistent/g' /etc/systemd/journald.conf
@@ -44,3 +42,28 @@ sed -i -E 's/^GRUB_TIMEOUT=.*$/GRUB_TIMEOUT=5/g' /etc/default/grub
 grub2-mkconfig -o /boot/grub2/grub.cfg
 # rebuild on UEFI/GPT based machines, VBoxCentos is run as MBR machine
 #grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
+
+# sample users
+groupadd testers
+groupadd infra
+for i in {1..3}; do useradd -m -s /bin/bash -g testers test${i}; done
+for i in {1..3}; do echo "test" | passwd --stdin test${i}; done
+for i in {1..3}; do useradd -m -s /bin/bash -g infra infra${i}; done
+for i in {1..3}; do echo "test" | passwd --stdin infra${i}; done
+
+# sample colaborative directory
+mkdir /src
+chmod 775 /src
+chown root:testers /src
+# files, and directories will have owner same as /src directory which is testing
+chmod g+s /src
+
+# allow full access to infra group as well
+setfacl -m g:infra:rwx /src
+
+# ensure new files and directories will get correct ACLs
+setfacl -m d:u::rwx /src
+setfacl -m d:u::rwx /src
+setfacl -m d:g::rwx /src
+setfacl -m d:o::r-x /src
+setfacl -m d:g:infra:rwx /src
