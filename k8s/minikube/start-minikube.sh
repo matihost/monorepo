@@ -211,6 +211,7 @@ if ! minikube status &>/dev/null; then
   sudo mkdir -p /etc/kubernetes
   sudo chmod a+rwx /etc/kubernetes
 
+  # Default admission plugins do not need to be specified in apiserver.enable-admission-plugins: NamespaceLifecycle, LimitRanger, ServiceAccount, TaintNodesByCondition, Priority, DefaultTolerationSeconds, DefaultStorageClass, StorageObjectInUseProtection, PersistentVolumeClaimResize, RuntimeClass, CertificateApproval, CertificateSigning, CertificateSubjectRestriction, DefaultIngressClass, MutatingAdmissionWebhook, ValidatingAdmissionWebhook, ResourceQuota
   # With docker as continer runtime --extra-config=kubelet.cgroup-driver=systemd \
   # Added --extra-config=kubelet.resolv-conf=/run/systemd/resolve/resolv.conf due to  https://coredns.io/plugins/loop/
   # because under Ubuntu systemd-resolved service conflicts create a loop between CodeDNS and systemc DNS wrapper systemd-resolved.
@@ -218,7 +219,7 @@ if ! minikube status &>/dev/null; then
   # shellcheck disable=SC2086
   sudo -E minikube start --vm-driver=none --apiserver-ips 127.0.0.1 --apiserver-name localhost \
     --kubernetes-version='latest' \
-    --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook,PodSecurityPolicy" \
+    --extra-config=apiserver.enable-admission-plugins="NamespaceExists,PodSecurityPolicy" \
     --extra-config=kubelet.resolv-conf=/run/systemd/resolve/resolv.conf \
     --extra-config=kubelet.cgroup-driver=systemd \
     --addons=pod-security-policy \
