@@ -17,8 +17,9 @@ rules:
   verbs:
   - use
 ---
+# Create cluster rolebinding as cnrm-system namespace may not exist yet
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
   annotations:
     kubernetes.io/description: Cnrm PSP bound to crm-system service accounts
@@ -26,7 +27,6 @@ metadata:
     {{- include "cluster-config.labels" . | nindent 4 }}
     kubernetes.io/cluster-service: "true"
   name: cnrm-psp
-  namespace: cnrm-system
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

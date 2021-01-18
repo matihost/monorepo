@@ -20,7 +20,7 @@ function installIstioProfile() {
   kubectl create ns istio-system
 
   kubectl apply -f - <<EOF
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 kind: IngressClass
 metadata:
   # annotations:
@@ -56,7 +56,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: psp-host
-  namespace: istio-system
+  namespace: kube-system
 rules:
 - apiGroups:
   - policy
@@ -71,7 +71,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: psp-host
-  namespace: istio-system
+  namespace: kube-system
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -79,7 +79,7 @@ roleRef:
 subjects:
   - apiGroup: rbac.authorization.k8s.io
     kind: Group
-    name: system:serviceaccounts:istio-system
+    name: system:serviceaccounts:kube-system
 EOF
   kubectl apply -f - <<EOF
 apiVersion: install.istio.io/v1alpha1
@@ -92,8 +92,10 @@ spec:
   components:
     cni:
       enabled: true
+      namespace: kube-system
   values:
     cni:
+      cniBinDir: "/home/kubernetes/bin"
       excludeNamespaces:
        - istio-system
        - kube-system
@@ -102,6 +104,10 @@ spec:
       istio-ingressgateway:
         type: LoadBalancer
         autoscaleMax: "20"
+        serviceAnnotations:
+          cloud.google.com/load-balancer-type: Internal
+          networking.gke.io/internal-load-balancer-allow-global-access: "true"
+          external-dns.alpha.kubernetes.io/hostname: "*.internal.gke.shared.dev."
 EOF
 }
 
@@ -122,7 +128,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: psp:privileged
+  name: gce:podsecuritypolicy:privileged
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
@@ -130,13 +136,13 @@ subjects:
 EOF
 
   mkdir -p /tmp/istio-certs
-  CN="httpbin.example.com"
+  CN="httpbin.internal.gke.shared.dev"
   openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "/tmp/istio-certs/${CN}.crt" -newkey rsa:2048 -nodes -keyout "/tmp/istio-certs/${CN}.key"
   kubectl create -n istio-system secret tls httpbin-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
 
   # sidecar is not necessary when only Ingress is used from istio
   kubectl apply -f - <<EOF
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   annotations:
@@ -147,27 +153,20 @@ metadata:
 spec:
   # ingressClassName: istio
   rules:
-  - host: httpbin.example.com
+  - host: httpbin.internal.gke.shared.dev
     http:
       paths:
       - backend:
-          service:
-            name: httpbin
-            port:
-              number: 8000
+          serviceName: httpbin
+          servicePort: 8000
         path: /
         pathType: Prefix
   # Istio support Ingresses with TLS but secret has to be in istio-system namespace
   tls:
   - hosts:
-    - httpbin.example.com
+    - httpbin.internal.gke.shared.dev
     secretName: httpbin-credential
 EOF
-
-  # to enforce autosidecar injection in namespace
-  # we do use Istion only as k8s Ingress controller
-  # so it is not necessary
-  # kubectl label namespace default istio-injection=enabled
 
   kubectl apply -n sample-istio -f - <<EOF
 apiVersion: v1
@@ -220,10 +219,10 @@ EOF
 
 function exposeSampleAppViaIstioNatively() {
   # TLS certificates has to be in namespace where ingressgateway is deployed (istio-system)
-  CN="api.example.com"
+  CN="api.internal.gke.shared.dev"
   openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "/tmp/istio-certs/${CN}.crt" -newkey rsa:2048 -nodes -keyout "/tmp/istio-certs/${CN}.key"
   kubectl create -n istio-system secret tls api-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
-  CN="http.example.com"
+  CN="http.internal.gke.shared.dev"
   openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "/tmp/istio-certs/${CN}.crt" -newkey rsa:2048 -nodes -keyout "/tmp/istio-certs/${CN}.key"
   kubectl create -n istio-system secret tls http-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
 
@@ -244,8 +243,8 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-    - "api.example.com"
-    - "http.example.com"
+    - "api.internal.gke.shared.dev"
+    - "http.internal.gke.shared.dev"
   - port:
       number: 443
       name: httphttps
@@ -254,7 +253,7 @@ spec:
       mode: SIMPLE
       credentialName: http-credential
     hosts:
-    - http.example.com
+    - http.internal.gke.shared.dev
   - port:
       number: 443
       name: apihttps
@@ -263,7 +262,7 @@ spec:
       mode: SIMPLE
       credentialName: api-credential
     hosts:
-    - api.example.com
+    - api.internal.gke.shared.dev
 EOF
   kubectl apply -f - <<EOF
 apiVersion: networking.istio.io/v1beta1
@@ -273,7 +272,7 @@ metadata:
   namespace: sample-istio
 spec:
   hosts:
-  - "api.example.com"
+  - "api.internal.gke.shared.dev"
   gateways:
   - sample-istio/api-gateway
   http:
@@ -295,7 +294,7 @@ metadata:
   namespace: sample-istio
 spec:
   hosts:
-  - "http.example.com"
+  - "http.internal.gke.shared.dev"
   gateways:
   - sample-istio/api-gateway
   - mesh # applies to all the sidecars in the mesh
