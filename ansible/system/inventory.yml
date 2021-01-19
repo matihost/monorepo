@@ -428,6 +428,25 @@ all:
               echo "${AWSP_BASHRC}" >> ~/.bashrc
               echo "AWSP Installed"
             }
+        - name: chrome unsafe link
+          become: false
+          desc: chrome allowing access to site with self-signed or invalid TLS certificates
+          command: |
+            [ -e ~/.local/share/applications/unsafe-chrome.desktop  ] || {
+              mkdir -p ~/.local/share/applications
+              echo '[Desktop Entry]
+            Version=1.0
+            Name=Unsafe Google Chrome
+            GenericName=Web Browser
+            Comment=Access the Internet
+            Exec=/usr/bin/google-chrome-stable --ignore-certificate-errors
+            StartupNotify=true
+            Terminal=false
+            Icon=google-chrome
+            Type=Application
+            Categories=Network;WebBrowser;' > ~/.local/share/applications/unsafe-chrome.desktop
+              echo "Unsafe Chrome link installed"
+            }
         files_config:
         - file: /etc/gai.conf
           content: |
