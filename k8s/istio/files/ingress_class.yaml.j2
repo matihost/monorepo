@@ -1,0 +1,11 @@
+---
+apiVersion: networking.k8s.io/{{ ingress_class.api_version }}
+kind: IngressClass
+metadata:
+{% if ingress_class.default is sameas true %}
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true
+{% endif %}
+  name: istio
+spec:
+  controller: istio.io/ingress-controller

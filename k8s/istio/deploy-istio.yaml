@@ -1,0 +1,105 @@
+---
+- hosts: localhost
+  become: false
+  collections:
+  - community.kubernetes
+  vars:
+    files: "{{ playbook_dir }}/files"
+  tasks:
+  - name: Check .istio/current exists
+    stat:
+      path: "{{ lookup('env', 'HOME') }}/.istio/current"
+    register: istio_installed
+
+  - name: Ensure Istio downloaded
+    shell: |
+      mkdir -p ~/.istio
+      cd ~/.istio
+      curl -sL https://istio.io/downloadIstio | sh -
+      cd istio-*
+      ln -s "$(pwd)" ../current
+    when: not istio_installed.stat.exists
+
+  - name: Ensure istio-system namespace present
+    k8s:
+      name: istio-system
+      api_version: v1
+      kind: Namespace
+      state: present
+
+  - name: Ensure PodSecurityPolicy present for Istio CNI Daemon Set
+    k8s:
+      state: present
+      definition: "{{ lookup('template', '{{ files }}/psp.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+
+  - name: Ensure tcp:15017 is open on GKE nodes
+    shell: |
+      FIREWALL_NAME=$(gcloud compute firewall-rules list --filter="name~'{{ options.gke_cluster_name|mandatory }}-.*-master'" --format="value(name)")
+      [ -z "${FIREWALL_NAME}" ] && {
+        echo "Missing cluster {{ options.gke_cluster_name }} master firewall rule"
+        echo "Unable to open Istio CNI port to be accessed by masters"
+        echo "Either GKE has changed the firewalls or your are logged to wrong GCP project"
+        exit 1
+      }
+      gcloud compute firewall-rules update "${FIREWALL_NAME}" --allow tcp:10250,tcp:443,tcp:15017
+    when: options.gke_mode|default(false)
+
+  - name: Deploy Istio Operator Helm chart
+    helm:
+      name: "istio-operator"
+      chart_ref: "{{ lookup('env', 'HOME') }}/.istio/current/manifests/charts/istio-operator"
+      release_namespace: "istio-system"
+      create_namespace: false
+      wait: true
+      wait_timeout: "5m0s"
+      values:
+        hub: "{{ operator.hub }}"
+        tag: "{{ operator.tag }}"
+
+
+  - name: Ensure Istio ControlPlane operator configured
+    k8s:
+      state: present
+      definition: "{{ lookup('template', '{{ files }}/control_plane.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+
+  - name: Ensure Istio IngressClass present
+    k8s:
+      state: present
+      definition: "{{ lookup('template', '{{ files }}/ingress_class.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+
+  - name: Ensure Istio ControlPlane operator reconciliating is finished
+    k8s_info:
+      api_version: install.istio.io/v1alpha1
+      kind: IstioOperator
+      name: istiocontrolplane
+      namespace: istio-system
+    register: operator_status
+    until: operator_status.resources[0].status.status == "HEALTHY"
+    retries: 12
+    delay: 10
+    ignore_errors: yes
+
+
+  - name: Get final ControlPlane operator status
+    k8s_info:
+      api_version: install.istio.io/v1alpha1
+      kind: IstioOperator
+      name: istiocontrolplane
+      namespace: istio-system
+    register: operator_status
+
+  - name:
+    fail:
+      msg: |
+        Istio Operator didn't install Istio components properly
+        Check istiooperator pod logs in istio-operator namespace
+    when: operator_status.resources[0].status.status != "HEALTHY"

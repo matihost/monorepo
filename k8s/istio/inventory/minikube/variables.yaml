@@ -1,0 +1,13 @@
+all:
+  hosts:
+    localhost:
+  vars:
+    operator:
+      hub: "docker.io/istio"
+      tag: "1.8.2"
+    ingress_class:
+      enable: true
+      api_version: v1
+      default: false
+    egress_gateway:
+      enable: true

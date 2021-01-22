@@ -1,0 +1,107 @@
+---
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  namespace: istio-system
+  name: istiocontrolplane
+spec:
+  profile: default
+  meshConfig:
+    accessLogFile: /dev/stdout
+    accessLogEncoding: TEXT
+    accessLogFormat:  "[%START_TIME%] %REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL% %RESPONSE_CODE% %RESPONSE_FLAGS% %BYTES_RECEIVED% %BYTES_SENT% %DURATION% %RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)% %REQ(X-FORWARDED-FOR)% UPSTREAM_HOST %UPSTREAM_CLUSTER% %UPSTREAM_LOCAL_ADDRESS% %DOWNSTREAM_LOCAL_ADDRESS% %DOWNSTREAM_REMOTE_ADDRESS%\n"
+  components:
+    cni:
+      enabled: true
+      namespace: {{ "kube-system" if options.gke_mode|default(false) else "istio-system" }}
+    ingressGateways:
+    - name: istio-ingressgateway
+      enabled: true
+    - name: istio-external-ingressgateway
+      enabled: {{ ingress_external_gateway.enable|default(false) }}
+      k8s:
+        env:
+        - name: ISTIO_META_ROUTER_MODE
+          value: standard
+        hpaSpec:
+          maxReplicas: 5
+          metrics:
+          - resource:
+              name: cpu
+              targetAverageUtilization: 80
+            type: Resource
+          minReplicas: 1
+          scaleTargetRef:
+            apiVersion: apps/v1
+            kind: Deployment
+            name: istio-external-ingressgateway
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 1024Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        service:
+          ports:
+          - name: status-port
+            port: 15021
+            protocol: TCP
+            targetPort: 15021
+          - name: http2
+            port: 80
+            protocol: TCP
+            targetPort: 8080
+          - name: https
+            port: 443
+            protocol: TCP
+            targetPort: 8443
+          - name: tcp-istiod
+            port: 15012
+            protocol: TCP
+            targetPort: 15012
+          - name: tls
+            port: 15443
+            protocol: TCP
+            targetPort: 15443
+{% if ingress_external_gateway.serviceAnnotations|default(false) %}
+        serviceAnnotations: {{ ingress_external_gateway.serviceAnnotations | to_yaml }}
+{% endif %}
+        strategy:
+          rollingUpdate:
+            maxSurge: 100%
+            maxUnavailable: 25%
+    egressGateways:
+    - name: istio-egressgateway
+      enabled: {{ egress_gateway.enable|default(false) }}
+      #k8s:
+      #  nodeSelector:
+      #    node-role: "egress"
+      #  tolerations:
+      #  - key: "node-role"
+      #    operator: "Exists"
+      #    effect: "NoSchedule"
+  values:
+{% if options.gke_mode|default(false)  %}
+    telemetry:
+      v2:
+        stackdriver:
+          enabled: true
+          outboundAccessLogging: FULL
+          logging: true
+{% endif %}
+    cni:
+{% if options.gke_mode|default(false)  %}
+      cniBinDir: /home/kubernetes/bin
+{% endif %}
+      excludeNamespaces:
+       - istio-system
+       - kube-system
+      logLevel: info
+    gateways:
+      istio-ingressgateway:
+        type: LoadBalancer
+        autoscaleMax: "{{ ingress_gateway.max_pods|default(5)}}"
+{% if ingress_gateway.serviceAnnotations|default(false) %}
+        serviceAnnotations: {{ ingress_gateway.serviceAnnotations | to_yaml }}
+{% endif %}

@@ -1,0 +1,53 @@
+---
+#
+# psp for istio cni DaemonSet
+#
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: psp-host
+spec:
+  allowPrivilegeEscalation: true
+  fsGroup:
+      rule: RunAsAny
+  hostNetwork: true
+  runAsUser:
+      rule: RunAsAny
+  seLinux:
+      rule: RunAsAny
+  supplementalGroups:
+      rule: RunAsAny
+  volumes:
+  - secret
+  - configMap
+  - emptyDir
+  - hostPath
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: psp-host
+  namespace: {{ "kube-system" if options.gke_mode|default(false) else "istio-system" }}
+rules:
+- apiGroups:
+  - policy
+  resourceNames:
+  - psp-host
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: psp-host
+  namespace: {{ "kube-system" if options.gke_mode|default(false) else "istio-system" }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: psp-host
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: Group
+    name: system:serviceaccounts:{{ "kube-system" if options.gke_mode|default(false) else "istio-system" }}
