@@ -21,6 +21,14 @@ resource "google_project_iam_binding" "gke-metrics-writer" {
   ]
 }
 
+# so that  GKE cluster can access images from its own GCP project (gcr.io/project-id)
+resource "google_project_iam_binding" "gke-gcr-access" {
+  role = "roles/storage.objectViewer"
+
+  members = [
+    "serviceAccount:${google_service_account.gke-sa.email}",
+  ]
+}
 
 
 // Dedicated service account for the Bastion instance

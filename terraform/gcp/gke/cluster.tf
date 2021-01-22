@@ -79,6 +79,13 @@ resource "google_container_cluster" "gke" {
     }
   }
 
+  # TODO Configuration of etcd encryption
+  # https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets#gcloud_3
+  # database_encryption {
+  #   state = "ENCRYPTED"
+  #   key_name = "TODO"
+  # }
+
   # Binary Authorization (requires anthos addon) - a system providing policy control for images
   # deployed to Kubernetes Engine clusters.
   # enable_binary_authorization = true

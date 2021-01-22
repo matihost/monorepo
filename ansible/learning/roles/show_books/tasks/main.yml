@@ -11,6 +11,17 @@
   loop: "{{ books|dict2items }}"
   loop_control:
     loop_var: book
+
+- name: Set files path
+  set_fact:
+    files: "{{ role_path }}/files"
+
+# Debugging Jinja templates
 - name: Show books as XML
   debug:
     msg: "{{ lookup('template', role_path + '/files/book-report.xml.j2') }}"
+
+- name: Creating a file with template content
+  copy:
+    dest: "/tmp/books.xml"
+    content: "{{ lookup('template', files + '/book-report.xml.j2') }}"
