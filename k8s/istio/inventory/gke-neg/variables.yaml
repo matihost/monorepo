@@ -1,0 +1,36 @@
+all:
+  hosts:
+    localhost:
+  vars:
+    operator:
+      hub: "docker.io/istio"
+      tag: "1.8.2"
+    ingress_gateway:
+      max_pods: 20
+      serviceAnnotations:
+        cloud.google.com/load-balancer-type: Internal
+        networking.gke.io/internal-load-balancer-allow-global-access: "true"
+        external-dns.alpha.kubernetes.io/hostname: "*.internal.gke.shared.dev."
+    ingress_external_gateway:
+      enable: true
+      service_type: ClusterIP
+      serviceAnnotations:
+        # NEG name is supported in GKE version 1.18.10-gke.600 and later
+        cloud.google.com/neg: '{"exposed_ports":{
+                "15021":{"name": "neg-istio-external-status"},
+                "80":{"name": "neg-istio-external-http"},
+                "443":{"name": "neg-istio-external-https"},
+                "15443":{"name": "neg-istio-external-tls"}
+            }
+          }'
+        # TODO run Terraform to define external TCP Proxy LB,
+        # + add DNS entry "*.external.gke.shared.dev." for it on on Gcloud Level
+    ingress_class:
+      enable: true
+      api_version: v1beta1
+      default: false
+    egress_gateway:
+      enable: true
+    options:
+      gke_mode: true
+      gke_cluster_name: "shared-dev"

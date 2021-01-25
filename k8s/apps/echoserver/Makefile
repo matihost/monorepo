@@ -2,7 +2,7 @@ deploy-minikube: ## deploys echoserver on minikube
 	scripts/deploy-on-minikube.sh
 
 deploy-gke: ## deploys echoserver on gke (requires current context on some GKE cluster and access to GKE API server, if private prexix with export HTTPS_PROXY=localhost:8888)
-	export HTTPS_PROXY=localhost:8888 && scripts/deploy-on-gke.sh
+	scripts/deploy-on-gke.sh
 
 undeploy: ## undeply echoserver
 	helm uninstall echoserver -n learning

@@ -19,4 +19,4 @@ spec:
   selector:
     {{- include "app.selectorLabels" . | nindent 6 }}
   sessionAffinity: None
-  type: NodePort
+  type: ClusterIP

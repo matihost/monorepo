@@ -19,6 +19,9 @@ spec:
       enabled: true
     - name: istio-external-ingressgateway
       enabled: {{ ingress_external_gateway.enable|default(false) }}
+      # namespace: custom-ns
+      label:
+        istio: external-ingressgateway
       k8s:
         env:
         - name: ISTIO_META_ROUTER_MODE
@@ -56,10 +59,6 @@ spec:
             port: 443
             protocol: TCP
             targetPort: 8443
-          - name: tcp-istiod
-            port: 15012
-            protocol: TCP
-            targetPort: 15012
           - name: tls
             port: 15443
             protocol: TCP
@@ -67,6 +66,8 @@ spec:
 {% if ingress_external_gateway.serviceAnnotations|default(false) %}
         serviceAnnotations: {{ ingress_external_gateway.serviceAnnotations | to_yaml }}
 {% endif %}
+        service:
+          type: {{ ingress_external_gateway.service_type|default("LoadBalancer") }}
         strategy:
           rollingUpdate:
             maxSurge: 100%
@@ -100,7 +101,7 @@ spec:
       logLevel: info
     gateways:
       istio-ingressgateway:
-        type: LoadBalancer
+        type: {{ ingress_gateway.service_type|default("LoadBalancer") }}
         autoscaleMax: "{{ ingress_gateway.max_pods|default(5)}}"
 {% if ingress_gateway.serviceAnnotations|default(false) %}
         serviceAnnotations: {{ ingress_gateway.serviceAnnotations | to_yaml }}
