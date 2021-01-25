@@ -1,12 +1,15 @@
+.EXPORT_ALL_VARIABLES:
+
 CURRENT_PROJECT := $(shell gcloud config get-value project)
 WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
 ACCESS_FROM_LAPTOP := true
 
-apply: ## setup GKE cluster
-	@export TF_VAR_external_access_ip=$(WHOAMI) && \
-	export TF_VAR_project=$(CURRENT_PROJECT) && \
-	export TF_VAR_expose_master_via_external_ip=$(ACCESS_FROM_LAPTOP) && \
-	terraform init -upgrade=true && \
+TF_VAR_external_access_ip := $(WHOAMI)
+TF_VAR_project := $(CURRENT_PROJECT)
+TF_VAR_expose_master_via_external_ip := $(ACCESS_FROM_LAPTOP)
+
+apply: pre-apply ## setup GKE cluster
+	@terraform init -upgrade=true && \
 	terraform validate && \
 	terraform plan -lock=false && \
 	terraform apply -auto-approve && \
@@ -25,16 +28,20 @@ show-state: ## show terraform.state
 	terraform state list
 	terraform show
 
-destroy: ## destroy GKE resources
-	export TF_VAR_external_access_ip=$(WHOAMI) && \
-	export TF_VAR_project=$(CURRENT_PROJECT) && \
-	export TF_VAR_expose_master_via_external_ip=$(ACCESS_FROM_LAPTOP) && \
+destroy: pre-destroy ## destroy GKE resources
 	terraform plan && terraform destroy -auto-approve
-
 
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
 	gcloud auth application-default login
+
+pre-apply: ## import undeletable KMS related state
+	-@terraform import google_kms_key_ring.gke-keyring us-central1/shared-dev-keyring 2>/dev/null
+	-@terraform import google_kms_crypto_key.gke-etcd-enc-key us-central1/shared-dev-keyring/gke-etcd-enc-key 2>/dev/null
+
+pre-destroy: ## remove no removable KMS related data from state before actually destroying cluster
+	-@terraform state rm google_kms_key_ring.gke-keyring
+	-@terraform state rm google_kms_crypto_key.gke-etcd-enc-key
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))

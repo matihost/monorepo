@@ -1,8 +1,10 @@
 data "google_container_engine_versions" "rapid" {
   provider = google-beta
-  // version differ per region or zonal cluster
+  # version differ per region or zonal cluster
+  # run: gcloud container get-server-config
+  # to see available versions
   location       = local.location
-  version_prefix = "1.18."
+  version_prefix = "1.19."
 
   project = var.project
 }
@@ -79,12 +81,11 @@ resource "google_container_cluster" "gke" {
     }
   }
 
-  # TODO Configuration of etcd encryption
-  # https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets#gcloud_3
-  # database_encryption {
-  #   state = "ENCRYPTED"
-  #   key_name = "TODO"
-  # }
+  # etcd encryption
+  database_encryption {
+    state    = "ENCRYPTED"
+    key_name = google_kms_crypto_key.gke-etcd-enc-key.id
+  }
 
   # Binary Authorization (requires anthos addon) - a system providing policy control for images
   # deployed to Kubernetes Engine clusters.
@@ -234,6 +235,10 @@ resource "google_container_node_pool" "gke_nodes" {
       # use nodeSelector: cloud.google.com/gke-nodepool to select placement on particual node pool
       node-role = "compute"
     }
+
+    # network tags - for firewall handling - as various node pool run using same gcp sa
+    # use it to open firewall for NEG from LB
+    tags = ["gke-compute"]
 
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"

@@ -5,6 +5,8 @@ provider "google" {
 }
 
 data "google_client_config" "current" {}
+data "google_project" "current" {
+}
 data "google_compute_network" "default" {
   name = "default"
 }
