@@ -24,6 +24,10 @@ make google-authentication
 
 * Latest Terraform installed
 
+* Prerequisites Terraform run once:
+
+  * `cd prerequisites\kms && make apply` to setup KMS keyring and keys for encyption
+
 ## Usage
 
 ```bash
