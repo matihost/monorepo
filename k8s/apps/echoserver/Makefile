@@ -4,6 +4,9 @@ deploy-minikube: ## deploys echoserver on minikube
 deploy-gke: ## deploys echoserver on gke (requires current context on some GKE cluster and access to GKE API server, if private prexix with export HTTPS_PROXY=localhost:8888)
 	scripts/deploy-on-gke.sh
 
+deploy-anthos: ## deploys echoserver on Anthos (requires current context on Anthos config cluster)
+	scripts/deploy-on-anthos.sh
+
 undeploy: ## undeply echoserver
 	helm uninstall echoserver -n learning
 

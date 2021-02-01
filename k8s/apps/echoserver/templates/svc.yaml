@@ -1,4 +1,5 @@
 # yamllint disable-file
+{{- if .Values.svc.enabled }}
 ---
 apiVersion: v1
 kind: Service
@@ -20,3 +21,4 @@ spec:
     {{- include "app.selectorLabels" . | nindent 6 }}
   sessionAffinity: None
   type: ClusterIP
+{{- end }}

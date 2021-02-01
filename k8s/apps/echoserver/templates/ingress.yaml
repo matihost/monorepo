@@ -1,5 +1,6 @@
 # yamllint disable-file
 {{- $fullName := include "app.fullname" . -}}
+{{- if .Values.ingress.enabled }}
 ---
 apiVersion: v1
 kind: Secret
@@ -48,3 +49,4 @@ spec:
           serviceName: {{ $fullName }}
           servicePort: 80
           {{- end }}
+{{- end }}

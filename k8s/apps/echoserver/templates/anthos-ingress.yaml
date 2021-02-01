@@ -1,0 +1,35 @@
+# yamllint disable-file
+{{- if .Values.anthos.ingress.enabled }}
+---
+apiVersion: networking.gke.io/v1
+kind: MultiClusterService
+metadata:
+  name: {{ include "app.fullname" . }}
+  namespace: {{ include "app.namespace" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  template:
+    spec:
+      selector:
+        {{- include "app.selectorLabels" . | nindent 8 }}
+      ports:
+      - name: web
+        protocol: TCP
+        port: 80
+        targetPort: {{ .Values.pod.port }}
+---
+apiVersion: networking.gke.io/v1
+kind: MultiClusterIngress
+metadata:
+  name: {{ include "app.fullname" . }}
+  namespace: {{ include "app.namespace" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  template:
+    spec:
+      backend:
+        serviceName: {{ include "app.fullname" . }}
+        servicePort: 80
+{{- end }}

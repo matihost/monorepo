@@ -30,10 +30,16 @@ pspPrivilegedClusterRole: psp:privileged # in GKE use: gce:podsecuritypolicy:pri
 podSecurityContext:
   runAsUser: 0
 
+# TODO NetworkPolicy has to be improved
+# as current one block HeatlhCheck from checking SVCNEG - making LoadBalancer exposure not working
 networkPolicy:
+  enabled: false
+
+svc:
   enabled: true
 
 ingress:
+  enabled: true
   version: v1
   class: "" # assume default impl, use gce-internal for GKE Internal LoadBalancer
   annotations:
@@ -47,6 +53,9 @@ ingress:
     key: ""
     crt: ""
 
+anthos:
+  ingress:
+    enabled: false
 
 resources:
   limits:

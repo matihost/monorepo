@@ -13,8 +13,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
     --set pspPrivilegedClusterRole=gce:podsecuritypolicy:privileged \
     --set ingress.version="v1beta1" \
     --set ingress.host=echoserver.learning.gke.shared.dev \
-    --set ingress.class=gce-internal \
-    --set networkPolicy.enabled=false
+    --set ingress.class=gce-internal
 
   while [ -z "$(kubectl get ingress echoserver -n learning -o jsonpath="{.status..ip}" | xargs)" ]; do
     sleep 1
