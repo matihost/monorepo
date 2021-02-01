@@ -9,12 +9,12 @@ data "google_kms_key_ring" "gke-keyring" {
 # etcd encryption key
 data "google_kms_crypto_key" "gke-etcd-enc-key" {
   name     = "gke-etcd-enc-key"
-  key_ring = data.google_kms_key_ring.gke-keyring.id
+  key_ring = data.google_kms_key_ring.gke-keyring.self_link
 }
 
 # allow GKE itself (represented as below sa) to use key for encyption
 resource "google_kms_crypto_key_iam_binding" "gke-etcd-enc-key-binding" {
-  crypto_key_id = data.google_kms_crypto_key.gke-etcd-enc-key.id
+  crypto_key_id = data.google_kms_crypto_key.gke-etcd-enc-key.self_link
   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
 
   members = [

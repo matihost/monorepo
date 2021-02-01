@@ -8,6 +8,9 @@ TF_VAR_external_access_ip := $(WHOAMI)
 TF_VAR_project := $(CURRENT_PROJECT)
 TF_VAR_expose_master_via_external_ip := $(ACCESS_FROM_LAPTOP)
 
+# uncomment to run terraform in debug mode
+# TF_LOG := DEBUG
+
 apply: ## setup GKE cluster
 	@terraform init -upgrade=true && \
 	terraform validate && \

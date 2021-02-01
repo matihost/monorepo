@@ -84,7 +84,7 @@ resource "google_container_cluster" "gke" {
   # etcd encryption
   database_encryption {
     state    = "ENCRYPTED"
-    key_name = data.google_kms_crypto_key.gke-etcd-enc-key.id
+    key_name = data.google_kms_crypto_key.gke-etcd-enc-key.self_link
   }
 
   # Binary Authorization (requires anthos addon) - a system providing policy control for images
