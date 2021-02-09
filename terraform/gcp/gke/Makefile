@@ -3,10 +3,14 @@
 CURRENT_PROJECT := $(shell gcloud config get-value project)
 WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
 ACCESS_FROM_LAPTOP := true
+ENCRYPT_ETCD := false
+ENABLE_PSP := true
 
 TF_VAR_external_access_ip := $(WHOAMI)
 TF_VAR_project := $(CURRENT_PROJECT)
 TF_VAR_expose_master_via_external_ip := $(ACCESS_FROM_LAPTOP)
+TF_VAR_encrypt_etcd := $(ENCRYPT_ETCD)
+TF_VAR_enable_pod_security_policy := $(ENABLE_PSP)
 
 # uncomment to run terraform in debug mode
 # TF_LOG := DEBUG

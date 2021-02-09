@@ -1,7 +1,7 @@
 resource "google_compute_router" "router" {
-  name    = "gke-network-router"
-  region  = google_compute_subnetwork.private-gke.region
-  network = google_compute_network.private-gke.id
+  name    = "network-router"
+  region  = google_compute_subnetwork.private.region
+  network = google_compute_network.private.id
 
   bgp {
     asn = 64514
@@ -9,7 +9,7 @@ resource "google_compute_router" "router" {
 }
 
 resource "google_compute_router_nat" "nat" {
-  name                               = "gke-network-router-nat"
+  name                               = "network-router-nat"
   router                             = google_compute_router.router.name
   region                             = google_compute_router.router.region
   nat_ip_allocate_option             = "AUTO_ONLY"

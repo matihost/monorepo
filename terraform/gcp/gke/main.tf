@@ -11,6 +11,15 @@ data "google_compute_network" "default" {
   name = "default"
 }
 
+data "google_compute_network" "private-gke" {
+  name = "private-vpc"
+}
+
+data "google_compute_subnetwork" "private-gke" {
+  name   = "private-subnet-${var.region}"
+  region = var.region
+}
+
 locals {
   zone     = "${var.region}-${var.zone_letter}"
   gke_name = "${var.cluster_name}-${var.env}"
@@ -73,4 +82,16 @@ variable "external_dns_k8s_sa_name" {
   type        = string
   default     = "external-dns"
   description = "ExternalDNS  K8S ServiceAccount"
+}
+
+variable "enable_pod_security_policy" {
+  default     = true
+  description = "Whether to enable PodSecurityPolicy in the GKE cluster, PSP are deprecated since K8S 1.21 and going to be removed in K8S 1.25"
+  type        = bool
+}
+
+variable "encrypt_etcd" {
+  default     = false
+  description = "Whether to encrypt GKE etcd with KMS key, requires prerequisites/kms to be run once"
+  type        = bool
 }

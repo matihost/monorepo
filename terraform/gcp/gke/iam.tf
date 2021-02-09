@@ -1,6 +1,6 @@
 // Service Account which is used by GKE Nodes
 resource "google_service_account" "gke-sa" {
-  account_id   = "gke-sa"
+  account_id   = "${local.gke_name}-gke-sa"
   display_name = "Service Account which is used by GKE Nodes"
 }
 
@@ -48,7 +48,7 @@ resource "google_project_iam_binding" "bastion-gke-admin" {
 
 // Service Account used by External DNS workflow on GKE
 resource "google_service_account" "edns-sa" {
-  account_id   = "edns-sa"
+  account_id   = "${local.gke_name}-edns-sa"
   display_name = "Service Account which is used by ExternalDNS workflow in GKE"
 }
 

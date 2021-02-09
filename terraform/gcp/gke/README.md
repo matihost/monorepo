@@ -25,8 +25,8 @@ make google-authentication
 * Latest Terraform installed
 
 * Prerequisites Terraform run once:
-
-  * `cd prerequisites\kms && make apply` to setup KMS keyring and keys for encyption
+  * `cd prerequisites\networking && make apply` to setup VPC and subnetwork
+  * (Optionally) `cd prerequisites\kms && make apply` to setup KMS keyring and keys for encyption. Then run `make apply ENCRYPT_ETCD=true` to use setup cluster with ETCD encryption
 
 ## Usage
 

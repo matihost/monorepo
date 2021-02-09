@@ -1,7 +1,7 @@
 // Allow access to the Bastion Host via SSH
 resource "google_compute_firewall" "bastion-ssh" {
   name          = "${local.gke_name}-bastion-ssh"
-  network       = google_compute_network.private-gke.name
+  network       = data.google_compute_network.private-gke.name
   direction     = "INGRESS"
   project       = var.project
   source_ranges = ["0.0.0.0/0"]
@@ -38,7 +38,7 @@ resource "google_compute_instance" "bastion" {
   }
 
   network_interface {
-    subnetwork = google_compute_subnetwork.private-gke.name
+    subnetwork = data.google_compute_subnetwork.private-gke.name
 
     # Do not add public IP, connect only via gcloud compute ssh --tunnel-through-iap
     # access_config {

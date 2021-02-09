@@ -19,8 +19,8 @@ resource "google_container_cluster" "gke" {
   location = local.location
 
   // network and subnetwork, for Shared VPC, set this to the self link of the shared network.
-  network    = google_compute_network.private-gke.name
-  subnetwork = google_compute_subnetwork.private-gke.name
+  network    = data.google_compute_network.private-gke.name
+  subnetwork = data.google_compute_subnetwork.private-gke.name
 
   project = var.project
 
@@ -82,9 +82,12 @@ resource "google_container_cluster" "gke" {
   }
 
   # etcd encryption
-  database_encryption {
-    state    = "ENCRYPTED"
-    key_name = data.google_kms_crypto_key.gke-etcd-enc-key.self_link
+  dynamic "database_encryption" {
+    for_each = var.encrypt_etcd ? [1] : []
+    content {
+      state    = "ENCRYPTED"
+      key_name = data.google_kms_crypto_key.gke-etcd-enc-key[0].self_link
+    }
   }
 
   # Binary Authorization (requires anthos addon) - a system providing policy control for images
@@ -95,8 +98,8 @@ resource "google_container_cluster" "gke" {
 
   # Allocate IPs in our subnetwork
   ip_allocation_policy {
-    cluster_secondary_range_name  = google_compute_subnetwork.private-gke.secondary_ip_range.0.range_name
-    services_secondary_range_name = google_compute_subnetwork.private-gke.secondary_ip_range.1.range_name
+    cluster_secondary_range_name  = data.google_compute_subnetwork.private-gke.secondary_ip_range.0.range_name
+    services_secondary_range_name = data.google_compute_subnetwork.private-gke.secondary_ip_range.1.range_name
   }
   networking_mode = "VPC_NATIVE"
 
@@ -114,7 +117,7 @@ resource "google_container_cluster" "gke" {
 
   master_authorized_networks_config {
     cidr_blocks {
-      cidr_block = google_compute_subnetwork.private-gke.ip_cidr_range
+      cidr_block = data.google_compute_subnetwork.private-gke.ip_cidr_range
     }
     # PublicIP cannot be added as authorized  when enable_private_endpoint is true
     dynamic "cidr_blocks" {
@@ -126,7 +129,7 @@ resource "google_container_cluster" "gke" {
   }
 
   pod_security_policy_config {
-    enabled = true
+    enabled = var.enable_pod_security_policy
   }
 
   private_cluster_config {
@@ -190,10 +193,6 @@ resource "google_container_cluster" "gke" {
     update = "30m"
     delete = "30m"
   }
-
-  depends_on = [
-    google_compute_router_nat.nat,
-  ]
 }
 
 resource "google_container_node_pool" "gke_nodes" {

@@ -12,7 +12,7 @@ resource "google_dns_managed_zone" "cluster-zone" {
   visibility = "private"
   private_visibility_config {
     networks {
-      network_url = google_compute_network.private-gke.id
+      network_url = data.google_compute_network.private-gke.id
     }
     networks {
       network_url = data.google_compute_network.default.id
@@ -36,7 +36,7 @@ resource "google_dns_managed_zone" "external-dns-cluster-zone" {
   visibility = "private"
   private_visibility_config {
     networks {
-      network_url = google_compute_network.private-gke.id
+      network_url = data.google_compute_network.private-gke.id
     }
     networks {
       network_url = data.google_compute_network.default.id
