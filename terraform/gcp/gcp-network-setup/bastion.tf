@@ -1,7 +1,7 @@
 // Allow access to the Bastion Host via SSH
 resource "google_compute_firewall" "bastion-ssh" {
-  name          = "${local.gke_name}-bastion-ssh"
-  network       = data.google_compute_network.private-gke.name
+  name          = "${google_compute_network.private.name}-bastion-ssh"
+  network       = google_compute_network.private.name
   direction     = "INGRESS"
   project       = var.project
   source_ranges = ["0.0.0.0/0"]
@@ -16,9 +16,9 @@ resource "google_compute_firewall" "bastion-ssh" {
 
 // A single Compute Engine instance
 resource "google_compute_instance" "bastion" {
-  name         = "${local.gke_name}-bastion"
+  name         = "${google_compute_network.private.name}-bastion"
   machine_type = "f1-micro"
-  zone         = local.zone
+  zone         = local.zones[0]
 
   boot_disk {
     initialize_params {
@@ -38,7 +38,7 @@ resource "google_compute_instance" "bastion" {
   }
 
   network_interface {
-    subnetwork = data.google_compute_subnetwork.private-gke.name
+    subnetwork = google_compute_subnetwork.private1.name
 
     # Do not add public IP, connect only via gcloud compute ssh --tunnel-through-iap
     # access_config {
@@ -54,6 +54,22 @@ resource "google_compute_instance" "bastion" {
     scopes = ["cloud-platform"]
   }
 }
+
+
+// Dedicated service account for the Bastion instance
+resource "google_service_account" "bastion" {
+  account_id   = "${google_compute_network.private.name}-bastion-sa"
+  display_name = "Service account for bastion instance"
+}
+
+resource "google_project_iam_binding" "bastion-gke-admin" {
+  role = "roles/container.clusterAdmin"
+
+  members = [
+    "serviceAccount:${google_service_account.bastion.email}",
+  ]
+}
+
 
 
 output "bastion_instance_name" {

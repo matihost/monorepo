@@ -31,20 +31,6 @@ resource "google_project_iam_binding" "gke-gcr-access" {
 }
 
 
-// Dedicated service account for the Bastion instance
-resource "google_service_account" "bastion" {
-  account_id   = "${local.gke_name}-bastion-sa"
-  display_name = "Service account for GKE ${local.gke_name} bastion instance"
-}
-
-resource "google_project_iam_binding" "bastion-gke-admin" {
-  role = "roles/container.clusterAdmin"
-
-  members = [
-    "serviceAccount:${google_service_account.bastion.email}",
-  ]
-}
-
 
 // Service Account used by External DNS workflow on GKE
 resource "google_service_account" "edns-sa" {

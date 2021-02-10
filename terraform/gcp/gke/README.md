@@ -34,6 +34,8 @@ make google-authentication
 # setup GKE cluster and other accompanied resources and expose Kube Master API via ExternalIP
 # but limits access only from this laptop public ip
 make apply
+# which is equivalent for
+make apply CLUSTER_NAME=shared REGION=us-central1
 
 # opens tunnel via bastion, export HTTP_PROXY=http://localhost:8888 to use it in the shell
 make open-tunnel

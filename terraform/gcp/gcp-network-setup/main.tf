@@ -1,6 +1,6 @@
 provider "google" {
-  region  = var.region
-  zone    = local.zone
+  region  = var.regions[0]
+  zone    = local.zones[0]
   project = var.project
 }
 
@@ -12,12 +12,12 @@ data "google_compute_network" "default" {
 }
 
 locals {
-  zone = "${var.region}-${var.zone_letter}"
+  zones = formatlist("%s-${var.zone_letter}", var.regions)
 }
 
-variable "region" {
-  type        = string
-  default     = "us-central1"
+variable "regions" {
+  type        = list(string)
+  default     = ["us-central1", "us-east1"]
   description = "GCP Region For Deployment"
 }
 
