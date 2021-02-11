@@ -2,29 +2,69 @@
 
 CURRENT_PROJECT := $(shell gcloud config get-value project)
 WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
-ACCESS_FROM_LAPTOP := true
+
+
 ENCRYPT_ETCD := false
 ENABLE_PSP := false
 CLUSTER_NAME := shared
 REGION := us-central1
+ZONE_LETTER := a
+MASTER_PUBLIC_IP := true
+MASTER_CIDR := "172.16.0.32/28"
+MASTER_ACCESS_CIRDS := ["$(WHOAMI)/32"]
 
-TF_VAR_external_access_ip := $(WHOAMI)
+TF_VAR_master_cidr = $(MASTER_CIDR)
+TF_VAR_external_access_cidrs := $(MASTER_ACCESS_CIRDS)
+TF_VAR_expose_master_via_external_ip := $(MASTER_PUBLIC_IP)
+
 TF_VAR_project := $(CURRENT_PROJECT)
-TF_VAR_expose_master_via_external_ip := $(ACCESS_FROM_LAPTOP)
 TF_VAR_encrypt_etcd := $(ENCRYPT_ETCD)
 TF_VAR_enable_pod_security_policy := $(ENABLE_PSP)
 TF_VAR_cluster_name := $(CLUSTER_NAME)
 TF_VAR_region := $(REGION)
+TF_VAR_zone_letter := $(ZONE_LETTER)
 
 # uncomment to run terraform in debug mode
 # TF_LOG := DEBUG
 
-apply: ## setup GKE cluster
+ensure-cluster-shared1: ## create/update cluster shared1-dev in us-central1-a
+	@-terraform workspace new shared1@$(CURRENT_PROJECT) &>/dev/null
+	terraform workspace select shared1@$(CURRENT_PROJECT) && \
+	$(MAKE) apply CLUSTER_NAME=shared1 MASTER_CIDR=172.16.0.32/28 REGION=us-central1
+
+ensure-cluster-shared2: ## create/update cluster shared2-dev in us-east1-b
+	@-terraform workspace new shared2@$(CURRENT_PROJECT) &>/dev/null
+	terraform workspace select shared2@$(CURRENT_PROJECT) && \
+	$(MAKE) apply CLUSTER_NAME=shared2 MASTER_CIDR=172.16.0.64/28 REGION=us-east1 ZONE_LETTER=b
+
+destroy-cluster-shared1: ## destroy cluster shared1-dev in us-central1-a
+	@-terraform workspace new shared1@$(CURRENT_PROJECT) &>/dev/null
+	terraform workspace select shared1@$(CURRENT_PROJECT) && \
+	$(MAKE) destroy CLUSTER_NAME=shared1 MASTER_CIDR=172.16.0.32/28 REGION=us-central1
+
+destroy-cluster-shared2: ## destroy cluster shared2-dev in us-east1-b
+	@-terraform workspace new shared2@$(CURRENT_PROJECT) &>/dev/null
+	terraform workspace select shared2@$(CURRENT_PROJECT) && \
+	$(MAKE) destroy CLUSTER_NAME=shared2 MASTER_CIDR=172.16.0.64/28 REGION=us-east1 ZONE_LETTER=b
+
+scale-down-shared1: ## scale down to 0 nodes cluster shared1-dev in us-central1-a
+	cloud container clusters resize shared1-dev --zone=us-centra1-a --num-nodes=0 --async --quiet
+
+scale-down-shared2: ## scale down to 0 nodes cluster shared2-dev in us-east1-b
+	cloud container clusters resize shared2-dev --zone=us-east1-b --num-nodes=0 --async --quiet
+
+scale-up-shared1: ## scale up to 1 nodes cluster shared1-dev in us-central1-a
+	cloud container clusters resize shared1-dev --zone=us-centra1-a --num-nodes=1 --async --quiet
+
+scale-up-shared2:  ## scale up to 1 node cluster shared2-dev in us-east1-b
+	cloud container clusters resize shared2-dev --zone=us-east1-b --num-nodes=1 --async --quiet
+
+apply: init-terraform ## setup GKE cluster
 	@terraform validate && \
 	terraform plan -lock=false && \
 	terraform apply -auto-approve && \
-	[ "$(ACCESS_FROM_LAPTOP)" = "true" ] && \
-    echo "Run 'gcloud container clusters get-credentials shared-dev --zone us-central1-a' to access GKE  from Kubectl" || \
+	[ -n "$(MASTER_ACCESS_CIRDS)" ] && \
+    gcloud container clusters get-credentials $(CLUSTER_NAME)-dev --zone $(REGION)-$(ZONE_LETTER) || \
     echo "Run 'source access-gke.sh' to setup GKE access for kubectl etc. commands in current shell";
 
 open-tunnel: ## opens tunnel via bastion, export HTTP_PROXY=http://localhost:8888 to use it in the shell
@@ -45,7 +85,7 @@ google-authentication: prepare ## authenticate to GCP and prepare Application De
 	gcloud init
 	gcloud auth application-default login
 
-init:
+init-terraform:
 	terraform init -upgrade=true
 
 help: ## show usage and tasks (default)

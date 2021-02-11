@@ -30,12 +30,32 @@ make google-authentication
 
 ## Usage
 
+### TL;DR
+
+```bash
+# run
+make <TASK>
+
+#with one of the following tags:
+#
+#ensure-cluster-shared1         create/update cluster shared1-dev in us-central1-a
+#ensure-cluster-shared2         create/update cluster shared2-dev in us-east1-b
+#destroy-cluster-shared1        destroy cluster shared1-dev in us-central1-a
+#destroy-cluster-shared2        destroy cluster shared2-dev in us-east1-b
+#scale-down-shared1             scale down to 0 nodes cluster shared1-dev in us-central1-a
+#scale-down-shared2             scale down to 0 nodes cluster shared2-dev in us-east1-b
+#scale-up-shared1               scale up to 1 nodes cluster shared1-dev in us-central1-a
+#scale-up-shared2               scale up to 1 node cluster shared2-dev in us-east1-b
+```
+
+### Detailed usage
+
 ```bash
 # setup GKE cluster and other accompanied resources and expose Kube Master API via ExternalIP
 # but limits access only from this laptop public ip
 make apply
 # which is equivalent for
-make apply CLUSTER_NAME=shared REGION=us-central1
+make apply CLUSTER_NAME=shared REGION=us-central1 ZONE_LETTER=a MASTER_CIDR := "172.16.0.32/28"
 
 # opens tunnel via bastion, export HTTP_PROXY=http://localhost:8888 to use it in the shell
 make open-tunnel
@@ -44,7 +64,8 @@ make open-tunnel
 make setup-kubecontext
 
 # create GKE cluster w/o public IP for Master Kube API
-make ACCESS_FROM_LAPTOP=false
+# GKE API would available only internall or via bastion node
+make MASTER_PUBLIC_IP=false MASTER_ACCESS_CIRDS="[]"
 
 # in that case in order to access it from laptop it requires to setup SSH tunnel to proxy located on bastion VM and configure kube commands to access private GKE cluster freely
 source access-gke.sh

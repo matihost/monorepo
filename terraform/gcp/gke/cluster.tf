@@ -97,6 +97,8 @@ resource "google_container_cluster" "gke" {
   enable_shielded_nodes = true
 
   # Allocate IPs in our subnetwork
+  # It is possible to use non-RFC1918 ip for pods and svc but it has implications:
+  # https://cloud.google.com/kubernetes-engine/docs/how-to/alias-ips#enable_reserved_ip_ranges
   ip_allocation_policy {
     cluster_secondary_range_name  = data.google_compute_subnetwork.private-gke.secondary_ip_range.0.range_name
     services_secondary_range_name = data.google_compute_subnetwork.private-gke.secondary_ip_range.1.range_name
@@ -117,13 +119,19 @@ resource "google_container_cluster" "gke" {
 
   master_authorized_networks_config {
     cidr_blocks {
-      cidr_block = data.google_compute_subnetwork.private-gke.ip_cidr_range
+      cidr_block   = data.google_compute_subnetwork.private-gke.ip_cidr_range
+      display_name = "from GKE nodes subnetwork"
+    }
+    cidr_blocks {
+      cidr_block   = "10.0.0.0/8"
+      display_name = "from entire VPC network"
     }
     # PublicIP cannot be added as authorized  when enable_private_endpoint is true
     dynamic "cidr_blocks" {
-      for_each = var.expose_master_via_external_ip ? [1] : []
+      for_each = var.external_access_cidrs
+      iterator = cidr
       content {
-        cidr_block = "${var.external_access_ip}/32"
+        cidr_block = cidr.value
       }
     }
   }
@@ -135,7 +143,7 @@ resource "google_container_cluster" "gke" {
   private_cluster_config {
     enable_private_nodes    = true
     enable_private_endpoint = !var.expose_master_via_external_ip
-    master_ipv4_cidr_block  = "172.16.0.64/28"
+    master_ipv4_cidr_block  = var.master_cidr
     master_global_access_config {
       enabled = true
     }
@@ -176,9 +184,13 @@ resource "google_container_cluster" "gke" {
 
   enable_intranode_visibility = false
 
-  # TODO chek what the is this...
+  # This option is required if you privately use non-RFC 1918/public IP addresses for your Pods or Services.
+  # Disabling SNAT is required so that responses can be routed to the Pod that originated the traffic.
+  # Using public ips to pods using as private may cause problems with CloudNAT:
+  # https://cloud.google.com/kubernetes-engine/docs/how-to/alias-ips#internal_ip_addresses
+  #
   # default_snat_status {
-  #   disabled = false
+  #   disabled = true
   # }
 
   maintenance_policy {
@@ -213,6 +225,10 @@ resource "google_container_node_pool" "gke_nodes" {
     # use 4cores and 16 GB ram, e2-medium - 2 cores and 4 GB RAM is too small for all apps running on node
     machine_type = "e2-standard-4"
     # machine_type = "e2-medium"
+
+    # GCP Free tier has only: pd-standard - which is default disk type
+    # increase size and switch type to pd-balanced or pd-ssd for better performance
+    # https://cloud.google.com/compute/disks-image-pricing - for pricing
     # disk_type    = "pd-ssd"
     disk_size_gb = 30
 

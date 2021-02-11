@@ -61,15 +61,22 @@ variable "regional_cluster" {
   description = "Whether to create regional cluster. Default false - which means cluster will be zonal."
 }
 
-variable "expose_master_via_external_ip" {
-  type        = bool
-  default     = false
-  description = "Whether to expose Kube API as ExternalIP. Default false - which means cluster will be available only from internal VPC"
+variable "master_cidr" {
+  type        = string
+  default     = "172.16.0.32/28"
+  description = "IP CIDR to allocate to Master Nodes in GoogleVPC, cannot interfere with any range from nodes VPC, cannot interfere between any private GKE master ranges as peering is reused, has to be /28"
 }
 
-variable "external_access_ip" {
-  type        = string
-  description = "The public IP which is allowed to access Kube API"
+variable "expose_master_via_external_ip" {
+  type        = bool
+  default     = true
+  description = "Whether to expose Kube API as ExternalIP. Default true - which means cluster will be available from laptop"
+}
+
+variable "external_access_cidrs" {
+  type        = set(string)
+  default     = []
+  description = "The public CIDR IP which is allowed to access Kube API. expose_master_via_external_ip has to be true and you need to put your ip to be able to access GKE Master API"
 }
 
 variable "external_dns_k8s_namespace" {

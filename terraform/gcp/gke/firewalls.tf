@@ -15,13 +15,12 @@ resource "google_compute_firewall" "gke-accept-lb" {
 }
 
 resource "google_compute_firewall" "gke-accept-istio-webhook" {
-  name        = "${local.gke_name}-accept-istio-webhook"
-  description = "Allow traffic to GKE nodes for istio webhook from GKE Master VPC"
-  network     = data.google_compute_network.private-gke.name
-  direction   = "INGRESS"
-  project     = var.project
-  # same as GKE cluster master_ipv4_cidr_block
-  source_ranges = ["172.16.0.64/28"]
+  name          = "${local.gke_name}-accept-istio-webhook"
+  description   = "Allow traffic to GKE nodes for istio webhook from GKE Master Nodes"
+  network       = data.google_compute_network.private-gke.name
+  direction     = "INGRESS"
+  project       = var.project
+  source_ranges = [var.master_cidr]
 
   allow {
     protocol = "tcp"

@@ -62,14 +62,35 @@ resource "google_service_account" "bastion" {
   display_name = "Service account for bastion instance"
 }
 
+# allows connect and operate as cluster-admin on any GKE cluster
+# gcloud container clusters  get-credentials <gke-name> --[region|zone]=<location> --internal-ip
+# kubectl get po -A
 resource "google_project_iam_binding" "bastion-gke-admin" {
-  role = "roles/container.clusterAdmin"
+  role = "roles/container.admin"
 
   members = [
     "serviceAccount:${google_service_account.bastion.email}",
   ]
 }
 
+# allows to gcloud SSH to VM (but they need to be running with same SA)
+resource "google_project_iam_binding" "bastion-oslogin-user" {
+  role = "roles/compute.osLogin"
+
+  members = [
+    "serviceAccount:${google_service_account.bastion.email}",
+  ]
+}
+
+# allows gcloud ssh to other VMs running with different GSA from bastion VM
+# gcloud compute <vm-name> --zone=<zone> --internal-ip
+resource "google_project_iam_binding" "bastion-service-account-user" {
+  role = "roles/iam.serviceAccountUser"
+
+  members = [
+    "serviceAccount:${google_service_account.bastion.email}",
+  ]
+}
 
 
 output "bastion_instance_name" {

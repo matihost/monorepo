@@ -3,6 +3,10 @@ resource "google_compute_network" "private" {
   auto_create_subnetworks = "false"
 }
 
+# For private GKE cluster
+# Primary ip_cidr_range has to belong to rfc1918 and it is used for GKE nodes
+# Secondary adress ranges can be non-rfc1918, but it complicates NAT:
+# https://cloud.google.com/kubernetes-engine/docs/how-to/alias-ips#enable_reserved_ip_ranges
 resource "google_compute_subnetwork" "private1" {
   name          = "private-subnet-${var.regions[0]}"
   region        = var.regions[0]
