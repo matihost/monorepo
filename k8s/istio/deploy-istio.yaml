@@ -84,7 +84,7 @@
       namespace: istio-system
     register: operator_status
     until: operator_status.resources[0].status.status == "HEALTHY"
-    retries: 12
+    retries: 36
     delay: 10
     ignore_errors: yes
 

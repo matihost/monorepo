@@ -36,9 +36,9 @@ all:
             https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_20.04/Release.key
         - name: libcontainers-crio
           repo: >-
-            deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.19/x{{ ansible_distribution }}_20.04/ /
+            deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.20/x{{ ansible_distribution }}_20.04/ /
           key_url: >-
-            https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.19/x{{ ansible_distribution }}_20.04/Release.key
+            https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.20/x{{ ansible_distribution }}_20.04/Release.key
         - name: google-cloud-sdk
           repo: "deb [arch=amd64] https://packages.cloud.google.com/apt cloud-sdk main"
           key_url: https://packages.cloud.google.com/apt/doc/apt-key.gpg

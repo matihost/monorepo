@@ -64,7 +64,7 @@ function ensureCrictlPresent() {
   )
 }
 function ensureCrioPresent() {
-  CRIO_VERSION=1.19
+  CRIO_VERSION=1.20
 
   [ -x /usr/bin/crio ] || (
     # shellcheck disable=SC1091
