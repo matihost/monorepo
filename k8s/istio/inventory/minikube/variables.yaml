@@ -4,7 +4,7 @@ all:
   vars:
     operator:
       hub: "docker.io/istio"
-      tag: "1.8.2"
+      tag: "1.9.0"
     ingress_class:
       enable: true
       api_version: v1

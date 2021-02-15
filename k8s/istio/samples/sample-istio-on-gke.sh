@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
+# usage: ./sample-istio-on-gke.sh shared1-dev
+
+CLUSTER_NAME="${1:?CLUSTER_NAME is required}"
+
+DNS_SUFFIX="$(echo -n "${CLUSTER_NAME}" | sed 's/-/./g')"
 
 function deploySampleAppWithK8SIngress() {
-  kubectl create ns sample-istio
+  kubectl create ns sample-istio || echo "ignoring..."
   # to enforce autosidecar injection in namespace
   # we do use Istion only as k8s Ingress controller
   # so it is not necessary
-  # kubectl label namespace sample-istio istio-injection=enabled
+  kubectl label namespace sample-istio istio-injection=enabled --overwrite
 
   # because sample app need to be run as root
   kubectl apply -f - <<EOF
@@ -25,7 +30,7 @@ subjects:
 EOF
 
   mkdir -p /tmp/istio-certs
-  CN="httpbin.internal.gke.shared.dev"
+  CN="httpbin.internal.gke.${DNS_SUFFIX}"
   openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "/tmp/istio-certs/${CN}.crt" -newkey rsa:2048 -nodes -keyout "/tmp/istio-certs/${CN}.key"
   kubectl create -n istio-system secret tls httpbin-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
 
@@ -42,7 +47,7 @@ metadata:
 spec:
   # ingressClassName: istio
   rules:
-  - host: httpbin.internal.gke.shared.dev
+  - host: httpbin.internal.gke.${DNS_SUFFIX}
     http:
       paths:
       - backend:
@@ -53,7 +58,7 @@ spec:
   # Istio support Ingresses with TLS but secret has to be in istio-system namespace
   tls:
   - hosts:
-    - httpbin.internal.gke.shared.dev
+    - httpbin.internal.gke.${DNS_SUFFIX}
     secretName: httpbin-credential
 EOF
 
@@ -108,14 +113,12 @@ EOF
 
 function exposeSampleAppViaInternalIstioNatively() {
   # TLS certificates has to be in namespace where ingressgateway is deployed (istio-system)
-  CN="api.internal.gke.shared.dev"
+  CN="api.internal.gke.${DNS_SUFFIX}"
   openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "/tmp/istio-certs/${CN}.crt" -newkey rsa:2048 -nodes -keyout "/tmp/istio-certs/${CN}.key"
   kubectl create -n istio-system secret tls api-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
-  CN="http.internal.gke.shared.dev"
+  CN="http.internal.gke.${DNS_SUFFIX}"
   openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "/tmp/istio-certs/${CN}.crt" -newkey rsa:2048 -nodes -keyout "/tmp/istio-certs/${CN}.key"
   kubectl create -n istio-system secret tls http-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
-
-  echo "Wait for istio to come up..." && sleep 60
 
   kubectl apply -f - <<EOF
 apiVersion: networking.istio.io/v1beta1
@@ -132,26 +135,26 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-    - "api.internal.gke.shared.dev"
-    - "http.internal.gke.shared.dev"
+    - "api.internal.gke.${DNS_SUFFIX}"
+    - "http.internal.gke.${DNS_SUFFIX}"
   - port:
       number: 443
-      name: httphttps
+      name: https-httpbin
       protocol: HTTPS
     tls:
       mode: SIMPLE
       credentialName: http-credential
     hosts:
-    - http.internal.gke.shared.dev
+    - http.internal.gke.${DNS_SUFFIX}
   - port:
       number: 443
-      name: apihttps
+      name: https-api
       protocol: HTTPS
     tls:
       mode: SIMPLE
       credentialName: api-credential
     hosts:
-    - api.internal.gke.shared.dev
+    - api.internal.gke.${DNS_SUFFIX}
 EOF
   kubectl apply -f - <<EOF
 apiVersion: networking.istio.io/v1beta1
@@ -161,7 +164,7 @@ metadata:
   namespace: sample-istio
 spec:
   hosts:
-  - "api.internal.gke.shared.dev"
+  - "api.internal.gke.${DNS_SUFFIX}"
   gateways:
   - sample-istio/api-gateway
   http:
@@ -183,7 +186,7 @@ metadata:
   namespace: sample-istio
 spec:
   hosts:
-  - "http.internal.gke.shared.dev"
+  - "http.internal.gke.${DNS_SUFFIX}"
   gateways:
   - sample-istio/api-gateway
   - mesh # applies to all the sidecars in the mesh
@@ -205,7 +208,7 @@ spec:
   hosts:
   - httpbin.sample-istio.svc.cluster.local
   http:
-  - timeout: 5s
+  - timeout: 3s
     route:
     - destination:
         host: httpbin.sample-istio.svc.cluster.local
@@ -214,7 +217,7 @@ EOF
 
 function exposeSampleAppExternally() {
   # TLS certificates has to be in namespace where ingressgateway is deployed (istio-system)
-  CN="http.external.gke.shared.dev"
+  CN="http.external.gke.${DNS_SUFFIX}"
   openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "/tmp/istio-certs/${CN}.crt" -newkey rsa:2048 -nodes -keyout "/tmp/istio-certs/${CN}.key"
   kubectl create -n istio-system secret tls http-external-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
 
@@ -230,19 +233,19 @@ spec:
   servers:
   - port:
       number: 80
-      name: http
+      name: http-httpbin
       protocol: HTTP
     hosts:
-    - "http.external.gke.shared.dev"
+    - "http.external.gke.${DNS_SUFFIX}"
   - port:
       number: 443
-      name: httphttps
+      name: https-httpbin
       protocol: HTTPS
     tls:
       mode: SIMPLE
       credentialName: http-external-credential
     hosts:
-    - http.external.gke.shared.dev
+    - http.external.gke.${DNS_SUFFIX}
 EOF
   kubectl apply -f - <<EOF
 apiVersion: networking.istio.io/v1beta1
@@ -252,7 +255,7 @@ metadata:
   namespace: sample-istio
 spec:
   hosts:
-  - "http.external.gke.shared.dev"
+  - "http.external.gke.${DNS_SUFFIX}"
   gateways:
   - sample-istio/external-gateway
   - mesh # applies to all the sidecars in the mesh
