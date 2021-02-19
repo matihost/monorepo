@@ -49,6 +49,12 @@ variable "cluster_name" {
   description = "GKE Cluster Name Project For Deployment"
 }
 
+variable "secondary_ip_range_number" {
+  type        = string
+  default     = "0"
+  description = "secondary_ip_range for pod and svc, assumption there are two ip ragnes for both pods and svc per region, second GKE cluster in region should use other subnets"
+}
+
 variable "env" {
   type        = string
   default     = "dev"

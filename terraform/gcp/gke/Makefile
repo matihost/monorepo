@@ -48,16 +48,16 @@ destroy-cluster-shared2: ## destroy cluster shared2-dev in us-east1-b
 	$(MAKE) destroy CLUSTER_NAME=shared2 MASTER_CIDR=172.16.0.64/28 REGION=us-east1 ZONE_LETTER=b
 
 scale-down-shared1: ## scale down to 0 nodes cluster shared1-dev in us-central1-a
-	cloud container clusters resize shared1-dev --zone=us-centra1-a --num-nodes=0 --async --quiet
+	gcloud container clusters resize shared1-dev --zone=us-central1-a --num-nodes=0 --async --quiet
 
 scale-down-shared2: ## scale down to 0 nodes cluster shared2-dev in us-east1-b
-	cloud container clusters resize shared2-dev --zone=us-east1-b --num-nodes=0 --async --quiet
+	gcloud container clusters resize shared2-dev --zone=us-east1-b --num-nodes=0 --async --quiet
 
 scale-up-shared1: ## scale up to 1 nodes cluster shared1-dev in us-central1-a
-	cloud container clusters resize shared1-dev --zone=us-centra1-a --num-nodes=1 --async --quiet
+	gcloud container clusters resize shared1-dev --zone=us-central1-a --num-nodes=1 --async --quiet
 
 scale-up-shared2:  ## scale up to 1 node cluster shared2-dev in us-east1-b
-	cloud container clusters resize shared2-dev --zone=us-east1-b --num-nodes=1 --async --quiet
+	gcloud container clusters resize shared2-dev --zone=us-east1-b --num-nodes=1 --async --quiet
 
 apply: init-terraform ## setup GKE cluster
 	@terraform validate && \

@@ -15,14 +15,25 @@ resource "google_compute_subnetwork" "private1" {
 
   private_ip_google_access = true
 
+  # max pods: 32,766
   secondary_ip_range {
-    range_name    = "private-pod-range"
-    ip_cidr_range = "10.11.0.0/16"
+    range_name    = "pod-range-0"
+    ip_cidr_range = "100.64.0.0/17"
   }
 
   secondary_ip_range {
-    range_name    = "private-svc-range"
-    ip_cidr_range = "10.12.0.0/16"
+    range_name    = "pod-range-1"
+    ip_cidr_range = "100.66.0.0/17"
+  }
+  # max svcs: 4,094
+  secondary_ip_range {
+    range_name    = "svc-range-0"
+    ip_cidr_range = "100.96.0.0/20"
+  }
+
+  secondary_ip_range {
+    range_name    = "svc-range-1"
+    ip_cidr_range = "100.96.16.0/20"
   }
 }
 
@@ -35,13 +46,23 @@ resource "google_compute_subnetwork" "private2" {
   private_ip_google_access = true
 
   secondary_ip_range {
-    range_name    = "private-pod-range"
-    ip_cidr_range = "10.15.0.0/16"
+    range_name    = "pod-range-0"
+    ip_cidr_range = "100.68.0.0/17"
   }
 
   secondary_ip_range {
-    range_name    = "private-svc-range"
-    ip_cidr_range = "10.16.0.0/16"
+    range_name    = "pod-range-1"
+    ip_cidr_range = "100.70.0.0/17"
+  }
+
+  secondary_ip_range {
+    range_name    = "svc-range-0"
+    ip_cidr_range = "100.96.32.0/20"
+  }
+
+  secondary_ip_range {
+    range_name    = "svc-range-1"
+    ip_cidr_range = "100.96.48.0/20"
   }
 }
 

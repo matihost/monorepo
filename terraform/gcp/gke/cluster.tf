@@ -100,8 +100,8 @@ resource "google_container_cluster" "gke" {
   # It is possible to use non-RFC1918 ip for pods and svc but it has implications:
   # https://cloud.google.com/kubernetes-engine/docs/how-to/alias-ips#enable_reserved_ip_ranges
   ip_allocation_policy {
-    cluster_secondary_range_name  = data.google_compute_subnetwork.private-gke.secondary_ip_range.0.range_name
-    services_secondary_range_name = data.google_compute_subnetwork.private-gke.secondary_ip_range.1.range_name
+    cluster_secondary_range_name  = "pod-range-${var.secondary_ip_range_number}"
+    services_secondary_range_name = "svc-range-${var.secondary_ip_range_number}"
   }
   networking_mode = "VPC_NATIVE"
 
