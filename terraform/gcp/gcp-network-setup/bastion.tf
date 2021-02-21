@@ -28,9 +28,9 @@ resource "google_compute_instance" "bastion" {
 
   metadata_startup_script = <<EOT
   #!/usr/bin/env bash
-  sudo apt-get update -y
-  sudo apt-get install -y bash-completion vim bind9-dnsutils tinyproxy
-  sudo snap install kubectl --classic
+  apt-get update -y
+  apt-get install -y bash-completion vim less bind9-dnsutils tinyproxy iputils-ping ncat
+  snap install kubectl --classic
   EOT
 
   metadata = {
@@ -97,7 +97,16 @@ output "bastion_instance_name" {
   value = google_compute_instance.bastion.name
 }
 
+output "bastion_instance_zone" {
+  value = google_compute_instance.bastion.zone
+}
+
+output "bastion_instance_ssh_cmd" {
+  value = format("gcloud compute ssh %s --zone=%s", google_compute_instance.bastion.name, google_compute_instance.bastion.zone)
+}
+
+
 
 output "bastion_tunnel_to_proxy" {
-  value = format("gcloud compute ssh %s -- -o ExitOnForwardFailure=yes -M -S /tmp/sslsock -L8888:127.0.0.1:8888 -f sleep 36000", google_compute_instance.bastion.name)
+  value = format("gcloud compute ssh %s --zone=%s -- -o ExitOnForwardFailure=yes -M -S /tmp/sslsock -L8888:127.0.0.1:8888 -f sleep 36000", google_compute_instance.bastion.name, google_compute_instance.bastion.zone)
 }

@@ -42,6 +42,9 @@ all:
         - name: google-cloud-sdk
           repo: "deb [arch=amd64] https://packages.cloud.google.com/apt cloud-sdk main"
           key_url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        - name: openvpn
+          repo: "deb [arch=amd64] https://swupdate.openvpn.net/community/openvpn3/repos grovy main"
+          key_url: https://swupdate.openvpn.net/repos/openvpn-repo-pkg-key.pub
         packages:
         - lm-sensors
         - hddtemp
@@ -99,6 +102,7 @@ all:
         - kubectl
         # Skipped packages:
         # - skypeforlinux
+        - openvpn3
         snaps:
         - mc-installer
         - minecraft-server-jdstrand
