@@ -68,11 +68,11 @@ apply: init-terraform ## setup GKE cluster
     echo "Run 'source access-gke.sh' to setup GKE access for kubectl etc. commands in current shell";
 
 open-tunnel: ## opens tunnel via bastion, export HTTP_PROXY=http://localhost:8888 to use it in the shell
-	-@kill `pgrep -a ssh | grep shared-dev-bastion | cut -f1 -d' '`
-	gcloud compute ssh shared-dev-bastion -- -o ExitOnForwardFailure=yes -M -S /tmp/sslsock -L8888:127.0.0.1:8888 -f sleep 36000
+	-@kill `pgrep -a ssh | grep private-dev-bastion | cut -f1 -d' '`
+	gcloud compute ssh private-vpc-bastion -- -o ExitOnForwardFailure=yes -M -S /tmp/sslsock -L8888:127.0.0.1:8888 -f sleep 36000
 
 setup-kubecontext: ## creates ~/.kube/config context to for GKE cluster
-	gcloud container clusters get-credentials shared-dev --zone us-central1-a
+	gcloud container clusters get-credentials $(CLUSTER_NAME)-dev --zone $(REGION)-$(ZONE_LETTER)
 
 show-state: ## show terraform.state
 	terraform state list
