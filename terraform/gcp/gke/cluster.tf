@@ -30,6 +30,9 @@ resource "google_container_cluster" "gke" {
   remove_default_node_pool = true
   initial_node_count       = 1
 
+  # TODO consider parametrizing
+  # enable_tpu = false
+
   addons_config {
     http_load_balancing {
       disabled = false
@@ -48,6 +51,9 @@ resource "google_container_cluster" "gke" {
     gce_persistent_disk_csi_driver_config {
       enabled = true
     }
+    kalm_config {
+      enabled = true
+    }
     config_connector_config {
       enabled = true
     }
@@ -55,6 +61,7 @@ resource "google_container_cluster" "gke" {
 
   network_policy {
     enabled = true
+    # provider = "CALICO"
   }
 
 
@@ -140,6 +147,11 @@ resource "google_container_cluster" "gke" {
     enabled = var.enable_pod_security_policy
   }
 
+  # Ability to use G Suite Groups in GKE RBACs
+  #
+  # authenticator_groups_config {
+  #   security_group = "security-groups@DOM.com"
+  # }
   private_cluster_config {
     enable_private_nodes    = true
     enable_private_endpoint = !var.expose_master_via_external_ip
@@ -164,16 +176,6 @@ resource "google_container_cluster" "gke" {
     node-owner = local.gke_name
   }
 
-  #TODO define cluster metering in BigQuery
-  # resource_usage_export_config {
-  #   enable_network_egress_metering = false
-  #   enable_resource_consumption_metering = true
-
-  #   bigquery_destination {
-  #     dataset_id = "cluster_resource_usage"
-  #   }
-  # }
-
   vertical_pod_autoscaling {
     enabled = true
   }
@@ -182,6 +184,7 @@ resource "google_container_cluster" "gke" {
     identity_namespace = "${var.project}.svc.id.goog"
   }
 
+  # Whether Intra-node visibility is enabled for this cluster. This makes same node pod to pod traffic visible for VPC network.
   enable_intranode_visibility = false
 
   # This option is required if you privately use non-RFC 1918/public IP addresses for your Pods or Services.
@@ -193,10 +196,24 @@ resource "google_container_cluster" "gke" {
   #   disabled = true
   # }
 
+  #TODO define cluster metering in BigQuery
+  # resource_usage_export_config {
+  #   enable_network_egress_metering = false
+  #   enable_resource_consumption_metering = true
+
+  #   bigquery_destination {
+  #     dataset_id = "cluster_resource_usage"
+  #   }
+  # }
+
   maintenance_policy {
     daily_maintenance_window {
       start_time = "03:00"
     }
+  }
+
+  lifecycle {
+    ignore_changes = [initial_node_count]
   }
 
   // Allow plenty of time for each operation to finish (default was 10m)
@@ -205,13 +222,27 @@ resource "google_container_cluster" "gke" {
     update = "30m"
     delete = "30m"
   }
+
+  # aka https://www.terraform.io/docs/cloud/api/notification-configurations.html
+  # notification_config {
+  #   pubsub {
+  #     enabled = true
+  #     topic   = notification_topic
+  #   }
+  # }
+}
+
+resource "random_id" "gke_node_pool_id" {
+  byte_length = 2
 }
 
 resource "google_container_node_pool" "gke_nodes" {
-  name       = "compute"
+  name       = "compute-${random_id.gke_node_pool_id.hex}"
   location   = local.location
   cluster    = google_container_cluster.gke.name
   node_count = 1
+
+  max_pods_per_node = 110
 
   # Repair any issues but don't auto upgrade node versions
   management {
@@ -219,6 +250,7 @@ resource "google_container_node_pool" "gke_nodes" {
     # Auto_upgrade cannot be false when release_channel RAPID is set
     auto_upgrade = true
   }
+
 
   node_config {
     # preemptible  = true
@@ -265,11 +297,34 @@ resource "google_container_node_pool" "gke_nodes" {
     workload_metadata_config {
       node_metadata = "GKE_METADATA_SERVER"
     }
+
+    # requires image_type = COS_CONTAINERD as well
+    # sandbox_config {
+    #   sandbox_type= "gvisor"
+    # }
+
+    shielded_instance_config {
+      enable_secure_boot          = true
+      enable_integrity_monitoring = true
+    }
   }
 
   autoscaling {
     min_node_count = 1
     max_node_count = 5
+  }
+
+  lifecycle {
+    ignore_changes = [initial_node_count]
+    # so that first new node pool is created (with random name)
+    # before node pool is removed so that pods from destroyed node pool has somewhere to migrate
+    create_before_destroy = true
+  }
+
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "30m"
   }
 }
 

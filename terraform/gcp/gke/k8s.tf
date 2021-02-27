@@ -25,12 +25,16 @@ resource "helm_release" "cluster-config" {
 
   namespace        = "cluster-config"
   create_namespace = true
+  depends_on = [
+    google_container_cluster.gke
+  ]
 }
 
 # Deploy ExternalDNS addon
 resource "helm_release" "external-dns" {
   # Ensure deployment starts when GKE Node Pool is provisioned
   depends_on = [
+    google_container_cluster.gke,
     google_container_node_pool.gke_nodes
   ]
   name       = "external-dns"

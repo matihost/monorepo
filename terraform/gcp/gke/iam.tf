@@ -4,7 +4,6 @@ resource "google_service_account" "gke-sa" {
   display_name = "Service Account which is used by GKE Nodes"
 }
 
-
 resource "google_project_iam_binding" "gke-log-writer" {
   role = "roles/logging.logWriter"
 
@@ -21,9 +20,28 @@ resource "google_project_iam_binding" "gke-metrics-writer" {
   ]
 }
 
+# also needed to send metrics, permits write-only access to resource metadata provide permissions needed by agents to send metadata
+resource "google_project_iam_binding" "gke-metrics-metadata-writer" {
+  role = "roles/stackdriver.resourceMetadata.writer"
+
+  members = [
+    "serviceAccount:${google_service_account.gke-sa.email}",
+  ]
+}
+
+
 # so that  GKE cluster can access images from its own GCP project (gcr.io/project-id)
 resource "google_project_iam_binding" "gke-gcr-access" {
   role = "roles/storage.objectViewer"
+
+  members = [
+    "serviceAccount:${google_service_account.gke-sa.email}",
+  ]
+}
+
+# so that  GKE cluster can access GCP Artifacts
+resource "google_project_iam_binding" "gke-artifacts-access" {
+  role = "roles/artifactregistry.reader"
 
   members = [
     "serviceAccount:${google_service_account.gke-sa.email}",
