@@ -108,3 +108,9 @@ variable "encrypt_etcd" {
   description = "Whether to encrypt GKE etcd with KMS key, requires prerequisites/kms to be run once"
   type        = bool
 }
+
+variable "bigquery_metering" {
+  default     = false
+  description = "Whether to export usage metering to BigQuery, requires prerequisites/bigquery-dataset to be run once"
+  type        = bool
+}

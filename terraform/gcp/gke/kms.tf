@@ -3,7 +3,7 @@
 
 data "google_kms_key_ring" "gke-keyring" {
   count    = var.encrypt_etcd ? 1 : 0
-  name     = "${local.gke_name}-keyring"
+  name     = "${var.region}-keyring"
   location = var.region # GKE does not support global location for keyring
 }
 

@@ -1,7 +1,7 @@
 # KMS for cluster encryption
 resource "google_kms_key_ring" "gke-keyring" {
   project  = var.project
-  name     = "${local.gke_name}-keyring"
+  name     = "${var.region}-keyring"
   location = var.region # GKE does not support global location for keyring
 
   # KMS keys are un-deletable and there is no way to not omit them upo terraform destrory

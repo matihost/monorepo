@@ -196,15 +196,18 @@ resource "google_container_cluster" "gke" {
   #   disabled = true
   # }
 
-  #TODO define cluster metering in BigQuery
-  # resource_usage_export_config {
-  #   enable_network_egress_metering = false
-  #   enable_resource_consumption_metering = true
+  dynamic "resource_usage_export_config" {
+    for_each = var.bigquery_metering ? [1] : []
+    content {
+      # this requires prerequisite: https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-usage-metering#enable-network-egress-metering
+      enable_network_egress_metering       = false
+      enable_resource_consumption_metering = true
 
-  #   bigquery_destination {
-  #     dataset_id = "cluster_resource_usage"
-  #   }
-  # }
+      bigquery_destination {
+        dataset_id = "${replace(var.region, "-", "_")}_dataset"
+      }
+    }
+  }
 
   maintenance_policy {
     daily_maintenance_window {

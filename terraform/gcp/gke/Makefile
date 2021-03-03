@@ -4,6 +4,7 @@ CURRENT_PROJECT := $(shell gcloud config get-value project)
 WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
 
 
+BIGQUERY_METERING := false
 ENCRYPT_ETCD := false
 ENABLE_PSP := false
 CLUSTER_NAME := shared
@@ -19,6 +20,7 @@ TF_VAR_expose_master_via_external_ip := $(MASTER_PUBLIC_IP)
 
 TF_VAR_project := $(CURRENT_PROJECT)
 TF_VAR_encrypt_etcd := $(ENCRYPT_ETCD)
+TF_VAR_bigquery_metering := $(BIGQUERY_METERING)
 TF_VAR_enable_pod_security_policy := $(ENABLE_PSP)
 TF_VAR_cluster_name := $(CLUSTER_NAME)
 TF_VAR_region := $(REGION)

@@ -27,6 +27,7 @@ make google-authentication
 * Prerequisites Terraform run once:
   * `cd prerequisites\networking && make apply` to setup VPC and subnetwork
   * (Optionally) `cd prerequisites\kms && make apply` to setup KMS keyring and keys for encyption. Then run `make apply ENCRYPT_ETCD=true` to use setup cluster with ETCD encryption
+  * (Optionally) `cd prerequisites\bigquery-dataset && make apply` to setup BigQuery dataset. Then run `make apply BIGQUERY_METERING=true` to use setup cluster with BigQuery metering
 
 ## Usage
 
