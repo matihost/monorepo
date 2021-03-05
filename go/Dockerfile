@@ -1,4 +1,4 @@
-FROM golang:1.13 as builder
+FROM golang:1.15 as builder
 COPY . /tmp/build
 WORKDIR /tmp/build
 RUN go build -o . ./cmd/language

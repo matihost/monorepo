@@ -27,7 +27,7 @@ repos:
   - id: terraform-validate
   - id: tflint
 - repo: https://github.com/jumanjihouse/pre-commit-hooks
-  rev: 2.1.4
+  rev: 2.1.5
   hooks:
   - id: forbid-binary
   - id: git-check

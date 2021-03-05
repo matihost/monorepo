@@ -1,5 +1,5 @@
 module github.com/matihost/learning/go
 
-go 1.13
+go 1.15
 
-require go.uber.org/zap v1.15.0
+require go.uber.org/zap v1.16.0
