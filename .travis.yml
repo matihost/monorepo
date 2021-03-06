@@ -36,7 +36,8 @@ jobs:
     - ./language
     cache:
       directories:
-      - $TRAVIS_BUILD_DIR/go/vendor
+      - $HOME/.cache/go-build  # Cache the binaries
+      - $HOME/gopath/pkg/mod   # Cache the Go modules
   - language: python
     python: "3.8"
     before_install: cd python/apps/exchange-rate
