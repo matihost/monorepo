@@ -8,23 +8,6 @@ data "aws_subnet" "default" {
   default_for_az    = true
 }
 
-# AMI designed for NAT purposes
-# https://docs.aws.amazon.com/vpc/latest/userguide/VPC_NAT_Instance.html#nat-instance-ami
-data "aws_ami" "nat" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["amzn-ami-vpc-nat-2018.03.0*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  owners = ["amazon"]
-}
 
 resource "aws_security_group" "nat_access" {
   name        = "nat_access"
@@ -81,14 +64,19 @@ resource "aws_security_group" "nat_access" {
 
 # setup NAT instance as NAT Gateway is not free-tier eliglible
 resource "aws_instance" "nat" {
-  ami                    = data.aws_ami.nat.id
+  ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t2.micro"
   subnet_id              = data.aws_subnet.default.id
   key_name               = aws_key_pair.vm_key.key_name
   vpc_security_group_ids = [aws_security_group.nat_access.id]
   # NAT instance has to have source / dest adress check disabled
   source_dest_check = false
-  user_data         = file("nat.cloud-init.yaml")
+
+  user_data = templatefile("nat.init.tpl.sh", {
+    private_cidr = aws_subnet.private_a.cidr_block,
+    }
+  )
+
   tags = {
     Name = "nat"
   }
@@ -167,5 +155,5 @@ output "nat_dns" {
 
 output "nat_ssh" {
   description = "Connect to NAT instance"
-  value       = format("ssh -i ~/.ssh/id_rsa.aws.vm ec2-user@%s", aws_instance.nat.public_dns)
+  value       = format("ssh -i ~/.ssh/id_rsa.aws.vm ubuntu@%s", aws_instance.nat.public_dns)
 }
