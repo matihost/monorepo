@@ -17,6 +17,16 @@ spec:
     ingressGateways:
     - name: istio-ingressgateway
       enabled: true
+{% if ingress_gateway.enable_node_selector|default(false) %}
+      k8s:
+        nodeSelector:
+          node-role: "internal-ingress"
+        tolerations:
+        - key: "ingress-type"
+          value: "internal"
+          operator: "Equal"
+          effect: "NoSchedule"
+{% endif %}
     - name: istio-external-ingressgateway
       enabled: {{ ingress_external_gateway.enable|default(false) }}
       # namespace: custom-ns
@@ -72,6 +82,15 @@ spec:
           rollingUpdate:
             maxSurge: 100%
             maxUnavailable: 25%
+{% if ingress_external_gateway.enable_node_selector|default(false) %}
+        nodeSelector:
+          node-role: "external-ingress"
+        tolerations:
+        - key: "ingress-type"
+          value: "internal"
+          operator: "Equal"
+          effect: "NoSchedule"
+{% endif %}
     egressGateways:
     - name: istio-egressgateway
       enabled: {{ egress_gateway.enable|default(false) }}
@@ -79,7 +98,7 @@ spec:
       #  nodeSelector:
       #    node-role: "egress"
       #  tolerations:
-      #  - key: "node-role"
+      #  - key: "egress"
       #    operator: "Exists"
       #    effect: "NoSchedule"
   values:

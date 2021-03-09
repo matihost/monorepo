@@ -3,10 +3,11 @@ all:
     localhost:
   vars:
     operator:
-      hub: "docker.io/istio"
-      tag: "1.9.0"
+      hub: "gcr.io/istio-release"
+      tag: "1.9.1"
     ingress_gateway:
       max_pods: 20
+      enable_node_selector: true
       serviceAnnotations:
         cloud.google.com/load-balancer-type: Internal
         networking.gke.io/internal-load-balancer-allow-global-access: "true"
@@ -14,6 +15,7 @@ all:
     ingress_external_gateway:
       enable: true
       service_type: ClusterIP
+      enable_node_selector: true
       serviceAnnotations:
         # NEG name is supported in GKE version 1.18.10-gke.600 and later
         cloud.google.com/neg: '{"exposed_ports":{

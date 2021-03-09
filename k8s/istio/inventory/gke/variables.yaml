@@ -3,8 +3,8 @@ all:
     localhost:
   vars:
     operator:
-      hub: "docker.io/istio"
-      tag: "1.9.0"
+      hub: "gcr.io/istio-release"
+      tag: "1.9.1"
     ingress_gateway:
       max_pods: 20
       serviceAnnotations:
