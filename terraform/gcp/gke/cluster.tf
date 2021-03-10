@@ -66,16 +66,24 @@ resource "google_container_cluster" "gke" {
 
 
   cluster_autoscaling {
-    enabled = true
-    resource_limits {
-      resource_type = "cpu"
-      minimum       = 0
-      maximum       = 24
+    enabled = var.enable_auto_nodepools
+
+    dynamic "resource_limits" {
+      for_each = var.enable_auto_nodepools ? [1] : []
+      content {
+        resource_type = "cpu"
+        minimum       = 0
+        maximum       = 24
+      }
     }
-    resource_limits {
-      resource_type = "memory"
-      minimum       = 0
-      maximum       = 48
+
+    dynamic "resource_limits" {
+      for_each = var.enable_auto_nodepools ? [1] : []
+      content {
+        resource_type = "memory"
+        minimum       = 0
+        maximum       = 48
+      }
     }
     # whether the cluster autoscaler should optimize for resource utilization (OPTIMIZE_UTILIZATION)
     # or resource availability (BALANCED) when deciding to remove nodes from a cluster
@@ -237,6 +245,11 @@ resource "google_container_cluster" "gke" {
 
 resource "random_id" "gke_node_pool_id" {
   byte_length = 2
+  keepers = {
+    machine_type = "e2-standard-4"
+    disk_size_gb = 20
+    disk_type    = "pd-standard"
+  }
 }
 
 resource "google_container_node_pool" "gke_nodes" {
@@ -254,18 +267,18 @@ resource "google_container_node_pool" "gke_nodes" {
     auto_upgrade = true
   }
 
-
   node_config {
     # preemptible  = true
     # use 4cores and 16 GB ram, e2-medium - 2 cores and 4 GB RAM is too small for all apps running on node
-    machine_type = "e2-standard-4"
-    # machine_type = "e2-medium"
+    # machine_type = "e2-standard-4"
+    machine_type = random_id.gke_node_pool_id.keepers.machine_type
 
     # GCP Free tier has only: pd-standard - which is default disk type
     # increase size and switch type to pd-balanced or pd-ssd for better performance
     # https://cloud.google.com/compute/disks-image-pricing - for pricing
     # disk_type    = "pd-ssd"
-    disk_size_gb = 30
+    disk_type    = random_id.gke_node_pool_id.keepers.disk_type
+    disk_size_gb = random_id.gke_node_pool_id.keepers.disk_size_gb
 
     # since 1.20 usage of docker as container engine is deprecated
     # valid image types: gcloud container get-server-config

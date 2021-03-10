@@ -15,12 +15,17 @@ resource "google_compute_firewall" "gke-accept-istio-webhook" {
 }
 
 
-resource "random_id" "gke_internal_ingress_node_pool_id" {
+resource "random_id" "internal_pool_random" {
   byte_length = 2
+  keepers = {
+    machine_type = "n1-standard-1"
+    disk_size_gb = 20
+    disk_type    = "pd-standard"
+  }
 }
 
 resource "google_container_node_pool" "gke_internal_ingress_nodes" {
-  name       = "internal-ingress--${random_id.gke_internal_ingress_node_pool_id.hex}"
+  name       = "internal-ingress--${random_id.internal_pool_random.hex}"
   location   = local.location
   cluster    = google_container_cluster.gke.name
   node_count = 1
@@ -34,16 +39,16 @@ resource "google_container_node_pool" "gke_internal_ingress_nodes" {
     auto_upgrade = true
   }
 
-
   node_config {
     # preemptible  = true
-    machine_type = "n1-standard-1"
+    machine_type = random_id.internal_pool_random.keepers.machine_type
 
     # GCP Free tier has only: pd-standard - which is default disk type
     # increase size and switch type to pd-balanced or pd-ssd for better performance
     # https://cloud.google.com/compute/disks-image-pricing - for pricing
     # disk_type    = "pd-ssd"
-    disk_size_gb = 20
+    disk_type    = random_id.internal_pool_random.keepers.disk_type
+    disk_size_gb = random_id.internal_pool_random.keepers.disk_size_gb
 
     # since 1.20 usage of docker as container engine is deprecated
     # valid image types: gcloud container get-server-config
@@ -98,7 +103,7 @@ resource "google_container_node_pool" "gke_internal_ingress_nodes" {
 
   autoscaling {
     min_node_count = 1
-    max_node_count = 5
+    max_node_count = 6
   }
 
   lifecycle {
@@ -115,12 +120,17 @@ resource "google_container_node_pool" "gke_internal_ingress_nodes" {
   }
 }
 
-resource "random_id" "gke_external_ingress_node_pool_id" {
+resource "random_id" "external_pool_random" {
   byte_length = 2
+  keepers = {
+    machine_type = "n1-standard-1"
+    disk_size_gb = 20
+    disk_type    = "pd-standard"
+  }
 }
 
 resource "google_container_node_pool" "gke_external_ingress_nodes" {
-  name       = "external-ingress--${random_id.gke_external_ingress_node_pool_id.hex}"
+  name       = "external-ingress--${random_id.external_pool_random.hex}"
   location   = local.location
   cluster    = google_container_cluster.gke.name
   node_count = 1
@@ -138,13 +148,14 @@ resource "google_container_node_pool" "gke_external_ingress_nodes" {
   node_config {
     # preemptible  = true
     # there is a quota of max 8 CPU core per region on Free Tier Account
-    machine_type = "n1-standard-1"
+    machine_type = random_id.external_pool_random.keepers.machine_type
 
     # GCP Free tier has only: pd-standard - which is default disk type
     # increase size and switch type to pd-balanced or pd-ssd for better performance
     # https://cloud.google.com/compute/disks-image-pricing - for pricing
     # disk_type    = "pd-ssd"
-    disk_size_gb = 20
+    disk_type    = random_id.external_pool_random.keepers.disk_type
+    disk_size_gb = random_id.external_pool_random.keepers.disk_size_gb
 
     # since 1.20 usage of docker as container engine is deprecated
     # valid image types: gcloud container get-server-config
@@ -159,10 +170,7 @@ resource "google_container_node_pool" "gke_external_ingress_nodes" {
 
     labels = {
       node-owner = "gke-${google_container_cluster.gke.name}"
-      # kubernetes.io/role - cannot be used, because kubernetes.io/ and k8s.io/ prefixes
-      # are reserved by Kubernetes Core components and cannot be specified anymore on node
-      # use nodeSelector: cloud.google.com/gke-nodepool to select placement on particual node pool
-      node-role = "external-ingress"
+      node-role  = "external-ingress"
     }
 
     taint = [{
@@ -199,7 +207,7 @@ resource "google_container_node_pool" "gke_external_ingress_nodes" {
 
   autoscaling {
     min_node_count = 1
-    max_node_count = 5
+    max_node_count = 6
   }
 
   lifecycle {

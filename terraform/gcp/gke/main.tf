@@ -97,6 +97,13 @@ variable "external_dns_k8s_sa_name" {
   description = "ExternalDNS  K8S ServiceAccount"
 }
 
+
+variable "enable_auto_nodepools" {
+  type        = bool
+  default     = false
+  description = "Enable auto NodePools provisioning"
+}
+
 variable "enable_pod_security_policy" {
   default     = true
   description = "Whether to enable PodSecurityPolicy in the GKE cluster, PSP are deprecated since K8S 1.21 and going to be removed in K8S 1.25"
