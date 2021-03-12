@@ -3,9 +3,19 @@
   become: false
   collections:
   - community.kubernetes
+  - community.general
   vars:
     files: "{{ playbook_dir }}/files"
   tasks:
+  - name: Get current GCP project
+    shell: gcloud config get-value project
+    register: gcp_project_out
+    changed_when: false
+
+  - name: Set GCP project fact
+    set_fact:
+      gcp_project: "{{ gcp_project_out.stdout }}"
+
   - name: Check .istio/current exists
     stat:
       path: "{{ lookup('env', 'HOME') }}/.istio/current"
@@ -37,14 +47,27 @@
 
   - name: Ensure tcp:15017 is open on GKE nodes
     shell: |
-      FIREWALL_NAME=$(gcloud compute firewall-rules list --filter="name~'{{ options.gke_cluster_name|mandatory }}-.*-master'" --format="value(name)")
+      FIREWALL_NAME=$(gcloud compute firewall-rules list --filter="name~'{{ options.gke.cluster_name|mandatory }}-.*-master'" --format="value(name)")
       [ -z "${FIREWALL_NAME}" ] && {
-        echo "Missing cluster {{ options.gke_cluster_name }} master firewall rule"
+        echo "Missing cluster {{ options.gke.cluster_name }} master firewall rule"
         echo "Unable to open Istio CNI port to be accessed by masters"
         echo "Either GKE has changed the firewalls or your are logged to wrong GCP project"
         exit 1
       }
       gcloud compute firewall-rules update "${FIREWALL_NAME}" --allow tcp:10250,tcp:443,tcp:15017
+    when: options.gke_mode|default(false)
+
+  - name: Debug
+    debug:
+      msg: "{{ vars }}"
+
+  - name: Run Terraform to setup GCP prerequisites for Istio deployment
+    terraform:
+      project_path: 'files/gke'
+      state: present
+      workspace: "default"
+      force_init: true
+      variables: "{{ options.gke|mandatory|combine({'project': gcp_project}) }}"
     when: options.gke_mode|default(false)
 
   - name: Deploy Istio Operator Helm chart

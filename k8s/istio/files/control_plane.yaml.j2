@@ -103,6 +103,7 @@ spec:
       #    effect: "NoSchedule"
   values:
 {% if options.gke_mode|default(false)  %}
+    # TODO fix stackdriver metrics: https://github.com/istio/istio/issues/22658
     telemetry:
       v2:
         stackdriver:

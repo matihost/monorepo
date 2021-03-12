@@ -64,7 +64,7 @@ scale-up-shared2:  ## scale up to 1 node cluster shared2-dev in us-east1-b
 apply: init-terraform ## setup GKE cluster
 	@terraform validate && \
 	terraform plan -lock=false && \
-	terraform apply  && \
+	terraform apply -auto-approve && \
 	[ -n "$(MASTER_ACCESS_CIRDS)" ] && \
     gcloud container clusters get-credentials $(CLUSTER_NAME)-dev --zone $(REGION)-$(ZONE_LETTER) || \
     echo "Run 'source access-gke.sh' to setup GKE access for kubectl etc. commands in current shell";

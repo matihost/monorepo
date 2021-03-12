@@ -1,17 +1,17 @@
 resource "google_compute_firewall" "gke-accept-istio-webhook" {
   name          = "${local.gke_name}-accept-istio-webhook"
   description   = "Allow traffic to GKE nodes for istio webhook from GKE Master Nodes"
-  network       = data.google_compute_network.private-gke.name
+  network       = data.google_container_cluster.gke.network
   direction     = "INGRESS"
   project       = var.project
-  source_ranges = [var.master_cidr]
+  source_ranges = [data.google_container_cluster.gke.private_cluster_config[0].master_ipv4_cidr_block]
 
   allow {
     protocol = "tcp"
     ports    = ["15017"]
   }
 
-  target_service_accounts = [google_service_account.gke-sa.email]
+  target_service_accounts = [local.gke_nodes_sa]
 }
 
 
@@ -27,7 +27,7 @@ resource "random_id" "internal_pool_random" {
 resource "google_container_node_pool" "gke_internal_ingress_nodes" {
   name       = "internal-ingress--${random_id.internal_pool_random.hex}"
   location   = local.location
-  cluster    = google_container_cluster.gke.name
+  cluster    = data.google_container_cluster.gke.name
   node_count = 1
 
   max_pods_per_node = 110
@@ -62,7 +62,7 @@ resource "google_container_node_pool" "gke_internal_ingress_nodes" {
     }
 
     labels = {
-      node-owner = "gke-${google_container_cluster.gke.name}"
+      node-owner = "gke-${data.google_container_cluster.gke.name}"
       # kubernetes.io/role - cannot be used, because kubernetes.io/ and k8s.io/ prefixes
       # are reserved by Kubernetes Core components and cannot be specified anymore on node
       # use nodeSelector: cloud.google.com/gke-nodepool to select placement on particual node pool
@@ -83,7 +83,7 @@ resource "google_container_node_pool" "gke_internal_ingress_nodes" {
       "https://www.googleapis.com/auth/cloud-platform"
     ]
 
-    service_account = google_service_account.gke-sa.email
+    service_account = local.gke_nodes_sa
 
     // Enable workload identity on this node pool
     workload_metadata_config {
@@ -132,7 +132,7 @@ resource "random_id" "external_pool_random" {
 resource "google_container_node_pool" "gke_external_ingress_nodes" {
   name       = "external-ingress--${random_id.external_pool_random.hex}"
   location   = local.location
-  cluster    = google_container_cluster.gke.name
+  cluster    = data.google_container_cluster.gke.name
   node_count = 1
 
   max_pods_per_node = 110
@@ -169,7 +169,7 @@ resource "google_container_node_pool" "gke_external_ingress_nodes" {
     }
 
     labels = {
-      node-owner = "gke-${google_container_cluster.gke.name}"
+      node-owner = "gke-${data.google_container_cluster.gke.name}"
       node-role  = "external-ingress"
     }
 
@@ -187,7 +187,7 @@ resource "google_container_node_pool" "gke_external_ingress_nodes" {
       "https://www.googleapis.com/auth/cloud-platform"
     ]
 
-    service_account = google_service_account.gke-sa.email
+    service_account = local.gke_nodes_sa
 
     // Enable workload identity on this node pool
     workload_metadata_config {

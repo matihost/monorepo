@@ -15,7 +15,7 @@ all:
       enable: false
       serviceAnnotations:
         cloud.google.com/load-balancer-type: External
-        external-dns.alpha.kubernetes.io/hostname: "*.external.gke.shared.dev."
+        external-dns.alpha.kubernetes.io/hostname: "*.internal.gke.{{ options.gke.cluster_name|replace('-','.') }}."
     ingress_class:
       enable: true
       api_version: v1beta1
@@ -24,4 +24,7 @@ all:
       enable: true
     options:
       gke_mode: true
-      gke_cluster_name: "shared1-dev"
+      gke:
+        cluster_name: "shared1-dev"
+        region: "us-central1"
+        zone_letter: "a"
