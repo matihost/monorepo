@@ -1,0 +1,65 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: internal-wildcard-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - port:
+      number: 80
+      name: http-internal
+      protocol: HTTP
+    hosts:
+    - "*.{{ ingress_gateway.default_dns_suffix }}"
+  - port:
+      number: 443
+      name: https-internal
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: internal-wildcard-gateway-tls
+    hosts:
+    - "*.{{ ingress_gateway.default_dns_suffix }}"
+---
+# Expose kubernetes api service via TLS pass-through mode
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: kubernetes
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway # use istio default ingress gateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: PASSTHROUGH
+    hosts:
+    - kubernetes.{{ ingress_gateway.default_dns_suffix }}
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: kubernetes
+  namespace: istio-system
+spec:
+  hosts:
+  - "kubernetes.{{ ingress_gateway.default_dns_suffix }}"
+  gateways:
+  - istio-system/kubernetes
+  tls:
+  - match:
+    - port: 443
+      sniHosts:
+      - "kubernetes.{{ ingress_gateway.default_dns_suffix }}"
+    route:
+    - destination:
+        host: kubernetes.default.svc.cluster.local
+        port:
+          number: 443

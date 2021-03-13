@@ -37,6 +37,8 @@ resource "helm_release" "external-dns" {
     google_container_cluster.gke,
     google_container_node_pool.gke_nodes
   ]
+  wait       = true
+  timeout    = 360
   name       = "external-dns"
   repository = "https://charts.bitnami.com/bitnami"
   chart      = "external-dns"

@@ -6,6 +6,7 @@
   - community.general
   vars:
     files: "{{ playbook_dir }}/files"
+    internal_wildcard_cn: "*.{{ ingress_gateway.default_dns_suffix }}"
   tasks:
   - name: Get current GCP project
     shell: gcloud config get-value project
@@ -57,10 +58,6 @@
       gcloud compute firewall-rules update "${FIREWALL_NAME}" --allow tcp:10250,tcp:443,tcp:15017
     when: options.gke_mode|default(false)
 
-  - name: Debug
-    debug:
-      msg: "{{ vars }}"
-
   - name: Run Terraform to setup GCP prerequisites for Istio deployment
     terraform:
       project_path: 'files/gke'
@@ -99,6 +96,39 @@
         fail_on_error: true
         strict: true
 
+  - name: Ensure CN={{ internal_wildcard_cn }} TLSis present
+    block:
+    - name: Ensure CN={{ internal_wildcard_cn }} TLS is present
+      include_role:
+        name: create_certificate
+      vars:
+        certificate_def:
+          cn: "{{ internal_wildcard_cn }}"
+          tls_name: wildcard.{{ ingress_gateway.default_dns_suffix }}
+    become: true
+  - name: Ensure TLS Secret internal-wildcard-gateway-tls is present in namespace istio-system
+    k8s:
+      state: present
+      definition:
+        apiVersion: "v1"
+        kind: Secret
+        metadata:
+          name: internal-wildcard-gateway-tls
+          namespace: istio-system
+        data:
+          tls.crt: "{{ tls.crt}}"
+          tls.key: "{{ tls.key}}"
+        type: kubernetes.io/tls
+    no_log: true
+
+  - name: Ensure Istio internal ingress wildcard Gateway are exposed
+    k8s:
+      state: present
+      definition: "{{ lookup('template', '{{ files }}/internal_vs_config.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+
   - name: Ensure Istio ControlPlane operator reconciliating is finished
     k8s_info:
       api_version: install.istio.io/v1alpha1
@@ -126,3 +156,11 @@
         Istio Operator didn't install Istio components properly
         Check istiooperator pod logs in istio-operator namespace
     when: operator_status.resources[0].status.status != "HEALTHY"
+
+  - name: Ensure VirtualServices are exposed
+    include_role:
+      name: expose_virtual_svc
+    vars:
+      wildcard_dns_suffix: "{{ ingress_gateway.default_dns_suffix }}"
+      vs: "{{ item }}"
+    loop: "{{ ingress_gateway.virtual_services|default([])}}"

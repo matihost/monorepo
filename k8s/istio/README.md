@@ -2,6 +2,18 @@
 
 Deployment of Istio to Minikube or GKE
 
+Exposes automatically internal Kubernetess API ClusterIp Service via internal Istio ingress gateway.
+
+In case of GKE it solves the [problem](https://cloud.google.com/solutions/creating-kubernetes-engine-private-clusters-with-net-proxies) that GKE Control Plane is not accessible from peered VPC:
+
+  _To access the controller from on-premises or another VPC network, however, requires additional steps. This is because the VPC network that hosts the controller is owned by Google and cannot be accessed from resources connected through another VPC network peering connection, Cloud VPN or Cloud Interconnect._
+
+To access Kubernetes API:
+
+```bash
+curl -k -v https://kubernetes.internal.gke.[CLUSTER_NAME].dev/version
+```
+
 ## Prerequisites
 
 * Ansible

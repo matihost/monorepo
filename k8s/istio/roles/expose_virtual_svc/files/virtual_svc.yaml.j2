@@ -1,0 +1,18 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ vs.name }}
+  namespace: {{ vs.namespace }}
+spec:
+  hosts:
+  - "{{vs.name}}.{{ wildcard_dns_suffix }}"
+  gateways:
+  - istio-system/internal-wildcard-gateway
+  - mesh # applies to all the sidecars in the mesh
+  http:
+  - route:
+    - destination:
+        port:
+          number: {{ vs.svc.port }}
+        host: {{ vs.svc.fqdn }}

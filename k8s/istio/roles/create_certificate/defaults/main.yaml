@@ -1,0 +1,3 @@
+---
+cert_base_path: /usr/local/share/ca-certificates
+cert_size: 2048
