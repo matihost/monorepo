@@ -10,7 +10,7 @@ It also provisions:
 
 * Setup `restricted` PodSecurityPolicty to allow non priviledge deployment out of the box
 
-* Create CloudDNS private `gke.shared.dev.` zone and deploy ExternalDNS for Ingress/Svs auto DNS record provisioning.
+* Create CloudDNS private `shared.dev.gke.testing` zone and deploy ExternalDNS for Ingress/Svs auto DNS record provisioning.
 
 Use  GCP resources eliglible to [GCP Free Tier](https://cloud.google.com/free/docs/gcp-free-tier#free-tier-usage-limits) __only__.
 
@@ -72,7 +72,7 @@ make MASTER_PUBLIC_IP=false MASTER_ACCESS_CIRDS="[]"
 source access-gke.sh
 
 # sample url to Ingress exposed internally
-curl -x http://localhost:8888 -ksSL https://yyyy.gke.shared.dev
+curl -x http://localhost:8888 -ksSL https://yyyy.shared1.dev.gke.testing
 
 # show Terraform state
 make show-state

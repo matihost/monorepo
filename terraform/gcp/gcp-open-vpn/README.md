@@ -12,15 +12,15 @@ Supports:
 
 TODOs/Limitations:
 
-* update VPN client DNS to use `169.254.169.254` for `internal` subzone and any zone hostes in GCP interanl CloudDNS. For Bind add:
+* update VPN client DNS to use `169.254.169.254` for `gcp.testing` subzone and any zone hostes in GCP interanl CloudDNS. For Bind add:
 
-  ```
-  zone "internal" {
-      type forward;
-      forward only;
-      forwarders { 169.254.169.254; };
-  };
-  ```
+```
+zone "gcp.testing" {
+    type forward;
+    forward only;
+    forwarders { 169.254.169.254; };
+};
+```
 
 ## Prerequisites
 

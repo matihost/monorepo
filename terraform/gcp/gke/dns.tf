@@ -3,7 +3,7 @@ resource "google_dns_managed_zone" "cluster-zone" {
   project  = var.project
 
   name        = "${var.cluster_name}-${var.env}"
-  dns_name    = "${var.cluster_name}.${var.env}."
+  dns_name    = "${var.cluster_name}.${var.env}.gcp.testing."
   description = "DNS for ingresses/svs exposed from GKE ${local.gke_name} managed manually"
   labels = {
     owner = "gke-${local.gke_name}"
@@ -27,7 +27,7 @@ resource "google_dns_managed_zone" "external-dns-cluster-zone" {
   project  = var.project
 
   name        = "gke-${var.cluster_name}-${var.env}"
-  dns_name    = "gke.${var.cluster_name}.${var.env}."
+  dns_name    = "gke.${var.cluster_name}.${var.env}.gcp.testing."
   description = "DNS for ingresses/svs exposed from GKE ${local.gke_name} managed by ExternalDNS"
   labels = {
     owner = "gke-${local.gke_name}"

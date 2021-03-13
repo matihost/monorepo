@@ -10,6 +10,6 @@ all:
       api_version: v1
       default: false
     ingress_gateway:
-      default_dns_suffix: internal.minikube
+      default_dns_suffix: internal.testing.minikube
     egress_gateway:
       enable: true

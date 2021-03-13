@@ -3,7 +3,8 @@
 
 CLUSTER_NAME="${1:?CLUSTER_NAME is required}"
 
-DNS_SUFFIX="$(echo -n "${CLUSTER_NAME}" | sed 's/-/./g')"
+INTERNAL_DNS_SUFFIX="internal.gke.$(echo -n "${CLUSTER_NAME}" | sed 's/-/./g').gcp.testing"
+EXTERNAL_DNS_SUFFIX="external.gke.$(echo -n "${CLUSTER_NAME}" | sed 's/-/./g').gcp.testing"
 
 function deploySampleAppWithK8SIngress() {
   kubectl create ns sample-istio || echo "ignoring..."
@@ -30,7 +31,7 @@ subjects:
 EOF
 
   mkdir -p /tmp/istio-certs
-  CN="httpbin.internal.gke.${DNS_SUFFIX}"
+  CN="httpbin.${INTERNAL_DNS_SUFFIX}"
   openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "/tmp/istio-certs/${CN}.crt" -newkey rsa:2048 -nodes -keyout "/tmp/istio-certs/${CN}.key"
   kubectl create -n istio-system secret tls httpbin-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
 
@@ -47,7 +48,7 @@ metadata:
 spec:
   # ingressClassName: istio
   rules:
-  - host: httpbin.internal.gke.${DNS_SUFFIX}
+  - host: httpbin.${INTERNAL_DNS_SUFFIX}
     http:
       paths:
       - backend:
@@ -58,7 +59,7 @@ spec:
   # Istio support Ingresses with TLS but secret has to be in istio-system namespace
   tls:
   - hosts:
-    - httpbin.internal.gke.${DNS_SUFFIX}
+    - httpbin.${INTERNAL_DNS_SUFFIX}
     secretName: httpbin-credential
 EOF
 
@@ -113,10 +114,10 @@ EOF
 
 function exposeSampleAppViaInternalIstioNatively() {
   # TLS certificates has to be in namespace where ingressgateway is deployed (istio-system)
-  CN="api.internal.gke.${DNS_SUFFIX}"
+  CN="api.${INTERNAL_DNS_SUFFIX}"
   openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "/tmp/istio-certs/${CN}.crt" -newkey rsa:2048 -nodes -keyout "/tmp/istio-certs/${CN}.key"
   kubectl create -n istio-system secret tls api-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
-  CN="http.internal.gke.${DNS_SUFFIX}"
+  CN="http.${INTERNAL_DNS_SUFFIX}"
   openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "/tmp/istio-certs/${CN}.crt" -newkey rsa:2048 -nodes -keyout "/tmp/istio-certs/${CN}.key"
   kubectl create -n istio-system secret tls http-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
 
@@ -135,8 +136,8 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-    - "api.internal.gke.${DNS_SUFFIX}"
-    - "http.internal.gke.${DNS_SUFFIX}"
+    - "api.${INTERNAL_DNS_SUFFIX}"
+    - "http.${INTERNAL_DNS_SUFFIX}"
   - port:
       number: 443
       name: https-httpbin
@@ -145,7 +146,7 @@ spec:
       mode: SIMPLE
       credentialName: http-credential
     hosts:
-    - http.internal.gke.${DNS_SUFFIX}
+    - http.${INTERNAL_DNS_SUFFIX}
   - port:
       number: 443
       name: https-api
@@ -154,7 +155,7 @@ spec:
       mode: SIMPLE
       credentialName: api-credential
     hosts:
-    - api.internal.gke.${DNS_SUFFIX}
+    - api.${INTERNAL_DNS_SUFFIX}
 EOF
   kubectl apply -f - <<EOF
 apiVersion: networking.istio.io/v1beta1
@@ -164,7 +165,7 @@ metadata:
   namespace: sample-istio
 spec:
   hosts:
-  - "api.internal.gke.${DNS_SUFFIX}"
+  - "api.${INTERNAL_DNS_SUFFIX}"
   gateways:
   - sample-istio/api-gateway
   http:
@@ -186,7 +187,7 @@ metadata:
   namespace: sample-istio
 spec:
   hosts:
-  - "http.internal.gke.${DNS_SUFFIX}"
+  - "http.${INTERNAL_DNS_SUFFIX}"
   gateways:
   - sample-istio/api-gateway
   - mesh # applies to all the sidecars in the mesh
@@ -217,7 +218,7 @@ EOF
 
 function exposeSampleAppExternally() {
   # TLS certificates has to be in namespace where ingressgateway is deployed (istio-system)
-  CN="http.external.gke.${DNS_SUFFIX}"
+  CN="http.${EXTERNAL_DNS_SUFFIX}"
   openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "/tmp/istio-certs/${CN}.crt" -newkey rsa:2048 -nodes -keyout "/tmp/istio-certs/${CN}.key"
   kubectl create -n istio-system secret tls http-external-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
 
@@ -236,7 +237,7 @@ spec:
       name: http-httpbin
       protocol: HTTP
     hosts:
-    - "http.external.gke.${DNS_SUFFIX}"
+    - "http.${EXTERNAL_DNS_SUFFIX}"
   - port:
       number: 443
       name: https-httpbin
@@ -245,7 +246,7 @@ spec:
       mode: SIMPLE
       credentialName: http-external-credential
     hosts:
-    - http.external.gke.${DNS_SUFFIX}
+    - http.${EXTERNAL_DNS_SUFFIX}
 EOF
   kubectl apply -f - <<EOF
 apiVersion: networking.istio.io/v1beta1
@@ -255,7 +256,7 @@ metadata:
   namespace: sample-istio
 spec:
   hosts:
-  - "http.external.gke.${DNS_SUFFIX}"
+  - "http.${EXTERNAL_DNS_SUFFIX}"
   gateways:
   - sample-istio/external-gateway
   - mesh # applies to all the sidecars in the mesh

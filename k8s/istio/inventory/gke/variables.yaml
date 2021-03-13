@@ -7,16 +7,16 @@ all:
       tag: "1.9.1"
     ingress_gateway:
       max_pods: 20
-      default_dns_suffix: "internal.gke.{{ options.gke.cluster_name|replace('-','.') }}"
+      default_dns_suffix: "internal.{{ options.gke.cluster_name|replace('-','.') }}.gke.testing"
       serviceAnnotations:
         cloud.google.com/load-balancer-type: Internal
         networking.gke.io/internal-load-balancer-allow-global-access: "true"
-        external-dns.alpha.kubernetes.io/hostname: "*.internal.gke.{{ options.gke.cluster_name|replace('-','.') }}."
+        external-dns.alpha.kubernetes.io/hostname: "*.internal.gke.{{ options.gke.cluster_name|replace('-','.') }}.gcp.testing."
     ingress_external_gateway:
       enable: false
       serviceAnnotations:
         cloud.google.com/load-balancer-type: External
-        external-dns.alpha.kubernetes.io/hostname: "*.internal.gke.{{ options.gke.cluster_name|replace('-','.') }}."
+        external-dns.alpha.kubernetes.io/hostname: "*.external.gke.{{ options.gke.cluster_name|replace('-','.') }}.gcp.testing."
     ingress_class:
       enable: true
       api_version: v1beta1

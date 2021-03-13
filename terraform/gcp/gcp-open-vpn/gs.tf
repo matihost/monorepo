@@ -13,7 +13,7 @@ resource "google_storage_bucket" "vpn-data" {
 
 resource "null_resource" "openvpn-template" {
   triggers = {
-    always_run = "${timestamp()}"
+    always_run = timestamp()
   }
   provisioner "local-exec" {
     command = "pwd && mkdir -p target && tar -Jcvf target/openvpn-template.tar.xz openvpn"

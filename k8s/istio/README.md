@@ -11,7 +11,7 @@ In case of GKE it solves the [problem](https://cloud.google.com/solutions/creati
 To access Kubernetes API:
 
 ```bash
-curl -k -v https://kubernetes.internal.gke.[CLUSTER_NAME].dev/version
+curl -k -v https://kubernetes.internal.gke.[CLUSTER_NAME].dev.gcp.testing/version
 ```
 
 ## Prerequisites

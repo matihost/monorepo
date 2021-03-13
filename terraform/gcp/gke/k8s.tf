@@ -25,6 +25,7 @@ resource "helm_release" "cluster-config" {
 
   namespace        = "cluster-config"
   create_namespace = true
+
   depends_on = [
     google_container_cluster.gke
   ]

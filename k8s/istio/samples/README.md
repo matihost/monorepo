@@ -10,9 +10,9 @@ cd istio-global-lb-setup && make apply
 # to test application
 
 # from within VPC
-curl -kv https://http.internal.gke.shared1.dev
+curl -kv https://http.internal.gke.shared1.dev.gcp.testing
 
 # from anywhere
 # provide Global LB IP in EXTERNAL_IP
-curl -kv --resolve "http.external.gke.shared1.dev:443:EXTERNAL_IP" https://http.external.gke.shared1.de
+curl -kv --resolve "http.external.shared1.dev.gke.testing:443:EXTERNAL_IP" https://http.external.shared1.dev.gke.testing
 ```
