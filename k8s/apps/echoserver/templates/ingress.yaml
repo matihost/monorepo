@@ -6,7 +6,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: {{ $fullName }}
-  namespace: {{ include "app.namespace" . }}
+  namespace: {{ if eq .Values.ingress.class "istio" }} istio-system {{ else }} {{ include "app.namespace" . }} {{ end }}
   labels:
     {{- include "app.labels" . | nindent 4 }}
 data:

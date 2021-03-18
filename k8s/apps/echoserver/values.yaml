@@ -48,7 +48,7 @@ ingress:
     # for NGINX ingress to rewrite urls to ensure last slash is added
     nginx.ingress.kubernetes.io/rewrite-target: /
     # kubernetes.io/tls-acme: "true"
-  host: echoserver.learning.testing
+  host: echoserver.learning.minikube.testing
   tls:
     key: ""
     crt: ""

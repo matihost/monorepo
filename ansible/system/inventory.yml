@@ -146,6 +146,7 @@ all:
               nmcli conn modify br0 ipv4.method manual
               nmcli conn modify br0 ipv4.never-default yes
               nmcli conn modify br0 connection.autoconnect yes
+              nmcli conn up br0
             }
         - name: vboxuser
           desc: To ensure VBox can see host USB

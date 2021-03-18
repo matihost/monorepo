@@ -7,6 +7,8 @@ kubectl config use-context minikube || echo "Minikube not present in kube contex
   helm upgrade --install echoserver "$(dirname "${SCRIPT_DIR}")" -n learning \
     --set ingress.tls.crt="$(base64 -w 0 /tmp/echoserver.learning.minikube.testing.crt)" \
     --set ingress.tls.key="$(base64 -w 0 /tmp/echoserver.learning.minikube.testing.key)" \
+    --set ingress.host=echoserver.learning.minikube.testing \
+    --set ingress.class=istio \
     --set networkPolicy.enabled=true
 
   while [ -z "$(kubectl get ingress echoserver -n learning -o jsonpath="{.status..ip}" | xargs)" ]; do

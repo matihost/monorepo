@@ -20,7 +20,7 @@ show-state: ## show terraform.state
 destroy: ## destroy resources
 	terraform plan && terraform destroy -auto-approve
 
-google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
+google-authentication: ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
 	gcloud auth application-default login
 
