@@ -26,29 +26,33 @@
         fail_on_error: true
         strict: true
 
-  - name: Ensure Jenkins CN={{ jenkins_ingress }} is present
+  - name: Ensure Jenkins CN={{ jenkins_ingress.host }} Secret is present
     block:
-    - name: Ensure Jenkins CN={{ jenkins_ingress }} is present
-      include_role:
-        name: create_certificate
-      vars:
-        certificate_def:
-          cn: "{{ jenkins_ingress }}"
-    become: true
-  - name: Ensure TLS Secret {{ jenkins_ingress }} is present in namespace {{ namespace }}
-    k8s:
-      state: present
-      definition:
-        apiVersion: "v1"
-        kind: Secret
-        metadata:
-          name: "{{ jenkins_ingress }}"
-          namespace: "{{ namespace }}"
-        data:
-          tls.crt: "{{ tls.crt}}"
-          tls.key: "{{ tls.key}}"
-        type: kubernetes.io/tls
-    no_log: true
+    - name: Ensure Jenkins CN={{ jenkins_ingress.host }} is present
+      block:
+      - name: Ensure Jenkins CN={{ jenkins_ingress.host }} is present
+        include_role:
+          name: create_certificate
+        vars:
+          certificate_def:
+            cn: "{{ jenkins_ingress.host }}"
+      become: true
+    - name: Ensure TLS Secret {{ jenkins_ingress .secretName}} is present in namespace {{ namespace }}
+      k8s:
+        state: present
+        definition:
+          apiVersion: "v1"
+          kind: Secret
+          metadata:
+            name: "{{ jenkins_ingress.secretName }}"
+            namespace: "{{ namespace }}"
+          data:
+            tls.crt: "{{ tls.crt}}"
+            tls.key: "{{ tls.key}}"
+          type: kubernetes.io/tls
+      no_log: true
+    when: jenkins_ingress.class != "istio" # assuming using existing secret present in istio-system namespace
+
 
   - name: Deploy {{ chart_version }} version of Jenkins chart inside {{ namespace }} namespace
     helm:
@@ -77,7 +81,8 @@
       INGRESS_IP=`kubectl get ingress {{ namespace }}-jenkins -n {{ namespace }} -o jsonpath="{.status..ip}"`
       CHANGED=`grep -c "${INGRESS_IP} {{ jenkins_ingress }}" /etc/hosts`
       [ "${CHANGED}" -eq 0 ] && {
-        echo "update hosts" && sudo -E sh -c "echo \"${INGRESS_IP} {{ jenkins_ingress }}\" >> /etc/hosts"
+        echo "update hosts" && sudo -E sh -c "echo \"${INGRESS_IP} {{ jenkins_ingress.host }}\" >> /etc/hosts"
       } || echo "hosts already present"
     register: hosts_result
     changed_when: '"update hosts" in hosts_result.stdout'
+    when: env == "minikube"

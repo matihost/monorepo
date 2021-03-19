@@ -1,4 +1,8 @@
-jenkins_ingress: jenkins.ci.minikube
+jenkins_service_type: ClusterIP
+jenkins_ingress:
+  host: jenkins.ci.internal.testing.minikube
+  class: istio
+  secretName: internal-wildcard-gateway-tls  # in case of inress class istio this secret has to already be present in istio-system namespace
 jenkins_jobs:
 - name: learning
   description: Learning Multibranch Pipeline

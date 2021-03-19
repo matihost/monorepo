@@ -96,7 +96,35 @@
         fail_on_error: true
         strict: true
 
-  - name: Ensure CN={{ internal_wildcard_cn }} TLSis present
+  - name: Ensure Istio ControlPlane operator reconciliating is finished
+    k8s_info:
+      api_version: install.istio.io/v1alpha1
+      kind: IstioOperator
+      name: istiocontrolplane
+      namespace: istio-system
+    register: operator_status
+    until: operator_status.resources[0].status.status == "HEALTHY"
+    retries: 36
+    delay: 10
+    ignore_errors: yes
+
+
+  - name: Get final ControlPlane operator status
+    k8s_info:
+      api_version: install.istio.io/v1alpha1
+      kind: IstioOperator
+      name: istiocontrolplane
+      namespace: istio-system
+    register: operator_status
+
+  - name:
+    fail:
+      msg: |
+        Istio Operator didn't install Istio components properly
+        Check istiooperator pod logs in istio-operator namespace
+    when: operator_status.resources[0].status.status != "HEALTHY"
+
+  - name: Ensure CN={{ internal_wildcard_cn }} TLS is present
     block:
     - name: Ensure CN={{ internal_wildcard_cn }} TLS is present
       include_role:
@@ -128,34 +156,6 @@
       validate:
         fail_on_error: true
         strict: true
-
-  - name: Ensure Istio ControlPlane operator reconciliating is finished
-    k8s_info:
-      api_version: install.istio.io/v1alpha1
-      kind: IstioOperator
-      name: istiocontrolplane
-      namespace: istio-system
-    register: operator_status
-    until: operator_status.resources[0].status.status == "HEALTHY"
-    retries: 36
-    delay: 10
-    ignore_errors: yes
-
-
-  - name: Get final ControlPlane operator status
-    k8s_info:
-      api_version: install.istio.io/v1alpha1
-      kind: IstioOperator
-      name: istiocontrolplane
-      namespace: istio-system
-    register: operator_status
-
-  - name:
-    fail:
-      msg: |
-        Istio Operator didn't install Istio components properly
-        Check istiooperator pod logs in istio-operator namespace
-    when: operator_status.resources[0].status.status != "HEALTHY"
 
   - name: Ensure VirtualServices are exposed
     include_role:
