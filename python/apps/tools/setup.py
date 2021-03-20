@@ -37,19 +37,17 @@ setup(
         "Programming Language :: Python :: 3.8",
     ],
     keywords="exchange rate nbp",  # Optional
-
     # When your source code is in a subdirectory under the project root, e.g.
     # `src/`, it is necessary to specify the `package_dir` argument.
     package_dir={"": "src"},  # Optional
     packages=find_packages(where="src"),  # Required
-
     # Ensures that non .py files are included in package
-    setup_requires=['setuptools_scm'],
+    setup_requires=["setuptools_scm"],
     include_package_data=True,
-
     python_requires=">=3.7, <4",
     install_requires=[
-        "Jinja2>=2.11.2, <3",
+        "jinja2==2.11.3",
+        "markupsafe==1.1.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
     ],
     dependency_links=[],
     entry_points={
