@@ -3,3 +3,17 @@ jenkins_ingress:
   host: jenkins.ci.internal.gke.shared1.dev.gcp.testing
   class: istio
   secretName: internal-wildcard-gateway-tls  # in case of ingress class istio this secret has to already be present in istio-system namespace
+jenkins_jobs:
+- name: learning
+  description: Learning Multibranch Pipeline
+  type: multibranch
+  git:
+    scm: https://github.com/matihost/learning.git
+- name: learning-github
+  description: Learning GitHub Pipeline
+  type: github
+  github:
+    owner: matihost
+    projects:
+      include: '*'
+      exclude: 'bento'

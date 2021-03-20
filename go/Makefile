@@ -7,7 +7,7 @@ DIR := $(shell pwd )
 GO_PACKAGE := $(PROJECT)/$(REPOSITORY)
 
 build: ## build all
-	go build -o .  ./...
+	go build -mod=mod -o .  ./...
 
 list-dependencies: ## list all modules dependencies including transient ones
 	go list -m all

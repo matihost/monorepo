@@ -18,7 +18,7 @@
 
 - name: Get Jenkins crump
   uri:
-    url: "https://{{ jenkins_ingress }}//crumbIssuer/api/xml?xpath=concat(//crumbRequestField,\":\",//crumb)"
+    url: "https://{{ jenkins_ingress.host }}//crumbIssuer/api/xml?xpath=concat(//crumbRequestField,\":\",//crumb)"
     validate_certs: no
     force_basic_auth: yes
     user: "{{ jenkins_admin_user|default('admin') }}"
@@ -31,7 +31,7 @@
 
 - name: Ensure Job {{ job.name }} is present
   uri:
-    url: https://{{ jenkins_ingress }}/scriptText
+    url: https://{{ jenkins_ingress.host }}/scriptText
     validate_certs: no
     force_basic_auth: yes
     user: "{{ jenkins_admin_user|default('admin') }}"

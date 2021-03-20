@@ -30,8 +30,7 @@ jobs:
     go: "1.15"
     before_install: cd go
     script:
-    - go build github.com/matihost/learning/go/cmd/http-server
-    - go build github.com/matihost/learning/go/cmd/language
+    - go build -mod=mod -o .  ./...
     - go test github.com/matihost/learning/go/pkg/language
     - ./language
     cache:
