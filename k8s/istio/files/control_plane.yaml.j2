@@ -105,11 +105,17 @@ spec:
 {% if options.gke_mode|default(false)  %}
     # TODO fix stackdriver metrics: https://github.com/istio/istio/issues/22658
     telemetry:
+      enabled: true
+      accessLogPolicy:
+        enabled: true
       v2:
         stackdriver:
           enabled: true
+          inboundAccessLogging: FULL
           outboundAccessLogging: FULL
           logging: true
+          monitoring: true
+          topology: true
 {% endif %}
     cni:
 {% if options.gke_mode|default(false)  %}

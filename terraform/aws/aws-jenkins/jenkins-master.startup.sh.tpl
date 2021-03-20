@@ -156,6 +156,7 @@ jenkins:
       - \"View/Delete:admin\"
       - \"View/Read:admin\"
       - \"View/Read:authenticated\"
+      - \"Overall/Administer:matihost\"
 "
   echo -n "$${config_data}" >/var/lib/jenkins/casc_configs/iam.yaml
 

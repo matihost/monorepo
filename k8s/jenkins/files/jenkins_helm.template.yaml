@@ -1,6 +1,6 @@
 # yamllint disable-file
 #
-# Helm chart config: helm show chart jenkinsci/jenkins
+# Helm chart config: helm show values jenkinsci/jenkins
 # Current chart version: {{ chart_version }}
 # Default values for jenkinsci/jenkins chart:
 # helm show values jenkinsci/jenkins
@@ -25,6 +25,7 @@ controller:
   - configuration-as-code:1.47
   - timestamper:1.12
   - github-branch-source:2.10.2
+  - github-oauth:0.33
   - matrix-auth:2.6.6
   - prometheus:2.0.8
   - simple-theme-plugin:0.6
@@ -40,7 +41,8 @@ controller:
     enabled: true
     apiVersion: "networking.k8s.io/{{ ingress_version }}"
     annotations:
-      kubernetes.io/ingress.class: {{ jenkins_ingress.class|default("nginx") }}
+      kubernetes.io/ingress.class: {{ jenkins_ingress.class|default("nginx") }} # in case GKE: istio, gce-internal, gce-external
+      kubernetes.io/ingress.allow-http: "false"  ## in case GKE gce-internal class it disables HTTP
     hostName: {{ jenkins_ingress.host }}
     tls:
     - secretName: {{ jenkins_ingress.secretName }}
@@ -127,6 +129,7 @@ controller:
               - "View/Delete:admin"
               - "View/Read:admin"
               - "View/Read:authenticated"
+              - "Overall/Administer:matihost"
       welcome-message: |
         jenkins:
           systemMessage: Welcome to the Matihost CI\CD server.
@@ -147,7 +150,7 @@ agent:
   # image: "mirror.gcr.io/jenkins/inbound-agent"
   # tag: "4.6-1"
   image: "jenkins/inbound-agent"
-  tag: "latest-jdk11"
+  tag: "4.6-1-jdk11-nanoserver-1809"
   resources:
     requests:
       cpu: "50m"

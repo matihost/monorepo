@@ -4,51 +4,34 @@ resource "google_service_account" "gke-sa" {
   display_name = "Service Account which is used by GKE Nodes"
 }
 
-resource "google_project_iam_binding" "gke-log-writer" {
-  role = "roles/logging.logWriter"
-
-  members = [
-    "serviceAccount:${google_service_account.gke-sa.email}",
-  ]
+resource "google_project_iam_member" "gke-log-writer" {
+  role   = "roles/logging.logWriter"
+  member = "serviceAccount:${google_service_account.gke-sa.email}"
 }
 
-resource "google_project_iam_binding" "gke-metrics-writer" {
-  role = "roles/monitoring.metricWriter"
-
-  members = [
-    "serviceAccount:${google_service_account.gke-sa.email}",
-  ]
+resource "google_project_iam_member" "gke-metrics-writer" {
+  role   = "roles/monitoring.metricWriter"
+  member = "serviceAccount:${google_service_account.gke-sa.email}"
 }
 
 # also needed to send metrics, permits write-only access to resource metadata provide permissions needed by agents to send metadata
-resource "google_project_iam_binding" "gke-metrics-metadata-writer" {
-  role = "roles/stackdriver.resourceMetadata.writer"
-
-  members = [
-    "serviceAccount:${google_service_account.gke-sa.email}",
-  ]
+resource "google_project_iam_member" "gke-metrics-metadata-writer" {
+  role   = "roles/stackdriver.resourceMetadata.writer"
+  member = "serviceAccount:${google_service_account.gke-sa.email}"
 }
 
 
 # so that  GKE cluster can access images from its own GCP project (gcr.io/project-id)
-resource "google_project_iam_binding" "gke-gcr-access" {
-  role = "roles/storage.objectViewer"
-
-  members = [
-    "serviceAccount:${google_service_account.gke-sa.email}",
-  ]
+resource "google_project_iam_member" "gke-gcr-access" {
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.gke-sa.email}"
 }
 
 # so that  GKE cluster can access GCP Artifacts
-resource "google_project_iam_binding" "gke-artifacts-access" {
-  role = "roles/artifactregistry.reader"
-
-  members = [
-    "serviceAccount:${google_service_account.gke-sa.email}",
-  ]
+resource "google_project_iam_member" "gke-artifacts-access" {
+  role   = "roles/artifactregistry.reader"
+  member = "serviceAccount:${google_service_account.gke-sa.email}"
 }
-
-
 
 // Service Account used by External DNS workflow on GKE
 resource "google_service_account" "edns-sa" {
@@ -56,12 +39,9 @@ resource "google_service_account" "edns-sa" {
   display_name = "Service Account which is used by ExternalDNS workflow in GKE"
 }
 
-resource "google_project_iam_binding" "edns-dnsadmin" {
-  role = "roles/dns.admin"
-
-  members = [
-    "serviceAccount:${google_service_account.edns-sa.email}",
-  ]
+resource "google_project_iam_member" "edns-dnsadmin" {
+  role   = "roles/dns.admin"
+  member = "serviceAccount:${google_service_account.edns-sa.email}"
 }
 
 // Make an IAM policy that allows the K8S SA to be a workload identity user

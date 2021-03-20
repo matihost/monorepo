@@ -9,6 +9,7 @@ export JENKINS_PLUGINS="ec2 \
   configuration-as-code:1.47 \
   timestamper:1.12 \
   github-branch-source:2.10.2 \
+  github-oauth:0.33 \
   matrix-auth:2.6.6 \
   prometheus:2.0.8 \
   simple-theme-plugin:0.6 \

@@ -52,31 +52,22 @@ resource "google_service_account" "vpn" {
 }
 
 # allows to gcloud SSH to VM (but they need to be running with same SA)
-resource "google_project_iam_binding" "vpn-oslogin-user" {
-  role = "roles/compute.osLogin"
-
-  members = [
-    "serviceAccount:${google_service_account.vpn.email}",
-  ]
+resource "google_project_iam_member" "vpn-oslogin-user" {
+  role   = "roles/compute.osLogin"
+  member = "serviceAccount:${google_service_account.vpn.email}"
 }
 
 # allows to gsutil cp both directions
-resource "google_project_iam_binding" "vpn-gs" {
-  role = "roles/storage.objectAdmin"
-
-  members = [
-    "serviceAccount:${google_service_account.vpn.email}",
-  ]
+resource "google_project_iam_member" "vpn-gs" {
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${google_service_account.vpn.email}"
 }
 
 # allows gcloud ssh to other VMs running with different GSA from VPN VM
 # gcloud compute <vm-name> --zone=<zone> --internal-ip
-resource "google_project_iam_binding" "vpn-service-account-user" {
-  role = "roles/iam.serviceAccountUser"
-
-  members = [
-    "serviceAccount:${google_service_account.vpn.email}",
-  ]
+resource "google_project_iam_member" "vpn-service-account-user" {
+  role   = "roles/iam.serviceAccountUser"
+  member = "serviceAccount:${google_service_account.vpn.email}"
 }
 
 
