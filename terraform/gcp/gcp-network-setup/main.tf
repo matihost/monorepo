@@ -31,3 +31,9 @@ variable "project" {
   type        = string
   description = "GCP Project For Deployment"
 }
+
+variable "env" {
+  type        = string
+  default     = "dev"
+  description = "Environment"
+}

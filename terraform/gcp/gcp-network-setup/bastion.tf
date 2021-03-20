@@ -53,6 +53,11 @@ resource "google_compute_instance" "bastion" {
     email  = google_service_account.bastion.email
     scopes = ["cloud-platform"]
   }
+
+  depends_on = [
+    # to ensure that DNS resolver will get IP ending with .2
+    google_dns_policy.allow-inbound-query-forwarding
+  ]
 }
 
 

@@ -30,18 +30,21 @@ pspPrivilegedClusterRole: psp:privileged # in GKE use: gce:podsecuritypolicy:pri
 podSecurityContext:
   runAsUser: 0
 
-# TODO NetworkPolicy has to be improved
-# as current one block HeatlhCheck from checking SVCNEG - making LoadBalancer exposure not working
 networkPolicy:
   enabled: false
+  externalIpRanges: # allow from GCP nodes and LoadBalancer health ranges (for SVCNEG HeatlhChecks)
+  - 10.0.0.0/8
+  - 130.211.0.0/22
+  - 35.191.0.0/16
 
 svc:
   enabled: true
 
 ingress:
   enabled: true
-  version: v1
-  class: "" # assume default impl, use gce-internal for GKE Internal LoadBalancer
+  version: v1  # in case GKE 1.18 or lower - it does not support v1 ingress yet - use ingress version: v1beta1
+  class: "" # assume default impl, use gce-internal for GKE Internal LoadBalancer, use istio or nginx when Istio or Nginx installed
+
   annotations:
     # required in case GKE Ingress as it does not support both http and https on the same ip
     kubernetes.io/ingress.allow-http: "false"
@@ -76,9 +79,9 @@ affinity:
   nodeAffinity:
     enabled: false
     zones:
-      - us-central1-a
-      - us-central1-b
-      - us-central1-c
+    - us-central1-a
+    - us-central1-b
+    - us-central1-c
   podAntiAffinity:
     enabled: true
     topologyKey: kubernetes.io/hostname

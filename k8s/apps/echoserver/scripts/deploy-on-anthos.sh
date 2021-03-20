@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-[[ "$(kubectl config current-context)" == "gke"* ]] || echo "Not logged to GKE cluster" && {
-  kubectl create ns learning
+
+[[ "$(kubectl config current-context)" == *"gke"* ]] || echo "Not logged to GKE cluster" && {
+  kubectl create ns learning &>/dev/null
   kubectl config set-context --current --namespace learning
+  [ -e "/tmp/${CN}.key" ] || {
+    openssl req -x509 -sha256 -nodes -days 365 -subj "/CN=${CN}" -newkey rsa:2048 -keyout "/tmp/${CN}.key" -out "/tmp/${CN}.crt"
+  }
   # GKE tweaks in variables:
   # PSP privileged cluster role is different thatn psp:privileged
-  # GKE 1.18 does not support v1 ingress yet
-  # Ingress needs gce-internal ingressclass to deploy via Internal Load Balancer
-  helm upgrade --install echoserver "$(dirname "${SCRIPT_DIR}")" -n learning --set ingress.tls.crt="$(base64 -w 0 /tmp/echoserver.learning.internal.gke.shared1.dev.gcp.testing.crt)" --set ingress.tls.key="$(base64 -w 0 /tmp/echoserver.learning.internal.gke.shared1.dev.gcp.testing.key)" \
+  # Expose via Anthos MCS & MCI instead of svc & ingress
+  helm upgrade --install echoserver "$(dirname "${SCRIPT_DIR}")" -n learning --set ingress.tls.crt="$(base64 -w 0 "/tmp/${CN}.crt")" --set ingress.tls.key="$(base64 -w 0 /tmp/"${CN}".key)" \
     --set pspPrivilegedClusterRole=gce:podsecuritypolicy:privileged \
     --set ingress.enabled=false \
     --set svc.enabled=false \

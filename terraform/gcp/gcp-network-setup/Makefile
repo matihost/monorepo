@@ -13,6 +13,10 @@ apply: pre-all ## setup VPC
 ssh: ## ssh to VPC bastion host
 	eval $(shell terraform output bastion_instance_ssh_cmd)
 
+
+list-dns-resolvers: # list inbound CloudDNS resolvers
+	gcloud compute addresses list --filter='purpose = "DNS_RESOLVER"' --format='csv(address, region, subnetwork)'
+
 show-state: ## show terraform.state
 	terraform state list
 	terraform show

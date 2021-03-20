@@ -12,15 +12,22 @@ Supports:
 
 TODOs/Limitations:
 
-* update VPN client DNS to use `169.254.169.254` for `gcp.testing` subzone and any zone hostes in GCP interanl CloudDNS. For Bind add:
+* update VPN client machine DNS setting to use Cloud DNS nameserver for Cloud hosted private zones. That requires using DNS nameserver on client which forward queries for particular zone to other nameserver.
 
-```
-zone "gcp.testing" {
-    type forward;
-    forward only;
-    forwarders { 169.254.169.254; };
-};
-```
+  * For GCP it requires creating [Cloud DNS inbound policy](https://cloud.google.com/dns/docs/policies#list-in-entrypoints) which exposes DNS nameserver IP in each subnetwork.
+  The possible IP which VPN can use as DNS servers are: `gcloud compute addresses list --filter='purpose = "DNS_RESOLVER"' --format='csv(address, region, subnetwork)'`.
+
+  Then configure DNS server on VPN client side forward queries to CloudDNS proxy DNS server. For Bind add:
+
+  ```
+  zone "gcp.testing" {
+      type forward;
+      forward only;
+      forwarders { 10.10.0.yyy; };
+  };
+  ```
+
+  The IP should be takend from subnetwork and region where VPN server is deployed.
 
 ## Prerequisites
 

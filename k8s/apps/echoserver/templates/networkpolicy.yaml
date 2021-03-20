@@ -14,12 +14,26 @@ kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
   namespace: {{ include "app.namespace" . }}
-  name: {{ include "app.name" . }}-allow-from-all-namespaces
+  name: {{ include "app.namespace" . }}-allow-from-all-namespaces
 spec:
-  podSelector:
-    matchLabels:
-      {{- include "app.selectorLabels" . | nindent 6 }}
+  podSelector: {}
   ingress:
   - from:
     - namespaceSelector: {}
+{{- if .Values.networkPolicy.externalIpRanges }}
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  namespace: {{ include "app.namespace" . }}
+  name: {{ include "app.name" . }}-allow-from-external-ip-ranges
+spec:
+  podSelector: {}
+  ingress:
+  - from:
+{{- range .Values.networkPolicy.externalIpRanges }}
+    - ipBlock:
+        cidr: {{ .|quote }}
+{{- end }}
+{{- end }}
 {{- end }}
