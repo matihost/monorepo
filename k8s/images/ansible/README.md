@@ -23,6 +23,4 @@ make tag TAG=2.10.3
 
 # push image with tag to quay.io
 make push TAG=2.10.3
-
-
 ```

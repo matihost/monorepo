@@ -26,7 +26,10 @@ controller:
   - timestamper:1.12
   - github-branch-source:2.10.2
   - github-oauth:0.33
+  - ldap:2.4
+  - google-login:1.6
   - matrix-auth:2.6.6
+  - authorize-project:1.4.0
   - prometheus:2.0.8
   - simple-theme-plugin:0.6
   - jdk-tool:1.5
@@ -36,6 +39,9 @@ controller:
 {% endif %}
   servicePort: 80
   serviceType: {{ jenkins_service_type|default("NodePort") }}
+
+  podAnnotations:
+    rollme: "{{ 10000|random }}"
 
   ingress:
     enabled: true
@@ -139,6 +145,12 @@ controller:
             approvedSignatures:
             - "method groovy.json.JsonSlurperClassic parseText java.lang.String"
             - "new groovy.json.JsonSlurperClassic"
+      authorize-project: |
+        security:
+          queueItemAuthenticator:
+            authenticators:
+            - global:
+                strategy: "triggeringUsersAuthorizationStrategy"
       neo-theme: |
         unclassified:
           simple-theme-plugin:

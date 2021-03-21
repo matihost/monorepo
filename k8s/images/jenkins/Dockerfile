@@ -9,7 +9,10 @@ RUN jenkins-plugin-cli --plugins \
   timestamper:1.12 \
   github-branch-source:2.10.2 \
   github-oauth:0.33 \
+  ldap:2.4 \
+  google-login:1.6 \
   matrix-auth:2.6.6 \
+  authorize-project:1.4.0 \
   prometheus:2.0.8 \
   simple-theme-plugin:0.6 \
   jdk-tool:1.5 \
