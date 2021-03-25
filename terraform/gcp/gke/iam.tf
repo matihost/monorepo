@@ -33,6 +33,7 @@ resource "google_project_iam_member" "gke-artifacts-access" {
   member = "serviceAccount:${google_service_account.gke-sa.email}"
 }
 
+
 // Service Account used by External DNS workflow on GKE
 resource "google_service_account" "edns-sa" {
   account_id   = "${local.gke_name}-edns-sa"
@@ -44,21 +45,13 @@ resource "google_project_iam_member" "edns-dnsadmin" {
   member = "serviceAccount:${google_service_account.edns-sa.email}"
 }
 
-// Make an IAM policy that allows the K8S SA to be a workload identity user
-data "google_iam_policy" "edns_gsa2k8ssa" {
-  binding {
-    role = "roles/iam.workloadIdentityUser"
-    members = [
-      format("serviceAccount:%s.svc.id.goog[%s/%s]", var.project, var.external_dns_k8s_namespace, var.external_dns_k8s_sa_name)
-    ]
-  }
+# WorkloadIdentity of external-dns KSA to act as GSA
+resource "google_service_account_iam_member" "edns_gsa2k8ssa" {
+  service_account_id = google_service_account.edns-sa.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = format("serviceAccount:%s.svc.id.goog[%s/%s]", var.project, var.external_dns_k8s_namespace, var.external_dns_k8s_sa_name)
 }
 
-// Bind the workload identity IAM policy to the GSA
-resource "google_service_account_iam_policy" "edns_gsa2k8ssa" {
-  service_account_id = google_service_account.edns-sa.name
-  policy_data        = data.google_iam_policy.edns_gsa2k8ssa.policy_data
-}
 
 # Still requires to annotate KSA to use GSA from K8S level:
 # kubectl annotate serviceaccount \
@@ -70,3 +63,10 @@ resource "google_service_account_iam_policy" "edns_gsa2k8ssa" {
 #   --namespace external-dns \
 #   external-dns \
 #   iam.gke.io/gcp-service-account=edns-sa@matihost.iam.gserviceaccount.com
+
+
+# so that  GKE cluster can access GCP Source repositories - required by Config Sync
+resource "google_project_iam_member" "gke-source-reader" {
+  role   = "roles/source.reader"
+  member = "serviceAccount:${google_service_account.gke-sa.email}"
+}

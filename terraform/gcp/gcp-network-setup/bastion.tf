@@ -89,6 +89,12 @@ resource "google_project_iam_member" "bastion-service-account-user" {
   member = "serviceAccount:${google_service_account.bastion.email}"
 }
 
+# allows gcloud source repos list
+resource "google_project_iam_member" "bastion-source-reader" {
+  role   = "roles/source.reader"
+  member = "serviceAccount:${google_service_account.bastion.email}"
+}
+
 
 output "bastion_instance_name" {
   value = google_compute_instance.bastion.name
