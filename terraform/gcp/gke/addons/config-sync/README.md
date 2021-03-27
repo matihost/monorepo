@@ -8,6 +8,12 @@ Installs [Standalone Config Sync](https://cloud.google.com/kubernetes-engine/doc
 
 * GKE cluster created
 
+* Latest Terraform installed
+
+* Prerequisites Terraform run once per GCP project:
+
+  * `cd prerequisites && make apply` to setup GCP Git repository and necessary IAM bindings
+
 ## Usage
 
 ```bash

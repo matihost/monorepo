@@ -1,25 +1,15 @@
 .EXPORT_ALL_VARIABLES:
 
 CURRENT_PROJECT := $(shell gcloud config get-value project)
-CLUSTER_NAME := shared1
 TF_VAR_project := $(CURRENT_PROJECT)
 
-TF_VAR_cluster_name := $(CLUSTER_NAME)
 
-apply: pre-all # installs Standalone Config Sync on GKE
+apply: pre-all # installs prerequisites for Standalone Config Sync on GKE
 	@terraform validate && \
 	terraform plan -lock=false && \
 	terraform apply -auto-approve
 
-status: # retrieve Config Sync status
-	-nomos status
-	kubectl logs -n config-management-system -l app=git-importer -c git-sync
-	kubectl logs -n config-management-system -l app=git-importer -c importer
-
-destroy: ## uninstalls Standalone Config Sync
-	kubectl delete configmanagement config-management
-	sleep 30
-	kubectl delete -f target/config-sync-operator.yaml
+destroy: ## unregister GKE from Anthos
 	terraform plan && terraform destroy -auto-approve
 
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
@@ -27,7 +17,6 @@ google-authentication: prepare ## authenticate to GCP and prepare Application De
 	gcloud auth application-default login
 
 pre-all:
-	rm -rf target
 	terraform init -upgrade=true
 
 

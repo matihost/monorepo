@@ -4,8 +4,8 @@ kind: ConfigManagement
 metadata:
   name: config-management
 spec:
-  clusterName: CLUSTER_NAME
+  clusterName: ${CLUSTER_NAME}
   git:
-    syncRepo: REPO
+    syncRepo: ${SYNC_REPO}
     syncBranch: master
     secretType: gcenode

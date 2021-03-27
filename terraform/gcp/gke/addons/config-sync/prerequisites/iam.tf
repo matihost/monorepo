@@ -1,6 +1,6 @@
 
 resource "google_service_account" "configsync-sa" {
-  account_id   = "${local.gke_name}-config-sync-sa"
+  account_id   = "gke-config-sync-sa"
   display_name = "Service Account which is used by ConfigSync workflow in GKE"
 }
 
