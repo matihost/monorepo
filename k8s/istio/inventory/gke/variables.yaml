@@ -4,7 +4,7 @@ all:
   vars:
     operator:
       hub: "gcr.io/istio-release"
-      tag: "1.9.1"
+      tag: "1.9.2"
     ingress_gateway:
       max_pods: 20
       default_dns_suffix: "internal.{{ options.gke.cluster_name|replace('-','.') }}.gke.testing"

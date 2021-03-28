@@ -14,8 +14,11 @@ apply: init-terraform prepare ## setup Open VPN
 	terraform plan -lock=false && \
 	terraform apply -auto-approve
 
-ssh: ## ssh to instance (via External IP since VPN Gateway has to be exposed via public IP)
+ssh: ## ssh to OpenVPN instance (via External IP since VPN Gateway has to be exposed via public IP)
 	ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=no ubuntu@$(shell terraform output vpn_gateway_external_ip)
+
+show-clouddns-resolvers: ## show CloudDNS resolvers
+	gcloud compute addresses list --filter='purpose = "DNS_RESOLVER"' --format='csv(address, region, subnetwork)'
 
 show-state: ## show terraform.state
 	terraform state list

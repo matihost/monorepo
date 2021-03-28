@@ -7,9 +7,9 @@ metadata:
 spec:
   profile: default
   meshConfig:
+    enableTracing: true
     accessLogFile: /dev/stdout
-    accessLogEncoding: TEXT
-    accessLogFormat:  "[%START_TIME%] %REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL% %RESPONSE_CODE% %RESPONSE_FLAGS% %BYTES_RECEIVED% %BYTES_SENT% %DURATION% %RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)% %REQ(X-FORWARDED-FOR)% UPSTREAM_HOST %UPSTREAM_CLUSTER% %UPSTREAM_LOCAL_ADDRESS% %DOWNSTREAM_LOCAL_ADDRESS% %DOWNSTREAM_REMOTE_ADDRESS%\n"
+    accessLogEncoding: JSON
   components:
     cni:
       enabled: true
@@ -102,12 +102,12 @@ spec:
       #    operator: "Exists"
       #    effect: "NoSchedule"
   values:
+    global:
+      logAsJson: true
 {% if options.gke_mode|default(false)  %}
     # TODO fix stackdriver metrics: https://github.com/istio/istio/issues/22658
     telemetry:
       enabled: true
-      accessLogPolicy:
-        enabled: true
       v2:
         stackdriver:
           enabled: true
