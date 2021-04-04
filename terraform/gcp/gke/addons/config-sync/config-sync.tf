@@ -31,6 +31,7 @@ resource "null_resource" "config-sync-install" {
   }
 
   depends_on = [
-    local_file.config-sync-operator-yaml
+    local_file.config-sync-operator-yaml,
+    local_file.kubeconfig
   ]
 }

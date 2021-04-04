@@ -1,3 +1,6 @@
+#TODO add
+# enable api: meshtelemetry.googleapis.com
+
 resource "google_compute_firewall" "gke-accept-istio-webhook" {
   name          = "${local.gke_name}-accept-istio-webhook"
   description   = "Allow traffic to GKE nodes for istio webhook from GKE Master Nodes"

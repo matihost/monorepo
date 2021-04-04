@@ -21,6 +21,6 @@ Installs [Standalone Config Sync](https://cloud.google.com/kubernetes-engine/doc
 # installs Standalone Config Sync on GKE
 make apply CLUSTER_NAME=shared1
 
-# unregister GKE from Anthos
+# uninstalls Standalone Config Sync
 make destroy
 ```

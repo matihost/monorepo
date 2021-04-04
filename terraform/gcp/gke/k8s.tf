@@ -21,7 +21,7 @@ provider "helm" {
 # Deploy GKE K8S cluster configuration like restricted PSP, clusterroles, network policies etc.
 resource "helm_release" "cluster-config" {
   name  = "cluster-config"
-  chart = "./addons/cluster-config"
+  chart = "${path.module}/cluster-config"
 
   namespace        = "cluster-config"
   create_namespace = true
@@ -49,7 +49,7 @@ resource "helm_release" "external-dns" {
   create_namespace = true
 
   values = [
-    templatefile("addons/external-dns/values.template.yaml", {
+    templatefile("${path.module}/external-dns.template.yaml", {
       GCP_PROJECT = var.project,
       GCP_GSA     = google_service_account.edns-sa.account_id,
       }

@@ -9,7 +9,7 @@ apply: pre-all # installs prerequisites for Standalone Config Sync on GKE
 	terraform plan -lock=false && \
 	terraform apply -auto-approve
 
-destroy: ## unregister GKE from Anthos
+destroy: ## unregister Standalone Config Sync from GKE
 	terraform plan && terraform destroy -auto-approve
 
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage

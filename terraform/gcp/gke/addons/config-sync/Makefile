@@ -6,12 +6,12 @@ TF_VAR_project := $(CURRENT_PROJECT)
 
 TF_VAR_cluster_name := $(CLUSTER_NAME)
 
-apply: pre-all # installs Standalone Config Sync on GKE
+apply: pre-all prerequisites ## installs Standalone Config Sync on GKE
 	@terraform validate && \
 	terraform plan -lock=false && \
 	terraform apply -auto-approve
 
-status: # retrieve Config Sync status
+status: ## retrieve Config Sync status
 	-nomos status
 	kubectl logs -n config-management-system -l app=git-importer -c git-sync
 	kubectl logs -n config-management-system -l app=git-importer -c importer
@@ -30,8 +30,11 @@ pre-all:
 	rm -rf target
 	terraform init -upgrade=true
 
+prerequisites:
+	cd prerequisites && $(MAKE) apply
+
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help apply destroy
+.PHONY: help apply destroy prerequisites

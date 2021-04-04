@@ -103,7 +103,7 @@
       name: istiocontrolplane
       namespace: istio-system
     register: operator_status
-    until: operator_status.resources[0].status.status == "HEALTHY"
+    until: operator_status.resources[0].status is defined and operator_status.resources[0].status.status == "HEALTHY"
     retries: 36
     delay: 10
     ignore_errors: yes
