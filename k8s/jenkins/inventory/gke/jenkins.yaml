@@ -1,3 +1,4 @@
+gke_mode: true
 jenkins_service_type: ClusterIP
 jenkins_ingress:
   host: jenkins.ci.internal.gke.shared1.dev.gcp.testing
@@ -9,6 +10,13 @@ jenkins_jobs:
   type: multibranch
   git:
     scm: https://github.com/matihost/learning.git
+    jenkinsfile: Jenkinsfile
+- name: ansible-image
+  description: Ansible Image Build
+  type: multibranch
+  git:
+    scm: https://github.com/matihost/learning.git
+    jenkinsfile: k8s/images/ansible/Jenkinsfile
 - name: learning-github
   description: Learning GitHub Pipeline
   type: github
