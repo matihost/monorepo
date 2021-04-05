@@ -30,6 +30,6 @@
   </sources>
   <factory class="org.jenkinsci.plugins.workflow.multibranch.WorkflowBranchProjectFactory">
     <owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
-    <scriptPath>{{ job.jenkinsfile|default("Jenkinsfile") }}</scriptPath>
+    <scriptPath>{{ job.git.jenkinsfile|default("Jenkinsfile") }}</scriptPath>
   </factory>
 </org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject>
