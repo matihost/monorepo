@@ -24,3 +24,27 @@ make tag TAG=2.10.7
 # push image with tag to quay.io
 make push TAG=2.10.7
 ```
+
+## Jenkins CI under GKE
+
+The `k8s/images/ansible/Jenkinsfile` is assumed to work under Jenkins deployed in GKE:
+
+Requirements:
+
+* GKE with Worflow Identytity (aka `terraform/gcp/gke`)
+
+* Jenkins deployed along with this repo Jenkins multibranch pipelines/jobs:
+
+  ```bash
+  JENKINS_ADMIN_PASS=choosePass
+  cd ../../jenkins && \
+    ./deploy-jenkins.sh -e gke -p "${JENKINS_ADMIN_PASS}" && \
+    ./ensure-jobs.sh -e gke -p "${JENKINS_ADMIN_PASS}"
+  ```
+
+* Workload identity configured for Jenkins `ci` namespaces Kubernetes Service Accounts (KSAs)
+
+  ```bash
+  cd ../../../gcp/gke/addons/ng-gke-setup && \
+    make apply CLUSTER_NAME=shared1 KNS=ci KSAS='["default","ci", "ci-jenkins"]' ROLES='["roles/storage.admin"]'
+  ```

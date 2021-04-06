@@ -31,6 +31,13 @@ Playbooks:
   ansible-galaxy collection install community.kubernetes
   ```
 
+* In case of GKE workload identity configured for Jenkins `ci` namespaces Kubernetes Service Accounts (KSAs)
+
+  ```bash
+  cd ../.../gcp/gke/addons/ng-gke-setup && \
+    make apply CLUSTER_NAME=shared1 KNS=ci KSAS='["default","ci", "ci-jenkins"]' ROLES='["roles/storage.admin"]'
+  ```
+
 ## Running
 
 Samples:
@@ -43,6 +50,7 @@ deploy-jenkins.sh minikube -p password-for-jenkins
 
 # deploy to gke
 deploy-jenkins.sh -e gke -p password-for-jenkins
+
 
 # ensure Jobs for env are present
 ensure-jobs.sh -e minikube -p password-for-jenkins

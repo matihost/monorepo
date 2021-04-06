@@ -21,6 +21,10 @@ It creates:
 # configures Worflow Identity and Config Connector for GKE namespace and its service accounts
 make apply CLUSTER_NAME=shared1 KNS=sample-istio KSAS='["default","httpbin"]'
 
+# configure Jenkins namespace so that its builds can push images to gcr.io/ownProject
+# https://cloud.google.com/container-registry/docs/access-control#permissions_and_roles
+make apply CLUSTER_NAME=shared1 KNS=ci KSAS='["default","ci", "ci-jenkins"]' ROLES='["roles/storage.admin"]'
+
 # removes GSA and all its GCP roles bindings making ConfigConnector and Workflow Identity disabled for KNS and KSAs
 make destroy CLUSTER_NAME=shared1 KNS=sample-istio KSAS='["default","httpbin"]'
 
