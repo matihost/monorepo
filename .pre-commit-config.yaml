@@ -38,17 +38,17 @@ repos:
     additional_dependencies: []
   - id: shfmt
 - repo: https://github.com/adrienverge/yamllint.git
-  rev: v1.26.0
+  rev: v1.26.1
   hooks:
   - id: yamllint
     entry: yamllint --strict
 - repo: https://github.com/ansible/ansible-lint.git
-  rev: v5.0.0a1
+  rev: v5.0.0a1 # TODO latest v5.0.6 fails on parsing template yamls, https://github.com/ansible-community/ansible-lint/issues/1511
   hooks:
   - id: ansible-lint
     files: \.(yaml|yml)$
 - repo: https://gitlab.com/pycqa/flake8.git
-  rev: 3.8.4
+  rev: 3.9.0
   hooks:
   - id: flake8
     language_version: python3
