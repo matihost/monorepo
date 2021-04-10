@@ -17,6 +17,12 @@
     set_fact:
       gcp_project: "{{ gcp_project_out.stdout }}"
 
+
+  - name: Ensure Istio main directory present
+    file:
+      path: "{{ lookup('env', 'HOME') }}/.istio"
+      state: directory
+
   - name: Check .istio/current exists
     stat:
       path: "{{ lookup('env', 'HOME') }}/.istio/current"
@@ -24,7 +30,6 @@
 
   - name: Ensure Istio downloaded
     shell: |
-      mkdir -p ~/.istio
       cd ~/.istio
       curl -sL https://istio.io/downloadIstio | sh -
       cd istio-*
@@ -117,7 +122,7 @@
       namespace: istio-system
     register: operator_status
 
-  - name:
+  - name: Fail when Istio Operator didn't start properly
     fail:
       msg: |
         Istio Operator didn't install Istio components properly
@@ -144,8 +149,8 @@
           name: internal-wildcard-gateway-tls
           namespace: istio-system
         data:
-          tls.crt: "{{ tls.crt}}"
-          tls.key: "{{ tls.key}}"
+          tls.crt: "{{ tls.crt }}"
+          tls.key: "{{ tls.key }}"
         type: kubernetes.io/tls
     no_log: true
 
@@ -163,4 +168,4 @@
     vars:
       wildcard_dns_suffix: "{{ ingress_gateway.default_dns_suffix }}"
       vs: "{{ item }}"
-    loop: "{{ ingress_gateway.virtual_services|default([])}}"
+    loop: "{{ ingress_gateway.virtual_services|default([]) }}"

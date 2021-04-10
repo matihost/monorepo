@@ -28,7 +28,7 @@
 
   - name: Ensure Jenkins CN={{ jenkins_ingress.host }} Secret is present
     block:
-    - name: Ensure Jenkins CN={{ jenkins_ingress.host }} is present
+    - name: Ensure Jenkins CN={{jenkins_ingress.host }} is present
       block:
       - name: Ensure Jenkins CN={{ jenkins_ingress.host }} is present
         include_role:
@@ -37,7 +37,7 @@
           certificate_def:
             cn: "{{ jenkins_ingress.host }}"
       become: true
-    - name: Ensure TLS Secret {{ jenkins_ingress .secretName}} is present in namespace {{ namespace }}
+    - name: Ensure TLS Secret {{ jenkins_ingress .secretName }} is present in namespace {{ namespace }}
       k8s:
         state: present
         definition:
@@ -47,8 +47,8 @@
             name: "{{ jenkins_ingress.secretName }}"
             namespace: "{{ namespace }}"
           data:
-            tls.crt: "{{ tls.crt}}"
-            tls.key: "{{ tls.key}}"
+            tls.crt: "{{ tls.crt }}"
+            tls.key: "{{ tls.key }}"
           type: kubernetes.io/tls
       no_log: true
     when: jenkins_ingress.class != "istio" # assuming using existing secret present in istio-system namespace

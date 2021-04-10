@@ -1,6 +1,7 @@
 ---
 skip_list:
-- '208'  # File permissions not mentioned'
+- '208'  # File permissions not mentioned
 - '305'
 - '306'
+- '403'  # package-latest: Package installs should not use latest
 - '503'

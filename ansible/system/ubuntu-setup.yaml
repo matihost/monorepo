@@ -64,4 +64,4 @@
       name: file_config
     vars:
       file_config: "{{ item }}"
-    loop: "{{ files_config|default([])}}"
+    loop: "{{ files_config|default([]) }}"

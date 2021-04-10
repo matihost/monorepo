@@ -2,7 +2,8 @@
 - hosts: local
   gather_facts: false
   tasks:
-    - set_fact:
+    - name: Set initial facts
+      set_fact:
         dictionaries:
           books:
             valid-k8s-name:
@@ -16,7 +17,8 @@
       debug:
         msg: "{{ dictionaries }}"
 
-    - set_fact:
+    - name: Set fact some_books
+      set_fact:
         some_books: "{{ dictionaries.books }}"
 
     - name: Show books

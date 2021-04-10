@@ -42,11 +42,31 @@ repos:
   hooks:
   - id: yamllint
     entry: yamllint --strict
-- repo: https://github.com/ansible/ansible-lint.git
-  rev: v5.0.0a1 # TODO latest v5.0.6 fails on parsing template yamls, https://github.com/ansible-community/ansible-lint/issues/1511
+- repo: local
   hooks:
   - id: ansible-lint
-    files: \.(yaml|yml)$
+    name: Ansible-lint
+    description: |
+      This hook runs ansible-lint on selected ansible playbooks and roles.
+      Do not use https://github.com/ansible/ansible-lint.git default pre-commit b/c its autodetect feature
+      does not correctly detect plays and roles and it always traverse entire subdirectory
+    entry: ansible-lint --force-color
+    language: python
+    pass_filenames: true
+    always_run: false
+    files: |
+      (?x)^(
+          ansible\/[^/]*\/[^/]*yaml|
+          ansible/.*/roles/.*/tasks/.*(yaml|yml)|
+          k8s/(jenkins|istio)/(deploy|ensure|roles/.*/tasks).*.(yaml|yml)
+      )$
+    exclude: |
+      (?x)^(
+          .*/templates/.*.yaml|
+          .*.template.yaml
+      )$
+    additional_dependencies:
+    - .[community,yamllint]
 - repo: https://gitlab.com/pycqa/flake8.git
   rev: 3.9.0
   hooks:
