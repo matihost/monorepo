@@ -34,8 +34,6 @@ repos:
   - id: markdownlint
   - id: require-ascii
   - id: shellcheck
-    # remove additional_dependencies when https://github.com/jumanjihouse/pre-commit-hooks/issues/82 fixed
-    additional_dependencies: []
   - id: shfmt
 - repo: https://github.com/adrienverge/yamllint.git
   rev: v1.26.1
