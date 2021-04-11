@@ -59,6 +59,9 @@ if [[ -z "$ENV" || -z "$PASS" ]]; then
 fi
 
 ansible-playbook deploy-jenkins.yaml -v -e env="${ENV}" -e jenkins_admin_pass="${PASS}" && (
-  echo "Jenkins Url: https://$(kubectl get ingress ci-jenkins -n ci -o jsonpath="{.spec.rules[0].host}")"
+  JENKINS_HOST="$(kubectl get ingress ci-jenkins -n ci -o jsonpath="{.spec.rules[0].host}")"
+  JENKINS_IP="$(kubectl get ingress ci-jenkins -n ci -o jsonpath="{.status.loadBalancer.ingress[0].ip}")"
+  echo "Jenkins Url: https://${JENKINS_HOST}"
+  echo "For example: curl -k --resolve \"${JENKINS_HOST}:443:${JENKINS_IP}\" https://${JENKINS_HOST}"
   echo "User: admin Password: ${PASS}"
 )

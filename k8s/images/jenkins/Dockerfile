@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:2.277.1-lts-jdk11
+FROM jenkins/jenkins:2.277.2-lts-jdk11
 RUN jenkins-plugin-cli --plugins \
   kubernetes:1.29.2 \
   workflow-job:2.40 \
@@ -9,7 +9,7 @@ RUN jenkins-plugin-cli --plugins \
   timestamper:1.12 \
   github-branch-source:2.10.2 \
   github-oauth:0.33 \
-  ldap:2.4 \
+  ldap:2.5 \
   google-login:1.6 \
   matrix-auth:2.6.6 \
   authorize-project:1.4.0 \
