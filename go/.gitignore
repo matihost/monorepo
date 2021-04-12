@@ -4,4 +4,6 @@ vendor
 
 # Executables in the project
 language
+grpc-server
+grpc-client
 http-server

@@ -1,10 +1,9 @@
-FROM golang:1.15 as builder
+FROM gcr.io/cloud-builders/go:1.15 as builder
 COPY . /tmp/build
 WORKDIR /tmp/build
-RUN go build -o . ./cmd/language
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=mod -o . ./cmd/language
 
-FROM gcr.io/distroless/base
-USER 1001
+FROM gcr.io/distroless/static:nonroot
 COPY --from=builder /tmp/build/language .
 ENTRYPOINT ["./language"]
 LABEL Name=language Version=0.0.1

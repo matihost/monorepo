@@ -19,7 +19,7 @@ remove-unused-dependencies: ## remove unused dependencies
 	go mod tidy
 
 clean: ## removes compiled application and vendor directory
-	@rm -rf ${CMD_PACKAGE_NAME} http-server go.sum vendor
+	@rm -rf ${CMD_PACKAGE_NAME} http-server grpc-client grpc-server go.sum vendor
 
 build-image: ## builds docker image
 	@DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build -t $(GO_PACKAGE)/cmd/language:latest .
