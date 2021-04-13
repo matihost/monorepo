@@ -1,10 +1,23 @@
 #!/usr/bin/env bash
-# usage: ./sample-istio-on-gke.sh shared1-dev
+# usage for gke deployment: ./sample-http-server.sh gke shared1-dev
+# usage for minikube deployment: ./sample-http-server.sh minikube
 
-CLUSTER_NAME="${1:?CLUSTER_NAME is required}"
-
-INTERNAL_DNS_SUFFIX="internal.gke.$(echo -n "${CLUSTER_NAME}" | sed 's/-/./g').gcp.testing"
-EXTERNAL_DNS_SUFFIX="external.gke.$(echo -n "${CLUSTER_NAME}" | sed 's/-/./g').gcp.testing"
+case $1 in
+gke)
+  MODE=gke
+  CLUSTER_NAME="${2:?CLUSTER_NAME is required}"
+  INTERNAL_DNS_SUFFIX="internal.gke.$(echo -n "${CLUSTER_NAME}" | sed 's/-/./g').gcp.testing"
+  EXTERNAL_DNS_SUFFIX="external.gke.$(echo -n "${CLUSTER_NAME}" | sed 's/-/./g').gcp.testing"
+  ;;
+minikube)
+  MODE=minikube
+  INTERNAL_DNS_SUFFIX="internal.testing.minikube"
+  ;;
+*)
+  echo "Mode minikube or gke only supported"
+  exit 1
+  ;;
+esac
 
 function deploySampleAppWithK8SIngress() {
   kubectl create ns sample-istio || echo "ignoring..."
@@ -23,7 +36,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: gce:podsecuritypolicy:privileged
+  name: $([ "${MODE}" = "gke" ] && echo "gce:podsecuritypolicy:privileged" || echo "psp:privileged")
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
@@ -78,7 +91,7 @@ metadata:
     service: httpbin
 spec:
   ports:
-  - name: http
+  - name: http-httpbin
     port: 8000
     targetPort: 80
   selector:
@@ -138,6 +151,8 @@ spec:
     hosts:
     - "api.${INTERNAL_DNS_SUFFIX}"
     - "http.${INTERNAL_DNS_SUFFIX}"
+    tls:
+      httpsRedirect: true # sends 301 redirect for http requests
   - port:
       number: 443
       name: https-httpbin
@@ -272,4 +287,7 @@ EOF
 # Main
 deploySampleAppWithK8SIngress
 exposeSampleAppViaInternalIstioNatively
-exposeSampleAppExternally
+
+if [ "${MODE}" = "gke" ]; then
+  exposeSampleAppExternally
+fi

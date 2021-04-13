@@ -1,14 +1,14 @@
-PROJECT := "github.com/matihost/learning"
-REPOSITORY := "go"
 CMD_PACKAGE_NAME := "grpc-server"
 
-GO_PACKAGE := $(PROJECT)/$(REPOSITORY)
-
 build: ## build grpc-server app docker image
-	@DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build -t $(GO_PACKAGE)/$(CMD_PACKAGE_NAME):latest -f Dockerfile ../..
+	@DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build -t quay.io/matihost/$(CMD_PACKAGE_NAME):latest -f Dockerfile ../..
+
+push: ## push image to quay.io repository (assume docker login quay.io has been perfomed)
+	docker push quay.io/matihost/$(CMD_PACKAGE_NAME):latest
+
 
 run-server: ## run grpc-server app container
-	docker run --detach --name $(CMD_PACKAGE_NAME) -p 6565:6565 --rm $(GO_PACKAGE)/$(CMD_PACKAGE_NAME):latest --address :6565
+	docker run --detach --name $(CMD_PACKAGE_NAME) -p 6565:6565 --rm quay.io/matihost/$(CMD_PACKAGE_NAME):latest --address :6565
 
 show-server-logs: ## show grpc-server app container logs
 	docker logs grpc-server

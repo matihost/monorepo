@@ -47,19 +47,19 @@ const (
 
 func main() {
 	hostname, _ := os.Hostname()
-	address := flag.String("address", hostname + ":6565", "host:port of gRPC server")
+	address := flag.String("addr", hostname + ":6565", "host:port of gRPC server")
 	cert := flag.String("cert", "/data/cert.pem", "path to TLS certificate")
 	repeat := flag.Int("repeat", 3, "number of unary gRPC requests to send")
-	insecure := flag.Bool("insecure", false, "connect without TLS")
-	unsafe := flag.Bool("unsafe", false, "connect with TLS with ignoring TLS cert")
+	secure := flag.Bool("tls", true, "connect with TLS")
+	tlsNoCheck := flag.Bool("tls-no-verify", false, "connect with TLS with ignoring TLS cert")
 	flag.Parse()
 
 	// Set up a connection to the server.
 	var conn *grpc.ClientConn
 	var err error
-	if *insecure {
+	if !*secure {
 		conn, err = grpc.Dial(*address, grpc.WithInsecure())
-	} else if *unsafe {
+	} else if *tlsNoCheck {
 		config := &tls.Config{
 			InsecureSkipVerify: true,
 		}
@@ -82,12 +82,12 @@ func main() {
 	name := defaultName
 	nonFlagArgs := make([]string, 0)
 	for _, arg := range os.Args {
-		if !strings.HasPrefix(arg, "--") {
+		if !strings.HasPrefix(arg, "-") {
 			nonFlagArgs = append(nonFlagArgs, arg)
 		}
 	}
 	if len(nonFlagArgs) > 1 {
-		name = nonFlagArgs[1]
+		name = nonFlagArgs[len(nonFlagArgs) -1 ]
 	}
 
 	// Contact the server and print out its response multiple times.
