@@ -34,10 +34,16 @@ kubectl apply -f target/config-sync-operator.yaml
 # enable Config Sync configuration
 kubectl apply -f target/config-management.yaml
 
-while [ -z "$(kubectl get sa importer -n config-management-system -o jsonpath="{.metadata.name}" 2>/dev/null | xargs)" ]; do
+timeout="3 minute"
+deadline=$(date -ud "${timeout}" +%s)
+while [ -z "$(kubectl get sa importer -n config-management-system -o jsonpath="{.metadata.name}" 2>/dev/null | xargs)" ] && [[ $(date -u +%s) -le ${deadline} ]]; do
   sleep 2
   echo "Awaiting for config-management-system/importer KSA"
 done
+if [ -z "$(kubectl get sa importer -n config-management-system -o jsonpath="{.metadata.name}" 2>/dev/null | xargs)" ]; then
+  echo "Config Sync not present? Missing config-management-system/importer KSA in GKE cluster"
+  exit 1
+fi
 
 # ensure Config Sync is able to read GCP Source Repo
 kubectl annotate serviceaccount importer iam.gke.io/gcp-service-account="${GSA}" -n config-management-system --overwrite
