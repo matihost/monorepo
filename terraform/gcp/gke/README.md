@@ -1,6 +1,6 @@
 # Terraform :: Sample GKE Instance
 
-Setup private Google Kubernetes Engine (GKE) instance in own provisioned VPC.
+Setup private standalone Google Kubernetes Engine (GKE) instance in own provisioned VPC.
 
 It also provisions:
 

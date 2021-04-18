@@ -196,8 +196,19 @@ resource "google_container_cluster" "gke" {
     identity_namespace = "${var.project}.svc.id.goog"
   }
 
-  # Whether Intra-node visibility is enabled for this cluster. This makes same node pod to pod traffic visible for VPC network.
+  # Whether Intra-node visibility is enabled for this cluster.
+  # This makes same node pod to pod traffic visible for VPC network.
   enable_intranode_visibility = false
+
+  # internal-load-balancing subsetting
+  # uses GKE controlled NEGs for each service using a subset of the GKE nodes as members
+  enable_l4_ilb_subsetting = true
+
+  # controls whether and how the pods can communicate with Google Services through gRPC over IPv6.
+  private_ipv6_google_access = "PRIVATE_IPV6_GOOGLE_ACCESS_BIDIRECTIONAL"
+
+  # The desired datapath provider for this cluster. By default, uses the IPTables-based kube-proxy implementation.
+  # datapath_provider = ...
 
   # This option is required if you privately use non-RFC 1918/public IP addresses for your Pods or Services.
   # Disabling SNAT is required so that responses can be routed to the Pod that originated the traffic.
@@ -284,6 +295,15 @@ resource "google_container_node_pool" "gke_nodes" {
     disk_type    = random_id.gke_node_pool_id.keepers.disk_type
     disk_size_gb = random_id.gke_node_pool_id.keepers.disk_size_gb
 
+    # Parameters for the ephemeral storage filesystem.
+    # # If unspecified, ephemeral storage is backed by the boot disk
+    # ephemeral_storage_config {
+    #   # Number of local SSDs to use to back ephemeral storage.
+    #   # Uses NVMe interfaces. Each local SSD is 375 GB in size.
+    #   # If zero, it means to disable using local SSDs as ephemeral storage.
+    #   local_ssd_count = 2
+    # }
+
     # since 1.20 usage of docker as container engine is deprecated
     # valid image types: gcloud container get-server-config
     image_type = "UBUNTU_CONTAINERD"
@@ -335,7 +355,7 @@ resource "google_container_node_pool" "gke_nodes" {
   }
 
   lifecycle {
-    ignore_changes = [initial_node_count]
+    ignore_changes = [initial_node_count, node_count]
     # so that first new node pool is created (with random name)
     # before node pool is removed so that pods from destroyed node pool has somewhere to migrate
     create_before_destroy = true
