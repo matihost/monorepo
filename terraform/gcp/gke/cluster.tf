@@ -105,11 +105,15 @@ resource "google_container_cluster" "gke" {
     }
   }
 
-  # Binary Authorization (requires anthos addon) - a system providing policy control for images
+  # Binary Authorization (requires Anthos subscription or standalone
+  # a system providing policy control for images
   # deployed to Kubernetes Engine clusters.
   # enable_binary_authorization = true
 
   enable_shielded_nodes = true
+
+  # GKE standalone mode
+  #enable_autopilot = false
 
   # Allocate IPs in our subnetwork
   # It is possible to use non-RFC1918 ip for pods and svc but it has implications:

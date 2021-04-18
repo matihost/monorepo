@@ -4,7 +4,7 @@ all:
   vars:
     operator:
       hub: "gcr.io/istio-release"
-      tag: "1.9.2"
+      tag: "1.9.3"
     ingress_gateway:
       max_pods: 20
       enable_node_selector: true
@@ -24,6 +24,8 @@ all:
       service_type: ClusterIP
       enable_node_selector: true
       serviceAnnotations:
+        cloud.google.com/load-balancer-type: External
+        external-dns.alpha.kubernetes.io/hostname: "*.external.gke.{{ options.gke.cluster_name|replace('-','.') }}.gcp.testing."
         # NEG name is supported in GKE version 1.18.10-gke.600 and later
         cloud.google.com/neg: '{"exposed_ports":{
                 "15021":{"name": "neg-istio-external-status"},

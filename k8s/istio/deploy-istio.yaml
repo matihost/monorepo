@@ -69,7 +69,11 @@
       state: present
       workspace: "default"
       force_init: true
-      variables: "{{ options.gke|mandatory|combine({'project': gcp_project}) }}"
+      variables: "{{ options.gke|mandatory
+        |combine({'project': gcp_project})
+        |combine({'enable_internal_ingress_node_pool': ingress_gateway.enable_node_selector|default(false)|string|lower})
+        |combine({'enable_external_ingress_node_pool': (ingress_external_gateway.enable|default(false) and ingress_external_gateway.enable_node_selector|default(false))|string|lower})
+      }}"
     when: options.gke_mode|default(false)
 
   - name: Deploy Istio Operator Helm chart

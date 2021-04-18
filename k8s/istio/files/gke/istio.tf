@@ -1,5 +1,12 @@
-#TODO add
-# enable api: meshtelemetry.googleapis.com
+locals {
+  required-apis = ["meshtelemetry"]
+}
+
+resource "google_project_service" "required-api" {
+  count              = length(local.required-apis)
+  service            = "${local.required-apis[count.index]}.googleapis.com"
+  disable_on_destroy = false
+}
 
 resource "google_compute_firewall" "gke-accept-istio-webhook" {
   name          = "${local.gke_name}-accept-istio-webhook"
@@ -28,6 +35,8 @@ resource "random_id" "internal_pool_random" {
 }
 
 resource "google_container_node_pool" "gke_internal_ingress_nodes" {
+  count = var.enable_internal_ingress_node_pool ? 1 : 0
+
   name       = "internal-ingress--${random_id.internal_pool_random.hex}"
   location   = local.location
   cluster    = data.google_container_cluster.gke.name
@@ -133,6 +142,8 @@ resource "random_id" "external_pool_random" {
 }
 
 resource "google_container_node_pool" "gke_external_ingress_nodes" {
+  count = var.enable_external_ingress_node_pool ? 1 : 0
+
   name       = "external-ingress--${random_id.external_pool_random.hex}"
   location   = local.location
   cluster    = data.google_container_cluster.gke.name

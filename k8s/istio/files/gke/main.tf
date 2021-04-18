@@ -43,6 +43,18 @@ variable "cluster_name" {
   description = "GKE Cluster Name Project For Deployment"
 }
 
+variable "enable_internal_ingress_node_pool" {
+  type        = bool
+  default     = false
+  description = "Whether to create separated node pool for internal"
+}
+
+variable "enable_external_ingress_node_pool" {
+  type        = bool
+  default     = false
+  description = "Whether to create separated node pool for internal"
+}
+
 
 variable "regional_cluster" {
   type        = bool
