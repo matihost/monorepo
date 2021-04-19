@@ -173,3 +173,11 @@
       wildcard_dns_suffix: "{{ ingress_gateway.default_dns_suffix }}"
       vs: "{{ item }}"
     loop: "{{ ingress_gateway.virtual_services|default([]) }}"
+
+  - name: Ensure Istio ClusterRoles present
+    k8s:
+      state: present
+      definition: "{{ lookup('template', '{{ files }}/roles.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
