@@ -23,27 +23,30 @@ all:
         - name: google-chrome
           repo: "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main"
           key_url: https://dl.google.com/linux/linux_signing_key.pub
-        # TODO use {{ ansible_distribution_release }} when 20.10 Ubuntu is supported
         - name: virtualbox
           repo: >-
-            deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian focal contrib
+            deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian {{ ansible_distribution_release }} contrib
         # cri-o :: https://github.com/cri-o/cri-o/blob/master/install.md#apt-based-operating-systems
+        #TODO use {{ ansible_distribution_version }} instead of 20.10 when 21.04 is supported
         - name: libcontainers
           repo: >-
-            deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/ /
+            deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_20.10/ /
           key_url: >-
-            https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/Release.key
+            https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_20.10/Release.key
         - name: libcontainers-crio
           repo: >-
-            deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.20/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/ /
+            deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.21/x{{ ansible_distribution }}_20.10/ /
           key_url: >-
-            https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.20/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/Release.key
+            https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.21/x{{ ansible_distribution }}_20.10/Release.key
         - name: google-cloud-sdk
           repo: "deb [arch=amd64] https://packages.cloud.google.com/apt cloud-sdk main"
           key_url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
         - name: openvpn
           repo: "deb [arch=amd64] https://swupdate.openvpn.net/community/openvpn3/repos grovy main"
           key_url: https://swupdate.openvpn.net/repos/openvpn-repo-pkg-key.pub
+        - name: terraform
+          repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+          key_url: https://apt.releases.hashicorp.com/gpg
         packages:
         - lm-sensors
         - hddtemp

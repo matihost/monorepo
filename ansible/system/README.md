@@ -2,7 +2,7 @@
 
 Various playbooks for Ubuntu machine management.
 
-Supported Ubuntu distribution: **20.04 LTS (focal)**
+Supported Ubuntu distribution: **21.04 (hirsute)**
 
 ## Running
 
