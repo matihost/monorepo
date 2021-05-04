@@ -27,7 +27,7 @@ jobs:
     before_script: cd rust/guessing_game
     cache: cargo
   - language: go
-    go: "1.15"
+    go: "1.16"
     before_install: cd go
     script:
     - go build -mod=mod -o .  ./...
@@ -38,7 +38,7 @@ jobs:
       - $HOME/.cache/go-build  # Cache the binaries
       - $HOME/gopath/pkg/mod   # Cache the Go modules
   - language: python
-    python: "3.8"
+    python: "3.9"
     before_install: cd python/apps/exchange-rate
     install:
     - pip3 install tox

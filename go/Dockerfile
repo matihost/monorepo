@@ -3,7 +3,7 @@ COPY . /tmp/build
 WORKDIR /tmp/build
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=mod -o . ./cmd/language
 
-FROM gcr.io/distroless/static:nonroot
+FROM gcr.io/distroless/static:debug-nonroot
 COPY --from=builder /tmp/build/language .
 ENTRYPOINT ["./language"]
 LABEL Name=language Version=0.0.1

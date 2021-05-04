@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.9
 RUN pip3 install --no-cache-dir --upgrade pip && \
   adduser --uid 1000 --disabled-password --ingroup root default
 USER default

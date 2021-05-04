@@ -12,12 +12,12 @@ However it supports GOPATH style of building as well though [Dep](https://golang
 
 ## Prerequisites
 
-Go lang 1.15.x+
+Go lang 1.16.x+
 
 Ubuntu
 
 ```bash
-sudo apt -y install golang-1.15
+sudo apt -y install golang-1.16
 sudo apt -y install golang-golang-x-tools
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 ```
