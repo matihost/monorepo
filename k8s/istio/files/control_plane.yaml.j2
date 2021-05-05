@@ -102,7 +102,14 @@ spec:
       #    operator: "Exists"
       #    effect: "NoSchedule"
   values:
+    # enabled optional: https://istio.io/latest/docs/reference/config/config-status/
+    pilot:
+      # full list of envs https://github.com/istio/istio/blob/master/pilot/pkg/features/pilot.go
+      env:
+        PILOT_ENABLE_STATUS: true
     global:
+      istiod:
+        enableAnalysis: true
       logAsJson: true
 {% if options.gke_mode|default(false)  %}
     # TODO fix stackdriver metrics: https://github.com/istio/istio/issues/22658
