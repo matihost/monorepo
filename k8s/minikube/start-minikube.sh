@@ -5,7 +5,7 @@
 }
 
 function usage() {
-  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-containder|containerd|c] [--with-crio|crio] [--with-docker | docker | d] [--with-cni] [--with-istio | istio] [--with-gatekeeper | gatekeeper]
+  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-containder|containerd|c] [--with-crio|crio] [--with-docker | docker | d] [--with-cni] [--with-istio | istio] [--with-psp | psp]
 
 Starts Minikube in bare / none mode. Assumes latest Ubuntu.
 
@@ -13,21 +13,21 @@ Mandatory option:
 - Container runtime selection (--with-containerd, --with-crio, --with-docker (deprecated since k8s 1.20))
 
 Minimum set of features enabled in every Minikube:
-- PodSecurityPolicy,
+- OPA Gatekeeper,
 - Minikube Tunnel Loadbalancer along with Nginx Ingress
 - Registry, Dashboard
 - NetworkPolicy via CNI/Cilium (--with-cni - for docker container engine it has to be explicitely defined)
 
 Optional features:
 - Istio (--with-istio)
-- OPA Gatekeeper (--with-gatekeeper)
+- Enable PodSecurityPolicies (deprecated since k8s 1.21) (--with-psp | psp)
 
 Samples:
 # start Minikube with containerd minimum set of features
 $(basename "$0") --with-containerd
 
 # start Minikube with docker maximum set of features (implies CNI aka enables NetworkPolicy)
-$(basename "$0") --with-containerd --with-gatekeeper --with-istio
+$(basename "$0") --with-containerd --with-psp --with-istio
 
 # start with Crio as container engine (implies CNI aka enables NetworkPolicy)
 $(basename "$0") --with-crio
@@ -36,7 +36,7 @@ $(basename "$0") --with-crio
 $(basename "$0") --with-crio --with-istio
 
 # Deprecated: start Minikube with docker maximum set of features
-$(basename "$0") --with-docker --with-cni --with-gatekeeper --with-istio
+$(basename "$0") --with-docker --with-cni --with-psp --with-istio
 "
 }
 
@@ -64,7 +64,7 @@ function ensureCrictlPresent() {
   )
 }
 function ensureCrioPresent() {
-  CRIO_VERSION=1.20
+  CRIO_VERSION=1.21
 
   [ -x /usr/bin/crio ] || (
     # shellcheck disable=SC1091
@@ -147,6 +147,7 @@ MODE=''
 # ADDONS="registry dashboard volumesnapshots csi-hostpath-driver"
 ADDONS="registry dashboard"
 EXTRA_PARAMS=''
+export ADMISSION_PLUGINS="NamespaceExists"
 
 while [[ "$#" -gt 0 ]]; do
   case $1 in
@@ -169,8 +170,8 @@ while [[ "$#" -gt 0 ]]; do
   --with-istio | istio)
     ADDONS="${ADDONS} istio"
     ;;
-  --with-gatekeeper | gatekeeper)
-    ADDONS="${ADDONS} gatekeeper"
+  --with-psp | psp)
+    export ADMISSION_PLUGINS="${ADMISSION_PLUGINS},PodSecurityPolicy"
     ;;
   *) PARAMS+=("$1") ;; # save it in an array for later
   esac
@@ -211,7 +212,9 @@ if ! minikube status &>/dev/null; then
   sudo mkdir -p /etc/kubernetes
   sudo chmod a+rwx /etc/kubernetes
 
-  # Default admission plugins do not need to be specified in apiserver.enable-admission-plugins: NamespaceLifecycle, LimitRanger, ServiceAccount, TaintNodesByCondition, Priority, DefaultTolerationSeconds, DefaultStorageClass, StorageObjectInUseProtection, PersistentVolumeClaimResize, RuntimeClass, CertificateApproval, CertificateSigning, CertificateSubjectRestriction, DefaultIngressClass, MutatingAdmissionWebhook, ValidatingAdmissionWebhook, ResourceQuota
+  # Default admission plugins do not need to be specified in apiserver.enable-admission-plugins:
+  # https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#which-plugins-are-enabled-by-default
+  #
   # With docker as continer runtime --extra-config=kubelet.cgroup-driver=systemd \
   # Added --extra-config=kubelet.resolv-conf=/run/systemd/resolve/resolv.conf due to  https://coredns.io/plugins/loop/
   # because under Ubuntu systemd-resolved service conflicts create a loop between CodeDNS and systemc DNS wrapper systemd-resolved.
@@ -219,7 +222,7 @@ if ! minikube status &>/dev/null; then
   # shellcheck disable=SC2086
   sudo -E minikube start --vm-driver=none --apiserver-ips 127.0.0.1 --apiserver-name localhost \
     --kubernetes-version='latest' \
-    --extra-config=apiserver.enable-admission-plugins="NamespaceExists,PodSecurityPolicy" \
+    --extra-config=apiserver.enable-admission-plugins="${ADMISSION_PLUGINS}" \
     --extra-config=kubelet.resolv-conf=/run/systemd/resolve/resolv.conf \
     --extra-config=kubelet.cgroup-driver=systemd \
     --addons=pod-security-policy \
@@ -248,17 +251,14 @@ if ! minikube status &>/dev/null; then
       ensureIstioctlIsPresent
       istioctl operator init
       minikube addons enable istio
-    elif [ "${ADDON}" != 'gatekeeper' ]; then # skip gatekeeper, as it needs to be installer last
+    else
       minikube addons enable "${ADDON}"
     fi
   done
 
   addNginxIngress
 
-  # OPA Gatekeeper should be last as its installation make API timeouting for next calls for short period of time
-  if [[ "${ADDONS}" == *'gatekeeper'* ]]; then
-    installGatekeeper
-  fi
+  installGatekeeper
 else
   echo "Minikube already started"
 fi

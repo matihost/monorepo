@@ -5,6 +5,8 @@ all:
       hosts:
         localhost:
       vars:
+        versions:
+          crio: 1.21
         virtual_interface_ip: 192.168.10.1
         update_cache_timeout: 300
         systemd_journal:
@@ -35,9 +37,9 @@ all:
             https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_20.10/Release.key
         - name: libcontainers-crio
           repo: >-
-            deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.21/x{{ ansible_distribution }}_20.10/ /
+            deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ versions.crio }}/x{{ ansible_distribution }}_20.10/ /
           key_url: >-
-            https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.21/x{{ ansible_distribution }}_20.10/Release.key
+            https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ versions.crio }}/x{{ ansible_distribution }}_20.10/Release.key
         - name: google-cloud-sdk
           repo: "deb [arch=amd64] https://packages.cloud.google.com/apt cloud-sdk main"
           key_url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
