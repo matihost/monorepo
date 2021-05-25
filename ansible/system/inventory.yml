@@ -326,8 +326,10 @@ all:
         - name: calibre
           become: true
           command: |
-            [ -x /usr/bin/calibre ] || {
-              wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | bash
+            CURRENT_VERSION="$(curl -sL https://calibre-ebook.com/download_linux |grep 'The latest release of calibre is' | sed -E 's/.*The latest release of calibre is (.+)\..*/\1/')"
+            INSTALLED_VERSION="$(calibre --version 2>/dev/null | sed -E 's/.*\(calibre (.*)\)/\1/')"
+            [[ "${CURRENT_VERSION}" == *"${INSTALLED_VERSION}"* ]] || {
+              wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo bash
             }
         - name: kubectl plugins
           become: true
