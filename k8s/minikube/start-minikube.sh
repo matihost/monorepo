@@ -113,7 +113,7 @@ function installGatekeeper() {
     helm repo update
   }
   # Set replicas to 1 as for minikube HA for gatekeeper is less important than memory usage
-  helm install gatekeeper gatekeeper/gatekeeper --namespace kube-system --set replicas=1
+  helm install gatekeeper gatekeeper/gatekeeper --set replicas=1 -n gatekeeper-system --create-namespace
 }
 
 # minikube addons enable ingress - stopped working for "none" minikube driver
