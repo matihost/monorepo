@@ -5,7 +5,7 @@
 }
 
 function usage() {
-  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-containder|containerd|c] [--with-crio|crio] [--with-docker | docker | d] [--with-cni] [--with-istio | istio] [--with-psp | psp]
+  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-containder|containerd|c] [--with-crio|crio] [--with-docker | docker | d] [--with-cni] [--with-istio | istio] [--with-gatekeeper | gatekeeper] [--with-psp | psp]
 
 Starts Minikube in bare / none mode. Assumes latest Ubuntu.
 
@@ -13,30 +13,29 @@ Mandatory option:
 - Container runtime selection (--with-containerd, --with-crio, --with-docker (deprecated since k8s 1.20))
 
 Minimum set of features enabled in every Minikube:
-- OPA Gatekeeper,
 - Minikube Tunnel Loadbalancer along with Nginx Ingress
 - Registry, Dashboard
 - NetworkPolicy via CNI/Cilium (--with-cni - for docker container engine it has to be explicitely defined)
 
 Optional features:
-- Istio (--with-istio)
+- Istio (--with-istio) - install base Istio w/o meaningful config, go to k8s/istio dir to install istio fully
+- OPA Gatekeeper (--with-gatekeeper) - install base Gatekeeper w/o meaningful config, go to k8s/gatekeeper dir to install OPA Gatekeeper fully
 - Enable PodSecurityPolicies (deprecated since k8s 1.21) (--with-psp | psp)
 
 Samples:
 # start Minikube with containerd minimum set of features
 $(basename "$0") --with-containerd
 
-# start Minikube with docker maximum set of features (implies CNI aka enables NetworkPolicy)
-$(basename "$0") --with-containerd --with-psp --with-istio
 
 # start with Crio as container engine (implies CNI aka enables NetworkPolicy)
 $(basename "$0") --with-crio
 
-# start with Crio as container engine with Istio
-$(basename "$0") --with-crio --with-istio
+# deprecated: start Minikube with docker (CNI enablement has to be defined explicitely)
+$(basename "$0") --with-docker --with-cni
 
-# Deprecated: start Minikube with docker maximum set of features
-$(basename "$0") --with-docker --with-cni --with-psp --with-istio
+
+# start with Crio as container engine with Istio
+$(basename "$0") --with-crio --with-gatekeeper
 "
 }
 
@@ -170,6 +169,9 @@ while [[ "$#" -gt 0 ]]; do
   --with-istio | istio)
     ADDONS="${ADDONS} istio"
     ;;
+  --with-gatekeeper | gatekeeper)
+    ADDONS="${ADDONS} gatekeeper"
+    ;;
   --with-psp | psp)
     export ADMISSION_PLUGINS="${ADMISSION_PLUGINS},PodSecurityPolicy"
     ;;
@@ -251,14 +253,17 @@ if ! minikube status &>/dev/null; then
       ensureIstioctlIsPresent
       istioctl operator init
       minikube addons enable istio
-    else
+    elif [ "${ADDON}" != 'gatekeeper' ]; then # skip gatekeeper as it has to be installed as the last one
       minikube addons enable "${ADDON}"
     fi
   done
 
   addNginxIngress
 
-  installGatekeeper
+  [[ "${ADDONS}" == *gatekeeper* ]] && {
+    installGatekeeper
+  }
+  echo "Minikube addons are started"
 else
   echo "Minikube already started"
 fi

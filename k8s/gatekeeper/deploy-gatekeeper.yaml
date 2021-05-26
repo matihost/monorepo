@@ -1,0 +1,54 @@
+---
+- hosts: localhost
+  become: false
+  collections:
+  - community.kubernetes
+  - community.general
+  vars:
+    files: "{{ playbook_dir }}/files"
+  tasks:
+  - name: Get current GCP project
+    shell: gcloud config get-value project
+    register: gcp_project_out
+    changed_when: false
+    when: options.gke_mode|default(false)
+
+  - name: Set GCP project fact
+    set_fact:
+      gcp_project: "{{ gcp_project_out.stdout|default('') }}"
+
+  - name: Deploy OPA Gatekeeper Helm chart
+    helm:
+      name: "gatekeeper"
+      chart_ref: "gatekeeper/gatekeeper"
+      release_namespace: "gatekeeper-system"
+      create_namespace: true
+      wait: true
+      wait_timeout: "5m0s"
+      values: "{{ lookup('template', '{{ files }}/gatekeeper_helm.yaml.j2') | from_yaml }}"
+
+
+  - name: Ensure Gatekeeper Config present
+    k8s:
+      state: present
+      definition: "{{ lookup('file', '{{ files }}/config.yaml') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+
+  - name: Ensure Gatekeeper constrainttemplates CRDs present
+    k8s:
+      state: present
+      definition: "{{ lookup('template', '{{ files }}/constraittemplates.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+# TODO ensure CRDs are really created before applying constraints to avoid error:
+# Failed to find exact match for constraints.gatekeeper.sh/v1beta1.K8sPSPPrivilegedContainer by [kind, name, singularName, shortNames]
+  - name: Ensure Gatekeeper constraints present
+    k8s:
+      state: present
+      definition: "{{ lookup('template', '{{ files }}/constraints.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true

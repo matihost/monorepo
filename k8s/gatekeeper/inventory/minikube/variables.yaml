@@ -1,0 +1,7 @@
+all:
+  hosts:
+    localhost:
+  vars:
+    gatekeeper:
+      chart_variables:
+        replicas: 1

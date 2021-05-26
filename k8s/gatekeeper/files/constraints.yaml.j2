@@ -1,0 +1,31 @@
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPPrivilegedContainer
+metadata:
+  name: psp-privileged-container
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sUniqueIngressHost
+metadata:
+  name: unique-ingress-host
+spec:
+  match:
+    kinds:
+      - apiGroups: ["extensions", "networking.k8s.io"]
+        kinds: ["Ingress"]
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDebug
+metadata:
+  name: debug-all-namespaces
+spec:
+  enforcementAction: warn # possible  enforcementActions: deny, dryrun, warn
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Namespace"]
