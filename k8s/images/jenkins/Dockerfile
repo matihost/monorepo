@@ -1,7 +1,7 @@
 FROM jenkins/jenkins:2.277.4-lts-jdk11
 RUN jenkins-plugin-cli --latest true --plugins \
   branch-api:2.6.4 \
-  kubernetes:1.29.4 \
+  kubernetes:1.29.6 \
   workflow-job:2.40 \
   workflow-aggregator:2.6 \
   cloudbees-disk-usage-simple:0.10 \
@@ -14,7 +14,7 @@ RUN jenkins-plugin-cli --latest true --plugins \
   timestamper:1.13 \
   github-branch-source:2.10.4 \
   github-oauth:0.33 \
-  ldap:2.6 \
+  ldap:2.7 \
   google-login:1.6 \
   matrix-auth:2.6.7 \
   authorize-project:1.4.0 \
