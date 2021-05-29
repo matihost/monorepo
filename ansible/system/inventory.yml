@@ -274,7 +274,11 @@ all:
               helm repo add cilium https://helm.cilium.io/
               helm repo add bitnami https://charts.bitnami.com/bitnami
               helm repo update
-              helm plugin install https://github.com/databus23/helm-diff
+              [ "$(helm plugin list |grep -c diff)" -eq 1 ] || {
+                helm plugin install https://github.com/databus23/helm-diff
+              } && {
+                helm plugin update diff
+              }
             }
         - name: minikube
           become: false
