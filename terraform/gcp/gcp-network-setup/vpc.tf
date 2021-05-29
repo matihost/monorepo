@@ -14,6 +14,8 @@ resource "google_compute_subnetwork" "private1" {
   ip_cidr_range = "10.10.0.0/16"
 
   private_ip_google_access = true
+  # TODO seems not working?
+  private_ipv6_google_access = true
 
   # max pods: 32,766
   secondary_ip_range {
@@ -44,6 +46,8 @@ resource "google_compute_subnetwork" "private2" {
   ip_cidr_range = "10.14.0.0/16"
 
   private_ip_google_access = true
+  # TODO seems not working?
+  private_ipv6_google_access = true
 
   secondary_ip_range {
     range_name    = "pod-range-0"

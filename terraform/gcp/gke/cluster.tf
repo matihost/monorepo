@@ -1,4 +1,4 @@
-data "google_container_engine_versions" "rapid" {
+data "google_container_engine_versions" "versions" {
   provider = google-beta
   # version differ per region or zonal cluster
   # run: gcloud container get-server-config
@@ -42,9 +42,11 @@ resource "google_container_cluster" "gke" {
       disabled = false
     }
 
-    network_policy_config {
-      disabled = false
-    }
+    # when https://cloud.google.com/kubernetes-engine/docs/how-to/dataplane-v2 enabled
+    # network policy is enabled by default and attempt to set it ends with error
+    # network_policy_config {
+    #   disabled = false
+    # }
     dns_cache_config {
       enabled = true
     }
@@ -59,10 +61,12 @@ resource "google_container_cluster" "gke" {
     }
   }
 
-  network_policy {
-    enabled = true
-    # provider = "CALICO"
-  }
+  # when https://cloud.google.com/kubernetes-engine/docs/how-to/dataplane-v2 enabled
+  # network policy is enabled by default and attempt to set it ends with error
+  # network_policy {
+  #   enabled = true
+  #   # provider = "CALICO"
+  # }
 
 
   cluster_autoscaling {
@@ -178,7 +182,7 @@ resource "google_container_cluster" "gke" {
     type = "SYSTEM_ONLY"
   }
 
-  min_master_version = data.google_container_engine_versions.rapid.release_channel_default_version["RAPID"]
+  min_master_version = data.google_container_engine_versions.versions.release_channel_default_version["RAPID"]
 
   release_channel {
     channel = "RAPID"
@@ -204,11 +208,14 @@ resource "google_container_cluster" "gke" {
   # uses GKE controlled NEGs for each service using a subset of the GKE nodes as members
   enable_l4_ilb_subsetting = true
 
+  # TODO can be enabled when subnetwork has same property enabled
   # controls whether and how the pods can communicate with Google Services through gRPC over IPv6.
-  private_ipv6_google_access = "PRIVATE_IPV6_GOOGLE_ACCESS_BIDIRECTIONAL"
+  # private_ipv6_google_access = "PRIVATE_IPV6_GOOGLE_ACCESS_BIDIRECTIONAL"
 
   # The desired datapath provider for this cluster. By default, uses the IPTables-based kube-proxy implementation.
-  # datapath_provider = ...
+  # ADVANCED_DATAPATH is dataplane v2 implementation: https://cloud.google.com/kubernetes-engine/docs/how-to/dataplane-v2
+  # https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1beta1/projects.locations.clusters#datapathprovider
+  datapath_provider = "ADVANCED_DATAPATH"
 
   # This option is required if you privately use non-RFC 1918/public IP addresses for your Pods or Services.
   # Disabling SNAT is required so that responses can be routed to the Pod that originated the traffic.

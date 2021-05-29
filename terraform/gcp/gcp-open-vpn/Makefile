@@ -14,6 +14,9 @@ apply: init-terraform prepare ## setup Open VPN
 	terraform plan -lock=false && \
 	terraform apply -auto-approve
 
+connect-to-vpn: ## connect to Open VPN peer
+	./connect-to-vpn.sh
+
 ssh: ## ssh to OpenVPN instance (via External IP since VPN Gateway has to be exposed via public IP)
 	ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=no ubuntu@$(shell terraform output vpn_gateway_external_ip)
 

@@ -17,7 +17,7 @@ TODOs/Limitations:
   * For GCP it requires creating [Cloud DNS inbound policy](https://cloud.google.com/dns/docs/policies#list-in-entrypoints) which exposes DNS nameserver IP in each subnetwork.
   The possible IP which VPN can use as DNS servers are: `gcloud compute addresses list --filter='purpose = "DNS_RESOLVER"' --format='csv(address, region, subnetwork)'`.
 
-  Then configure DNS server on VPN client side forward queries to CloudDNS proxy DNS server. For Bind add:
+  Then configure DNS server on VPN client side forward queries to CloudDNS proxy DNS server. For Bind add the following zone with valid IP address to /etc/bind/named.conf.local:
 
   ```
   zone "gcp.testing" {
