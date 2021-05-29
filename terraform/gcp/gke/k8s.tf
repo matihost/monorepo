@@ -1,3 +1,20 @@
+
+module "gke_auth" {
+  source = "terraform-google-modules/kubernetes-engine/google//modules/auth"
+
+  project_id   = var.project
+  cluster_name = local.gke_name
+  location     = local.location
+
+  depends_on = [
+    google_container_cluster.gke
+  ]
+}
+resource "local_file" "kubeconfig" {
+  content  = module.gke_auth.kubeconfig_raw
+  filename = "${path.module}/.terraform/kubeconfig"
+}
+
 provider "kubernetes" {
   load_config_file = false
 
@@ -18,6 +35,20 @@ provider "helm" {
   }
 }
 
+resource "null_resource" "cluster-config-script" {
+  triggers = {
+    always_run = timestamp()
+  }
+  provisioner "local-exec" {
+    command = "${path.module}/cluster-config/cluster-config.sh"
+  }
+
+  depends_on = [
+    google_container_cluster.gke,
+    local_file.kubeconfig
+  ]
+}
+
 # Deploy GKE K8S cluster configuration like restricted PSP, clusterroles, network policies etc.
 resource "helm_release" "cluster-config" {
   name  = "cluster-config"
@@ -27,7 +58,7 @@ resource "helm_release" "cluster-config" {
   create_namespace = true
 
   depends_on = [
-    google_container_cluster.gke
+    null_resource.cluster-config-script
   ]
 }
 

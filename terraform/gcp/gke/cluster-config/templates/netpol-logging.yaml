@@ -1,0 +1,19 @@
+# yamllint disable-file
+kind: NetworkLogging
+apiVersion: networking.gke.io/v1alpha1
+metadata:
+  name: default
+  annotations:
+    helm.sh/resource-policy: keep
+  labels:
+    {{- include "cluster-config.labels" . | nindent 4 }}
+spec:
+  cluster:
+    allow:
+      delegate: false
+      log: false
+    deny:
+      log: true
+      # denied connections are only logged if the Pod where the connection was denied is in a namespace
+      # with the annotation policy.network.gke.io/enable-deny-logging: "true"
+      delegate: true
