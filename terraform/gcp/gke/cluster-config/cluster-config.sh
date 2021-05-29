@@ -7,9 +7,10 @@ function import_existing_object_to_helm() {
 }
 
 # Main
+set -x
 
-[ -f ../.terraform/kubeconfig ] && {
-  export KUBECONFIG=../.terraform/kubeconfig
+[ -f .terraform/kubeconfig ] && {
+  export KUBECONFIG=.terraform/kubeconfig
 }
 
 import_existing_object_to_helm nl default cluster-config cluster-config
