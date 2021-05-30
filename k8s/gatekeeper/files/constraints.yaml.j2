@@ -1,5 +1,16 @@
 ---
 apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDebug
+metadata:
+  name: debug-all-namespaces
+spec:
+  enforcementAction: warn # possible  enforcementActions: deny, dryrun, warn
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Namespace"]
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPPrivilegedContainer
 metadata:
   name: psp-privileged-container
@@ -8,6 +19,74 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: psp-pods-allowed-user-ranges
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    runAsUser:
+      rule: MustRunAsNonRoot
+    runAsGroup:
+      rule: MustRunAsNonRoot
+    supplementalGroups:
+      rule: MustRunAsNonRoot
+    fsGroup:
+      rule: RunAsAny
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: psp-volume-types
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    volumes:
+    # - "*" # * may be used to allow all volume types
+    - configMap
+    - emptyDir
+    - projected
+    - secret
+    - downwardAPI
+    - persistentVolumeClaim
+    #- hostPath #required for allowedHostPaths
+    - flexVolume #required for allowedFlexVolumes
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostNetworkingPorts
+metadata:
+  name: psp-host-network-ports
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    hostNetwork: false
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: psp-host-filesystem
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    allowedHostPaths: []
+#    allowedHostPaths:
+#    - readOnly: true
+#      pathPrefix: "/foo"
+
 ---
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sUniqueIngressHost
@@ -20,12 +99,25 @@ spec:
         kinds: ["Ingress"]
 ---
 apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sDebug
+kind: K8sBlockNodePort
 metadata:
-  name: debug-all-namespaces
+  name: block-node-port
 spec:
-  enforcementAction: warn # possible  enforcementActions: deny, dryrun, warn
   match:
     kinds:
       - apiGroups: [""]
-        kinds: ["Namespace"]
+        kinds: ["Service"]
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredProbes
+metadata:
+  name: must-have-probes
+spec:
+  enforcementAction: warn
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    probes: ["readinessProbe", "livenessProbe"]
+    probeTypes: ["tcpSocket", "httpGet", "exec"]

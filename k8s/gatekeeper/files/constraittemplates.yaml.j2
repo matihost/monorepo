@@ -2,6 +2,25 @@
 apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
+  name: k8sdebug
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDebug
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdebug
+
+        violation[{"msg": msg}] {
+          true
+          msg := sprintf("REVIEW OBJECT: %v\nDATA OBJECT: %v\n", [input.review, data.inventory])
+        }
+---
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
   name: k8spspprivilegedcontainer
   annotations:
     description: Controls running of privileged containers.
@@ -21,6 +40,404 @@ spec:
             msg := sprintf("Privileged container is not allowed: %v, securityContext: %v", [c.name, c.securityContext])
         }
 
+        input_containers[c] {
+            c := input.review.object.spec.containers[_]
+        }
+
+        input_containers[c] {
+            c := input.review.object.spec.initContainers[_]
+        }
+---
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8spspallowedusers
+  annotations:
+    description: Controls the user and group IDs of the container.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPAllowedUsers
+      validation:
+        openAPIV3Schema:
+          properties:
+            runAsUser:
+              type: object
+              properties:
+                rule:
+                  type: string
+                ranges:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      min:
+                        type: integer
+                      max:
+                        type: integer
+            runAsGroup:
+              type: object
+              properties:
+                rule:
+                  type: string
+                ranges:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      min:
+                        type: integer
+                      max:
+                        type: integer
+            supplementalGroups:
+              type: object
+              properties:
+                rule:
+                  type: string
+                ranges:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      min:
+                        type: integer
+                      max:
+                        type: integer
+            fsGroup:
+              type: object
+              properties:
+                rule:
+                  type: string
+                ranges:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      min:
+                        type: integer
+                      max:
+                        type: integer
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8spspallowedusers
+
+        violation[{"msg": msg}] {
+          fields := ["runAsUser", "runAsGroup", "supplementalGroups", "fsGroup"]
+          field := fields[_]
+          container := input_containers[_]
+          msg := get_type_violation(field, container)
+        }
+
+        get_type_violation(field, container) = msg {
+          field == "runAsUser"
+          params := input.parameters[field]
+          msg := get_user_violation(params, container)
+        }
+
+        get_type_violation(field, container) = msg {
+          field != "runAsUser"
+          params := input.parameters[field]
+          msg := get_violation(field, params, container)
+        }
+
+        # RunAsUser (separate due to "MustRunAsNonRoot")
+        get_user_violation(params, container) = msg {
+          rule := params.rule
+          provided_user := get_field_value("runAsUser", container, input.review)
+          not accept_users(rule, provided_user)
+          msg := sprintf("Container %v is attempting to run as disallowed user %v. Allowed runAsUser: %v", [container.name, provided_user, params])
+        }
+
+        get_user_violation(params, container) = msg {
+          not get_field_value("runAsUser", container, input.review)
+          params.rule = "MustRunAs"
+          msg := sprintf("Container %v is attempting to run without a required securityContext/runAsUser", [container.name])
+        }
+
+        get_user_violation(params, container) = msg {
+          params.rule = "MustRunAsNonRoot"
+          not get_field_value("runAsUser", container, input.review)
+          not get_field_value("runAsNonRoot", container, input.review)
+          msg := sprintf("Container %v is attempting to run without a required securityContext/runAsNonRoot or securityContext/runAsUser != 0", [container.name])
+        }
+
+        accept_users("RunAsAny", provided_user) {true}
+
+        accept_users("MustRunAsNonRoot", provided_user) = res {res := provided_user != 0}
+
+        accept_users("MustRunAs", provided_user) = res  {
+          ranges := input.parameters.runAsUser.ranges
+          res := is_in_range(provided_user, ranges)
+        }
+
+        # Group Options
+        get_violation(field, params, container) = msg {
+          rule := params.rule
+          provided_value := get_field_value(field, container, input.review)
+          not is_array(provided_value)
+          not accept_value(rule, provided_value, params.ranges)
+          msg := sprintf("Container %v is attempting to run as disallowed group %v. Allowed %v: %v", [container.name, provided_value, field, params])
+        }
+        # SupplementalGroups is array value
+        get_violation(field, params, container) = msg {
+          rule := params.rule
+          array_value := get_field_value(field, container, input.review)
+          is_array(array_value)
+          provided_value := array_value[_]
+          not accept_value(rule, provided_value, params.ranges)
+          msg := sprintf("Container %v is attempting to run with disallowed supplementalGroups %v. Allowed %v: %v", [container.name, array_value, field, params])
+        }
+
+        get_violation(field, params, container) = msg {
+          not get_field_value(field, container, input.review)
+          params.rule == "MustRunAs"
+          msg := sprintf("Container %v is attempting to run without a required securityContext/%v. Allowed %v: %v", [container.name, field, field, params])
+        }
+
+        accept_value("RunAsAny", provided_value, ranges) {true}
+
+        accept_value("MayRunAs", provided_value, ranges) = res { res := is_in_range(provided_value, ranges)}
+
+        accept_value("MustRunAs", provided_value, ranges) = res { res := is_in_range(provided_value, ranges)}
+
+
+        # If container level is provided, that takes precedence
+        get_field_value(field, container, review) = out {
+          container_value := get_seccontext_field(field, container)
+          out := container_value
+        }
+
+        # If no container level exists, use pod level
+        get_field_value(field, container, review) = out {
+          not has_seccontext_field(field, container)
+          review.kind.kind == "Pod"
+          pod_value := get_seccontext_field(field, review.object.spec)
+          out := pod_value
+        }
+
+        # Helper Functions
+        is_in_range(val, ranges) = res {
+          matching := {1 | val >= ranges[j].min; val <= ranges[j].max}
+          res := count(matching) > 0
+        }
+
+        has_seccontext_field(field, obj) {
+          get_seccontext_field(field, obj)
+        }
+
+        has_seccontext_field(field, obj) {
+          get_seccontext_field(field, obj) == false
+        }
+
+        get_seccontext_field(field, obj) = out {
+          out = obj.securityContext[field]
+        }
+
+        input_containers[c] {
+          c := input.review.object.spec.containers[_]
+        }
+        input_containers[c] {
+          c := input.review.object.spec.initContainers[_]
+        }
+---
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8spspvolumetypes
+  annotations:
+    description: Controls usage of volume types.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPVolumeTypes
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          properties:
+            volumes:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8spspvolumetypes
+
+        violation[{"msg": msg, "details": {}}] {
+            volume_fields := {x | input.review.object.spec.volumes[_][x]; x != "name"}
+            field := volume_fields[_]
+            not input_volume_type_allowed(field)
+            msg := sprintf("The volume type %v is not allowed, pod: %v. Allowed volume types: %v", [field, input.review.object.metadata.name, input.parameters.volumes])
+        }
+
+        # * may be used to allow all volume types
+        input_volume_type_allowed(field) {
+            input.parameters.volumes[_] == "*"
+        }
+
+        input_volume_type_allowed(field) {
+            field == input.parameters.volumes[_]
+        }
+---
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8spsphostnetworkingports
+  annotations:
+    description: Controls usage of host networking and ports.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPHostNetworkingPorts
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          properties:
+            hostNetwork:
+              type: boolean
+            min:
+              type: integer
+            max:
+              type: integer
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8spsphostnetworkingports
+
+        violation[{"msg": msg, "details": {}}] {
+          input_share_hostnetwork(input.review.object)
+          msg := sprintf("The specified hostNetwork and hostPort are not allowed, pod: %v. Allowed values: %v", [input.review.object.metadata.name, input.parameters])
+        }
+
+        input_share_hostnetwork(o) {
+          not input.parameters.hostNetwork
+          o.spec.hostNetwork
+        }
+
+        input_share_hostnetwork(o) {
+          hostPort := input_containers[_].ports[_].hostPort
+          hostPort < input.parameters.min
+        }
+
+        input_share_hostnetwork(o) {
+          hostPort := input_containers[_].ports[_].hostPort
+          hostPort > input.parameters.max
+        }
+
+        input_containers[c] {
+          c := input.review.object.spec.containers[_]
+        }
+
+        input_containers[c] {
+          c := input.review.object.spec.initContainers[_]
+        }
+---
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8spsphostfilesystem
+  annotations:
+    description: Controls usage of the host filesystem.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPHostFilesystem
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          properties:
+            allowedHostPaths:
+              type: array
+              items:
+                type: object
+                properties:
+                  readOnly:
+                    type: boolean
+                  pathPrefix:
+                    type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8spsphostfilesystem
+
+        violation[{"msg": msg, "details": {}}] {
+            volume := input_hostpath_volumes[_]
+            allowedPaths := get_allowed_paths(input)
+            input_hostpath_violation(allowedPaths, volume)
+            msg := sprintf("HostPath volume %v is not allowed, pod: %v. Allowed path: %v", [volume, input.review.object.metadata.name, allowedPaths])
+        }
+
+        input_hostpath_violation(allowedPaths, volume) {
+            # An empty list means all host paths are blocked
+            allowedPaths == []
+        }
+        input_hostpath_violation(allowedPaths, volume) {
+            not input_hostpath_allowed(allowedPaths, volume)
+        }
+
+        get_allowed_paths(arg) = out {
+            not arg.parameters
+            out = []
+        }
+        get_allowed_paths(arg) = out {
+            not arg.parameters.allowedHostPaths
+            out = []
+        }
+        get_allowed_paths(arg) = out {
+            out = arg.parameters.allowedHostPaths
+        }
+
+        input_hostpath_allowed(allowedPaths, volume) {
+            allowedHostPath := allowedPaths[_]
+            path_matches(allowedHostPath.pathPrefix, volume.hostPath.path)
+            not allowedHostPath.readOnly == true
+        }
+
+        input_hostpath_allowed(allowedPaths, volume) {
+            allowedHostPath := allowedPaths[_]
+            path_matches(allowedHostPath.pathPrefix, volume.hostPath.path)
+            allowedHostPath.readOnly
+            not writeable_input_volume_mounts(volume.name)
+        }
+
+        writeable_input_volume_mounts(volume_name) {
+            container := input_containers[_]
+            mount := container.volumeMounts[_]
+            mount.name == volume_name
+            not mount.readOnly
+        }
+
+        # This allows "/foo", "/foo/", "/foo/bar" etc., but
+        # disallows "/fool", "/etc/foo" etc.
+        path_matches(prefix, path) {
+            a := split(trim(prefix, "/"), "/")
+            b := split(trim(path, "/"), "/")
+            prefix_matches(a, b)
+        }
+        prefix_matches(a, b) {
+            count(a) <= count(b)
+            not any_not_equal_upto(a, b, count(a))
+        }
+
+        any_not_equal_upto(a, b, n) {
+            a[i] != b[i]
+            i < n
+        }
+
+        input_hostpath_volumes[v] {
+            v := input.review.object.spec.volumes[_]
+            has_field(v, "hostPath")
+        }
+
+        # has_field returns whether an object has a field
+        has_field(object, field) = true {
+            object[field]
+        }
         input_containers[c] {
             c := input.review.object.spec.containers[_]
         }
@@ -64,18 +481,133 @@ spec:
 apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
-  name: k8sdebug
+  name: k8sblocknodeport
+  annotations:
+    description: Disallows all Services with type NodePort.
 spec:
   crd:
     spec:
       names:
-        kind: K8sDebug
+        kind: K8sBlockNodePort
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
-        package k8sdebug
+        package k8sblocknodeport
 
         violation[{"msg": msg}] {
-          true
-          msg := sprintf("REVIEW OBJECT: %v\nDATA OBJECT: %v\n", [input.review, data.inventory])
+          input.review.kind.kind == "Service"
+          input.review.object.spec.type == "NodePort"
+          msg := "User is not allowed to create service of type NodePort"
+        }
+---
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredprobes
+  annotations:
+    description: Requires Pods to have readiness and/or liveness probes.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredProbes
+      validation:
+        openAPIV3Schema:
+          properties:
+            probes:
+              type: array
+              items:
+                type: string
+            probeTypes:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8srequiredprobes
+
+        probe_type_set = probe_types {
+          probe_types := {type | type := input.parameters.probeTypes[_]}
+        }
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          probe := input.parameters.probes[_]
+          probe_is_missing(container, probe)
+          msg := get_violation_message(container, input.review, probe)
+        }
+
+        probe_is_missing(ctr, probe) = true {
+          not ctr[probe]
+        }
+
+        probe_is_missing(ctr, probe) = true {
+          probe_field_empty(ctr, probe)
+        }
+
+        probe_field_empty(ctr, probe) = true {
+          probe_fields := {field | ctr[probe][field]}
+          diff_fields := probe_type_set - probe_fields
+          count(diff_fields) == count(probe_type_set)
+        }
+
+        get_violation_message(container, review, probe) = msg {
+          msg := sprintf("Container <%v> in your <%v> <%v> has no <%v>", [container.name, review.kind.kind, review.object.metadata.name, probe])
+        }
+---
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredprobes
+  annotations:
+    description: Requires Pods to have readiness and/or liveness probes.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredProbes
+      validation:
+        openAPIV3Schema:
+          properties:
+            probes:
+              type: array
+              items:
+                type: string
+            probeTypes:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8srequiredprobes
+
+        probe_type_set = probe_types {
+          probe_types := {type | type := input.parameters.probeTypes[_]}
+        }
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          probe := input.parameters.probes[_]
+          probe_is_missing(container, probe)
+          msg := get_violation_message(container, input.review, probe)
+        }
+
+        probe_is_missing(ctr, probe) = true {
+          not ctr[probe]
+        }
+
+        probe_is_missing(ctr, probe) = true {
+          probe_field_empty(ctr, probe)
+        }
+
+        probe_field_empty(ctr, probe) = true {
+          probe_fields := {field | ctr[probe][field]}
+          diff_fields := probe_type_set - probe_fields
+          count(diff_fields) == count(probe_type_set)
+        }
+
+        get_violation_message(container, review, probe) = msg {
+          msg := sprintf("Container <%v> in your <%v> <%v> has no <%v>", [container.name, review.kind.kind, review.object.metadata.name, probe])
         }

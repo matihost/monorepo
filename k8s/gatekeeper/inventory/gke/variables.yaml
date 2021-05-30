@@ -4,6 +4,10 @@ all:
   vars:
     options:
       gke_mode: true
+      gke:
+        cluster_name: "shared1-dev"
+        region: "us-central1"
+        zone_letter: "a"
     gatekeeper:
       chart_variables:
-        replicas: 1
+        replicas: 2

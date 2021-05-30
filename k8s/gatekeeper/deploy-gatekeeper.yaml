@@ -17,6 +17,17 @@
     set_fact:
       gcp_project: "{{ gcp_project_out.stdout|default('') }}"
 
+  - name: Run Terraform to setup GCP prerequisites for Gatekeeper deployment
+    terraform:
+      project_path: 'files/gke'
+      state: present
+      workspace: "default"
+      force_init: true
+      variables: "{{ options.gke|mandatory
+        |combine({'project': gcp_project})
+      }}"
+    when: options.gke_mode|default(false)
+
   - name: Deploy OPA Gatekeeper Helm chart
     helm:
       name: "gatekeeper"

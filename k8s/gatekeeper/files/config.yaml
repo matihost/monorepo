@@ -6,7 +6,24 @@ metadata:
   namespace: "gatekeeper-system"
 spec:
   match:
-    - excludedNamespaces: ["istio-system", "kube-system", "gatekeeper-system"]
+    - excludedNamespaces:
+        # k8s default ns
+        - kube-system
+        - default
+        # gke system ns
+        - application-system
+        - cnrm-system
+        - configconnector-operator-system
+        - kalm-system
+        - kube-node-lease
+        - kube-public
+        # my gke ns addons
+        - external-dns
+        - cluster-config
+        # istio
+        - istio-system
+        # gatekeeper
+        - gatekeeper-system
       processes: ["*"]
   sync:
     syncOnly:

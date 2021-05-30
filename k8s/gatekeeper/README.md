@@ -6,7 +6,7 @@ Deploys OPA Gatekeeper along with:
 
 * `config` - so that system namespaces are [exempted](https://open-policy-agent.github.io/gatekeeper/website/docs/exempt-namespaces/) from gatekeeping,  and K8S `ns`, `ing` and `vs` objects are [cached within OPA](https://open-policy-agent.github.io/gatekeeper/website/docs/sync) `data.inventory` object.
 
-* sample `constrainttemplates` and `constraints` from [OPA library](https://github.com/open-policy-agent/gatekeeper-library/tree/master/library) to ensure
+* deployment of  `constrainttemplates` and `constraints` from [OPA library](https://github.com/open-policy-agent/gatekeeper-library/tree/master/library) to ensure various good practice enforcements( PSP like and general ones)
 
 ## Prerequisites
 
