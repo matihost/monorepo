@@ -62,11 +62,21 @@
       release_namespace: "{{ namespace }}"
       values: "{{ lookup('template', '{{ files }}/jenkins_helm.template.yaml') | from_yaml }}"
 
-  - name: Ensure Jenkins deployment finishes
+  - name: Ensure Jenkins StatefulSet present
     k8s:
       name: "{{ namespace }}-jenkins"
       api_version: apps/v1
       kind: StatefulSet
+      state: present
+      namespace: "{{ namespace }}"
+      wait: true
+      wait_timeout: 300
+
+  - name: Ensure Jenkins POD deployment finishes
+    k8s:
+      name: "{{ namespace }}-jenkins-0"
+      api_version: v1
+      kind: Pod
       state: present
       namespace: "{{ namespace }}"
       wait: true
