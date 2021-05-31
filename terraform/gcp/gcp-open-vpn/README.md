@@ -10,6 +10,8 @@ Supports:
 
 * access to GCP internal DNS - to query internal VPC CloudDNS entries. For example: `nslookup private-vpc-bastion.us-central1-a.c.PROJECT_NAME.internal 169.254.169.254` does work.
 
+* allows CloudDNS forward DNS queries for on-premise/vpn client DNS zone
+
 TODOs/Limitations:
 
 * update VPN client machine DNS setting to use Cloud DNS nameserver for Cloud hosted private zones. That requires using DNS nameserver on client which forward queries for particular zone to other nameserver.
@@ -39,6 +41,11 @@ TODOs/Limitations:
 # deploy OpenVPN Gateway in GCP VPC
 make apply
 
+# setup Open VPN and forwards DNS in GCP to client VPN network DNS nameserver
+make apply-with-dns-forwarding ZONE=vpnclient.zone.com IP=10.8.0.2
+
 # connect to to VPN, press Ctrl+C to disconnect
+make connect-to-vpn
+# or
 ./connect-to-vpn.sh
 ```

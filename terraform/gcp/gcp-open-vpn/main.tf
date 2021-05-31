@@ -47,3 +47,13 @@ variable "external_access_cidrs" {
   default     = ["0.0.0.0/0"]
   description = "The public CIDR IP which is allowed to access VPN Gateway."
 }
+
+
+variable "onpremise_dns_zone_forward" {
+  type = object({
+    zone   = string
+    dns_ip = string
+  })
+  default     = { "zone" : "", "dns_ip" : "" }
+  description = "The public CIDR IP which is allowed to access VPN Gateway."
+}

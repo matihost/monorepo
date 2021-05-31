@@ -11,8 +11,13 @@ TF_VAR_external_access_cidrs := ["$(WHOAMI)/32"]
 
 apply: init-terraform prepare ## setup Open VPN
 	@terraform validate && \
-	terraform plan -lock=false && \
-	terraform apply -auto-approve
+	terraform plan -lock=false' && \
+	terraform apply -auto-approve'
+
+apply-with-dns-forwarding: init-terraform prepare ## usage: make apply-with-dns-forwarding ZONE=vpnclient.zone.com IP=onpremise_dns_server_ip;  setup Open VPN and forwards DNS to client VPN network DNS nameserver
+	@terraform validate && \
+	terraform plan -lock=false -var='onpremise_dns_zone_forward={"zone":"$(ZONE)","dns_ip":"$(IP)"}' && \
+	terraform apply -auto-approve -var='onpremise_dns_zone_forward={"zone":"$(ZONE)","dns_ip":"$(IP)"}'
 
 connect-to-vpn: ## connect to Open VPN peer
 	./connect-to-vpn.sh

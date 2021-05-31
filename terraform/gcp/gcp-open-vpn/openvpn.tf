@@ -81,24 +81,24 @@ output "vpn_gateway_external_ip" {
   value = google_compute_address.external-vpn.address
 }
 
-
+# Cloud VPN acts as a router - it allows 22, DNS queries from both networks (home & GCP) and from GCP CloudDNS special range
 resource "google_compute_firewall" "vpn" {
   name          = "${data.google_compute_network.private.name}-vpn"
   network       = data.google_compute_network.private.name
   direction     = "INGRESS"
   project       = var.project
-  source_ranges = flatten(concat(["10.0.0.0/8"], var.external_access_cidrs))
+  source_ranges = flatten(concat(["10.0.0.0/8", "35.199.192.0/19"], var.external_access_cidrs))
 
   allow {
     protocol = "icmp"
   }
   allow {
     protocol = "tcp"
-    ports    = ["22"]
+    ports    = ["22", "53"]
   }
   allow {
     protocol = "udp"
-    ports    = ["1194"]
+    ports    = ["1194", "53"] # CloudDNS uses UDP port still for DNS queries
   }
 
   target_service_accounts = [google_service_account.vpn.email]
