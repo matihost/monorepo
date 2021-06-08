@@ -6,6 +6,10 @@ function import_existing_object_to_helm() {
   kubectl label --overwrite "${1}" "${2}" app.kubernetes.io/managed-by=Helm
 }
 
+function disable_default_storageclass() {
+  kubectl patch storageclass standard -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+}
+
 # Main
 set -x
 
@@ -14,3 +18,4 @@ set -x
 }
 
 import_existing_object_to_helm nl default cluster-config cluster-config
+disable_default_storageclass
