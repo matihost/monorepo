@@ -1,0 +1,27 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: external-wildcard-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: external-ingressgateway # use Istio external ingress gateway implementation
+  servers:
+  - port:
+      number: 80
+      name: http-external
+      protocol: HTTP
+    hosts:
+    - "*"
+  - port:
+      number: 443
+      name: https-external
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: external-wildcard-gateway-tls
+    hosts:
+    # Disable SNI matching in the Gateway by setting the hosts field to *
+    # https://istio.io/latest/docs/ops/common-problems/network-issues/#configuring-sni-routing-when-not-sending-sni
+    - "*"

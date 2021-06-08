@@ -42,16 +42,35 @@ variable "cluster_name" {
   description = "GKE Cluster Name Project For Deployment"
 }
 
-variable "enable_internal_ingress_node_pool" {
+variable "enable_external_ingress_node_pool" {
   type        = bool
   default     = false
   description = "Whether to create separated node pool for internal"
 }
 
-variable "enable_external_ingress_node_pool" {
-  type        = bool
-  default     = false
-  description = "Whether to create separated node pool for internal"
+
+variable "external_wildcard_cn" {
+  type        = string
+  default     = ""
+  description = "CN for default external DNS, for example: *.external.gke.shared1.dev.gcp.testing"
+}
+
+variable "external_wildcard_name" {
+  type        = string
+  default     = "wildcard-external-gke"
+  description = "Name for external wildcard CN"
+}
+
+variable "external_wildcard_tls_key" {
+  type        = string
+  default     = ""
+  description = "Wildcard TLS Key"
+}
+
+variable "external_wildcard_tls_crt" {
+  type        = string
+  default     = ""
+  description = "Wildcard TLS Crt"
 }
 
 variable "regional_cluster" {

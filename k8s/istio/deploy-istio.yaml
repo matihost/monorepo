@@ -7,6 +7,7 @@
   vars:
     files: "{{ playbook_dir }}/files"
     internal_wildcard_cn: "*.{{ ingress_gateway.default_dns_suffix }}"
+    enable_external_ingress_node_pool: "{{ ingress_external_gateway.enable|default(false) and ingress_external_gateway.enable_node_selector|default(false) }}"
   tasks:
   - name: Get current GCP project
     shell: gcloud config get-value project
@@ -72,7 +73,7 @@
       variables: "{{ options.gke|mandatory
         |combine({'project': gcp_project})
         |combine({'enable_internal_ingress_node_pool': ingress_gateway.enable_node_selector|default(false)|string|lower})
-        |combine({'enable_external_ingress_node_pool': (ingress_external_gateway.enable|default(false) and ingress_external_gateway.enable_node_selector|default(false))|string|lower})
+        |combine({'enable_external_ingress_node_pool': enable_external_ingress_node_pool|string|lower})
       }}"
     when: options.gke_mode|default(false)
 
@@ -166,6 +167,49 @@
         fail_on_error: true
         strict: true
 
+  - name: Set external wildcard  variables
+    set_fact:
+      external_wildcard_cn: "*.{{ ingress_external_gateway.default_dns_suffix }}"
+      external_wildcard_name: "wildcard-{{ ingress_external_gateway.default_dns_suffix|replace('.','-') }}"
+    when: ingress_external_gateway.enable|default(false)
+
+  - name: Ensure CN=* TLS is present
+    block:
+    - name: Ensure CN=* TLS is present
+      include_role:
+        name: create_certificate
+      vars:
+        certificate_def:
+          cn: "*"
+          tls_name: wildcard.global
+    become: true
+    when: ingress_external_gateway.enable|default(false)
+
+  - name: Ensure TLS Secret for external global wildcard gateway is present in namespace istio-system
+    k8s:
+      state: present
+      definition:
+        apiVersion: "v1"
+        kind: Secret
+        metadata:
+          name: external-wildcard-gateway-tls
+          namespace: istio-system
+        data:
+          tls.crt: "{{ tls.crt }}"
+          tls.key: "{{ tls.key }}"
+        type: kubernetes.io/tls
+    no_log: true
+    when: ingress_external_gateway.enable|default(false)
+
+  - name: Ensure Istio external ingress wildcard Gateway are exposed
+    k8s:
+      state: present
+      definition: "{{ lookup('template', '{{ files }}/external_config.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+    when: ingress_external_gateway.enable|default(false)
+
   - name: Ensure VirtualServices are exposed
     include_role:
       name: expose_virtual_svc
@@ -181,3 +225,33 @@
       validate:
         fail_on_error: true
         strict: true
+
+  - name: Ensure CN={{ external_wildcard_cn }} TLS is present
+    block:
+    - name: Ensure CN={{ external_wildcard_cn }} TLS is present
+      include_role:
+        name: create_certificate
+      vars:
+        certificate_def:
+          cn: "{{ external_wildcard_cn }}"
+          tls_name: "{{ external_wildcard_name }}"
+    become: true
+    when: ingress_external_gateway.enable|default(false)
+
+  - name: Run Terraform to setup External HTTPS LB for external Istio ingress gateway
+    terraform:
+      project_path: 'files/gke/external-lb'
+      state: present
+      workspace: "default"
+      force_init: true
+      variables: "{{ options.gke|mandatory
+        |combine({'project': gcp_project})
+        |combine({'enable_external_ingress_node_pool': enable_external_ingress_node_pool|string|lower})
+        |combine({'external_wildcard_cn': external_wildcard_cn|default(\"\")})
+        |combine({'external_wildcard_name': external_wildcard_name|default(\"\")})
+        |combine({'external_wildcard_tls_key': tls.key|default(\"\")|b64decode})
+        |combine({'external_wildcard_tls_crt': tls.crt|default(\"\")|b64decode})
+      }}"
+    when:
+    - options.gke_mode|default(false)
+    - enable_external_ingress_node_pool

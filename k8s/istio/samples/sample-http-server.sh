@@ -234,35 +234,7 @@ EOF
 function exposeSampleAppExternally() {
   # TLS certificates has to be in namespace where ingressgateway is deployed (istio-system)
   CN="http.${EXTERNAL_DNS_SUFFIX}"
-  openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "/tmp/istio-certs/${CN}.crt" -newkey rsa:2048 -nodes -keyout "/tmp/istio-certs/${CN}.key"
-  kubectl create -n istio-system secret tls http-external-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
 
-  kubectl apply -f - <<EOF
-apiVersion: networking.istio.io/v1beta1
-kind: Gateway
-metadata:
-  name: external-gateway
-  namespace: sample-istio
-spec:
-  selector:
-    istio: external-ingressgateway # use Istio external ingress gateway implementation
-  servers:
-  - port:
-      number: 80
-      name: http-httpbin
-      protocol: HTTP
-    hosts:
-    - "http.${EXTERNAL_DNS_SUFFIX}"
-  - port:
-      number: 443
-      name: https-httpbin
-      protocol: HTTPS
-    tls:
-      mode: SIMPLE
-      credentialName: http-external-credential
-    hosts:
-    - http.${EXTERNAL_DNS_SUFFIX}
-EOF
   kubectl apply -f - <<EOF
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
@@ -273,7 +245,7 @@ spec:
   hosts:
   - "http.${EXTERNAL_DNS_SUFFIX}"
   gateways:
-  - sample-istio/external-gateway
+  - istio-system/external-wildcard-gateway
   - mesh # applies to all the sidecars in the mesh
   http:
   - route:

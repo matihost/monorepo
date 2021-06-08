@@ -23,9 +23,8 @@ all:
       enable: true
       service_type: ClusterIP
       enable_node_selector: true
+      default_dns_suffix: "external.gke.{{ options.gke.cluster_name|replace('-','.') }}.gcp.testing"
       serviceAnnotations:
-        cloud.google.com/load-balancer-type: External
-        external-dns.alpha.kubernetes.io/hostname: "*.external.gke.{{ options.gke.cluster_name|replace('-','.') }}.gcp.testing."
         # NEG name is supported in GKE version 1.18.10-gke.600 and later
         cloud.google.com/neg: '{"exposed_ports":{
                 "15021":{"name": "neg-istio-external-status"},

@@ -2,7 +2,7 @@
 
 Deployment of Istio to Minikube or GKE
 
-Exposes automatically internal Kubernetess API ClusterIp Service via internal Istio ingress gateway.
+Exposes automatically internal Kubernetes API ClusterIp Service via internal Istio ingress gateway.
 
 In case of GKE it solves the [problem](https://cloud.google.com/solutions/creating-kubernetes-engine-private-clusters-with-net-proxies) that GKE Control Plane is not accessible from peered VPC:
 
@@ -38,7 +38,7 @@ ansible-galaxy collection install community.general
 make deploy-on-minikube
 
 
-# Deploys Istio on GKE with standalone NEGs for external provisioning
+# Deploys Istio on GKE with standalone NEGs with External Global HTTPS LoadBalancer for external provisioning
 # Assumes current kubecontext points to GKE cluster and gcloud context to project where GKE cluster is deployed
 make deploy-on-gke-neg
 
