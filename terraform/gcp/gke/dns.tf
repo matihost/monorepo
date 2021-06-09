@@ -2,6 +2,8 @@ resource "google_dns_managed_zone" "cluster-zone" {
   provider = google-beta
   project  = var.project
 
+  force_destroy = true
+
   name        = "${var.cluster_name}-${var.env}"
   dns_name    = "${var.cluster_name}.${var.env}.gcp.testing."
   description = "DNS for ingresses/svs exposed from GKE ${local.gke_name} managed manually"
@@ -25,6 +27,8 @@ resource "google_dns_managed_zone" "cluster-zone" {
 resource "google_dns_managed_zone" "external-dns-cluster-zone" {
   provider = google-beta
   project  = var.project
+
+  force_destroy = true
 
   name        = "gke-${var.cluster_name}-${var.env}"
   dns_name    = "gke.${var.cluster_name}.${var.env}.gcp.testing."

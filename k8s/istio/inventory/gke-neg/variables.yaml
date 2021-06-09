@@ -23,6 +23,7 @@ all:
       enable: true
       service_type: ClusterIP
       enable_node_selector: true
+      # points Global HTTPS LB tp DNS entry  "*.external.shared1.dev.gke.testing."
       default_dns_suffix: "external.gke.{{ options.gke.cluster_name|replace('-','.') }}.gcp.testing"
       serviceAnnotations:
         # NEG name is supported in GKE version 1.18.10-gke.600 and later
@@ -33,11 +34,8 @@ all:
                 "15443":{"name": "neg-istio-external-tls"}
             }
           }'
-        # TODO run Terraform to define external TCP Proxy LB,
-        # + add DNS entry "*.external.shared1.dev.gke.testing." for it on on Gcloud Level
     ingress_class:
       enable: true
-      api_version: v1beta1
       default: false
     egress_gateway:
       enable: true

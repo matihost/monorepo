@@ -7,7 +7,6 @@ all:
       tag: "1.10.0"
     ingress_class:
       enable: true
-      api_version: v1
       default: false
     ingress_gateway:
       default_dns_suffix: internal.testing.minikube

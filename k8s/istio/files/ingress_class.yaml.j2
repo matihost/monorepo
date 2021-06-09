@@ -1,5 +1,5 @@
 ---
-apiVersion: networking.k8s.io/{{ ingress_class.api_version }}
+apiVersion: networking.k8s.io/v1
 kind: IngressClass
 metadata:
 {% if ingress_class.default is sameas true %}

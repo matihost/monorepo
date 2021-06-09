@@ -2,6 +2,8 @@ resource "google_dns_managed_zone" "main-zone" {
   provider = google-beta
   project  = var.project
 
+  force_destroy = true
+
   name        = var.env
   dns_name    = "${var.env}.gcp.testing."
   description = "Main private DNS zone"

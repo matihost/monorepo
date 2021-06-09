@@ -38,7 +38,6 @@ all:
         # + add DNS entry "*.external.shared1.dev.gke.testing." for it on on Gcloud Level
     ingress_class:
       enable: true
-      api_version: v1beta1
       default: false
     egress_gateway:
       enable: true

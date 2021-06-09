@@ -100,3 +100,16 @@ resource "google_compute_health_check" "istio-status" {
   timeout_sec         = "5"
   unhealthy_threshold = "3"
 }
+
+
+resource "google_dns_record_set" "external-ingress-wildcard-entry" {
+  provider = google-beta
+  count    = var.enable_external_ingress_node_pool ? 1 : 0
+  project  = var.project
+
+  managed_zone = data.google_dns_managed_zone.gke-dns-zone.name
+  name         = "${var.external_wildcard_cn}."
+  type         = "A"
+  rrdatas      = [google_compute_global_address.https_lb[0].address]
+  ttl          = 86400
+}

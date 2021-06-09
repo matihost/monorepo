@@ -13,6 +13,10 @@ data "google_container_cluster" "gke" {
   location = local.location
 }
 
+data "google_dns_managed_zone" "gke-dns-zone" {
+  name = "gke-${var.cluster_name}"
+}
+
 locals {
   zone         = "${var.region}-${var.zone_letter}"
   gke_name     = var.cluster_name

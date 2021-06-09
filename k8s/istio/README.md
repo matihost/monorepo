@@ -38,7 +38,7 @@ ansible-galaxy collection install community.general
 make deploy-on-minikube
 
 
-# Deploys Istio on GKE with standalone NEGs with External Global HTTPS LoadBalancer for external provisioning
+# Deploys Istio on GKE with standalone NEGs exposed via External Global HTTPS LoadBalancer for external provisioning
 # Assumes current kubecontext points to GKE cluster and gcloud context to project where GKE cluster is deployed
 make deploy-on-gke-neg
 
