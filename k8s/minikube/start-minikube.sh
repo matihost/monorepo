@@ -5,7 +5,7 @@
 }
 
 function usage() {
-  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-containder|containerd|c] [--with-crio|crio] [--with-docker | docker | d] [--with-cni] [--with-istio | istio] [--with-gatekeeper | gatekeeper] [--with-psp | psp]
+  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-containder|containerd|c] [--with-crio|crio] [--with-docker | docker | d] [--with-cni] [--with-version stable/latest/x.x.x] [--with-istio | istio] [--with-gatekeeper | gatekeeper] [--with-psp | psp]
 
 Starts Minikube in bare / none mode. Assumes latest Ubuntu.
 
@@ -18,6 +18,7 @@ Minimum set of features enabled in every Minikube:
 - NetworkPolicy via CNI/Cilium (--with-cni - for docker container engine it has to be explicitely defined)
 
 Optional features:
+- K8S Version (--with-version) - default to stable, possible values: stable, latest, same as Minikube's --kubernetes-version
 - Istio (--with-istio) - install base Istio w/o meaningful config, go to k8s/istio dir to install istio fully
 - OPA Gatekeeper (--with-gatekeeper) - install base Gatekeeper w/o meaningful config, go to k8s/gatekeeper dir to install OPA Gatekeeper fully
 - Enable PodSecurityPolicies (deprecated since k8s 1.21) (--with-psp | psp)
@@ -25,6 +26,9 @@ Optional features:
 Samples:
 # start Minikube with containerd minimum set of features
 $(basename "$0") --with-containerd
+
+# start Minikube with containerd with K8S latest version (default: stable)
+$(basename "$0") --with-containerd --with-version latest
 
 
 # start with Crio as container engine (implies CNI aka enables NetworkPolicy)
@@ -129,13 +133,19 @@ function addNginxIngress() {
     helm repo update
   }
   [ "$(kubectl config current-context)" == "minikube" ] && {
-    # start Nginx ingress with PodSecurityPolicy: https://kubernetes.github.io/ingress-nginx/examples/psp/
-    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/docs/examples/psp/psp.yaml
-    helm install -f ngnix.values.yaml ingress-nginx nginx-stable/nginx-ingress -n ingress-nginx
+    [[ "${ADMISSION_PLUGINS}" == *PodSecurityPolicy* ]] && {
+      # start Nginx ingress with PodSecurityPolicy: https://kubernetes.github.io/ingress-nginx/examples/psp/
+      kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/docs/examples/psp/psp.yaml
+    }
+    helm install -f ngnix.values.yaml ingress-nginx nginx-stable/nginx-ingress -n ingress-nginx --create-namespace || {
+      echo "Unable to install NGNIX, ngnix / k8s incompatibility? check NGinx Helm"
+      exit 1
+    }
   }
 }
 
 ensureMinikubePresent
+K8S_VERSION='stable'
 MODE=''
 
 # TODO csi-hostpath-driver faild with containerd
@@ -153,6 +163,10 @@ while [[ "$#" -gt 0 ]]; do
   -h | --help | help)
     usage
     exit 1
+    ;;
+  --with-version)
+    K8S_VERSION="${2}"
+    shift
     ;;
   --with-crio | crio)
     MODE='crio'
@@ -223,7 +237,7 @@ if ! minikube status &>/dev/null; then
   # TODO replace usage of /run/systemd/resolve/resolv.conf with some temporary file withot any 127.0.0.x entries ,because CRC add dnsmasq
   # shellcheck disable=SC2086
   sudo -E minikube start --vm-driver=none --apiserver-ips 127.0.0.1 --apiserver-name localhost \
-    --kubernetes-version='latest' \
+    --kubernetes-version="${K8S_VERSION}" \
     --extra-config=apiserver.enable-admission-plugins="${ADMISSION_PLUGINS}" \
     --extra-config=kubelet.resolv-conf=/run/systemd/resolve/resolv.conf \
     --extra-config=kubelet.cgroup-driver=systemd \

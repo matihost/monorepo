@@ -7,6 +7,10 @@ all:
       vars:
         versions:
           crio: 1.21
+          # libcontainers && cri-o :: https://github.com/cri-o/cri-o/blob/master/install.md#apt-based-operating-systems
+          # use {{ ansible_distribution_version }} instead of current Ubuntu version is supported, otherwise hardcode version (aka: 21.04)
+          libcontainers_repo_ubuntu_version: "{{ ansible_distribution_version }}"
+          libcontainers_crio_repo_ubuntu_version: "20.10"
         virtual_interface_ip: 192.168.10.1
         update_cache_timeout: 300
         systemd_journal:
@@ -28,18 +32,16 @@ all:
         - name: virtualbox
           repo: >-
             deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian {{ ansible_distribution_release }} contrib
-        # cri-o :: https://github.com/cri-o/cri-o/blob/master/install.md#apt-based-operating-systems
-        #TODO use {{ ansible_distribution_version }} instead of 20.10 when 21.04 is supported
         - name: libcontainers
           repo: >-
-            deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_20.10/ /
+            deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ versions.libcontainers_repo_ubuntu_version }}/ /
           key_url: >-
-            https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_20.10/Release.key
+            https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_{{ versions.libcontainers_repo_ubuntu_version }}/Release.key
         - name: libcontainers-crio
           repo: >-
-            deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ versions.crio }}/x{{ ansible_distribution }}_20.10/ /
+            deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ versions.crio }}/x{{ ansible_distribution }}_{{ versions.libcontainers_crio_repo_ubuntu_version }}/ /
           key_url: >-
-            https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ versions.crio }}/x{{ ansible_distribution }}_20.10/Release.key
+            https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ versions.crio }}/x{{ ansible_distribution }}_{{ versions.libcontainers_crio_repo_ubuntu_version }}/Release.key
         - name: google-cloud-sdk
           repo: "deb [arch=amd64] https://packages.cloud.google.com/apt cloud-sdk main"
           key_url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
@@ -161,8 +163,10 @@ all:
           desc: To ensure Ansible galaxy collection community.kubernetes with k8s, helm modules is present
           become: false
           command: |
-            [ "$(ansible-galaxy collection install community.kubernetes |grep -c 'is already installed')" -eq 1 ] || \
-            echo "Ansible collection community.kubernetes has been installed"
+            [ -n "$(ansible-galaxy collection list community.kubernetes --format json |jq -r '(try ..)|.version' |grep -v null)" ] || {
+              ansible-galaxy collection install community.kubernetes
+              echo "Ansible collection community.kubernetes has been installed"
+            }
         - name: ensure-hp-lip
           desc: |
             Ensure the latest hplip is installed from source

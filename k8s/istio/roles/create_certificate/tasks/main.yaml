@@ -6,7 +6,7 @@
 
 - name: Calculate certificate file name
   set_fact:
-    tls_file_name: "{{ certificate_def.tls_name if certificate_def.tls_name else certificate_def.cn }}"
+    tls_file_name: "{{ certificate_def.tls_name|default(certificate_def.cn) }}"
 
 - name: Check whether certificate is already created
   stat:

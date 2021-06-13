@@ -5,11 +5,11 @@ terraform {
       # Cluster uses config options available at:
       # https://github.com/hashicorp/terraform-provider-google/blob/master/website/docs/r/container_cluster.html.markdown
       # in version:
-      version = ">= 3.69"
+      version = ">= 3.71"
     }
     google-beta = {
       source  = "hashicorp/google-beta"
-      version = ">= 3.69"
+      version = ">= 3.71"
     }
     helm = {
       source = "hashicorp/helm"
@@ -18,5 +18,5 @@ terraform {
       source = "hashicorp/kubernetes"
     }
   }
-  required_version = ">= 0.15"
+  required_version = ">= 1.0"
 }
