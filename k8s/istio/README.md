@@ -33,16 +33,24 @@ ansible-galaxy collection install community.general
 ## Running
 
 ```bash
-# Deploys Istio on Minikube
-# Assumes current kubecontext points to Minikube
+# Deploys Istio on Minikube (assumes current kubecontext points to Minikube)
 make deploy-on-minikube
+
+# undeploys Istio from minikube (assumes current kubecontext points to Minikube)
+make undeploy-from-minikube
 
 
 # Deploys Istio on GKE with standalone NEGs exposed via External Global HTTPS LoadBalancer for external provisioning
 # Assumes current kubecontext points to GKE cluster and gcloud context to project where GKE cluster is deployed
 make deploy-on-gke-neg
 
+# undeploys Istio from GKE with nEGs
+make undeploy-from-gke-neg
+
 # Deploys Istio on GKE
 # Assumes current kubecontext points to GKE cluster and gcloud context to project where GKE cluster is deployed
 make deploy-on-gke
+
+# undeploys Istio from GKE
+make undeploy-from-gke
 ```

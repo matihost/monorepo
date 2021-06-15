@@ -1,0 +1,111 @@
+---
+- hosts: localhost
+  become: false
+  collections:
+  - community.kubernetes
+  - community.general
+  vars:
+    files: "{{ playbook_dir }}/files"
+    internal_wildcard_cn: "*.{{ ingress_gateway.default_dns_suffix }}"
+    enable_external_ingress_node_pool: "{{ ingress_external_gateway.enable|default(false) and ingress_external_gateway.enable_node_selector|default(false) }}"
+  tasks:
+  - name: Get current GCP project
+    shell: gcloud config get-value project
+    register: gcp_project_out
+    changed_when: false
+
+  - name: Set GCP project fact
+    set_fact:
+      gcp_project: "{{ gcp_project_out.stdout }}"
+
+  - name: Ensure Istio ClusterRoles removed
+    k8s:
+      state: absent
+      definition: "{{ lookup('template', '{{ files }}/roles.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+
+  - name: Set external wildcard  variables
+    set_fact:
+      external_wildcard_cn: "*.{{ ingress_external_gateway.default_dns_suffix }}"
+      external_wildcard_name: "wildcard-{{ ingress_external_gateway.default_dns_suffix|replace('.','-') }}"
+    when: ingress_external_gateway.enable|default(false)
+
+
+  - name: Run Terraform to remove External HTTPS LB for external Istio ingress gateway
+    terraform:
+      project_path: 'files/gke/external-lb'
+      state: absent
+      workspace: "default"
+      variables: "{{ options.gke|mandatory
+        |combine({'project': gcp_project})
+        |combine({'enable_external_ingress_node_pool': enable_external_ingress_node_pool|string|lower})
+        |combine({'external_wildcard_cn': external_wildcard_cn|default(\"\")})
+        |combine({'external_wildcard_name': external_wildcard_name|default(\"\")})
+        |combine({'external_wildcard_tls_key': tls.key|default(\"\")|b64decode})
+        |combine({'external_wildcard_tls_crt': tls.crt|default(\"\")|b64decode})
+      }}"
+    when:
+    - options.gke_mode|default(false)
+    - enable_external_ingress_node_pool
+
+  - name: Ensure Istio IngressClass absent
+    k8s:
+      state: absent
+      definition: "{{ lookup('template', '{{ files }}/ingress_class.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+
+
+  - name: Ensure Istio ControlPlane operator removed
+    k8s:
+      state: absent
+      definition: "{{ lookup('template', '{{ files }}/control_plane.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+
+  - name: Undeploy Istio Operator Helm chart
+    helm:
+      name: "istio-operator"
+      chart_ref: "{{ lookup('env', 'HOME') }}/.istio/current/manifests/charts/istio-operator"
+      release_namespace: "istio-system"
+      release_state: absent
+      wait: true
+      wait_timeout: "5m0s"
+      values:
+        hub: "{{ operator.hub }}"
+        tag: "{{ operator.tag }}"
+
+
+  - name: Run Terraform to remove GCP prerequisites for Istio deployment
+    terraform:
+      project_path: 'files/gke'
+      state: absent
+      workspace: "default"
+      purge_workspace: true
+      variables: "{{ options.gke|mandatory
+        |combine({'project': gcp_project})
+        |combine({'enable_internal_ingress_node_pool': ingress_gateway.enable_node_selector|default(false)|string|lower})
+        |combine({'enable_external_ingress_node_pool': enable_external_ingress_node_pool|string|lower})
+      }}"
+    when: options.gke_mode|default(false)
+
+
+  - name: Ensure PodSecurityPolicy for Istio CNI Daemon Set removed
+    k8s:
+      state: absent
+      definition: "{{ lookup('template', '{{ files }}/psp.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+
+
+  - name: Ensure istio-system namespace removed
+    k8s:
+      name: istio-system
+      api_version: v1
+      kind: Namespace
+      state: absent
