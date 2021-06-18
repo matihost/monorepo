@@ -116,7 +116,7 @@ function installGatekeeper() {
     helm repo update
   }
   # Set replicas to 1 as for minikube HA for gatekeeper is less important than memory usage
-  helm install gatekeeper gatekeeper/gatekeeper --set replicas=1 -n gatekeeper-system --create-namespace
+  helm upgrade --install gatekeeper gatekeeper/gatekeeper --set replicas=1 -n gatekeeper-system --create-namespace
 }
 
 # minikube addons enable ingress - stopped working for "none" minikube driver
@@ -137,7 +137,7 @@ function addNginxIngress() {
       # start Nginx ingress with PodSecurityPolicy: https://kubernetes.github.io/ingress-nginx/examples/psp/
       kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/docs/examples/psp/psp.yaml
     }
-    helm install -f ngnix.values.yaml ingress-nginx nginx-stable/nginx-ingress -n ingress-nginx --create-namespace || {
+    helm upgrade --install -f ngnix.values.yaml ingress-nginx nginx-stable/nginx-ingress -n ingress-nginx --create-namespace || {
       echo "Unable to install NGNIX, ngnix / k8s incompatibility? check NGinx Helm"
       exit 1
     }
