@@ -21,7 +21,7 @@ resource "null_resource" "minecraft-config-template" {
     cp -r config/* target/minecraft-server && \
     curl -sSL ${var.minecraft_server_url} -o  target/minecraft-server/server/server.jar && \
     cd target/ && \
-    sed -i 's/MINECRAFT_PASS/${var.server_pass}/g' minecraft-server/server/server.properties minecraft-server/minecraft.service && \
+    sed -i 's/MINECRAFT_PASS/${var.server_rcon_pass}/g' minecraft-server/server/server.properties minecraft-server/minecraft.service && \
     tar -Jcvf minecraft-config-template.tar.xz minecraft-server
     EOT
   }

@@ -49,7 +49,13 @@ variable "minecraft_server_url" {
   description = "Minecraft server.jar version 1.17"
 }
 
-variable "server_pass" {
+variable "minecraft_server_name" {
   type        = string
-  description = "Minecraft server pass"
+  default     = "prod-01"
+  description = "Minecraft server name"
+}
+
+variable "server_rcon_pass" {
+  type        = string
+  description = "Minecraft server rcon pass"
 }

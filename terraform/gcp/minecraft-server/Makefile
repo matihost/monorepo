@@ -2,6 +2,7 @@
 
 CURRENT_PROJECT := $(shell gcloud config get-value project)
 WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
+PASS := default-password
 
 TF_VAR_project := $(CURRENT_PROJECT)
 TF_VAR_external_access_cidrs := ["$(WHOAMI)/32"]
@@ -9,14 +10,14 @@ TF_VAR_external_access_cidrs := ["$(WHOAMI)/32"]
 # uncomment to run terraform in debug mode
 # TF_LOG := DEBUG
 
-apply: init-terraform prepare ## setup Minecraft Server VM
+apply: init-terraform prepare ## setup Minecraft Server VM, usage make apply PASS=pass_for_minecraft_rcon
 	@terraform validate && \
-	terraform plan -lock=false -var='server_pass=$(PASS)' && \
-	terraform apply -auto-approve -var='server_pass=$(PASS)'
+	terraform plan -lock=false -var='server_rcon_pass=$(PASS)' && \
+	terraform apply -auto-approve -var='server_rcon_pass=$(PASS)'
 
-
-ssh: ## ssh to Minecraft Server instance
-	gcloud compute ssh minecraft-server
+# TODO figure out mincecraft-server instance from instance group
+# ssh: ## ssh to Minecraft Server instance
+# 	gcloud compute ssh minecraft-server
 
 show-state: ## show terraform.state
 	terraform state list
@@ -24,7 +25,7 @@ show-state: ## show terraform.state
 
 destroy: ## destroy Minecraft Server resources
 	rm -rf target
-	terraform destroy -auto-approve -var='server_pass=whatever_as_we_destroy'
+	terraform destroy -auto-approve -var='server_rcon_pass=whatever_as_we_destroy'
 
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init

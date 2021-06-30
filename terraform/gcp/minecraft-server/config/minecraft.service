@@ -13,7 +13,7 @@ SuccessExitStatus=0 1
 #PrivateDevices=true
 #NoNewPrivileges=true
 WorkingDirectory=/home/minecraft/server
-ExecStart=/usr/bin/java -Xms4096M -Xmx7512M -jar server.jar nogui
+ExecStart=/usr/bin/java -Xms2048M -Xmx3596M -jar server.jar nogui
 # TODO add backuping before shutdown
 #ExecStop=/usr/bin/mcrcon -H 127.0.0.1 -P 25575 -p MINECRAFT_PASS stop
 ExecStop=/bin/kill -SIGTERM $MAINPID
