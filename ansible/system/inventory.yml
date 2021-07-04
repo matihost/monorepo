@@ -55,6 +55,7 @@ all:
         - lm-sensors
         - hddtemp
         - psensor
+        - inotify-tools
         - brasero
         - autofs
         - bind9
@@ -111,7 +112,6 @@ all:
         - openvpn3
         snaps:
         - mc-installer
-        - minecraft-server-jdstrand
         - notepad-plus-plus
         # Uncomment to use snap packages for gcloud sdk
         # classic_snaps:

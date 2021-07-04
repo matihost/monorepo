@@ -2,7 +2,6 @@
 
 CURRENT_PROJECT := $(shell gcloud config get-value project)
 WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
-PASS := default-password
 
 TF_VAR_project := $(CURRENT_PROJECT)
 TF_VAR_external_access_cidrs := ["$(WHOAMI)/32"]
@@ -11,13 +10,15 @@ TF_VAR_external_access_cidrs := ["$(WHOAMI)/32"]
 # TF_LOG := DEBUG
 
 apply: init-terraform prepare ## setup Minecraft Server VM, usage make apply PASS=pass_for_minecraft_rcon
+ifndef PASS
+	$(error Env PASS is not defined. Provider password for Minecraft rcon is required. Usage make apply PASS=pass_for_minecraft_rcon)
+endif
 	@terraform validate && \
 	terraform plan -lock=false -var='server_rcon_pass=$(PASS)' && \
 	terraform apply -auto-approve -var='server_rcon_pass=$(PASS)'
 
-# TODO figure out mincecraft-server instance from instance group
-# ssh: ## ssh to Minecraft Server instance
-# 	gcloud compute ssh minecraft-server
+ssh: ## ssh to Minecraft Server instance
+	gcloud compute ssh `gcloud compute instances list --filter="name~'^minecraft-server-.*$$'" --format=json | jq -rc .[].name`
 
 show-state: ## show terraform.state
 	terraform state list

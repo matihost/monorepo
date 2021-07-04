@@ -55,6 +55,12 @@ variable "minecraft_server_name" {
   description = "Minecraft server name"
 }
 
+variable "minecraft_rcon_url" {
+  type        = string
+  default     = "https://github.com/Tiiffi/mcrcon/releases/download/v0.7.1/mcrcon-0.7.1-linux-x86-64.tar.gz"
+  description = "Minecraft RCON utility download url"
+}
+
 variable "server_rcon_pass" {
   type        = string
   description = "Minecraft server rcon pass"
