@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 set -x
-export JENKINS_PLUGIN_MANAGER_VERSION="2.9.2"
+export JENKINS_PLUGIN_MANAGER_VERSION="2.10.0"
 export JENKINS_PLUGINS="ec2 \
-  workflow-job:2.40 \
+  workflow-job:2.41 \
   workflow-aggregator:2.6 \
   cloudbees-disk-usage-simple:0.10
-  credentials:2.4.1 \
-  credentials-binding:1.24 \
-  git:4.7.1 \
+  credentials:2.5 \
+  credentials-binding:1.26 \
+  git:4.7.2 \
   configuration-as-code:1.51 \
   timestamper:1.13 \
-  github-branch-source:2.10.4 \
+  github-branch-source:2.11.1 \
   github-oauth:0.33 \
   matrix-auth:2.6.7 \
   prometheus:2.0.10 \
