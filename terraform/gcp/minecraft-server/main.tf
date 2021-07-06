@@ -45,8 +45,8 @@ variable "external_access_cidrs" {
 
 variable "minecraft_server_url" {
   type        = string
-  default     = "https://launcher.mojang.com/v1/objects/0a269b5f2c5b93b1712d0f5dc43b6182b9ab254e/server.jar"
-  description = "Minecraft server.jar version 1.17"
+  default     = "https://launcher.mojang.com/v1/objects/a16d67e5807f57fc4e550299cf20226194497dc2/server.jar"
+  description = "Minecraft server.jar version 1.17.1, downloadable from: https://www.minecraft.net/pl-pl/download/server"
 }
 
 variable "minecraft_server_name" {
@@ -55,8 +55,7 @@ variable "minecraft_server_name" {
   description = "Minecraft server name"
 }
 
-# TODO https://github.com/pwaller/waitsilence  - zrobic to w timerze, backupowac tylko ostatnie 3 backupy
-# podczas startu ciagnac z backupa
+
 variable "minecraft_rcon_url" {
   type        = string
   default     = "https://github.com/Tiiffi/mcrcon/releases/download/v0.7.1/mcrcon-0.7.1-linux-x86-64.tar.gz"

@@ -95,16 +95,6 @@ resource "google_project_iam_member" "minecraft-server-gs" {
 }
 
 
-resource "google_compute_address" "minecraft-server" {
-  name         = "minecraft-server"
-  address_type = "EXTERNAL"
-}
-
-
-output "minecraft_server_external_ip" {
-  value = google_compute_address.minecraft-server.address
-}
-
 # let connect via to minecraft server only within GCP VPC or via IAP tunnel
 resource "google_compute_firewall" "minecraft-server-ssh" {
   name          = "minecraft-server-ssh"

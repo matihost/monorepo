@@ -65,3 +65,8 @@ resource "google_compute_region_health_check" "minecraft-lb-health" {
   timeout_sec         = "5"
   unhealthy_threshold = "3"
 }
+
+
+output "minecraft_server_external_ip" {
+  value = google_compute_address.minecraft-server-ip.address
+}
