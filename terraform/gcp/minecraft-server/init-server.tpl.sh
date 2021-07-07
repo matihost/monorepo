@@ -9,7 +9,7 @@ function install_software() {
 }
 
 function download_minecraft_data() {
-  gsutil cp "gs://${GS_BUCKET}/minecraft-config-template.tar.xz" /tmp
+  gsutil cp "gs://${GS_BUCKET}/${MINECRAFT_SERVER_NAME}/minecraft-config-template.tar.xz" /tmp
   cd /tmp || exit 6
   tar -Jxvf minecraft-config-template.tar.xz && rm minecraft-config-template.tar.xz
 }

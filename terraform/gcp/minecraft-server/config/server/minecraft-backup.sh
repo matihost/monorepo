@@ -1,12 +1,36 @@
 #!/usr/bin/env bash
 
-./mcrcon -H localhost -P 25575 -p MINECRAFT_PASS say "Attempt to backup the world..."
-./mcrcon -H localhost -P 25575 -w 5 -p MINECRAFT_PASS save-all save-off
-# wait until all files are stored
-sleep 1m
+BUCKET=GS_BUCKET
+SERVER_NAME=MINECRAFT_SERVER_NAME
+PASS=MINECRAFT_PASS
+function block_minecraft_from_modyfying_world() {
+  #  wait until all files are stored
+  # TODO make waiting inotifywait
+  ./mcrcon -H localhost -P 25575 -p "${PASS}" "say Attempt to backup the world..." &&
+    ./mcrcon -H localhost -P 25575 -w 5 -p "${PASS}" save-all save-off &&
+    sleep 1m
+}
 
-mkdir -p backup
-tar -Jcvf backup/world-backup.tar.xz world
-#TODO gsutil cp to GS
+function create_backup() {
+  mkdir -p backup &&
+    tar -Jcvf backup/world-backup.tar.xz world
+}
 
-./mcrcon -H localhost -P 25575 -p MINECRAFT_PASS save-on say "Saving world has been restored"
+function send_backup_to_gs() {
+  gsutil cp backup/world-backup.tar.xz "gs://${1}/${2}/"
+}
+
+function unblock_periodic_world_writes() {
+  ./mcrcon -H localhost -P 25575 -p "${PASS}" save-on "say Saving world has been restored"
+}
+
+# Main
+block_minecraft_from_modyfying_world &&
+  create_backup &&
+  send_backup_to_gs "${BUCKET}" "${SERVER_NAME}" &&
+  unblock_periodic_world_writes
+# shellcheck disable=SC2181
+[ "$?" -eq 0 ] || {
+  echo "Backup failed"
+  exit 1
+}

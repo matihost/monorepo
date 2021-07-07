@@ -9,7 +9,8 @@ resource "google_compute_instance_template" "minecraft_template" {
   }
 
   metadata_startup_script = templatefile("init-server.tpl.sh", {
-    GS_BUCKET = google_storage_bucket.minecraft-data.name
+    GS_BUCKET             = google_storage_bucket.minecraft-data.name,
+    MINECRAFT_SERVER_NAME = var.minecraft_server_name
   })
 
   metadata = {
