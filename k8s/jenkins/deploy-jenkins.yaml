@@ -80,7 +80,7 @@
       state: present
       namespace: "{{ namespace }}"
       wait: true
-      wait_timeout: 300
+      wait_timeout: 600
 
   - name: Ensure Jenkins Ingress DNS is resolvable locally
     shell: |

@@ -18,6 +18,7 @@ controller:
   tag: "2.289.2-lts-jdk11"
   initializeOnce: false
   installLatestPlugins: true
+  installLatestSpecifiedPlugins: false
   installPlugins:
   - branch-api:2.6.4
   - kubernetes:1.30.0

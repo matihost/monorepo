@@ -6,7 +6,7 @@ all:
       vars:
         files: "{{ playbook_dir }}/files"
         namespace: ci
-        chart_version: "3.5.0"
+        chart_version: "3.5.2"
         jenkins_service_type: ClusterIP
         use_prebuild_jenkins_image: true
         ingress_version: v1
