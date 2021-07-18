@@ -6,7 +6,7 @@ export JENKINS_PLUGINS="ec2 \
   workflow-aggregator:2.6 \
   cloudbees-disk-usage-simple:0.10
   credentials:2.5 \
-  credentials-binding:1.26 \
+  credentials-binding:1.27 \
   git:4.7.2 \
   configuration-as-code:1.51 \
   timestamper:1.13 \
@@ -14,11 +14,11 @@ export JENKINS_PLUGINS="ec2 \
   github-oauth:0.33 \
   matrix-auth:2.6.7 \
   prometheus:2.0.10 \
-  simple-theme-plugin:0.6 \
+  simple-theme-plugin:0.7 \
   jdk-tool:1.5 \
   command-launcher:1.6 \
   jaxb:2.3.0.1 \
-  branch-api:2.6.4"
+  branch-api:2.6.5"
 
 function download_jenkins_plugin_manager_cli() {
   sudo curl -sSL "https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/${JENKINS_PLUGIN_MANAGER_VERSION}/jenkins-plugin-manager-${JENKINS_PLUGIN_MANAGER_VERSION}.jar" -o /usr/share/jenkins/jenkins-plugin-manager.jar
