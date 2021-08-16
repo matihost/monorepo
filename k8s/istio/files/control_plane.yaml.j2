@@ -32,6 +32,7 @@ spec:
       namespace: {{ "kube-system" if options.gke_mode|default(false) else "istio-system" }}
     ingressGateways:
     - name: istio-ingressgateway
+      namespace: istio-system
       enabled: true
       k8s:
         hpaSpec:
@@ -47,6 +48,7 @@ spec:
           effect: "NoSchedule"
 {% endif %}
     - name: istio-external-ingressgateway
+      namespace: istio-system
       enabled: {{ ingress_external_gateway.enable|default(false) }}
       # namespace: custom-ns
       label:
@@ -153,6 +155,7 @@ spec:
       logLevel: info
     gateways:
       istio-ingressgateway:
+        injectionTemplate: gateway
         type: {{ ingress_gateway.service_type|default("LoadBalancer") }}
         autoscaleMax: "{{ ingress_gateway.max_pods|default(5)}}"
 {% if ingress_gateway.serviceAnnotations|default(false) %}
