@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:2.289.2-lts-jdk11
+FROM jenkins/jenkins:2.289.3-lts-jdk11
 RUN jenkins-plugin-cli --latest true --plugins \
   branch-api:2.6.5 \
   kubernetes:1.30.1 \
@@ -9,14 +9,14 @@ RUN jenkins-plugin-cli --latest true --plugins \
   credentials-binding:1.27 \
   docker-commons:1.17 \
   docker-workflow:1.26 \
-  git:4.7.2 \
-  configuration-as-code:1.51 \
+  git:4.8.2 \
+  configuration-as-code:1.52 \
   timestamper:1.13 \
-  github-branch-source:2.11.1 \
+  github-branch-source:2.11.2 \
   github-oauth:0.33 \
   ldap:2.7 \
   google-login:1.6 \
-  matrix-auth:2.6.7 \
+  matrix-auth:2.6.8 \
   authorize-project:1.4.0 \
   prometheus:2.0.10 \
   simple-theme-plugin:0.7 \
