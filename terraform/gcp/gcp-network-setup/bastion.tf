@@ -22,7 +22,7 @@ resource "google_compute_instance" "bastion" {
 
   boot_disk {
     initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-minimal-2010"
+      image = "ubuntu-os-cloud/ubuntu-minimal-2104"
     }
   }
 

@@ -12,6 +12,16 @@ resource "google_storage_bucket" "minecraft-data" {
   versioning {
     enabled = true
   }
+
+  lifecycle_rule {
+    condition {
+      # keep only 2 version of a file
+      num_newer_versions = 2
+    }
+    action {
+      type = "Delete"
+    }
+  }
 }
 
 

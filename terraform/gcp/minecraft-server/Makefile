@@ -32,6 +32,9 @@ google-authentication: prepare ## authenticate to GCP and prepare Application De
 	gcloud init
 	gcloud auth application-default login
 
+clean: ## clean Terraform cached plugins and data
+	rm -rf .terraform* terraform.tfstate*
+
 init-terraform:
 	terraform init -upgrade=true
 

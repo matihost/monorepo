@@ -36,6 +36,9 @@ destroy: shutdown_local_bastion_proxy ## destroy applied setup
 	export TF_VAR_external_access_ip=$(WHOAMI) && \
 	terraform plan && terraform destroy -auto-approve
 
+clean: ## clean Terraform cached plugins and data
+	rm -rf .terraform* terraform.tfstate*
+
 prepare:
 	@[ -e "$(HOME)/.ssh/id_rsa.aws.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.aws.vm; }
 

@@ -30,6 +30,8 @@ pre-destroy: ## remove no removable KMS related data from state before actually 
 	-@terraform state rm google_kms_key_ring.us-central1-keyring
 	-@terraform state rm google_kms_crypto_key.gke-etcd-enc-key
 
+clean: ## clean Terraform cached plugins and data
+	rm -rf .terraform* terraform.tfstate*
 
 pre-all:
 	terraform init -upgrade=true
