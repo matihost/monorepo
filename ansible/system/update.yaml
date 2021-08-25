@@ -62,3 +62,14 @@
       changed_when:
       - sdk_result.stdout is regex('Installing')
     become: false
+
+  - block:
+    - name: Check whether helm is present on the machine
+      shell: which helm
+      ignore_errors: true
+      changed_when: false
+      register: helm_presence
+    - name: Update helm repositories
+      shell: helm repo update
+      when: helm_presence.rc == 0
+    become: false

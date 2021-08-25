@@ -110,3 +110,15 @@
       changed_when: clean_out.stdout
       failed_when: false
     become: false
+  - block:
+    - name: Clean Terraform cached plugins
+      shell: |
+        TERRAFORM_PLUGINS="${HOME}/.terraform.d/plugins"
+        mkdir -p "${TERRAFORM_PLUGINS}"
+        command -v terraform 1>/dev/null 2>/dev/null && {
+          rm -rf "${TERRAFORM_PLUGINS}/*"
+        }
+      register: clean_out
+      changed_when: clean_out.stderr
+      failed_when: false
+    become: false
