@@ -6,6 +6,7 @@ metadata:
   name: istiocontrolplane
 spec:
   profile: default
+  hub: gcr.io/istio-release
   meshConfig:
     enableTracing: true
     accessLogFile: /dev/stdout
@@ -15,6 +16,8 @@ spec:
         # (Experimental) Enable Istio agent to handle DNS requests for known hosts
         # Unknown hosts will automatically be resolved using upstream dns servers in resolv.conf
         ISTIO_META_DNS_CAPTURE: "true"
+        # (Experimental) Enable dynamic bootstrap generation.
+        BOOTSTRAP_XDS_AGENT: "true"
   components:
     pilot:
       k8s:
@@ -25,6 +28,11 @@ spec:
           minReplicas: {{ 2 if options.gke_mode|default(false) else 1 }}
         replicaCount: {{ 2 if options.gke_mode|default(false) else 1 }}
         env:
+          # https://istio.io/latest/docs/reference/commands/pilot-agent/#envvars
+          # Sets the mesh-wide trace sampling percentage. Should be 0.0 - 100.0. Precision to 0.01. Default is 1.0.
+          - name: PILOT_TRACE_SAMPLING
+            value: "100"
+          # Anthos Service Mesh addon
           - name: ENABLE_STACKDRIVER_MONITORING
             value: "{{ options.gke_mode|default(false) }}"
     cni:
@@ -131,6 +139,8 @@ spec:
     global:
       istiod:
         enableAnalysis: true
+      logging:
+        level: "default:info"
       logAsJson: true
 {% if options.gke_mode|default(false)  %}
     # TODO fix stackdriver metrics: https://github.com/istio/istio/issues/22658
