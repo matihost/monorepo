@@ -5,7 +5,7 @@
 }
 
 function usage() {
-  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-containder|containerd|c] [--with-crio|crio] [--with-docker | docker | d] [--with-cni] [--with-version stable/latest/x.x.x] [--with-istio | istio] [--with-gatekeeper | gatekeeper] [--with-psp | psp]
+  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-containder|containerd|c] [--with-crio|crio] [--with-docker | docker | d] [--with-cni] [--with-version stable/latest/x.x.x] [--with-nginx | nginx] [--with-istio | istio] [--with-gatekeeper | gatekeeper] [--with-psp | psp]
 
 Starts Minikube in bare / none mode. Assumes latest Ubuntu.
 
@@ -19,6 +19,9 @@ Minimum set of features enabled in every Minikube:
 
 Optional features:
 - K8S Version (--with-version) - default to stable, possible values: stable, latest, same as Minikube's --kubernetes-version
+- Nginx Ingress Class (--with-nginx) - installs Ngnix Ingress Class
+
+Optional deprecated features:
 - Istio (--with-istio) - install base Istio w/o meaningful config, go to k8s/istio dir to install istio fully
 - OPA Gatekeeper (--with-gatekeeper) - install base Gatekeeper w/o meaningful config, go to k8s/gatekeeper dir to install OPA Gatekeeper fully
 - Enable PodSecurityPolicies (deprecated since k8s 1.21) (--with-psp | psp)
@@ -26,6 +29,9 @@ Optional features:
 Samples:
 # start Minikube with containerd minimum set of features
 $(basename "$0") --with-containerd
+
+# start Minikube with containerd with NGINX Ingress
+$(basename "$0") --with-containerd --with-nginx
 
 # start Minikube with containerd with K8S latest version (default: stable)
 $(basename "$0") --with-containerd --with-version latest
@@ -180,6 +186,9 @@ while [[ "$#" -gt 0 ]]; do
   --with-cni)
     EXTRA_PARAMS='--network-plugin=cni'
     ;;
+  --with-nginx | nginx)
+    ADDONS="${ADDONS} nginx"
+    ;;
   --with-istio | istio)
     ADDONS="${ADDONS} istio"
     ;;
@@ -267,12 +276,12 @@ if ! minikube status &>/dev/null; then
       ensureIstioctlIsPresent
       istioctl operator init
       minikube addons enable istio
+    elif [ "${ADDON}" == 'nginx' ]; then
+      addNginxIngress
     elif [ "${ADDON}" != 'gatekeeper' ]; then # skip gatekeeper as it has to be installed as the last one
       minikube addons enable "${ADDON}"
     fi
   done
-
-  addNginxIngress
 
   [[ "${ADDONS}" == *gatekeeper* ]] && {
     installGatekeeper
