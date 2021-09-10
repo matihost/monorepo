@@ -1,6 +1,6 @@
 # Jenkins Docker image
 
-Jenkins LTS JDK 11 image with pre-downloaded plugins to use with [Jenkins Helm Chart](https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/README.md#consider-using-a-custom-image) deployment.
+Jenkins LTS image with pre-downloaded plugins to use with [Jenkins Helm Chart](https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/README.md#consider-using-a-custom-image) deployment.
 
 Apart from recommended plugins it contains the following plugins:
 
@@ -23,10 +23,10 @@ make build
 make push
 
 # create additional tag for lts image
-make tag TAG=2.289.3
+make tag TAG=2.303.1
 
 # push image with tag to quay.io
-make push TAG=2.289.3
+make push TAG=2.303.1
 
 
 # run image with bash

@@ -1,11 +1,11 @@
-FROM jenkins/jenkins:2.289.3-lts-jdk11
-RUN jenkins-plugin-cli --latest true --plugins \
+FROM jenkins/jenkins:2.303.1
+RUN jenkins-plugin-cli --verbose --latest true --plugins \
   branch-api:2.6.5 \
   kubernetes:1.30.1 \
   workflow-job:2.41 \
   workflow-aggregator:2.6 \
   cloudbees-disk-usage-simple:0.10 \
-  credentials:2.5 \
+  credentials:2.6.1 \
   credentials-binding:1.27 \
   docker-commons:1.17 \
   docker-workflow:1.26 \
