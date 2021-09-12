@@ -13,7 +13,7 @@ resource "random_id" "instance_id" {
 // A single Compute Engine instance
 resource "google_compute_instance" "vm" {
   name         = "vm-${random_id.instance_id.hex}"
-  machine_type = "f1-micro"
+  machine_type = "e2-micro"
   zone         = local.zone
 
   boot_disk {

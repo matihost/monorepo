@@ -72,8 +72,6 @@ resource "google_compute_subnetwork" "private2" {
 
 
 resource "google_compute_subnetwork" "private-l7lb-1" {
-  provider = google-beta
-
   name          = "private-l7lb-subnetwork-${var.regions[0]}"
   ip_cidr_range = "10.13.0.0/24"
   region        = var.regions[0]
@@ -86,8 +84,6 @@ resource "google_compute_subnetwork" "private-l7lb-1" {
 
 
 resource "google_compute_subnetwork" "private-l7lb-2" {
-  provider = google-beta
-
   name          = "private-l7lb-subnetwork-${var.regions[1]}"
   ip_cidr_range = "10.13.1.0/24"
   region        = var.regions[1]

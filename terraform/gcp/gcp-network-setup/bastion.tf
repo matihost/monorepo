@@ -17,7 +17,7 @@ resource "google_compute_firewall" "bastion-ssh" {
 // A single Compute Engine instance
 resource "google_compute_instance" "bastion" {
   name         = "${google_compute_network.private.name}-bastion"
-  machine_type = "f1-micro"
+  machine_type = "e2-micro"
   zone         = local.zones[0]
 
   boot_disk {

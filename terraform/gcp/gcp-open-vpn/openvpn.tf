@@ -1,6 +1,6 @@
 resource "google_compute_instance" "vm" {
   name         = "vpn-gateway"
-  machine_type = "f1-micro"
+  machine_type = "e2-micro"
   zone         = local.zone
 
   boot_disk {
