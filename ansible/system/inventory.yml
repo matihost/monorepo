@@ -6,7 +6,7 @@ all:
         localhost:
       vars:
         versions:
-          crio: 1.21
+          crio: 1.22
           # libcontainers && cri-o :: https://github.com/cri-o/cri-o/blob/master/install.md#apt-based-operating-systems
           # use {{ ansible_distribution_version }} instead of current Ubuntu version is supported, otherwise hardcode version (aka: 21.04)
           libcontainers_repo_ubuntu_version: "{{ ansible_distribution_version }}"
