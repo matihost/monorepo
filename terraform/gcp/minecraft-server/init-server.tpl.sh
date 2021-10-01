@@ -5,7 +5,7 @@ function install_software() {
   apt update
   apt -y install bash-completion vim bind9-dnsutils less mlocate iputils-ping ncat
   # minecraft specific
-  apt -y install -y openjdk-16-jre-headless inotify-tools
+  apt -y install -y openjdk-17-jre-headless inotify-tools
 }
 
 function download_minecraft_data() {

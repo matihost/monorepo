@@ -29,7 +29,7 @@
   </scm>
 
   <properties>
-    <java.version>11</java.version>
+    <java.version>17</java.version>
     <maven.compiler.release>${java.version}</maven.compiler.release>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -119,23 +119,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.0.0-M5</version>
-          <configuration>
-            <!-- To mitigate Jigsaw warnings from heavily using reflection groovy -->
-            <argLine>
-              --illegal-access=permit
-            </argLine>
-          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <version>3.0.0-M5</version>
-          <configuration>
-            <!-- To mitigate Jigsaw warnings from heavily using reflection groovy -->
-            <argLine>
-              --illegal-access=permit
-            </argLine>
-          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>

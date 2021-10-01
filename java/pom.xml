@@ -35,12 +35,12 @@
   </modules>
 
   <properties>
-    <java.version>11</java.version>
+    <java.version>17</java.version>
     <maven.compiler.release>${java.version}</maven.compiler.release>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
-    <spring.boot.version>2.5.2</spring.boot.version>
+    <spring.boot.version>2.5.5</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -49,7 +49,7 @@
     <enforce.maven.version>3.6</enforce.maven.version>
 
     <!-- Groovy -->
-    <groovy.version>3.0.8</groovy.version>
+    <groovy.version>3.0.9</groovy.version>
     <spock.version>2.0-groovy-3.0</spock.version>
 
     <!-- Scala -->
@@ -165,7 +165,7 @@
         <plugin>
           <groupId>org.codehaus.gmavenplus</groupId>
           <artifactId>gmavenplus-plugin</artifactId>
-          <version>1.12.1</version>
+          <version>1.13.0</version>
           <executions>
             <execution>
               <goals>
@@ -293,23 +293,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.0.0-M5</version>
-          <configuration>
-            <!-- To mitigate Jigsaw warnings from heavily using reflection groovy -->
-            <argLine>
-              --illegal-access=permit
-            </argLine>
-          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <version>3.0.0-M5</version>
-          <configuration>
-            <!-- To mitigate Jigsaw warnings from heavily using reflection groovy -->
-            <argLine>
-              --illegal-access=permit
-            </argLine>
-          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>

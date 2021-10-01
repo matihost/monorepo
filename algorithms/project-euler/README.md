@@ -6,8 +6,7 @@ Project Euler algorithms [description](algorithms.md).
 
 ```bash
 # Ubuntu JDK 11
-sudo apt install openjdk-11-jdk
-sudo apt install openjdk-11-source
+sudo apt install openjdk-17-jdk openjdk-17-source
 
 # maven (via sdkman)
 curl -s "https://get.sdkman.io" | bash

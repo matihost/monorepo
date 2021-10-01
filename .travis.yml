@@ -6,7 +6,7 @@ jobs:
   include:
   - stage: build
     language: java
-    jdk: openjdk11
+    jdk: openjdk17
     before_script: cd java
     script: make build
     cache:
@@ -15,7 +15,7 @@ jobs:
     env:
     - CACHE=java
   - language: java
-    jdk: openjdk11
+    jdk: openjdk17
     before_script: cd algorithms/project-euler
     script: make build
     cache:
