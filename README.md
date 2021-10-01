@@ -1,7 +1,7 @@
 # Learning
 
 [![License](https://img.shields.io/github/license/matihost/learning.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://travis-ci.com/matihost/learning.svg?branch=master)](https://travis-ci.com/matihost/learning)
+[![Build Status](https://app.travis-ci.com/matihost/learning.svg?branch=master)](https://app.travis-ci.com/github/matihost/learning)
 
 Various technology code, snippets, home tools.
 
