@@ -26,7 +26,7 @@ def main():
     """Enter the program."""
     currency = _parse_program_argv()
     rate_to_pln = ExchangeRateToPLN().get_exchange_rate_to_pln(currency)
-    print('1 {0} = {1} PLN'.format(currency, rate_to_pln))
+    print(f'1 {currency} = {rate_to_pln} PLN')
 
 
 if __name__ == "__main__":
