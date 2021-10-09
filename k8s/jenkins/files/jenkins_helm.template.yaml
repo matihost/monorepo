@@ -15,13 +15,13 @@ controller:
   installPlugins: false
 {% else %}
   image: "jenkins/jenkins"
-  tag: "2.303.1"
+  tag: "2.303.2"
   initializeOnce: false
   installLatestPlugins: true
   installLatestSpecifiedPlugins: false
   installPlugins:
-  - branch-api:2.6.5
-  - kubernetes:1.30.1
+  - branch-api:2.7.0
+  - kubernetes:1.30.3
   - workflow-job:2.41
   - workflow-aggregator:2.6
   - cloudbees-disk-usage-simple:0.10
@@ -29,11 +29,11 @@ controller:
   - credentials-binding:1.27
   - docker-commons:1.17
   - docker-workflow:1.26
-  - git:4.8.2
-  - configuration-as-code:1.52
+  - git:4.9.0
+  - configuration-as-code:1.54
   - timestamper:1.13
-  - github-branch-source:2.11.2
-  - github-oauth:0.33
+  - github-branch-source:2.11.3
+  - github-oauth:0.34
   - ldap:2.7
   - google-login:1.6
   - matrix-auth:2.6.8
@@ -102,42 +102,58 @@ controller:
               - id: "user"
                 name: "user"
                 password: "{{ jenkins_admin_pass|mandatory }}"
-      # TODO matrix based casc stopped working
-      # authz: |
-      #   jenkins:
-      #     authorizationStrategy:
-      #       projectMatrix:
-      #         permissions:
-      #         - "Agent/Build:authenticated"
-      #         - "Agent/Configure:authenticated"
-      #         - "Agent/Connect:authenticated"
-      #         - "Agent/Create:authenticated"
-      #         - "Agent/Delete:authenticated"
-      #         - "Agent/Disconnect:authenticated"
-      #         - "Credentials/Create:authenticated"
-      #         - "Credentials/Delete:authenticated"
-      #         - "Credentials/ManageDomains:authenticated"
-      #         - "Credentials/Update:authenticated"
-      #         - "Credentials/View:authenticated"
-      #         - "Job/Build:authenticated"
-      #         - "Job/Cancel:authenticated"
-      #         - "Job/Configure:authenticated"
-      #         - "Job/Create:authenticated"
-      #         - "Job/Delete:authenticated"
-      #         - "Job/Discover:authenticated"
-      #         - "Job/Move:authenticated"
-      #         - "Job/Read:authenticated"
-      #         - "Job/Workspace:authenticated"
-      #         - "Overall/Read:anonymous"
-      #         - "Overall/Administer:authenticated"
-      #         - "Overall/Read:authenticated"
-      #         - "Run/Delete:authenticated"
-      #         - "Run/Replay:authenticated"
-      #         - "Run/Update:authenticated"
-      #         - "View/Configure:authenticated"
-      #         - "View/Create:authenticated"
-      #         - "View/Delete:authenticated"
-      #         - "View/Read:authenticated"
+      authz: |
+        jenkins:
+          authorizationStrategy:
+            projectMatrix:
+              permissions:
+              - "Agent/Build:admin"
+              - "Agent/Configure:admin"
+              - "Agent/Connect:admin"
+              - "Agent/Create:admin"
+              - "Agent/Delete:admin"
+              - "Agent/Disconnect:admin"
+              - "Agent/ExtendedRead:admin"
+              - "Agent/ExtendedRead:authenticated"
+              - "Credentials/Create:admin"
+              - "Credentials/Delete:admin"
+              - "Credentials/ManageDomains:admin"
+              - "Credentials/Update:admin"
+              - "Credentials/View:admin"
+              - "Job/Build:admin"
+              - "Job/Cancel:admin"
+              - "Job/Configure:admin"
+              - "Job/Create:admin"
+              - "Job/Delete:admin"
+              - "Job/Discover:admin"
+              - "Job/Discover:authenticated"
+              - "Job/ExtendedRead:admin"
+              - "Job/Move:admin"
+              - "Job/Read:admin"
+              - "Job/Read:authenticated"
+              - "Job/Workspace:admin"
+              - "Lockable Resources/Reserve:admin"
+              - "Lockable Resources/Unlock:admin"
+              - "Lockable Resources/View:admin"
+              - "Lockable Resources/View:authenticated"
+              - "Metrics/HealthCheck:admin"
+              - "Metrics/ThreadDump:admin"
+              - "Metrics/View:admin"
+              - "Metrics/View:authenticated"
+              - "Overall/Administer:admin"
+              - "Overall/Read:admin"
+              - "Overall/Read:authenticated"
+              - "Overall/SystemRead:admin"
+              - "Run/Delete:admin"
+              - "Run/Replay:admin"
+              - "Run/Update:admin"
+              - "SCM/Tag:admin"
+              - "View/Configure:admin"
+              - "View/Create:admin"
+              - "View/Delete:admin"
+              - "View/Read:admin"
+              - "View/Read:authenticated"
+              - "Overall/Administer:matihost"
       welcome-message: |
         jenkins:
           systemMessage: Welcome to the Matihost CI\CD server.

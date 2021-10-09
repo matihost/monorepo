@@ -1,7 +1,7 @@
-FROM jenkins/jenkins:2.303.1
+FROM jenkins/jenkins:2.303.2
 RUN jenkins-plugin-cli --verbose --latest true --plugins \
-  branch-api:2.6.5 \
-  kubernetes:1.30.1 \
+  branch-api:2.7.0 \
+  kubernetes:1.30.3 \
   workflow-job:2.41 \
   workflow-aggregator:2.6 \
   cloudbees-disk-usage-simple:0.10 \
@@ -9,11 +9,11 @@ RUN jenkins-plugin-cli --verbose --latest true --plugins \
   credentials-binding:1.27 \
   docker-commons:1.17 \
   docker-workflow:1.26 \
-  git:4.8.2 \
-  configuration-as-code:1.52 \
+  git:4.9.0 \
+  configuration-as-code:1.54 \
   timestamper:1.13 \
-  github-branch-source:2.11.2 \
-  github-oauth:0.33 \
+  github-branch-source:2.11.3 \
+  github-oauth:0.34 \
   ldap:2.7 \
   google-login:1.6 \
   matrix-auth:2.6.8 \
