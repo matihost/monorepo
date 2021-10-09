@@ -57,7 +57,7 @@
   - name: Clean all podman (root) and docker containers, images and volumes
     shell: |
       command -v podman 1>/dev/null 2>/dev/null && {
-        PODMAN_PRUNE_OUTPUT="$(podman system prune --all --volumes --force |grep -v "Deleted [PCVI]")"
+        PODMAN_PRUNE_OUTPUT="$(podman system prune --all --volumes --force | grep -v -e "Deleted [PCVI]" -e "Total reclaimed space: 0B")"
         if [ -n "${PODMAN_PRUNE_OUTPUT}" ]; then
           echo "${PODMAN_PRUNE_OUTPUT}"
         fi
@@ -101,7 +101,7 @@
     - name: Clean all podman (user) containers, images and volumes
       shell: |
         command -v podman 1>/dev/null 2>/dev/null && {
-          PODMAN_PRUNE_OUTPUT="$(podman system prune --all --volumes --force |grep -v "Deleted [PCVI]")"
+          PODMAN_PRUNE_OUTPUT="$(podman system prune --all --volumes --force |grep -v -e "Deleted [PCVI]" -e "Total reclaimed space: 0B")"
           if [ -n "${PODMAN_PRUNE_OUTPUT}" ]; then
             echo "${PODMAN_PRUNE_OUTPUT}"
           fi
