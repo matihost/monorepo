@@ -14,12 +14,12 @@ Mandatory option:
 
 Minimum set of features enabled in every Minikube:
 - Minikube Tunnel Loadbalancer along with Nginx Ingress
+- Nginx Ingress Class (--with-nginx) - installs Ngnix Ingress Class
 - Registry, Dashboard
 - NetworkPolicy via CNI/Cilium (--with-cni - for docker container engine it has to be explicitely defined)
 
 Optional features:
 - K8S Version (--with-version) - default to stable, possible values: stable, latest, same as Minikube's --kubernetes-version
-- Nginx Ingress Class (--with-nginx) - installs Ngnix Ingress Class
 
 Optional deprecated features:
 - Istio (--with-istio) - install base Istio w/o meaningful config, go to k8s/istio dir to install istio fully
@@ -30,19 +30,14 @@ Samples:
 # start Minikube with containerd minimum set of features
 $(basename "$0") --with-containerd
 
-# start Minikube with containerd with NGINX Ingress
-$(basename "$0") --with-containerd --with-nginx
-
 # start Minikube with containerd with K8S latest version (default: stable)
 $(basename "$0") --with-containerd --with-version latest
-
 
 # start with Crio as container engine (implies CNI aka enables NetworkPolicy)
 $(basename "$0") --with-crio
 
 # deprecated: start Minikube with docker (CNI enablement has to be defined explicitely)
 $(basename "$0") --with-docker --with-cni
-
 
 # start with Crio as container engine with Istio
 $(basename "$0") --with-crio --with-gatekeeper
@@ -160,7 +155,7 @@ MODE=''
 # that needs to be referenced in PVCs. The driver itself is created under the name:
 # hostpath.csi.k8s.io - to be used for e.g. snapshot class definitions.
 # ADDONS="registry dashboard volumesnapshots csi-hostpath-driver"
-ADDONS="registry dashboard"
+ADDONS="registry dashboard nginx"
 EXTRA_PARAMS=''
 export ADMISSION_PLUGINS="NamespaceExists"
 
@@ -185,9 +180,6 @@ while [[ "$#" -gt 0 ]]; do
     ;;
   --with-cni)
     EXTRA_PARAMS='--network-plugin=cni'
-    ;;
-  --with-nginx | nginx)
-    ADDONS="${ADDONS} nginx"
     ;;
   --with-istio | istio)
     ADDONS="${ADDONS} istio"
