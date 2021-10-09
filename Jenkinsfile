@@ -16,8 +16,8 @@ spec:
   securityContext:
     runAsUser: 1000
   containers:
-  - name: maven-jdk11
-    image: maven:3-jdk-11
+  - name: maven-jdk17
+    image: maven:3-openjdk-17
     command:
     - sleep
     args:
@@ -26,7 +26,7 @@ spec:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
   - name: golang
-    image: mirror.gcr.io/library/golang:latest
+    image: golang:1.16
     command:
     - sleep
     args:
@@ -102,7 +102,7 @@ spec:
       parallel {
         stage('Build :: Java') {
           steps {
-              container("maven-jdk11"){
+              container("maven-jdk17"){
                 dir("java"){
                   echo "Building ${pwd()}..."
                   sh """
@@ -122,7 +122,7 @@ spec:
         }
         stage('Build :: Project Euler') {
           steps {
-            container("maven-jdk11"){
+            container("maven-jdk17"){
               dir("algorithms/project-euler"){
                 echo "Building ${pwd()}..."
                 sh """
