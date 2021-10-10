@@ -56,7 +56,7 @@
     <scala.compat.version>2.13</scala.compat.version>
     <scala.version>${scala.compat.version}.6</scala.version>
     <!-- TODO fix scala.spec2.version and scata.test.version incompatibilities in transitive dependencies-->
-    <scala.spec2.version>4.12.3</scala.spec2.version>
+    <scala.spec2.version>4.12.12</scala.spec2.version>
     <scala.test.version>3.2.9</scala.test.version>
     <scala.test.plus.version>3.2.9.0</scala.test.plus.version>
   </properties>
