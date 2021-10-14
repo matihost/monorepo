@@ -2,7 +2,7 @@
 
 Various playbooks for Ubuntu machine management.
 
-Supported Ubuntu distribution: **21.04 (hirsute)**
+Supported Ubuntu distribution: **21.10 (impish)**
 
 ## Running
 

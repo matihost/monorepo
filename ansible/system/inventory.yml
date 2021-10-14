@@ -9,8 +9,15 @@ all:
           crio: 1.22
           # libcontainers && cri-o :: https://github.com/cri-o/cri-o/blob/master/install.md#apt-based-operating-systems
           # use {{ ansible_distribution_version }} instead of current Ubuntu version is supported, otherwise hardcode version (aka: 21.04)
-          libcontainers_repo_ubuntu_version: "{{ ansible_distribution_version }}"
-          libcontainers_crio_repo_ubuntu_version: "{{ ansible_distribution_version }}"
+          # TODO change to commented when impish/21.10 is supported Ubuntu
+          # libcontainers_repo_ubuntu_version: "{{ ansible_distribution_version }}"
+          libcontainers_repo_ubuntu_version: "21.04"
+          # libcontainers_crio_repo_ubuntu_version: "{{ ansible_distribution_version }}"
+          libcontainers_crio_repo_ubuntu_version: "21.04"
+          # terraform_ubuntu_version: "{{ ansible_distribution_release }}"
+          terraform_ubuntu_version: "hirsute"
+          # virtualbox_ubuntu_version: "{{ ansible_distribution_release }}"
+          virtualbox_ubuntu_version: "hirsute"
         virtual_interface_ip: 192.168.10.1
         update_cache_timeout: 300
         systemd_journal:
@@ -31,7 +38,7 @@ all:
           key_url: https://dl.google.com/linux/linux_signing_key.pub
         - name: virtualbox
           repo: >-
-            deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian {{ ansible_distribution_release }} contrib
+            deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian {{ versions.virtualbox_ubuntu_version }} contrib
         - name: libcontainers
           repo: >-
             deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ versions.libcontainers_repo_ubuntu_version }}/ /
@@ -49,7 +56,7 @@ all:
           repo: "deb [arch=amd64] https://swupdate.openvpn.net/community/openvpn3/repos grovy main"
           key_url: https://swupdate.openvpn.net/repos/openvpn-repo-pkg-key.pub
         - name: terraform
-          repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+          repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ versions.terraform_ubuntu_version }} main"
           key_url: https://apt.releases.hashicorp.com/gpg
         packages:
         - lm-sensors
@@ -67,7 +74,7 @@ all:
         - hplip
         - hplip-gui
         - ddclient
-        - golang-1.16-go
+        - golang-1.17-go
         - golang-golang-x-tools
         - python3-pip
         - ruby
@@ -172,7 +179,7 @@ all:
         - name: ensure-hp-lip
           desc: |
             Ensure the latest hplip is installed from source
-            TODO the latest 3.21.6 cannot be installed on Ubuntu 21.04 out of the box yet: https://bugs.launchpad.net/hplip/+bug/1879353
+            TODO the latest 3.21.8 cannot be installed on Ubuntu 21.04 out of the box yet: https://bugs.launchpad.net/hplip/+bug/1879353
             To install latest HPLIP in advanced mode (without GUI): https://developers.hp.com/hp-linux-imaging-and-printing/KnowledgeBase/InstallHPLIPwithqt5.html
             You need to install the following dependencies
                 PyQt5
@@ -304,8 +311,8 @@ all:
               [ "$(grep -c 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' ~/.bashrc)" -eq 0 ] && \
               echo 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' >> ~/.bashrc
               cd "$(mktemp -d)" &&
-              curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/download/${KREW_VERSION}/krew.{tar.gz,yaml}" &&
-              tar zxvf krew.tar.gz &&
+              curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/download/${KREW_VERSION}/krew{-linux_amd64.tar.gz,.yaml}" &&
+              tar zxvf krew-linux_amd64.tar.gz &&
               KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" &&
               "$KREW" install --manifest=krew.yaml --archive=krew.tar.gz &&
               "$KREW" install change-ns ctx whoami cilium unused-volumes apparmor-manager advise-psp np-viewer view-webhook &&
