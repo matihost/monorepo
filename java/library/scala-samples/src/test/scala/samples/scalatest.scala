@@ -31,7 +31,7 @@ import org.junit.Test
 
 class StackSuite extends Assertions {
 
-  @Test def stackShouldPopValuesIinLastInFirstOutOrder() {
+  @Test def stackShouldPopValuesIinLastInFirstOutOrder() : Unit = {
     val stack = new mutable.ArrayStack[Int]
     stack.push(1)
     stack.push(2)
@@ -39,7 +39,7 @@ class StackSuite extends Assertions {
     assert(stack.pop() === 1)
   }
 
-  @Test def stackShouldThrowRuntimeExceptionIfAnEmptyArrayStackIsPopped() {
+  @Test def stackShouldThrowRuntimeExceptionIfAnEmptyArrayStackIsPopped() : Unit = {
     val emptyStack = new mutable.ArrayStack[String]
     intercept[RuntimeException] {
       emptyStack.pop()

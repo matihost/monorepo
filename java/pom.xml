@@ -56,9 +56,9 @@
     <scala.compat.version>2.13</scala.compat.version>
     <scala.version>${scala.compat.version}.6</scala.version>
     <!-- TODO fix scala.spec2.version and scata.test.version incompatibilities in transitive dependencies-->
-    <scala.spec2.version>4.12.12</scala.spec2.version>
-    <scala.test.version>3.2.9</scala.test.version>
-    <scala.test.plus.version>3.2.9.0</scala.test.plus.version>
+    <scala.spec2.version>4.13.0</scala.spec2.version>
+    <scala.test.version>3.2.10</scala.test.version>
+    <scala.test.plus.version>3.2.10.0</scala.test.plus.version>
   </properties>
 
   <dependencies>
@@ -182,7 +182,7 @@
         <plugin>
           <groupId>net.alchim31.maven</groupId>
           <artifactId>scala-maven-plugin</artifactId>
-          <version>4.5.3</version>
+          <version>4.5.4</version>
           <executions>
             <execution>
               <goals>
@@ -191,6 +191,14 @@
               </goals>
               <configuration>
                 <args>
+                  <!-- When scala-lang dependency is 3.x then enabling below two can be-->
+                  <!-- used for attempt to migration-->
+                  <!-- https://docs.scala-lang.org/scala3/guides/migration/tooling-migration-mode.html -->
+                  <!-- <arg>-source:3.0-migration</arg>
+                  <arg>-rewrite</arg> -->
+                  <!-- Option of Scala 2.13 compiler to force some Scala 3 construct -->
+                  <arg>-Xsource:3</arg>
+                  <!-- Remaining parameters-->
                   <arg>-dependencyfile</arg>
                   <arg>${project.build.directory}/.scala_dependencies</arg>
                 </args>
@@ -265,17 +273,6 @@
           </executions>
           <configuration>
             <reportFile>${project.build.directory}/audit-report.json</reportFile>
-            <excludeVulnerabilityIds>
-              <!-- TODO when groovy > 3.0.8  has been released.
-                Groovy 3.0.8 depends on older Ant where
-                Failed to execute goal org.sonatype.ossindex.maven:ossindex-maven-plugin:3.1.0:audit (audit-dependencies) on project groovy-samples: Detected 1 vulnerable components:
-                org.apache.ant:ant:jar:1.10.9:compile; https://ossindex.sonatype.org/component/pkg:maven/org.apache.ant/ant@1.10.9?utm_source=ossindex-client&utm_medium=integration&utm_content=1.1.1
-                * [CVE-2021-36373] When reading a specially crafted TAR archive an Apache Ant build can be made to ... (5.5); https://ossindex.sonatype.org/vulnerability/0ad53e01-ee26-4fb6-9178-dc45c1fcea32?component-type=maven&component-name=org.apache.ant.ant&utm_source=ossindex-client&utm_medium=integration&utm_content=1.1.1
-                * [CVE-2021-36374] When reading a specially crafted ZIP archive, or a derived formats, an Apache An... (5.5); https://ossindex.sonatype.org/vulnerability/281b25c5-5aea-41ab-97bd-8065e85f430b?component-type=maven&component-name=org.apache.ant.ant&utm_source=ossindex-client&utm_medium=integration&utm_content=1.1.1
-              -->
-              <exclude>0ad53e01-ee26-4fb6-9178-dc45c1fcea32</exclude>
-              <exclude>281b25c5-5aea-41ab-97bd-8065e85f430b</exclude>
-            </excludeVulnerabilityIds>
           </configuration>
         </plugin>
 
