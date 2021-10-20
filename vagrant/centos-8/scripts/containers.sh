@@ -27,7 +27,7 @@ rm -rf Dockerfile
 # create container w/o running it,
 # it should run as deamon, and autoremove after finishing
 # and ideally expose some port on host
-podman create --name=web -d -it --rm -p 82:80 localhost/root/web:latest
+podman create --name=web -it --rm -p 82:80 localhost/root/web:latest
 cd /etc/systemd/system || exit 1
 
 # generate

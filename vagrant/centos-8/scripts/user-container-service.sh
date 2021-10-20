@@ -28,7 +28,7 @@ rm -rf /tmp/mywebi
 # create container w/o running it,
 # it should run as deamon, and autoremove after finishing
 # and ideally expose some port on host on host
-podman create -d --name=webi -it --rm -p 81:80 localhost/vagrant/webi:latest
+podman create --name=webi -it --rm -p 81:80 localhost/vagrant/webi:latest
 # allow user-land systemd services survice user logout
 loginctl enable-linger vagrant
 

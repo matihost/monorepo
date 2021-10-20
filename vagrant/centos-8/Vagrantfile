@@ -48,6 +48,10 @@ Vagrant.configure("2") do |config|
   #   vb.memory = "1024"
   # end
 
+  config.vm.provider "virtualbox" do |vb|
+    vb.cpus = 4
+  end
+
   # Update each time VM is started
   config.vm.provision "shell", run: "always", inline: <<-SHELL
     yum -y update
