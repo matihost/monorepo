@@ -27,7 +27,7 @@ jobs:
     before_script: cd rust/guessing_game
     cache: cargo
   - language: go
-    go: "1.16"
+    go: "1.17"
     before_install: cd go
     script:
     - go build -mod=mod -o .  ./...
