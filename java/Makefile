@@ -17,8 +17,14 @@ show-effective-pom: ## show Maven effective pom
 show-enforcer-info: ## show Maven enforcer plugin display info
 	mvn -T1 -s .mvn/settings.xml enforcer:display-info
 
+show-modules-dependencies: ## show java modules dependencies
+	mvn -T1 -s .mvn/settings.xml clean compile test-compile jdeps:jdkinternals jdeps:test-jdkinternals
+
 build: ## builds the project
-	mvn -s .mvn/settings.xml clean install
+	mvn -s .mvn/settings.xml --show-version clean install
+
+build-fast: ## builds the project w/o compiling and running tests
+	mvn -s .mvn/settings.xml --show-version clean install -PskipTests
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
