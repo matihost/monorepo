@@ -278,7 +278,7 @@ all:
           become: false
           command: |
             CURRENT_VERSION="$(curl -Ls https://github.com/helm/helm/releases | grep 'href="/helm/helm/releases/tag/v3.[0-9]*.[0-9]*\"' | \
-              grep -v no-underline | head -n 1 | cut -d '"' -f 2 | awk '{n=split($NF,a,"/");print a[n]}' | awk 'a !~ $0{print}; {a=$0}')"
+              sed -E 's/.*\/helm\/helm\/releases\/tag\/(v[0-9\.]+)".*/\1/g' | head -1)"
             INSTALLED_VERSION="$(helm version 2>/dev/null | sed -E 's/.*\{Version:"([^"]+)".*/\1/')"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
