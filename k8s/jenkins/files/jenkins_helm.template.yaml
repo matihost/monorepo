@@ -15,21 +15,21 @@ controller:
   installPlugins: false
 {% else %}
   image: "jenkins/jenkins"
-  tag: "2.303.2"
+  tag: "2.303.3"
   initializeOnce: false
   installLatestPlugins: true
   installLatestSpecifiedPlugins: false
   installPlugins:
   - branch-api:2.7.0
-  - kubernetes:1.30.3
-  - workflow-job:2.41
+  - kubernetes:1.30.6
+  - workflow-job:2.42
   - workflow-aggregator:2.6
   - cloudbees-disk-usage-simple:0.10
   - credentials:2.6.1
   - credentials-binding:1.27
   - docker-commons:1.17
   - docker-workflow:1.26
-  - git:4.9.0
+  - git:4.10.0
   - configuration-as-code:1.54
   - timestamper:1.13
   - github-branch-source:2.11.3
@@ -69,8 +69,8 @@ controller:
       cpu: "50m"
       memory: "256Mi"
     limits:
-      cpu: "{{ jenkins_max_cpu|default('2000m') }}"
-      memory: "{{ jenkins_max_memory|default('2Gi') }}"
+      cpu: "{{ jenkins_max_cpu|default('3000m') }}"
+      memory: "{{ jenkins_max_memory|default('5Gi') }}"
 
   sidecars:
     configAutoReload:
@@ -178,9 +178,9 @@ controller:
 agent:
   #TODO jenkins/inbound-agent mirrored image dissapeared from mirror.gcr.io
   # image: "mirror.gcr.io/jenkins/inbound-agent"
-  # tag: "4.6-1"
-  image: "jenkins/inbound-agent"
-  tag: "jdk11-nanoserver-1809"
+  # tag: "4.11-1"
+  # image: "jenkins/inbound-agent"
+  # tag: "jdk11-nanoserver-1809"
   resources:
     requests:
       cpu: "50m"

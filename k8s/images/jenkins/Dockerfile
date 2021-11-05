@@ -1,15 +1,15 @@
-FROM jenkins/jenkins:2.303.2
+FROM jenkins/jenkins:2.303.3
 RUN jenkins-plugin-cli --verbose --latest true --plugins \
   branch-api:2.7.0 \
-  kubernetes:1.30.3 \
-  workflow-job:2.41 \
+  kubernetes:1.30.6 \
+  workflow-job:2.42 \
   workflow-aggregator:2.6 \
   cloudbees-disk-usage-simple:0.10 \
   credentials:2.6.1 \
   credentials-binding:1.27 \
   docker-commons:1.17 \
   docker-workflow:1.26 \
-  git:4.9.0 \
+  git:4.10.0 \
   configuration-as-code:1.54 \
   timestamper:1.13 \
   github-branch-source:2.11.3 \
