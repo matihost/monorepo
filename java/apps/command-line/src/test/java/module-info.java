@@ -1,4 +1,4 @@
-open module test {
+open module org.matihost.learning.apps.commandline.test {
   requires org.matihost.learning.apps.commandline;
 
   requires transitive spring.boot.test;
