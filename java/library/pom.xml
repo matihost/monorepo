@@ -10,7 +10,6 @@
   </parent>
   <artifactId>library</artifactId>
   <packaging>pom</packaging>
-  <name>${project.artifactId}</name>
 
   <modules>
     <module>groovy-samples</module>

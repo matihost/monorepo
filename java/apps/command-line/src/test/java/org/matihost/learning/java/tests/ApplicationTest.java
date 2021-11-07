@@ -1,4 +1,4 @@
-package org.matihost.learning.java;
+package org.matihost.learning.java.tests;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

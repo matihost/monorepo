@@ -10,7 +10,6 @@
   </parent>
   <artifactId>apps</artifactId>
   <packaging>pom</packaging>
-  <name>${project.artifactId}</name>
   <modules>
     <module>command-line</module>
   </modules>

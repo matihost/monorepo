@@ -1,2 +1,2 @@
-module algorithms.euler {
+module org.matihost.algorithms.euler {
 }

@@ -1,4 +1,4 @@
-package org.matihost.learning.java.utils;
+package org.matihost.learning.java.utils.tests;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.matihost.learning.java.utils.*;
 
 import javax.xml.xpath.XPathExpressionException;
 import java.util.stream.Stream;

@@ -1,4 +1,4 @@
-package org.matihost.learning.java;
+package org.matihost.learning.java.tests;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
