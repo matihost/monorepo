@@ -69,6 +69,33 @@
         <maven.test.skip>true</maven.test.skip>
       </properties>
     </profile>
+    <!-- Profile enabled under VSCode-->
+    <profile>
+        <id>m2e</id>
+        <activation>
+            <property>
+            <name>m2e.version</name>
+            </property>
+        </activation>
+        <build>
+            <plugins>
+                <!-- workaround for https://github.com/redhat-developer/vscode-java/issues/2116 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <compilerArgs>
+                            <arg>--module-version=${project.version}</arg>
+                            <arg>-Xlint:unchecked</arg>
+                        </compilerArgs>
+                        <testExcludes>
+                            <testExclude>**/module-info.java</testExclude>
+                        </testExcludes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
   </profiles>
 
   <dependencies>

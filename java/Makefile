@@ -26,6 +26,12 @@ build: ## builds the project
 build-fast: ## builds the project w/o compiling and running tests
 	mvn -s .mvn/settings.xml --show-version clean install -PskipTests
 
+
+debug-submodule: ## build submodule with debug; usage make debug-submodule MODULE=mavenModule
+# -am added to allow running submodule with enforcer plugin under Maven 3
+# https://issues.apache.org/jira/browse/MENFORCER-189
+	mvn -s .mvn/settings.xml --show-version --debug -am -pl :$(MODULE) clean install
+
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
