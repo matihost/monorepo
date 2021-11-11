@@ -303,6 +303,17 @@ all:
               curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64  &&
               chmod a+x minikube && sudo mv minikube /usr/bin/ && echo "minikube installed"
             }
+        - name: cilium-cli
+          become: false
+          command: |
+            CURRENT_VERSION="$(curl -s https://github.com/cilium/cilium-cli/releases/latest |grep tag | sed -E 's/.*v([0-9\.]+).*/\1/')"
+            INSTALLED_VERSION="$(cilium version | grep cilium-cli: | sed -E 's/^cilium.* v([0-9\.]+).*/\1/')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -L --remote-name-all https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz{,.sha256sum}
+              sha256sum --check cilium-linux-amd64.tar.gz.sha256sum
+              sudo tar xzvfC cilium-linux-amd64.tar.gz /usr/local/bin
+              rm cilium-linux-amd64.tar.gz{,.sha256sum}
+            }
         - name: krew
           become: false
           command: |
