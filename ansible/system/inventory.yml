@@ -23,6 +23,46 @@ all:
         systemd_journal:
           max_size: 1G
           max_duration: 10days
+        vs_code_extensions: |
+          4ops.packer
+          4ops.terraform
+          asciidoctor.asciidoctor-vscode
+          DavidAnson.vscode-markdownlint
+          donjayamanne.githistory
+          DotJoshJohnson.xml
+          eamodio.gitlens
+          formulahendry.code-runner
+          foxundermoon.shell-format
+          GabrielBB.vscode-lombok
+          golang.go
+          hashicorp.terraform
+          joaompinto.asciidoctor-vscode
+          ms-azuretools.vscode-docker
+          ms-kubernetes-tools.vscode-kubernetes-tools
+          ms-python.python
+          ms-python.vscode-pylance
+          ms-toolsai.jupyter
+          ms-toolsai.jupyter-keymap
+          ms-toolsai.jupyter-renderers
+          Pivotal.vscode-boot-dev-pack
+          Pivotal.vscode-spring-boot
+          redhat.fabric8-analytics
+          redhat.java
+          redhat.vscode-commons
+          redhat.vscode-yaml
+          scala-lang.scala
+          streetsidesoftware.code-spell-checker
+          techer.open-in-browser
+          tomoki1207.pdf
+          VisualStudioExptTeam.vscodeintellicode
+          vscjava.vscode-java-debug
+          vscjava.vscode-java-dependency
+          vscjava.vscode-java-pack
+          vscjava.vscode-java-test
+          vscjava.vscode-maven
+          vscjava.vscode-spring-boot-dashboard
+          vscjava.vscode-spring-initializr
+          wholroyd.jinja
         repositories:
         - name: universe
         - name: multiverse
@@ -176,6 +216,17 @@ all:
               ansible-galaxy collection install community.kubernetes
               echo "Ansible collection community.kubernetes has been installed"
             }
+        - name: git-config
+          become: false
+          command: |
+            [ "$(git config --global pull.rebase)" == "true" ] || {
+              git config --global pull.rebase true
+              git config --global credential.helper store
+            }
+            ([ -n "$(git config --global user.name)" ] && [ -n "$(git config --global user.email)" ]) || {
+              echo "Git user.name and user.email MUST be set"
+              exit 1
+            }
         - name: ensure-hp-lip
           desc: |
             Ensure the latest hplip is installed from source
@@ -313,6 +364,16 @@ all:
               sha256sum --check cilium-linux-amd64.tar.gz.sha256sum
               sudo tar xzvfC cilium-linux-amd64.tar.gz /usr/local/bin
               rm cilium-linux-amd64.tar.gz{,.sha256sum}
+            }
+        - name: code-plugins
+          become: false
+          command: |
+            PLUGINS_TO_INSTALL="{{ vs_code_extensions }}"
+            CODE_PLUGINS="$(code --list-extensions |wc -l)"
+            [ "${CODE_PLUGINS}" -eq 39 ] || {
+              for i in ${PLUGINS_TO_INSTALL} ; do
+                code --force --install-extension "$i"
+              done
             }
         - name: krew
           become: false
