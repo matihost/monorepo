@@ -8,6 +8,14 @@ run: ## run command-line
 build: ## build
 	mvn -am clean package
 
+run-built: ## run built jar
+	java -XshowSettings:* -XX:+PrintFlagsFinal -XX:NativeMemoryTracking=summary -Xlog:async -Xlog:gc*=debug,gc+ergo*=trace,gc+age*=trace,safepoint*:file=/tmp/command-line.gc.log:utctime,pid:filecount=5,filesize=1m \
+		-XX:OnOutOfMemoryError='kill -9 %p' -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp \
+		-XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:+UseNUMA -XX:+PreserveFramePointer \
+		-Xms128m -Xmx128m \
+		-XX:ThreadStackSize=1024 -XX:MaxDirectMemorySize=3G -XX:MaxMetaspaceSize=64m -XX:ReservedCodeCacheSize=32m -XX:CompressedClassSpaceSize=32m\
+		-jar target/command-line-*.jar
+
 build-docker: build ## build docker image
 	DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build --build-arg JAR_FILE=target/*.jar -t $(BASE):$(TAG) .
 

@@ -9,7 +9,7 @@ module org.matihost.learning.apps.commandline {
   // spring
   requires spring.beans;
   requires spring.context;
-  requires spring.boot;
+  requires transitive spring.boot;
   requires spring.boot.autoconfigure;
 
   // to let Spring and Test framework access non public members
