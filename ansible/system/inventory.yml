@@ -309,6 +309,20 @@ all:
             sdk i maven;\
             sdk i groovy;\
             sdk i scala")
+            [ -e ~/.local/share/applications/jconsole.desktop  ] || {
+              mkdir -p ~/.local/share/applications
+              echo "[Desktop Entry]
+            Version=1.0
+            Name=JConsole (jconsole)
+            GenericName=JConsole
+            Comment=Java MBean Viewer
+            Exec=/home/${USER}/.sdkman/candidates/java/current/bin/jconsole
+            StartupNotify=true
+            Terminal=false
+            Type=Application
+            Categories=Java;Profiling;" > ~/.local/share/applications/jconsole.desktop
+              echo "JConsole (jconsole)"
+            }
             [ $(bash -ic "sdk c 2>/dev/null" |grep -cE 'groovy|maven|scala|java') -eq 4 ]
         - name: runc-conmon-fix
           desc: Ensure runc and conmon binaries for CRIO are on sysmte path, related to https://github.com/cri-o/cri-o/issues/1767
@@ -418,7 +432,9 @@ all:
           command: |
             [ -d ~/bin/.jmc ] || {
               cd "$(mktemp -d)" &&
-              curl -sSL https://github.com/adoptium/jmc-overrides/releases/download/8.1.0/org.openjdk.jmc-8.1.0-linux.gtk.x86_64.tar.gz | tar -zxv &&
+            curl -s https://api.github.com/repos/adoptium/jmc-overrides/releases/latest | \
+              jq -r ".assets[] | select(.browser_download_url | contains(\"linux\")) | .browser_download_url" | \
+            xargs curl -sSL | tar -zxv &&
               mv 'JDK Mission Control' ~/bin/.jmc &&
               ln -s ~/bin/.jmc/jmc ~/bin/jmc
             }
@@ -436,6 +452,33 @@ all:
             Type=Application
             Categories=Java;Profiling;" > ~/.local/share/applications/jmc.desktop
               echo "JDK Mission Control (jmc)"
+            }
+        - name: visualvm
+          become: false
+          command: |
+            [ -d ~/bin/.visualvm ] || {
+              cd "$(mktemp -d)" &&
+              curl -s https://api.github.com/repos/oracle/visualvm/releases/latest | \
+                jq -r ".assets[]|select(.content_type|test(\"application/zip\"))|.browser_download_url" | \
+              xargs curl -sSLO
+              unzip visualvm*.zip && rm visualvm*.zip &&
+              mv visualvm* ~/bin/.visualvm &&
+              ln -s ~/bin/.visualvm/bin/visualvm ~/bin/visualvm
+            }
+            [ -e ~/.local/share/applications/visualvm.desktop  ] || {
+              mkdir -p ~/.local/share/applications
+              echo "[Desktop Entry]
+            Version=1.0
+            Name=VisualVM (visualvm)
+            GenericName=VisualVM
+            Comment=Java Oracle Profiler
+            Exec=/home/$(whoami)/bin/visualvm
+            StartupNotify=true
+            Terminal=false
+            Icon=/home/$(whoami)/bin/.visualvm/etc/visualvm.icns
+            Type=Application
+            Categories=Java;Profiling;" > ~/.local/share/applications/visualvm.desktop
+              echo "VisualVM (visualvm)"
             }
         - name: calibre
           become: true
