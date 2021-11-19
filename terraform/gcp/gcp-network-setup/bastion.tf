@@ -22,19 +22,23 @@ resource "google_compute_instance" "bastion" {
 
   boot_disk {
     initialize_params {
+      # # OpsAgents support only LTS
+      # https://cloud.google.com/monitoring/agent/ops-agent?hl=en_US#supported_operating_systems
       image = "ubuntu-os-cloud/ubuntu-minimal-2104"
     }
   }
 
-  metadata_startup_script = <<EOT
-  #!/usr/bin/env bash
-  apt-get update -y
-  apt-get install -y bash-completion vim less bind9-dnsutils tinyproxy iputils-ping ncat
-  snap install kubectl --classic
-  EOT
-
   metadata = {
     enable-oslogin = "TRUE"
+    startup-script = <<EOT
+    #!/usr/bin/env bash
+    apt-get update -y
+    apt-get install -y bash-completion vim less bind9-dnsutils tinyproxy iputils-ping ncat
+    snap install kubectl --classic
+    # installl OpsAgent
+    curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
+    bash add-google-cloud-ops-agent-repo.sh --also-install
+    EOT
   }
 
   network_interface {
@@ -71,13 +75,16 @@ resource "google_service_account" "bastion" {
 # gcloud container clusters  get-credentials <gke-name> --[region|zone]=<location> --internal-ip
 # kubectl get po -A
 resource "google_project_iam_member" "bastion-gke-admin" {
+  project = var.project
+
   role   = "roles/container.admin"
   member = "serviceAccount:${google_service_account.bastion.email}"
-
 }
 
 # allows to gcloud SSH to VM (but they need to be running with same SA)
 resource "google_project_iam_member" "bastion-oslogin-user" {
+  project = var.project
+
   role   = "roles/compute.osLogin"
   member = "serviceAccount:${google_service_account.bastion.email}"
 }
@@ -85,12 +92,16 @@ resource "google_project_iam_member" "bastion-oslogin-user" {
 # allows gcloud ssh to other VMs running with different GSA from bastion VM
 # gcloud compute <vm-name> --zone=<zone> --internal-ip
 resource "google_project_iam_member" "bastion-service-account-user" {
+  project = var.project
+
   role   = "roles/iam.serviceAccountUser"
   member = "serviceAccount:${google_service_account.bastion.email}"
 }
 
 # allows gcloud source repos list
 resource "google_project_iam_member" "bastion-source-reader" {
+  project = var.project
+
   role   = "roles/source.reader"
   member = "serviceAccount:${google_service_account.bastion.email}"
 }

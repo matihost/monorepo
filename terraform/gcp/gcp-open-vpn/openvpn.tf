@@ -5,24 +5,25 @@ resource "google_compute_instance" "vm" {
 
   boot_disk {
     initialize_params {
+      # OpsAgents support only LTS:
+      # https://cloud.google.com/monitoring/agent/ops-agent?hl=en_US#supported_operating_systems
       image = "ubuntu-os-cloud/ubuntu-minimal-2104"
     }
   }
 
-  metadata_startup_script = templatefile("init-server.tpl.sh", {
-    GS_BUCKET = google_storage_bucket.vpn-data.name,
-    COUNTRY   = "PL",
-    STATE     = "XX",
-    CITY      = "YYY",
-    ORG       = "OpenVPN",
-    CA_EMAIL  = "me@me.me",
-    CN_SERVER = "Server",
-    CN_CLIENT = "Client"
-  })
-
   metadata = {
     enable-oslogin = "TRUE"
     ssh-keys       = "ubuntu:${file("~/.ssh/id_rsa.cloud.vm.pub")}"
+    startup-script = templatefile("init-server.tpl.sh", {
+      GS_BUCKET = google_storage_bucket.vpn-data.name,
+      COUNTRY   = "PL",
+      STATE     = "XX",
+      CITY      = "YYY",
+      ORG       = "OpenVPN",
+      CA_EMAIL  = "me@me.me",
+      CN_SERVER = "Server",
+      CN_CLIENT = "Client"
+    })
   }
 
   can_ip_forward = true
@@ -53,12 +54,16 @@ resource "google_service_account" "vpn" {
 
 # allows to gcloud SSH to VM (but they need to be running with same SA)
 resource "google_project_iam_member" "vpn-oslogin-user" {
+  project = var.project
+
   role   = "roles/compute.osLogin"
   member = "serviceAccount:${google_service_account.vpn.email}"
 }
 
 # allows to gsutil cp both directions
 resource "google_project_iam_member" "vpn-gs" {
+  project = var.project
+
   role   = "roles/storage.objectAdmin"
   member = "serviceAccount:${google_service_account.vpn.email}"
 }
@@ -66,6 +71,8 @@ resource "google_project_iam_member" "vpn-gs" {
 # allows gcloud ssh to other VMs running with different GSA from VPN VM
 # gcloud compute <vm-name> --zone=<zone> --internal-ip
 resource "google_project_iam_member" "vpn-service-account-user" {
+  project = var.project
+
   role   = "roles/iam.serviceAccountUser"
   member = "serviceAccount:${google_service_account.vpn.email}"
 }

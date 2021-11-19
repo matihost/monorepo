@@ -8,13 +8,12 @@ resource "google_compute_instance_template" "minecraft_template" {
     source_image = data.google_compute_image.ubuntu-latest.self_link
   }
 
-  metadata_startup_script = templatefile("init-server.tpl.sh", {
-    GS_BUCKET             = google_storage_bucket.minecraft-data.name,
-    MINECRAFT_SERVER_NAME = var.minecraft_server_name
-  })
-
   metadata = {
     enable-oslogin = "TRUE"
+    startup-script = templatefile("init-server.tpl.sh", {
+      GS_BUCKET             = google_storage_bucket.minecraft-data.name,
+      MINECRAFT_SERVER_NAME = var.minecraft_server_name
+    })
   }
 
   can_ip_forward = false
@@ -61,6 +60,7 @@ resource "google_compute_instance_group_manager" "minecraft_group_manager" {
 }
 
 data "google_compute_image" "ubuntu-latest" {
+  # OpsAgents support only LTS: https://cloud.google.com/monitoring/agent/ops-agent?hl=en_US#supported_operating_systems
   family  = "ubuntu-minimal-2104"
   project = "ubuntu-os-cloud"
 }
@@ -85,12 +85,16 @@ resource "google_service_account" "minecraft-server" {
 
 # allows to gcloud SSH to VM (but they need to be running with same SA)
 resource "google_project_iam_member" "minecraft-server-oslogin-user" {
+  project = var.project
+
   role   = "roles/compute.osLogin"
   member = "serviceAccount:${google_service_account.minecraft-server.email}"
 }
 
 # allows to gsutil cp both directions
 resource "google_project_iam_member" "minecraft-server-gs" {
+  project = var.project
+
   role   = "roles/storage.objectAdmin"
   member = "serviceAccount:${google_service_account.minecraft-server.email}"
 }

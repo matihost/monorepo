@@ -22,13 +22,12 @@ resource "google_compute_instance" "vm" {
     }
   }
 
-  metadata_startup_script = templatefile("instance.init.sh.tpl", {
-    ssh_key = filebase64("~/.ssh/id_rsa.cloud.vm"),
-    ssh_pub = filebase64("~/.ssh/id_rsa.cloud.vm.pub"),
-  })
-
   metadata = {
     enable-oslogin = "TRUE"
+    startup-script = templatefile("instance.init.sh.tpl", {
+      ssh_key = filebase64("~/.ssh/id_rsa.cloud.vm"),
+      ssh_pub = filebase64("~/.ssh/id_rsa.cloud.vm.pub"),
+    })
     # startup-script-url = "gs://bucket/context/path/some-startup-script.sh"
   }
 

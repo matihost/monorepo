@@ -14,6 +14,7 @@ apply: init-terraform prepare ## setup Open VPN
 	terraform plan -lock=false' && \
 	terraform apply -auto-approve'
 
+# sample: make apply-with-dns-forwarding ZONE=matihost IP=10.8.0.2
 apply-with-dns-forwarding: init-terraform prepare ## usage: make apply-with-dns-forwarding ZONE=vpnclient.zone.com IP=onpremise_dns_server_ip;  setup Open VPN and forwards DNS to client VPN network DNS nameserver
 	@terraform validate && \
 	terraform plan -lock=false -var='onpremise_dns_zone_forward={"zone":"$(ZONE)","dns_ip":"$(IP)"}' && \
