@@ -6,6 +6,8 @@ resource "google_service_account" "identity-workflow-sa" {
 
 # Metrics writing always add
 resource "google_project_iam_member" "identity-workflow-sa-metric-role" {
+  project = var.project
+
   role   = "roles/monitoring.metricWriter"
   member = "serviceAccount:${google_service_account.identity-workflow-sa.email}"
 }
@@ -13,8 +15,10 @@ resource "google_project_iam_member" "identity-workflow-sa-metric-role" {
 # Assing other roles to GSA
 resource "google_project_iam_member" "identity-workflow-sa-role" {
   for_each = toset(var.gsa_roles)
-  role     = each.key
-  member   = "serviceAccount:${google_service_account.identity-workflow-sa.email}"
+
+  project = var.project
+  role    = each.key
+  member  = "serviceAccount:${google_service_account.identity-workflow-sa.email}"
 }
 
 # WorkloadIdentity for ConfigConnector in Namespaced mode

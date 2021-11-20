@@ -63,7 +63,7 @@ gcloud beta compute instances create \
   --service-account=default \
   --scopes default,bigquery,cloud-platform,compute-rw,datastore,storage-full,taskqueue,userinfo-email,sql-admin \
   --tags=http-server,https-server \
-  --image=ubuntu-minimal-1910-eoan-v20200129 --image-project=ubuntu-os-cloud \
+  --image=ubuntu-minimal-2004-lts --image-project=ubuntu-os-cloud \
   --boot-disk-size=10GB \
   --boot-disk-type=pd-standard \
   --boot-disk-device-name=boot-disk-1 \

@@ -4,7 +4,7 @@ data "google_container_engine_versions" "versions" {
   # run: gcloud container get-server-config
   # to see available versions
   location       = local.location
-  version_prefix = "1.20."
+  version_prefix = "1.21."
 
   project = var.project
 }
@@ -53,8 +53,11 @@ resource "google_container_cluster" "gke" {
     gce_persistent_disk_csi_driver_config {
       enabled = true
     }
+
+    # Disabled Application Manager:
+    # https://cloud.google.com/kubernetes-engine/docs/how-to/add-on/application-delivery
     kalm_config {
-      enabled = true
+      enabled = false
     }
     config_connector_config {
       enabled = true
@@ -105,7 +108,7 @@ resource "google_container_cluster" "gke" {
     for_each = var.encrypt_etcd ? [1] : []
     content {
       state    = "ENCRYPTED"
-      key_name = data.google_kms_crypto_key.gke-etcd-enc-key[0].self_link
+      key_name = data.google_kms_crypto_key.gke-etcd-enc-key[0].id
     }
   }
 
@@ -128,13 +131,11 @@ resource "google_container_cluster" "gke" {
   }
   networking_mode = "VPC_NATIVE"
 
-  # Disable basic authentication and cert-based authentication.
-  # Empty fields for username and password are how to "disable" the
-  # credentials from being generated.
-  master_auth {
-    username = ""
-    password = ""
+  logging_config {
+    enable_components = ["SYSTEM_COMPONENTS", "WORKLOADS"]
+  }
 
+  master_auth {
     client_certificate_config {
       issue_client_certificate = false
     }
@@ -177,13 +178,17 @@ resource "google_container_cluster" "gke" {
     }
   }
 
-  cluster_telemetry {
-    # Supported values: ENABLE, DISABLE, SYSTEM_ONLY
-    type = "SYSTEM_ONLY"
-  }
+  # Cannot specify logging_config or monitoring_config together with cluster_telemetry
+  # cluster_telemetry {
+  #   # Supported values: ENABLE, DISABLE, SYSTEM_ONLY
+  #   type = "SYSTEM_ONLY"
+  # }
 
   min_master_version = data.google_container_engine_versions.versions.release_channel_default_version["RAPID"]
 
+  monitoring_config {
+    enable_components = ["SYSTEM_COMPONENTS", "WORKLOADS"]
+  }
   release_channel {
     channel = "RAPID"
   }
@@ -197,7 +202,7 @@ resource "google_container_cluster" "gke" {
   }
 
   workload_identity_config {
-    identity_namespace = "${var.project}.svc.id.goog"
+    workload_pool = "${var.project}.svc.id.goog"
   }
 
   # Whether Intra-node visibility is enabled for this cluster.
@@ -263,13 +268,20 @@ resource "google_container_cluster" "gke" {
   #     topic   = notification_topic
   #   }
   # }
+
+
+  # Confidential VM is only available on N2D instances of Compute Engine.
+  # Confidential GKE Nodes can be used with Container-Optimized OS (cos_containerd).
+  confidential_nodes {
+    enabled = false
+  }
 }
 
 resource "random_id" "gke_node_pool_id" {
   byte_length = 2
   keepers = {
     machine_type = "e2-standard-4"
-    disk_size_gb = 20
+    disk_size_gb = 30
     disk_type    = "pd-standard"
   }
 }
@@ -311,9 +323,18 @@ resource "google_container_node_pool" "gke_nodes" {
     #   local_ssd_count = 2
     # }
 
+    # GKE usually downloads the entire container image onto each node and uses it as the root filesystem for your workloads.
+    # With Image streaming, GKE uses a remote filesystem as the root filesystem for any containers that use eligible container images.
+    # GKE streams image data from the remote filesystem as needed by your workloads.
+    #
+    # requires image_type = COS_CONTAINERD and >= 16 GiB memory for node
+    gcfs_config {
+      enabled = true
+    }
+
     # since 1.20 usage of docker as container engine is deprecated
     # valid image types: gcloud container get-server-config
-    image_type = "UBUNTU_CONTAINERD"
+    image_type = "COS_CONTAINERD"
 
     metadata = {
       // Set metadata on the VM to supply more entropy
@@ -342,7 +363,7 @@ resource "google_container_node_pool" "gke_nodes" {
 
     // Enable workload identity on this node pool
     workload_metadata_config {
-      node_metadata = "GKE_METADATA_SERVER"
+      mode = "GKE_METADATA"
     }
 
     # requires image_type = COS_CONTAINERD as well

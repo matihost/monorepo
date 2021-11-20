@@ -22,13 +22,11 @@ locals {
 
 variable "region" {
   type        = string
-  default     = "us-central1"
   description = "GCP Region For Deployment"
 }
 
 variable "zone_letter" {
   type        = string
-  default     = "a"
   description = "GCP Region For Deployment"
 }
 
@@ -39,7 +37,6 @@ variable "project" {
 
 variable "cluster_name" {
   type        = string
-  default     = "shared-dev"
   description = "GKE Cluster Name Project For Deployment"
 }
 

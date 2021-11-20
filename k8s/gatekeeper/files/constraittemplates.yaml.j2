@@ -1,5 +1,5 @@
 ---
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8sdebug
@@ -18,7 +18,7 @@ spec:
           msg := sprintf("REVIEW OBJECT: %v\nDATA OBJECT: %v\n", [input.review, data.inventory])
         }
 ---
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8spspprivilegedcontainer
@@ -48,7 +48,7 @@ spec:
             c := input.review.object.spec.initContainers[_]
         }
 ---
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8spspallowedusers
@@ -242,7 +242,7 @@ spec:
           c := input.review.object.spec.initContainers[_]
         }
 ---
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8spspvolumetypes
@@ -282,7 +282,7 @@ spec:
             field == input.parameters.volumes[_]
         }
 ---
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8spsphostnetworkingports
@@ -336,7 +336,7 @@ spec:
           c := input.review.object.spec.initContainers[_]
         }
 ---
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8spsphostfilesystem
@@ -446,7 +446,7 @@ spec:
             c := input.review.object.spec.initContainers[_]
         }
 ---
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8suniqueingresshost
@@ -478,7 +478,7 @@ spec:
           msg := sprintf("ingress host conflicts with an existing ingress <%v>", [host])
         }
 ---
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8sblocknodeport
@@ -500,7 +500,7 @@ spec:
           msg := "User is not allowed to create service of type NodePort"
         }
 ---
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8srequiredprobes
@@ -556,7 +556,7 @@ spec:
           msg := sprintf("Container <%v> in your <%v> <%v> has no <%v>", [container.name, review.kind.kind, review.object.metadata.name, probe])
         }
 ---
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8srequiredprobes

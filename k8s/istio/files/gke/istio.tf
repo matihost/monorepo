@@ -99,7 +99,7 @@ resource "google_container_node_pool" "gke_internal_ingress_nodes" {
 
     // Enable workload identity on this node pool
     workload_metadata_config {
-      node_metadata = "GKE_METADATA_SERVER"
+      mode = "GKE_METADATA"
     }
 
     # requires image_type = COS_CONTAINERD as well
@@ -205,7 +205,7 @@ resource "google_container_node_pool" "gke_external_ingress_nodes" {
 
     // Enable workload identity on this node pool
     workload_metadata_config {
-      node_metadata = "GKE_METADATA_SERVER"
+      mode = "GKE_METADATA"
     }
 
     # requires image_type = COS_CONTAINERD as well

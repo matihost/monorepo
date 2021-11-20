@@ -36,7 +36,7 @@ EOF
 kubectl apply -f target/config-connector.yaml
 
 # wait for ConfigConnector Stateful set to initiate
-sleep 20
+sleep 60
 
 # ensure Config Connector Context for KNS is running
 kubectl wait -n cnrm-system \

@@ -54,8 +54,13 @@
       validate:
         fail_on_error: true
         strict: true
+
 # TODO ensure CRDs are really created before applying constraints to avoid error:
 # Failed to find exact match for constraints.gatekeeper.sh/v1beta1.K8sPSPPrivilegedContainer by [kind, name, singularName, shortNames]
+  - name: TODO ensure CRDs are really created before applying constraints to avoid
+    pause:
+      seconds: 30
+
   - name: Ensure Gatekeeper constraints present
     k8s:
       state: present

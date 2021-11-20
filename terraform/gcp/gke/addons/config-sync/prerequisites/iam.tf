@@ -6,6 +6,8 @@ resource "google_service_account" "configsync-sa" {
 
 
 resource "google_project_iam_member" "configsync-sa-source-reader" {
+  project = var.project
+
   role   = "roles/source.reader"
   member = "serviceAccount:${google_service_account.configsync-sa.email}"
 }
