@@ -9,7 +9,7 @@ export JENKINS_PLUGINS="ec2 \
   credentials-binding:1.27 \
   git:4.10.0 \
   configuration-as-code:1.54 \
-  timestamper:1.13 \
+  timestamper:1.14 \
   github-branch-source:2.11.3 \
   github-oauth:0.34 \
   matrix-auth:2.6.8 \
