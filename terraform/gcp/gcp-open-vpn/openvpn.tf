@@ -77,6 +77,22 @@ resource "google_project_iam_member" "vpn-service-account-user" {
   member = "serviceAccount:${google_service_account.vpn.email}"
 }
 
+# to let OpsAgent send logs
+resource "google_project_iam_member" "vpn-log-writer" {
+  project = var.project
+
+  role   = "roles/logging.logWriter"
+  member = "serviceAccount:${google_service_account.vpn.email}"
+}
+
+# to let OpsAgent expose metrics
+resource "google_project_iam_member" "vpn-metrics-writer" {
+  project = var.project
+
+  role   = "roles/monitoring.metricWriter"
+  member = "serviceAccount:${google_service_account.vpn.email}"
+}
+
 
 resource "google_compute_address" "external-vpn" {
   name         = "${data.google_compute_network.private.name}-vpn-gateway"

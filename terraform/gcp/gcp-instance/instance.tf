@@ -40,6 +40,13 @@ resource "google_compute_instance" "vm" {
   }
   // to enable default-allow-http firewall rule.
   tags = ["http-server"]
+
+  # If not given, the default Google Compute Engine service account is used.
+  # service_account {
+  #    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+  #   email  = google_service_account.default.email
+  #   scopes = ["cloud-platform"]
+  # }
 }
 
 resource "google_compute_health_check" "http-health-check" {

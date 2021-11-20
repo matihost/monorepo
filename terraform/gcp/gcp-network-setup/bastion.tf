@@ -33,11 +33,16 @@ resource "google_compute_instance" "bastion" {
     startup-script = <<EOT
     #!/usr/bin/env bash
     apt-get update -y
-    apt-get install -y bash-completion vim less bind9-dnsutils tinyproxy iputils-ping ncat
+    apt-get install -y bash-completion vim less bind9-dnsutils iputils-ping ncat
     snap install kubectl --classic
-    # installl OpsAgent
+    # install OpsAgent (it reserves 8888 and 2020 ports)
     curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
     bash add-google-cloud-ops-agent-repo.sh --also-install
+
+    # install TinyProxy on 8787 port
+    apt-get install -y tinyproxy
+    sed -i 's/^Port .*$/Port 8787/g' /etc/tinyproxy/tinyproxy.conf
+    systemctl restart tinyproxy
     EOT
   }
 
@@ -106,6 +111,22 @@ resource "google_project_iam_member" "bastion-source-reader" {
   member = "serviceAccount:${google_service_account.bastion.email}"
 }
 
+# to let OpsAgent send logs
+resource "google_project_iam_member" "bastion-log-writer" {
+  project = var.project
+
+  role   = "roles/logging.logWriter"
+  member = "serviceAccount:${google_service_account.bastion.email}"
+}
+
+# to let OpsAgent expose metrics
+resource "google_project_iam_member" "bastion-metrics-writer" {
+  project = var.project
+
+  role   = "roles/monitoring.metricWriter"
+  member = "serviceAccount:${google_service_account.bastion.email}"
+}
+
 
 output "bastion_instance_name" {
   value = google_compute_instance.bastion.name
@@ -122,5 +143,5 @@ output "bastion_instance_ssh_cmd" {
 
 
 output "bastion_tunnel_to_proxy" {
-  value = format("gcloud compute ssh %s --zone=%s -- -o ExitOnForwardFailure=yes -M -S /tmp/sslsock -L8888:127.0.0.1:8888 -f sleep 36000", google_compute_instance.bastion.name, google_compute_instance.bastion.zone)
+  value = format("gcloud compute ssh %s --zone=%s -- -o ExitOnForwardFailure=yes -M -S /tmp/sslsock -L8787:127.0.0.1:8787 -f sleep 36000", google_compute_instance.bastion.name, google_compute_instance.bastion.zone)
 }

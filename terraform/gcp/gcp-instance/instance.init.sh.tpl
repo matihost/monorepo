@@ -2,6 +2,10 @@
 sudo apt update
 sudo apt -y install bash-completion vim bind9-dnsutils
 
+# install OpsAgent (it reserves 8888 and 2020 ports)
+curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
+bash add-google-cloud-ops-agent-repo.sh --also-install
+
 # Apache2 sample showing region from instance metadata
 apt-get install -y apache2 php
 cd /var/www/html
