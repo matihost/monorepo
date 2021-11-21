@@ -1,7 +1,7 @@
 # containerfilesystem - required by: https://cloud.google.com/kubernetes-engine/docs/how-to/image-streaming
 
 locals {
-  gke-apis = ["containerfilesystem"]
+  gke-apis = ["container", "containerfilesystem"]
 }
 
 resource "google_project_service" "gke-apis" {

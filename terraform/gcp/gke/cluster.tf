@@ -269,12 +269,15 @@ resource "google_container_cluster" "gke" {
   #   }
   # }
 
-
   # Confidential VM is only available on N2D instances of Compute Engine.
   # Confidential GKE Nodes can be used with Container-Optimized OS (cos_containerd).
   confidential_nodes {
     enabled = false
   }
+
+  depends_on = [
+    google_project_service.gke-apis
+  ]
 }
 
 resource "random_id" "gke_node_pool_id" {
