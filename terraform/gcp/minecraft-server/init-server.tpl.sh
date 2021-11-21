@@ -4,6 +4,9 @@ set -x
 function install_software() {
   apt update
   apt -y install bash-completion vim bind9-dnsutils less mlocate iputils-ping ncat
+  # install OpsAgent (it reserves 8888 and 2020 ports)
+  curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
+  bash add-google-cloud-ops-agent-repo.sh --also-install
   # minecraft specific
   apt -y install -y openjdk-17-jre-headless inotify-tools
 }

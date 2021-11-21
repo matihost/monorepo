@@ -35,9 +35,8 @@ resource "null_resource" "minecraft-config-template" {
       cp -r config/* target/minecraft-server &&
       curl -sSL ${var.minecraft_server_url} -o  target/minecraft-server/server/server.jar &&
       cd target/ &&
-      curl -L ${var.minecraft_rcon_url} -o - |tar -zxv &&
-      mv mcrcon*/mcrcon minecraft-server/server/ &&
-      rm -rf mcrcon* &&
+      curl -L ${var.minecraft_rcon_url} -o - |tar -zxv mcrcon &&
+      mv mcrcon minecraft-server/server/ &&
       sed -i 's/MINECRAFT_PASS/${var.server_rcon_pass}/g' minecraft-server/server/server.properties minecraft-server/server/minecraft-backup.sh minecraft-server/minecraft.service &&
       sed -i 's/GS_BUCKET/${google_storage_bucket.minecraft-data.name}/g' minecraft-server/server/minecraft-backup.sh &&
       sed -i 's/MINECRAFT_SERVER_NAME/${var.minecraft_server_name}/g' minecraft-server/server/minecraft-backup.sh &&

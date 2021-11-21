@@ -30,6 +30,10 @@ resource "google_compute_instance_template" "minecraft_template" {
   lifecycle {
     create_before_destroy = true
   }
+
+  depends_on = [
+    google_storage_bucket_object.minecraft-config-template-object
+  ]
 }
 
 resource "google_compute_instance_group_manager" "minecraft_group_manager" {
@@ -99,6 +103,21 @@ resource "google_project_iam_member" "minecraft-server-gs" {
   member = "serviceAccount:${google_service_account.minecraft-server.email}"
 }
 
+# to let OpsAgent send logs
+resource "google_project_iam_member" "minecraft-server-log-writer" {
+  project = var.project
+
+  role   = "roles/logging.logWriter"
+  member = "serviceAccount:${google_service_account.minecraft-server.email}"
+}
+
+# to let OpsAgent expose metrics
+resource "google_project_iam_member" "minecraft-server-metrics-writer" {
+  project = var.project
+
+  role   = "roles/monitoring.metricWriter"
+  member = "serviceAccount:${google_service_account.minecraft-server.email}"
+}
 
 # let connect via to minecraft server only within GCP VPC or via IAP tunnel
 resource "google_compute_firewall" "minecraft-server-ssh" {
