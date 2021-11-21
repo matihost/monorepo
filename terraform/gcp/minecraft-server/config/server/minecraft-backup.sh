@@ -12,8 +12,9 @@ function block_minecraft_from_modyfying_world() {
 }
 
 function create_backup() {
+  # shellcheck disable=SC2035
   mkdir -p backup &&
-    tar -Jcvf backup/world-backup.tar.xz world
+    tar -Jcvf backup/world-backup.tar.xz world *.json *.properties
 }
 
 function send_backup_to_gs() {

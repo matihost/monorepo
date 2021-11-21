@@ -39,7 +39,7 @@ resource "null_resource" "minecraft-config-template" {
       mv mcrcon minecraft-server/server/ &&
       sed -i 's/MINECRAFT_PASS/${var.server_rcon_pass}/g' minecraft-server/server/server.properties minecraft-server/server/minecraft-backup.sh minecraft-server/minecraft.service &&
       sed -i 's/GS_BUCKET/${google_storage_bucket.minecraft-data.name}/g' minecraft-server/server/minecraft-backup.sh &&
-      sed -i 's/MINECRAFT_SERVER_NAME/${var.minecraft_server_name}/g' minecraft-server/server/minecraft-backup.sh &&
+      sed -i 's/MINECRAFT_SERVER_NAME/${var.minecraft_server_name}/g' minecraft-server/server/server.properties minecraft-server/server/minecraft-backup.sh &&
       tar -Jcvf minecraft-config-template.tar.xz minecraft-server
     EOT
   }

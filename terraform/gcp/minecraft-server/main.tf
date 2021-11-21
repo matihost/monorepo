@@ -40,7 +40,7 @@ variable "project" {
 variable "external_access_cidrs" {
   type        = list(string)
   default     = ["0.0.0.0/0"]
-  description = "The public CIDR IP which is allowed to access VPN Gateway."
+  description = "The public CIDR IP which is allowed to access Minecraft server"
 }
 
 variable "minecraft_server_url" {
