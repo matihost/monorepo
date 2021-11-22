@@ -45,8 +45,9 @@ resource "google_compute_region_backend_service" "minecraft-region-backend" {
   timeout_sec                     = "30"
 }
 
+# instance will automatically recrated after 200 seconds from Minecraft crash
 resource "google_compute_region_health_check" "minecraft-lb-health" {
-  check_interval_sec = "10"
+  check_interval_sec = "20"
   healthy_threshold  = "2"
 
   log_config {
@@ -62,8 +63,8 @@ resource "google_compute_region_health_check" "minecraft-lb-health" {
     proxy_header = "NONE"
   }
 
-  timeout_sec         = "5"
-  unhealthy_threshold = "3"
+  timeout_sec         = "10"
+  unhealthy_threshold = "10"
 }
 
 

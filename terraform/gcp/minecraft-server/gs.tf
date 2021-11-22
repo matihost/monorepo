@@ -15,8 +15,8 @@ resource "google_storage_bucket" "minecraft-data" {
 
   lifecycle_rule {
     condition {
-      # keep only 2 version of a file
-      num_newer_versions = 2
+      # keep  24 versions of a file, aka max 24 backups
+      num_newer_versions = 24
     }
     action {
       type = "Delete"
@@ -37,9 +37,11 @@ resource "null_resource" "minecraft-config-template" {
       cd target/ &&
       curl -L ${var.minecraft_rcon_url} -o - |tar -zxv mcrcon &&
       mv mcrcon minecraft-server/server/ &&
-      sed -i 's/MINECRAFT_PASS/${var.server_rcon_pass}/g' minecraft-server/server/server.properties minecraft-server/server/minecraft-backup.sh minecraft-server/minecraft.service &&
-      sed -i 's/GS_BUCKET/${google_storage_bucket.minecraft-data.name}/g' minecraft-server/server/minecraft-backup.sh &&
-      sed -i 's/MINECRAFT_SERVER_NAME/${var.minecraft_server_name}/g' minecraft-server/server/server.properties minecraft-server/server/minecraft-backup.sh &&
+      sed -i 's/MINECRAFT_PASS/${var.server_rcon_pass}/g' minecraft-server/server/server.properties minecraft-server/server/*.sh minecraft-server/minecraft.service &&
+      sed -i 's/GS_BUCKET/${google_storage_bucket.minecraft-data.name}/g' minecraft-server/server/*.sh &&
+      sed -i 's/MINECRAFT_SERVER_NAME/${var.minecraft_server_name}/g' minecraft-server/server/server.properties minecraft-server/server/*.sh &&
+      sed -i 's/MINECRAFT_SERVER_OP_USER/${var.server_op_user}/g' minecraft-server/server/server.properties minecraft-server/server/*.sh &&
+
       tar -Jcvf minecraft-config-template.tar.xz minecraft-server
     EOT
   }
@@ -51,6 +53,10 @@ resource "google_storage_bucket_object" "minecraft-config-template-object" {
   bucket = google_storage_bucket.minecraft-data.name
 
   depends_on = [null_resource.minecraft-config-template]
+
+  lifecycle {
+    create_before_destroy = false
+  }
 }
 
 

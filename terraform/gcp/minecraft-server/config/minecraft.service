@@ -13,11 +13,8 @@ SuccessExitStatus=0 1
 #PrivateDevices=true
 #NoNewPrivileges=true
 WorkingDirectory=/home/minecraft/server
-ExecStart=/usr/bin/java -Xms2048M -Xmx3596M -jar server.jar nogui
-# TODO add backuping before shutdown
-#ExecStop=/usr/bin/mcrcon -H 127.0.0.1 -P 25575 -p MINECRAFT_PASS stop
-ExecStop=/bin/kill -SIGTERM $MAINPID
-
+ExecStart=/home/minecraft/server/start-minecraft.sh foreground
+ExecStop=/home/minecraft/server/stop-minecraft.sh $MAINPID
 
 [Install]
 WantedBy=multi-user.target

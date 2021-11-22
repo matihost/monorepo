@@ -8,7 +8,7 @@ function block_minecraft_from_modyfying_world() {
   # TODO make waiting inotifywait
   ./mcrcon -H localhost -P 25575 -p "${PASS}" "say Attempt to backup the world..." &&
     ./mcrcon -H localhost -P 25575 -w 5 -p "${PASS}" save-all save-off &&
-    sleep 1m
+    sleep 20
 }
 
 function create_backup() {
@@ -22,7 +22,7 @@ function send_backup_to_gs() {
 }
 
 function unblock_periodic_world_writes() {
-  ./mcrcon -H localhost -P 25575 -p "${PASS}" save-on "say Saving world has been restored"
+  ./mcrcon -H localhost -P 25575 -p "${PASS}" save-on "say Backup completed"
 }
 
 # Main

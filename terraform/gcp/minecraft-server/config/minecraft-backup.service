@@ -1,0 +1,14 @@
+# /etc/systemd/system/minecraft-backup.service
+[Unit]
+Description=Minecraft Server Backup Runner
+After=network.target
+After=minecraft.service
+
+[Service]
+Type=oneshot
+User=minecraft
+WorkingDirectory=/home/minecraft/server
+ExecStart=/home/minecraft/server/minecraft-backup.sh
+
+[Install]
+WantedBy=multi-user.target

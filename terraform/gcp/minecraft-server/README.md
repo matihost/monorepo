@@ -4,13 +4,20 @@ Spawns a Minecraft Server
 
 Exposes Minecraft server and Minecraft RCON (password protected)
 
-Exposes Minecraft as singe intance template exposed via external GCP Network Loadbalancer.
+Exposes Minecraft as single instance template exposed via external GCP Network Loadbalancer.
 
-TODOs/Limitations:
+Minecraft server starts with single whitelisted & op (aka admin) user.
+To allow other users to connect - op user has to join server and whitelist users via command: `/whitelist add username`
 
-* requires separated external DNS for Minecraft server external IP
+Minecraft server world and configuration is automatically backup each hour to Cloud Storage.
 
-* automatic backup to GS
+When server crashes - after 200 seconds of inactivity - the instance is recreated. Upon startup , the last backup is downloaded, otherwise it creates a new fresh world.
+
+Upon ordinary reboot, the backup is not downloaded.
+
+Limitations:
+
+* public DNS is not create, requires separated public DNS for Minecraft server LB external IP
 
 ## Prerequisites
 
@@ -19,8 +26,8 @@ TODOs/Limitations:
 ## Usage
 
 ```bash
-# setup Minecraft Server VM
-make apply PASS=pass_for_minecraft_rcon
+# setup Minecraft Server
+make apply PASS=pass_for_minecraft_rcon OP_USER=minecraftusername
 
 # ssh to Minecraft Server instance
 make ssh

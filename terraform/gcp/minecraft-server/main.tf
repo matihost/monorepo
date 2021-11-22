@@ -66,3 +66,8 @@ variable "server_rcon_pass" {
   type        = string
   description = "Minecraft server rcon pass"
 }
+
+variable "server_op_user" {
+  type        = string
+  description = "Minecraft operator/op user"
+}

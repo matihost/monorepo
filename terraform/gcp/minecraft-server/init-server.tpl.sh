@@ -21,11 +21,12 @@ function install_minecraft_server() {
   useradd -r -m -U -d /home/minecraft -s /usr/bin/bash minecraft
   mv /tmp/minecraft-server/server /home/minecraft
   chown -R minecraft:minecraft /home/minecraft/server
-  mv /tmp/minecraft-server/minecraft.service /etc/systemd/system/minecraft.service
+  mv /tmp/minecraft-server/*.{service,timer} /etc/systemd/system/
 }
 
 function enable_minecraft_server_service() {
   systemctl enable --now minecraft.service
+  systemctl enable --now minecraft-backup.timer
 }
 
 # Main
