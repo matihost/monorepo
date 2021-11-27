@@ -2,18 +2,17 @@
 
 Spawns a Minecraft Server
 
-Exposes Minecraft server and Minecraft RCON (password protected)
+Features:
 
-Exposes Minecraft as single instance template exposed via external GCP Network Loadbalancer.
+* Exposes Minecraft server and Minecraft RCON (password protected)
 
-Minecraft server starts with single whitelisted & op (aka admin) user.
-To allow other users to connect - op user has to join server and whitelist users via command: `/whitelist add username`
+* Exposes Minecraft as single instance template exposed via external GCP Network Loadbalancer.
 
-Minecraft server world and configuration is automatically backup each hour to Cloud Storage.
+* Minecraft server starts with single whitelisted & op (aka admin) user. To allow other users to connect - op user has to join server and whitelist users via command: `/whitelist add username`
 
-When server crashes - after 200 seconds of inactivity - the instance is recreated. Upon startup , the last backup is downloaded, otherwise it creates a new fresh world.
+* Minecraft server world and configuration is automatically backup each hour to Cloud Storage. When server crashes - after 200 seconds of inactivity - the instance is recreated. Upon startup , the last backup is downloaded, otherwise it creates a new fresh world. Upon ordinary reboot, the backup is not downloaded.
 
-Upon ordinary reboot, the backup is not downloaded.
+* Minecraft server is automatically shutdown (instanceGroup is scaled to 0) at 10:30 PM and automatically started at 10:00 AM every day.
 
 Limitations:
 
@@ -21,7 +20,9 @@ Limitations:
 
 ## Prerequisites
 
-* Terraform `../gcp-network-setup` has been deployed
+* Terraform `../gcp-iam` has been deployed - for custom IAM roles setup
+
+* Terraform `../gcp-network-setup` has been deployed - for networking setup
 
 ## Usage
 

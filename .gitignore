@@ -66,6 +66,9 @@ tests/data/common_wheels/
 *.so
 *.dylib
 
+# go modules
+go.sum
+
 # Test binary, build with `go test -c`
 *.test
 

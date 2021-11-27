@@ -63,7 +63,7 @@ resource "google_compute_region_health_check" "minecraft-lb-health" {
     proxy_header = "NONE"
   }
 
-  timeout_sec         = "10"
+  timeout_sec         = "5"
   unhealthy_threshold = "10"
 }
 

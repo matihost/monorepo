@@ -36,7 +36,7 @@ google-authentication: prepare ## authenticate to GCP and prepare Application De
 	gcloud auth application-default login
 
 clean: ## clean Terraform cached plugins and data
-	rm -rf .terraform* terraform.tfstate*
+	rm -rf target .terraform* terraform.tfstate*
 
 init-terraform:
 	terraform init -upgrade=true
@@ -49,6 +49,7 @@ bring-up: ## resize instance group to one
 
 prepare:
 	@[ -e "$(HOME)/.ssh/id_rsa.cloud.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.cloud.vm; }
+	rm -rf target
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
