@@ -12,10 +12,10 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	if os.Getenv("GCP_PROJECT_ID") == "" {
-		panic(errors.New("Missing required GCP_PROJECT_ID env property"))
-	}
 	if os.Getenv("TEST") == "INT" {
+		if os.Getenv("GCP_PROJECT_ID") == "" {
+			panic(errors.New("Missing required GCP_PROJECT_ID env property"))
+		}
 		m.Run()
 	}
 }

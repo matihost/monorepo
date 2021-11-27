@@ -1,4 +1,15 @@
 // Allow access to the Bastion Host via SSH
+
+locals {
+  vpc-apis = ["compute", "dns"]
+}
+
+resource "google_project_service" "vpc-apis" {
+  count              = length(local.vpc-apis)
+  service            = "${local.vpc-apis[count.index]}.googleapis.com"
+  disable_on_destroy = false
+}
+
 resource "google_compute_firewall" "bastion-ssh" {
   name          = "${google_compute_network.private.name}-bastion-ssh"
   network       = google_compute_network.private.name

@@ -1,5 +1,5 @@
 resource "google_compute_instance_template" "minecraft_template" {
-  name_prefix  = "minecraft-server-${var.minecraft_server_name}-"
+  name_prefix  = "${var.minecraft_server_name}-minecraft-server-"
   machine_type = "e2-medium"
   region       = var.region
 
@@ -37,12 +37,12 @@ resource "google_compute_instance_template" "minecraft_template" {
 }
 
 resource "google_compute_instance_group_manager" "minecraft_group_manager" {
-  name = "minecraft-server-${var.minecraft_server_name}"
+  name = "${var.minecraft_server_name}-minecraft-server"
 
   version {
     instance_template = google_compute_instance_template.minecraft_template.id
   }
-  base_instance_name = "minecraft-server-${var.minecraft_server_name}"
+  base_instance_name = "${var.minecraft_server_name}-minecraft-server"
 
   zone        = local.zone
   target_size = "1"
@@ -70,21 +70,25 @@ data "google_compute_image" "ubuntu-latest" {
 }
 
 resource "google_compute_health_check" "minecraft-health-check" {
-  name = "tcp-health-check"
+  name = "${var.minecraft_server_name}-autohealing-tcp-health-check"
 
-  timeout_sec        = 1
-  check_interval_sec = 1
+  timeout_sec        = 5
+  check_interval_sec = 20
+  healthy_threshold  = "2"
+
+  unhealthy_threshold = 10
 
   tcp_health_check {
-    port = "25565"
+    port         = "25565"
+    proxy_header = "NONE"
   }
 }
 
 
 // Dedicated service account for the Minecraft server instance
 resource "google_service_account" "minecraft-server" {
-  account_id   = "minecraft-server-sa"
-  display_name = "Service account for Minecraft server instance"
+  account_id   = "${var.minecraft_server_name}-minecraft-server-sa"
+  display_name = "Service account for Minecraft ${var.minecraft_server_name} server instance"
 }
 
 # allows to gcloud SSH to VM (but they need to be running with same SA)
@@ -121,7 +125,7 @@ resource "google_project_iam_member" "minecraft-server-metrics-writer" {
 
 # let connect via to minecraft server only within GCP VPC or via IAP tunnel
 resource "google_compute_firewall" "minecraft-server-ssh" {
-  name          = "minecraft-server-ssh"
+  name          = "${var.minecraft_server_name}-minecraft-server-ssh"
   network       = data.google_compute_network.private.name
   direction     = "INGRESS"
   project       = var.project
@@ -142,7 +146,7 @@ resource "google_compute_firewall" "minecraft-server-ssh" {
 # ...and from anyone - as External TCP Network LoadBalancer does pass throu TLS connection - hence internal GCP firewall are in charge for connections from real Minecraft clients
 # it could be simplified - but leave as it is for clarity why
 resource "google_compute_firewall" "minecraft-server-minecraft-ports" {
-  name          = "minecraft-server"
+  name          = "${var.minecraft_server_name}-minecraft-server"
   network       = data.google_compute_network.private.name
   direction     = "INGRESS"
   project       = var.project

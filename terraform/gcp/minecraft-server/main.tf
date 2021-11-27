@@ -22,7 +22,7 @@ locals {
 
 variable "region" {
   type        = string
-  default     = "us-central1"
+  default     = "europe-central2"
   description = "GCP Region For Deployment"
 }
 

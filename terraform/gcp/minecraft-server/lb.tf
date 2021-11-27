@@ -1,5 +1,5 @@
 resource "google_compute_address" "minecraft-server-ip" {
-  name         = "minecraft-server-${var.minecraft_server_name}-ip"
+  name         = "${var.minecraft_server_name}-minecraft-server-ip"
   address_type = "EXTERNAL"
 }
 
@@ -18,7 +18,7 @@ resource "google_compute_forwarding_rule" "minecraft-fr" {
   ip_protocol            = "TCP"
   is_mirroring_collector = "false"
   load_balancing_scheme  = "EXTERNAL"
-  name                   = "minecraft-${var.minecraft_server_name}-fr"
+  name                   = "${var.minecraft_server_name}-minecraft-fr"
   network_tier           = "PREMIUM"
   ports                  = ["25565", "25575"]
 }
@@ -37,7 +37,7 @@ resource "google_compute_region_backend_service" "minecraft-region-backend" {
   enable_cdn                      = "false"
   health_checks                   = [google_compute_region_health_check.minecraft-lb-health.id]
   load_balancing_scheme           = "EXTERNAL"
-  name                            = "minecraft-${var.minecraft_server_name}-backend"
+  name                            = "${var.minecraft_server_name}-minecraft-backend"
   port_name                       = "http"
   protocol                        = "TCP"
   region                          = var.region
@@ -45,7 +45,7 @@ resource "google_compute_region_backend_service" "minecraft-region-backend" {
   timeout_sec                     = "30"
 }
 
-# instance will automatically recrated after 200 seconds from Minecraft crash
+# lb will detach instance after 200 seconds from Minecraft crash
 resource "google_compute_region_health_check" "minecraft-lb-health" {
   check_interval_sec = "20"
   healthy_threshold  = "2"
@@ -54,7 +54,7 @@ resource "google_compute_region_health_check" "minecraft-lb-health" {
     enable = "false"
   }
 
-  name = "minecraft-lb-${var.minecraft_server_name}-health"
+  name = "${var.minecraft_server_name}-minecraft-lb-health"
 
   region = var.region
 

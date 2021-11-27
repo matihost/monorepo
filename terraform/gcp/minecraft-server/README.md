@@ -24,11 +24,13 @@ Limitations:
 
 * Terraform `../gcp-network-setup` has been deployed - for networking setup
 
+* Cloud Scheduler requires AppEngine setup in your GCP project in the same region where you intent do deploy app.
+
 ## Usage
 
 ```bash
 # setup Minecraft Server
-make apply PASS=pass_for_minecraft_rcon OP_USER=minecraftusername
+make apply PASS=pass_for_minecraft_rcon OP_USER=minecraftusername [REGION=europe-central2]
 
 # ssh to Minecraft Server instance
 make ssh

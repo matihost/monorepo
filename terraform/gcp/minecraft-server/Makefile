@@ -3,7 +3,10 @@
 CURRENT_PROJECT := $(shell gcloud config get-value project)
 WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
 
+REGION := europe-central2
+
 TF_VAR_project := $(CURRENT_PROJECT)
+TF_VAR_region := $(REGION)
 TF_VAR_external_access_cidrs := ["$(WHOAMI)/32"]
 
 # uncomment to run terraform in debug mode
@@ -21,7 +24,7 @@ endif
 	terraform apply -auto-approve -var='server_rcon_pass=$(PASS)' -var='server_op_user=$(OP_USER)'
 
 ssh: ## ssh to Minecraft Server instance
-	gcloud compute ssh --strict-host-key-checking=no `gcloud compute instances list --filter="name~'^minecraft-server-.*$$'" --format=json | jq -rc .[].name`
+	gcloud compute ssh --strict-host-key-checking=no `gcloud compute instances list --filter="name~'.*-minecraft-server-.*$$'" --format=json | jq -rc .[].name`
 
 show-state: ## show terraform.state
 	terraform state list
@@ -42,10 +45,10 @@ init-terraform:
 	terraform init -upgrade=true
 
 shutdown: ## resize instance group to zero
-	gcloud compute instance-groups managed resize minecraft-server-prod-01 --zone=us-central1-a --size=0
+	gcloud compute instance-groups managed resize prod-01-minecraft-server --zone=europe-central2-a --size=0
 
 bring-up: ## resize instance group to one
-	gcloud compute instance-groups managed resize minecraft-server-prod-01 --zone=us-central1-a --size=1
+	gcloud compute instance-groups managed resize prod-01-minecraft-server --zone=europe-central2-a --size=1
 
 prepare:
 	@[ -e "$(HOME)/.ssh/id_rsa.cloud.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.cloud.vm; }

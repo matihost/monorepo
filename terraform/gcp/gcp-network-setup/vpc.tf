@@ -70,6 +70,37 @@ resource "google_compute_subnetwork" "private2" {
   }
 }
 
+resource "google_compute_subnetwork" "private3" {
+  name          = "private-subnet-${var.regions[2]}"
+  region        = var.regions[2]
+  network       = google_compute_network.private.name
+  ip_cidr_range = "10.15.0.0/16"
+
+  private_ip_google_access = true
+  # TODO seems not working?
+  private_ipv6_google_access = true
+
+  secondary_ip_range {
+    range_name    = "pod-range-0"
+    ip_cidr_range = "100.72.0.0/17"
+  }
+
+  secondary_ip_range {
+    range_name    = "pod-range-1"
+    ip_cidr_range = "100.74.0.0/17"
+  }
+
+  secondary_ip_range {
+    range_name    = "svc-range-0"
+    ip_cidr_range = "100.96.64.0/20"
+  }
+
+  secondary_ip_range {
+    range_name    = "svc-range-1"
+    ip_cidr_range = "100.96.80.0/20"
+  }
+}
+
 
 resource "google_compute_subnetwork" "private-l7lb-1" {
   name          = "private-l7lb-subnetwork-${var.regions[0]}"
@@ -87,6 +118,17 @@ resource "google_compute_subnetwork" "private-l7lb-2" {
   name          = "private-l7lb-subnetwork-${var.regions[1]}"
   ip_cidr_range = "10.13.1.0/24"
   region        = var.regions[1]
+  purpose       = "INTERNAL_HTTPS_LOAD_BALANCER"
+  role          = "ACTIVE"
+  network       = google_compute_network.private.name
+
+  project = var.project
+}
+
+resource "google_compute_subnetwork" "private-l7lb-3" {
+  name          = "private-l7lb-subnetwork-${var.regions[2]}"
+  ip_cidr_range = "10.13.2.0/24"
+  region        = var.regions[2]
   purpose       = "INTERNAL_HTTPS_LOAD_BALANCER"
   role          = "ACTIVE"
   network       = google_compute_network.private.name

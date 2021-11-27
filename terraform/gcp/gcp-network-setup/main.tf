@@ -9,6 +9,10 @@ data "google_project" "current" {
 }
 data "google_compute_network" "default" {
   name = "default"
+
+  depends_on = [
+    google_project_service.vpc-apis
+  ]
 }
 
 locals {
@@ -17,7 +21,7 @@ locals {
 
 variable "regions" {
   type        = list(string)
-  default     = ["us-central1", "us-east1"]
+  default     = ["us-central1", "us-east1", "europe-central2"]
   description = "GCP Region For Deployment"
 }
 

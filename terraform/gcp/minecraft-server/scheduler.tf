@@ -1,17 +1,21 @@
 # cloudscheduler puts event on pubsub which is read by cloudfunctions
 
 locals {
-  gke-apis = ["cloudscheduler", "pubsub", "cloudfunctions", "cloudbuild"]
+  scheduler-apis = ["cloudscheduler", "pubsub", "cloudfunctions", "cloudbuild"]
 }
 
 resource "google_project_service" "scheduler-apis" {
-  count              = length(local.gke-apis)
-  service            = "${local.gke-apis[count.index]}.googleapis.com"
+  count              = length(local.scheduler-apis)
+  service            = "${local.scheduler-apis[count.index]}.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_pubsub_topic" "minecraft-lifecycle-topic" {
   name = "${var.minecraft_server_name}.lifecycle.minecraft.topic"
+
+  depends_on = [
+    google_project_service.scheduler-apis
+  ]
 }
 
 resource "google_cloud_scheduler_job" "stop-cron" {
@@ -25,6 +29,10 @@ resource "google_cloud_scheduler_job" "stop-cron" {
     topic_name = google_pubsub_topic.minecraft-lifecycle-topic.id
     data       = base64encode("stop")
   }
+
+  depends_on = [
+    google_project_service.scheduler-apis
+  ]
 }
 
 resource "google_cloud_scheduler_job" "start-cron" {
@@ -66,7 +74,7 @@ resource "google_storage_bucket_object" "minecraft-code" {
   source = "target/scheduler.zip"
   bucket = google_storage_bucket.minecraft-data.name
 
-  depends_on = [null_resource.scheduler-code, google_project_service.scheduler-apis]
+  depends_on = [null_resource.scheduler-code]
 }
 
 
@@ -102,8 +110,8 @@ resource "google_cloudfunctions_function" "minecraft-lifecycle-executor" {
 }
 
 resource "google_service_account" "minecraft-scheduler" {
-  account_id   = "minecraft-scheduler-sa"
-  display_name = "Service account for Minecraft scheduler instance"
+  account_id   = "${var.minecraft_server_name}-minecraft-scheduler-sa"
+  display_name = "Service account for Minecraft ${var.minecraft_server_name} scheduler instance"
 }
 
 

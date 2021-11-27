@@ -3,10 +3,12 @@ resource "random_id" "minecraft-random" {
 }
 
 resource "google_storage_bucket" "minecraft-data" {
-  name          = "minecraft-server-data-${random_id.minecraft-random.hex}"
+  name          = "${var.minecraft_server_name}-minecraft-server-data-${random_id.minecraft-random.hex}"
   force_destroy = true
   # GCP free tier GS is free only with regional class in some US regions
-  location      = var.region
+  location = "US-CENTRAL1"
+  # location      = var.region
+
   storage_class = "REGIONAL"
 
   versioning {
