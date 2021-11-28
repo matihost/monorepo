@@ -25,8 +25,8 @@ func TestInstanceGroupScaling(t *testing.T) {
 	cases := []struct {
 		minecraftServerName, zone, action string
 	}{
-		{"prod-01", "us-central1-a", "start"},
-		{"prod-01", "us-central1-a", "stop"},
+		{"prod-01-minecraft-server", "us-central1-a", "start"},
+		{"prod-01-minecraft-server", "us-central1-a", "stop"},
 	}
 	for _, c := range cases {
 		// given

@@ -101,7 +101,7 @@ resource "google_cloudfunctions_function" "minecraft-lifecycle-executor" {
   }
 
   environment_variables = {
-    MINECRAFT_SERVER_NAME = var.minecraft_server_name
+    MINECRAFT_SERVER_NAME = google_compute_instance_group_manager.minecraft_group_manager.name
     GCP_ZONE              = local.zone
     GCP_PROJECT_ID        = var.project
   }

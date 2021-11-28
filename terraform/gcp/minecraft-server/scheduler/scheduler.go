@@ -26,7 +26,7 @@ func Handle(ctx context.Context, m PubSubMessage) error {
 	zone := os.Getenv("GCP_ZONE")
 	projectId := os.Getenv("GCP_PROJECT_ID")
 
-	return ScaleInstanceGroup(projectId, "minecraft-server-"+minecraftServerName, zone, desiredSize)
+	return ScaleInstanceGroup(projectId, minecraftServerName, zone, desiredSize)
 }
 
 
