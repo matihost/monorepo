@@ -45,8 +45,8 @@ variable "external_access_cidrs" {
 
 variable "minecraft_server_url" {
   type        = string
-  default     = "https://launcher.mojang.com/v1/objects/a16d67e5807f57fc4e550299cf20226194497dc2/server.jar"
-  description = "Minecraft server.jar version 1.17.1, downloadable from: https://www.minecraft.net/pl-pl/download/server"
+  default     = "https://launcher.mojang.com/v1/objects/3cf24a8694aca6267883b17d934efacc5e44440d/server.jar"
+  description = "Minecraft server.jar version 1.18, downloadable from: https://www.minecraft.net/pl-pl/download/server"
 }
 
 variable "minecraft_server_name" {
