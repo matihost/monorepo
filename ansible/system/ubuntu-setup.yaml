@@ -2,6 +2,11 @@
 - hosts: local
   gather_facts: true
   tasks:
+  - name: Ensure ~/bin is present
+    file:
+      path: "{{ lookup('env','HOME') }}/bin"
+      state: directory
+    become: false
   - name: Ensure package repositories
     include_role:
       name: apt

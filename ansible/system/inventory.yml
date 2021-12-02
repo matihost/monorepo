@@ -68,17 +68,20 @@ all:
         - name: multiverse
         - name: vscode
           repo: "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main"
+          key_url: "https://packages.microsoft.com/keys/microsoft.asc"
         - name: teams
           repo: "deb [arch=amd64] https://packages.microsoft.com/repos/ms-teams stable main"
         - name: skype-stable
           repo: "deb [arch=amd64] https://repo.skype.com/deb stable main"
           key_url: https://repo.skype.com/data/SKYPE-GPG-KEY
         - name: google-chrome
-          repo: "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main"
+          repo: "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main"
           key_url: https://dl.google.com/linux/linux_signing_key.pub
         - name: virtualbox
           repo: >-
             deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian {{ versions.virtualbox_ubuntu_version }} contrib
+          key_url: "https://www.virtualbox.org/download/oracle_vbox.asc"
+          # TODO add one more key for virtualbox: wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
         - name: libcontainers
           repo: >-
             deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ versions.libcontainers_repo_ubuntu_version }}/ /
@@ -93,7 +96,7 @@ all:
           repo: "deb [arch=amd64] https://packages.cloud.google.com/apt cloud-sdk main"
           key_url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
         - name: openvpn
-          repo: "deb [arch=amd64] https://swupdate.openvpn.net/community/openvpn3/repos grovy main"
+          repo: "deb [arch=amd64] https://swupdate.openvpn.net/community/openvpn3/repos focal main"
           key_url: https://swupdate.openvpn.net/repos/openvpn-repo-pkg-key.pub
         - name: terraform
           repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ versions.terraform_ubuntu_version }} main"
@@ -110,6 +113,7 @@ all:
         - dlocate
         - ubuntu-restricted-extras
         - gnome-shell-extensions
+        - gnome-tweaks
         - grub-customizer
         - hplip
         - hplip-gui
@@ -118,8 +122,6 @@ all:
         - golang-golang-x-tools
         - python3-pip
         - ruby
-        - openjdk-8-jdk
-        - openjdk-8-source
         - openjdk-11-jdk
         - openjdk-11-source
         - openjdk-17-jdk
@@ -158,7 +160,8 @@ all:
         - kubectl
         # Skipped packages:
         # - skypeforlinux
-        - openvpn3
+        # OpenVPN 3 is supported only on Ubuntu LTS: https://openvpn.net/cloud-docs/openvpn-3-client-for-linux/
+        # - openvpn3
         snaps:
         - mc-installer
         - notepad-plus-plus
@@ -207,7 +210,7 @@ all:
           desc: To ensure VBox can see host USB
           become: false
           command: |
-            [ "$(groups |grep -c vboxusers)" -eq 0 ] || sudo usermod -aG vboxusers ${USER}
+            [ "$(groups |grep -c vboxusers)" -neq 0 ] || sudo usermod -aG vboxusers ${USER}
         - name: ansible-community-kubernetes-collections
           desc: To ensure Ansible galaxy collection community.kubernetes with k8s, helm modules is present
           become: false
@@ -282,28 +285,28 @@ all:
 
             [ "$(grep -c systemd /etc/docker/daemon.json 2>/dev/null || echo 0)" -eq 1 ] && \
             systemctl is-enabled docker &>/dev/null && systemctl is-active docker &>/dev/null
-        - name: python-alternatives
-          become: true
-          command: |
-            [ $(update-alternatives --display python 2>/dev/null |grep -c priority) -eq 2 ] || (\
-              update-alternatives --debug --install /usr/bin/python python /usr/bin/python3 10;\
-              update-alternatives --debug --install /usr/bin/python python /usr/bin/python2 11;\
-              update-alternatives --set python /usr/bin/python2)
-            [ $(update-alternatives --display python 2>/dev/null |grep -c priority) -eq 2 ]
+        # TODO remove when confirming python2 is no more used
+        # - name: python-alternatives
+        #   become: true
+        #   command: |
+        #     [ $(update-alternatives --display python 2>/dev/null |grep -c priority) -eq 2 ] || (\
+        #       update-alternatives --debug --install /usr/bin/python python /usr/bin/python3 10;\
+        #       update-alternatives --debug --install /usr/bin/python python /usr/bin/python2 11;\
+        #       update-alternatives --set python /usr/bin/python2)
+        #     [ $(update-alternatives --display python 2>/dev/null |grep -c priority) -eq 2 ]
         - name: asciidoctor
           become: false
           command: |
-            [ $(gem list asciidoctor --no-verbose |grep -cE 'diagram|pdf') -eq 2 ] || (\
+            [ $(gem list asciidoctor --no-verbose |grep -cE 'diagram|pdf') -ge 2 ] || (\
               gem install prawn asciidoctor asciidoctor-diagram rouge --user-install && \
               gem install asciidoctor-pdf --pre --user-install)
-            [ $(gem list asciidoctor --no-verbose |grep -cE 'diagram|pdf') -eq 2 ]
+            [ $(gem list asciidoctor --no-verbose |grep -cE 'diagram|pdf') -ge 2 ]
         - name: sdkman
           become: false
           command: |
             [ $(bash -ic "sdk c 2>/dev/null" |grep -cE 'groovy|maven|scala|java') -eq 4 ] || (\
             curl -s "https://get.sdkman.io" | bash
-            bash -ic "sdk i java 8-openjdk /usr/lib/jvm/java-8-openjdk-amd64;\
-            sdk i java 11-openjdk /usr/lib/jvm/java-11-openjdk-amd64;\
+            bash -ic "sdk i java 11-openjdk /usr/lib/jvm/java-11-openjdk-amd64;\
             sdk i java 17-openjdk /usr/lib/jvm/java-17-openjdk-amd64;\
             sdk d java 17-openjdk;\
             sdk i maven;\
@@ -400,7 +403,7 @@ all:
               curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/download/${KREW_VERSION}/krew{-linux_amd64.tar.gz,.yaml}" &&
               tar zxvf krew-linux_amd64.tar.gz &&
               KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" &&
-              "$KREW" install --manifest=krew.yaml --archive=krew.tar.gz &&
+              "$KREW" install krew &&
               "$KREW" install change-ns ctx whoami cilium unused-volumes apparmor-manager advise-psp np-viewer view-webhook &&
               "$KREW" update &&
               "$KREW" upgrade
@@ -609,17 +612,18 @@ all:
         - name: awsp
           become: false
           command: |
+            AWSP_BASHRC='#AWS Profile Switcher (awsp)
+            source ~/bin/awsp_functions.sh
+            alias awsall="_awsListProfile"
+            alias awsp="_awsSetProfile"
+            alias awswho="aws configure list"
+            alias awswhoami="aws sts get-caller-identity"
+            alias awsgettoken="aws sts get-session-token"
+
+            complete -W "$(cat $HOME/.aws/credentials | grep -Eo '\[.*\]' | tr -d '[]')" _awsSwitchProfile
+            complete -W "$(cat $HOME/.aws/config | grep -Eo '\[.*\]' | tr -d '[]' | cut -d " " -f 2)" _awsSetProfile'
             [ -e ~/bin/awsp_functions.sh  ] || {
               cd ~/bin && curl -sSLO https://raw.githubusercontent.com/antonbabenko/awsp/master/awsp_functions.sh && chmod u+x awsp_functions.sh
-              AWSP_BASHRC='#AWS Profile Switcher (awsp)
-              source ~/bin/awsp_functions.sh
-              alias awsall="_awsListProfile"
-              alias awsp="_awsSetProfile"
-              alias awswho="aws configure list"
-              alias awswhoami="aws sts get-caller-identity"
-              alias awsgettoken="aws sts get-session-token"
-              complete -W "$(cat $HOME/.aws/credentials | grep -Eo '\[.*\]' | tr -d '[]')" _awsSwitchProfile
-              complete -W "$(cat $HOME/.aws/config | grep -Eo '\[.*\]' | tr -d '[]' | cut -d " " -f 2)" _awsSetProfile'
               echo "${AWSP_BASHRC}" >> ~/.bashrc
               echo "AWSP Installed"
             }
