@@ -283,6 +283,16 @@ all:
           become: true
           command: |
             sed -i -E "s/^hosts: .+$/hosts:          myhostname files mdns4_minimal [NOTFOUND=return] dns/" /etc/nsswitch.conf
+        - name: keepass-http
+          become: true
+          desc: Download KeePassRPC plugin to KeePass plugins for integration with Kee plugin to Firefox
+          command: |
+            [ -e /usr/lib/keepass2/Plugins/KeePassRPC.plgx ] || {
+              curl -s https://api.github.com/repos/kee-org/keepassrpc/releases/latest | jq -r ".assets[] |
+                select(.name | test(\"KeePassRPC.plgx\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/usr/lib/keepass2/Plugins/KeePassRPC.plgx"
+              echo "KeePassRPC downloaded, you may run Firefox with Kee plugin now and KeePass app"
+            }
         - name: docker-config
           become: true
           command: |
