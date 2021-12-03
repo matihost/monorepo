@@ -6,6 +6,8 @@ all:
         localhost:
       vars:
         versions:
+          # represents path to local gems, for example:  ~/.local/share/gem/ruby/2.7.0/bin
+          ruby: 2.7.0
           crio: 1.22
           # libcontainers && cri-o :: https://github.com/cri-o/cri-o/blob/master/install.md#apt-based-operating-systems
           # use {{ ansible_distribution_version }} instead of current Ubuntu version is supported, otherwise hardcode version (aka: 21.04)
@@ -80,8 +82,9 @@ all:
         - name: virtualbox
           repo: >-
             deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian {{ versions.virtualbox_ubuntu_version }} contrib
-          key_url: "https://www.virtualbox.org/download/oracle_vbox.asc"
-          # TODO add one more key for virtualbox: wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
+          key_url:
+          - https://www.virtualbox.org/download/oracle_vbox.asc
+          - https://www.virtualbox.org/download/oracle_vbox_2016.asc
         - name: libcontainers
           repo: >-
             deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ versions.libcontainers_repo_ubuntu_version }}/ /
@@ -210,7 +213,27 @@ all:
           desc: To ensure VBox can see host USB
           become: false
           command: |
-            [ "$(groups |grep -c vboxusers)" -neq 0 ] || sudo usermod -aG vboxusers ${USER}
+            [ "$(groups |grep -c vboxusers)" -ne 0 ] || sudo usermod -aG vboxusers ${USER}
+        - name: git-prompt
+          become: false
+          command: |
+            [ -d ~/.bash-git-prompt ] || {
+              git clone https://github.com/magicmonty/bash-git-prompt.git ~/.bash-git-prompt --depth=1
+              echo 'GIT_PROMPT_ONLY_IN_REPO=0
+              GIT_PROMPT_THEME=Single_line_Ubuntu
+              source ~/.bash-git-prompt/gitprompt.sh' >> ~/.bashrc
+              echo "Installed Git prompt"
+            }
+        - name: bash-history
+          become: false
+          command: |
+            [ "$(grep -c HISTTIMEFORMAT ~/.bashrc)" -gt 0 ] || {
+              sed -E "s/^HISTCONTROL=.+$/HISTCONTROL=ignoreboth:erasedups/" ~/.bashrc
+              sed -E "s/^HISTSIZE=.+$/HISTSIZE=-1/" ~/.bashrc
+              sed -E "s/^HISTFILESIZE=.+$/HISTFILESIZE=-1/" ~/.bashrc
+              echo 'HISTTIMEFORMAT="[%F %T] "' >> ~/.bashrc
+              echo "Bash history configured"
+            }
         - name: ansible-community-kubernetes-collections
           desc: To ensure Ansible galaxy collection community.kubernetes with k8s, helm modules is present
           become: false
@@ -285,6 +308,11 @@ all:
 
             [ "$(grep -c systemd /etc/docker/daemon.json 2>/dev/null || echo 0)" -eq 1 ] && \
             systemctl is-enabled docker &>/dev/null && systemctl is-active docker &>/dev/null
+        - name: docker-group
+          desc: Add user to docker group so that docker socket can be accessed w/o sudo
+          become: false
+          command: |
+            [ "$(groups |grep -c docker)" -ne 0 ] || sudo usermod -aG docker ${USER}
         # TODO remove when confirming python2 is no more used
         # - name: python-alternatives
         #   become: true
@@ -294,8 +322,16 @@ all:
         #       update-alternatives --debug --install /usr/bin/python python /usr/bin/python2 11;\
         #       update-alternatives --set python /usr/bin/python2)
         #     [ $(update-alternatives --display python 2>/dev/null |grep -c priority) -eq 2 ]
+        - name: ruby-gems-on-path
+          desc: Ensure ruby local gems are  on path. W/o it it is not possible to install asciidoctor below
+          become: false
+          command: |
+            [ "$(grep -c '.local/share/gem/ruby' ~/.bashrc)" -gt 0 ] || {
+              echo 'PATH=${HOME}/.local/share/gem/ruby/{{ versions.ruby }}/bin:${PATH}' >> ~/.bashrc
+            }
         - name: asciidoctor
           become: false
+          desc: Requires ruby-gems-on-path above task to be completed.
           command: |
             [ $(gem list asciidoctor --no-verbose |grep -cE 'diagram|pdf') -ge 2 ] || (\
               gem install prawn asciidoctor asciidoctor-diagram rouge --user-install && \
@@ -304,7 +340,7 @@ all:
         - name: sdkman
           become: false
           command: |
-            [ $(bash -ic "sdk c 2>/dev/null" |grep -cE 'groovy|maven|scala|java') -eq 4 ] || (\
+            [ -d ~/.sdkman/bin ] || (\
             curl -s "https://get.sdkman.io" | bash
             bash -ic "sdk i java 11-openjdk /usr/lib/jvm/java-11-openjdk-amd64;\
             sdk i java 17-openjdk /usr/lib/jvm/java-17-openjdk-amd64;\
