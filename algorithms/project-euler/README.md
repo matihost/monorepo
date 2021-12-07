@@ -5,7 +5,7 @@ Project Euler algorithms [description](algorithms.md).
 ## Prerequisites
 
 ```bash
-# Ubuntu JDK 11
+# JDK 17
 sudo apt install openjdk-17-jdk openjdk-17-source
 
 # maven (via sdkman)
@@ -21,14 +21,12 @@ gem install prawn asciidoctor asciidoctor-diagram rouge --user-install
 gem install asciidoctor-pdf --pre --user-install
 
 # install mathematical and asciidoctor-mathematical
-sudo apt-get -qq -y install bison flex libffi-dev libxml2-dev libgdk-pixbuf2.0-dev libcairo2-dev libpango1.0-dev fonts-lyx cmake ruby-devel
+sudo apt-get -qq -y install bison flex libffi-dev libxml2-dev libgdk-pixbuf2.0-dev libcairo2-dev libpango1.0-dev libzstd-dev libwebp-dev fonts-lyx cmake ruby-dev
 
-
-gem install mathematical --user-install
-gem install asciidoctor-mathematical --user-install
+gem install mathematical  asciidoctor-mathematical --user-install
 ```
 
-CentOS 8
+CentOS 8 Stream
 
 ```bash
 # asciidoctor plus diagram and pdf extensions
