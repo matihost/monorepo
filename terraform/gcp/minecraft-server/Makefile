@@ -12,7 +12,7 @@ TF_VAR_external_access_cidrs := ["$(WHOAMI)/32"]
 # uncomment to run terraform in debug mode
 # TF_LOG := DEBUG
 
-apply: init-terraform prepare ## setup Minecraft Server VM, usage make apply PASS=pass_for_minecraft_rcon
+apply: init-terraform prepare ## setup Minecraft Server VM, usage make apply PASS=pass_for_minecraft_rcon OP_USER=minecraftusername
 ifndef PASS
 	$(error Env PASS is not defined. Provider password for Minecraft rcon is required. Usage make apply PASS=pass_for_minecraft_rcon OP_USER=minecraftusername)
 endif
