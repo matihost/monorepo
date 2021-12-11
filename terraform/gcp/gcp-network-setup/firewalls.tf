@@ -1,3 +1,4 @@
+# allow to SSH to any instance within network
 resource "google_compute_firewall" "private-allow-ssh" {
   name          = "${google_compute_network.private.name}-allow-ssh"
   description   = "Allow SSH traffic to any VM within ${google_compute_network.private.name} VPC"

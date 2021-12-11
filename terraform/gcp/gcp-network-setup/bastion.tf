@@ -10,12 +10,14 @@ resource "google_project_service" "vpc-apis" {
   disable_on_destroy = false
 }
 
+# allows to SSH to bastion via IAP
 resource "google_compute_firewall" "bastion-ssh" {
-  name          = "${google_compute_network.private.name}-bastion-ssh"
-  network       = google_compute_network.private.name
-  direction     = "INGRESS"
-  project       = var.project
-  source_ranges = ["0.0.0.0/0"]
+  name      = "${google_compute_network.private.name}-bastion-ssh"
+  network   = google_compute_network.private.name
+  direction = "INGRESS"
+  project   = var.project
+  # represents adresses used for IAP
+  source_ranges = ["35.235.240.0/20"]
 
   allow {
     protocol = "tcp"
