@@ -105,6 +105,7 @@ all:
           repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ versions.terraform_ubuntu_version }} main"
           key_url: https://apt.releases.hashicorp.com/gpg
         packages:
+        - mc
         - lm-sensors
         - hddtemp
         - psensor
@@ -233,6 +234,13 @@ all:
               sed -E "s/^HISTFILESIZE=.+$/HISTFILESIZE=-1/" ~/.bashrc
               echo 'HISTTIMEFORMAT="[%F %T] "' >> ~/.bashrc
               echo "Bash history configured"
+            }
+        - name: golang-bin-on-path
+          desc: Ensure ~/go/bin is on PATH
+          become: false
+          command: |
+            [ "$(grep -c 'go/bin' ~/.bashrc)" -gt 0 ] || {
+              echo 'PATH=${HOME}/go/bin:${PATH}' >> ~/.bashrc
             }
         - name: ansible-community-kubernetes-collections
           desc: To ensure Ansible galaxy collection community.kubernetes with k8s, helm modules is present
@@ -549,13 +557,15 @@ all:
           command: |
             [ -x ~/bin/shellcheck ] || (
               cd ~/bin &&
-              wget -qO- https://storage.googleapis.com/shellcheck/shellcheck-stable.linux.x86_64.tar.xz | tar -xJv -o shellcheck-stable/shellcheck &&
+              wget -qO- https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.x86_64.tar.xz | tar -xJv -o shellcheck-stable/shellcheck &&
               mv shellcheck-stable/shellcheck . && rmdir shellcheck-stable
             )
         - name: shfmt
           become: false
           command: |
-            GO111MODULE=on go get mvdan.cc/sh/v3/cmd/shfmt
+            [ -x ~/bin/shfmt ] || (
+              go install mvdan.cc/sh/v3/cmd/shfmt@latest
+            )
         - name: markdownlinter
           become: true
           command: |
