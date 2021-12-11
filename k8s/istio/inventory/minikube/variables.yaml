@@ -4,7 +4,7 @@ all:
   vars:
     operator:
       hub: "gcr.io/istio-release"
-      tag: "1.12.0"
+      tag: "1.12.1"
     ingress_class:
       enable: true
       default: false
