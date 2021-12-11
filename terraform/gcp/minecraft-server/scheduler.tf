@@ -21,7 +21,7 @@ resource "google_pubsub_topic" "minecraft-lifecycle-topic" {
 resource "google_cloud_scheduler_job" "stop-cron" {
   name        = "${var.minecraft_server_name}-server-stop-cron"
   description = "Shutdown Minecraft ${var.minecraft_server_name} instance group"
-  schedule    = "30 22 * * *"
+  schedule    = "05 22 * * *"
   time_zone   = "Europe/Warsaw"
 
   pubsub_target {
@@ -38,7 +38,7 @@ resource "google_cloud_scheduler_job" "stop-cron" {
 resource "google_cloud_scheduler_job" "start-cron" {
   name        = "${var.minecraft_server_name}-server-start-cron"
   description = "Shutdown Minecraft ${var.minecraft_server_name} instance group"
-  schedule    = "00 10 * * *"
+  schedule    = "05 10 * * *"
   time_zone   = "Europe/Warsaw"
 
   pubsub_target {

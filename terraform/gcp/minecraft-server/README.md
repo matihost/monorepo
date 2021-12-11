@@ -12,7 +12,7 @@ Features:
 
 * Minecraft server world and configuration is automatically backup each hour to Cloud Storage. When server crashes - after 200 seconds of inactivity - the instance is recreated. Upon startup , the last backup is downloaded, otherwise it creates a new fresh world. Upon ordinary reboot, the backup is not downloaded.
 
-* Minecraft server is automatically shutdown (instanceGroup is scaled to 0) at 10:30 PM and automatically started at 10:00 AM every day.
+* Minecraft server is automatically shutdown (instanceGroup is scaled to 0) at 10:05 PM and automatically started at 10:05 AM every day.
 
 Limitations:
 
@@ -30,10 +30,10 @@ Limitations:
 
 ```bash
 # setup Minecraft Server
-make apply PASS=pass_for_minecraft_rcon OP_USER=minecraftusername [REGION=europe-central2]
+make apply PASS=pass_for_minecraft_rcon OP_USER=minecraftusername [REGION=europe-central2] [SERVER_NAME=prod-01]
 
 # ssh to Minecraft Server instance
-make ssh
+make ssh [SERVER_NAME=prod-01]
 
 # show terraform.state
 make show-state

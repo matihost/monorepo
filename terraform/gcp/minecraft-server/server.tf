@@ -10,10 +10,11 @@ resource "google_compute_instance_template" "minecraft_template" {
 
   metadata = {
     enable-oslogin = "TRUE"
-    startup-script = templatefile("init-server.tpl.sh", {
+    startup-script = templatefile("${path.module}/init-server.tpl.sh", {
       GS_BUCKET             = google_storage_bucket.minecraft-data.name,
       MINECRAFT_SERVER_NAME = var.minecraft_server_name
     })
+    shutdown-script = file("${path.module}/shutdown-server.sh")
   }
 
   can_ip_forward = false

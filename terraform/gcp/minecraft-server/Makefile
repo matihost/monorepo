@@ -4,7 +4,9 @@ CURRENT_PROJECT := $(shell gcloud config get-value project)
 WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
 
 REGION := europe-central2
+SERVER_NAME := prod-01
 
+TF_VAR_minecraft_server_name := $(SERVER_NAME)
 TF_VAR_project := $(CURRENT_PROJECT)
 TF_VAR_region := $(REGION)
 TF_VAR_external_access_cidrs := ["$(WHOAMI)/32"]
@@ -24,7 +26,7 @@ endif
 	terraform apply -auto-approve -var='server_rcon_pass=$(PASS)' -var='server_op_user=$(OP_USER)'
 
 ssh: ## ssh to Minecraft Server instance
-	gcloud compute ssh --strict-host-key-checking=no `gcloud compute instances list --filter="name~'.*-minecraft-server-.*$$'" --format=json | jq -rc .[].name`
+	gcloud compute ssh --strict-host-key-checking=no `gcloud compute instances list --filter="name~'.*$(SERVER_NAME)-minecraft-server-.*$$'" --format=json | jq -rc .[0].name`
 
 show-state: ## show terraform.state
 	terraform state list

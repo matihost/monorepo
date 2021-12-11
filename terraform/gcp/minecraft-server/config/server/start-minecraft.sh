@@ -21,7 +21,7 @@ function download_minecraft_backup() {
 }
 
 function check_for_minecraft_server() {
-  timeout="5 minute"
+  timeout="10 minute"
   deadline=$(date -ud "${timeout}" +%s)
   while [ -z "$(./mcrcon -H 127.0.0.1 -P 25575 -p "${PASS}" 'time query gametime' 2>/dev/null | xargs)" ] && [[ $(date -u +%s) -le ${deadline} ]]; do
     sleep 2
