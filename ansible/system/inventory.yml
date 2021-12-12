@@ -29,6 +29,7 @@ all:
           4ops.packer
           4ops.terraform
           asciidoctor.asciidoctor-vscode
+          jebbs.plantuml
           DavidAnson.vscode-markdownlint
           donjayamanne.githistory
           DotJoshJohnson.xml
@@ -125,6 +126,7 @@ all:
         - golang-1.17-go
         - golang-golang-x-tools
         - python3-pip
+        - graphviz
         - ruby
         - openjdk-11-jdk
         - openjdk-11-source
@@ -349,12 +351,19 @@ all:
             }
         - name: asciidoctor
           become: false
-          desc: Requires ruby-gems-on-path above task to be completed.
+          desc: Requires ruby-gems-on-path above task to be completed and graphviz installed
           command: |
             [ $(gem list asciidoctor --no-verbose |grep -cE 'diagram|pdf') -ge 2 ] || (\
               gem install prawn asciidoctor asciidoctor-diagram rouge --user-install && \
-              gem install asciidoctor-pdf --pre --user-install)
+              gem install asciidoctor-pdf --pre --user-install
+            )
+            [ $(gem list mathematical --no-verbose |wc -l) -ge 2 ] || (\
+              sudo apt-get -qq -y install bison flex libffi-dev libxml2-dev \
+                libgdk-pixbuf2.0-dev libcairo2-dev libpango1.0-dev libzstd-dev libwebp-dev fonts-lyx cmake ruby-dev
+              gem install mathematical asciidoctor-mathematical --user-install
+            )
             [ $(gem list asciidoctor --no-verbose |grep -cE 'diagram|pdf') -ge 2 ]
+            [ $(gem list mathematical --no-verbose |wc -l) -ge 2 ]
         - name: sdkman
           become: false
           command: |
@@ -441,7 +450,7 @@ all:
           command: |
             PLUGINS_TO_INSTALL="{{ vs_code_extensions }}"
             CODE_PLUGINS="$(code --list-extensions |wc -l)"
-            [ "${CODE_PLUGINS}" -eq 39 ] || {
+            [ "${CODE_PLUGINS}" -eq {{ vs_code_extensions.split() | length }} ] || {
               for i in ${PLUGINS_TO_INSTALL} ; do
                 code --force --install-extension "$i"
               done
