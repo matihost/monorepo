@@ -56,6 +56,11 @@ prepare:
 	@[ -e "$(HOME)/.ssh/id_rsa.cloud.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.cloud.vm; }
 	rm -rf target
 
+
+docs: prepare ## generate html/pdf from *.ad in target directory
+	asciidoctor -r asciidoctor-diagram -b html -D target docs/*.ad
+	asciidoctor -r asciidoctor-pdf,asciidoctor-diagram -b pdf -D target docs/*.ad
+
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help

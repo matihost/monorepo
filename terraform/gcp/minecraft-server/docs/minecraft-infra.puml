@@ -1,0 +1,55 @@
+@startuml
+' configures the library
+!global $LIB_BASE_LOCATION="https://raw.githubusercontent.com/tmorin/plantuml-libs/master/distribution"
+
+' loads the library
+!include $LIB_BASE_LOCATION/bootstrap.puml
+
+' loads the package bootstrap
+include('gcp/bootstrap')
+
+left to right direction
+
+include('material-4/Hardware/Laptop')
+
+include('gcp/Item/CloudDns')
+include('gcp/Item/CloudLoadBalancing')
+include('gcp/Item/ComputeEngine')
+include('gcp/Group/GroupProjectZone')
+include('gcp/Group/GroupInstances')
+include('gcp/Item/CloudStorage')
+
+include('gcp/Item/CloudFunctions')
+include('gcp/Item/Pubsub')
+include('gcp/Item/CloudScheduler')
+
+Title("Minecraft Server Infrastructure")
+
+Laptop('laptop', 'Minecraft client')
+CloudDns('dns', 'external dns')
+GroupProjectZone('project', 'GCP Project') {
+  CloudLoadBalancing('lb', 'Network','LB')
+  GroupInstances('grp_instances', 'Instance Group') {
+    ComputeEngine('instances', 'Minecraft Server', 'single instance')
+  }
+
+  CloudStorage('gs_backup','Backup', 'GS')
+
+  Pubsub('ps', 'Pubsub', '//server-name.lifecycle.minecraft.topic//')
+  CloudFunctions('cf', 'Instance Group Resizer Function', 'resize to 1 or to 0 the instance group')
+  CloudScheduler('stop_cs', 'Cron Stopper', 'at 22:05 sends //stop// message')
+  CloudScheduler('start_cs', 'Cron Starter', 'at 10:05 sends //start// message')
+}
+
+laptop --> dns
+dns --> lb
+lb --> instances
+instances <--> gs_backup : hourly
+
+stop_cs --> ps : //stop// message
+start_cs --> ps : //start// message
+ps --> cf : triggers
+
+cf --> grp_instances : resizes
+
+@enduml

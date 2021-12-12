@@ -1,0 +1,39 @@
+= Minecraft Server
+matihost@github
+:doctype: book
+:reproducible:
+:source-highlighter: rouge
+:listing-caption: Listing
+:math:
+:data-uri:
+:imagesoutdir: ../target/generated-images
+:stem: latexmath
+:toc: left
+
+
+== Minecraft Server instance
+
+Spawns a Minecraft Server
+
+Features:
+
+* Exposes Minecraft server and Minecraft RCON (password protected)
+
+* Exposes Minecraft as single instance template exposed via external GCP Network Loadbalancer.
+
+* Minecraft server starts with single whitelisted & op (aka admin) user. To allow other users to connect - op user has to join server and whitelist users via command: `/whitelist add username`
+
+* Minecraft server world and configuration is automatically backup each hour to Cloud Storage. When server crashes - after 200 seconds of inactivity - the instance is recreated. Upon startup , the last backup is downloaded, otherwise it creates a new fresh world. Upon ordinary reboot, the backup is not downloaded.
+
+* Minecraft server is automatically shutdown (instanceGroup is scaled to 0) at 10:05 PM and automatically started at 10:05 AM every day.
+
+Limitations:
+
+* public DNS is not created, requires separated public DNS for Minecraft server LB external IP
+
+== Architecture
+
+[plantuml, target=minecraft-infra, format=png]
+....
+include::minecraft-infra.puml[]
+....

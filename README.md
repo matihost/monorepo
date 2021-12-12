@@ -12,6 +12,6 @@ Various technology code, snippets, home tools.
 * [Python](python)
 * [Rust](rust)
 * [Docker, K8S, Minikube, Helm, GKE, Istio, OpenShift](k8s)
-* [Terraform deployments to AWS, GCP](terraform) - Minecraft deployment, GKE, Jenkins, OpenVPN
+* [Terraform deployments to AWS, GCP](terraform) - [GCP Minecraft deployment](terraform/gcp/minecraft-server), GKE, Jenkins, OpenVPN deployments
 * CI with Jenkins, CloudBuild, Travis
 * Vagrant, Packer
