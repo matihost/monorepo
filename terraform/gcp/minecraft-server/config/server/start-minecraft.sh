@@ -5,18 +5,18 @@ SERVER_NAME=MINECRAFT_SERVER_NAME
 PASS=MINECRAFT_PASS
 OP_USER=MINECRAFT_SERVER_OP_USER
 
-GS_BACKUP_OBJECT="gs://${BUCKET}/${SERVER_NAME}/world-backup.tar.xz"
+GS_BACKUP_OBJECT="gs://${BUCKET}/${SERVER_NAME}/world-backup.tar"
 
 FOREGROUND=${1:-background}
 
 function download_minecraft_backup() {
   mkdir -p backup
   # shellcheck disable=SC2035
-  gsutil cp "${GS_BACKUP_OBJECT}" backup/ && {
-    cp backup/world-backup.tar.xz . &&
-      rm -rf world *.properties *.json &&
-      tar -Jxvf world-backup.tar.xz &&
-      rm world-backup.tar.xz
+  gsutil cp -Z "${GS_BACKUP_OBJECT}" backup/ && {
+    cp backup/world-backup.tar . &&
+      rm -rf world *.json *.properties *.png &&
+      tar -xf world-backup.tar &&
+      rm world-backup.tar
   }
 }
 

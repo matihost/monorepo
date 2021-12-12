@@ -47,10 +47,10 @@ init-terraform:
 	terraform init -upgrade=true
 
 shutdown: ## resize instance group to zero
-	gcloud compute instance-groups managed resize prod-01-minecraft-server --zone=europe-central2-a --size=0
+	gcloud compute instance-groups managed resize $(SERVER_NAME)-minecraft-server --zone=europe-central2-a --size=0
 
 bring-up: ## resize instance group to one
-	gcloud compute instance-groups managed resize prod-01-minecraft-server --zone=europe-central2-a --size=1
+	gcloud compute instance-groups managed resize $(SERVER_NAME)-minecraft-server --zone=europe-central2-a --size=1
 
 prepare:
 	@[ -e "$(HOME)/.ssh/id_rsa.cloud.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.cloud.vm; }
