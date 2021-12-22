@@ -474,11 +474,12 @@ all:
         - name: k9s
           become: false
           command: |
-            K9S_VERSION=$(git ls-remote -t https://github.com/derailed/k9s.git | grep -v '\^{}' | cut -d'/' -f3 |sort -n |tail -n 1 | cut -d'v' -f2)
+            K9S_VERSION="$(curl -s "https://api.github.com/repos/derailed/k9s/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"v([^"]+)".*/\1/')"
             [[ -x /usr/local/bin/k9s && "$(k9s version -s |grep Version)" =~ ${K9S_VERSION} ]] || (
               cd "$(mktemp -d)" &&
-              curl -fsSLO "https://github.com/derailed/k9s/releases/download/v${K9S_VERSION}/k9s_Linux_x86_64.tar.gz" &&
-              tar -zxvf k9s_Linux_x86_64.tar.gz -o k9s &&
+              curl -s "https://api.github.com/repos/derailed/k9s/releases/latest" |
+                jq -r ".assets[]|select(.content_type|test(\"application/gzip\"))|.browser_download_url" |
+                  grep Linux | grep x86_64 | xargs curl -sSL | tar -zxv -o k9s &&
               sudo mv k9s /usr/local/bin
             )
         - name: kubectx-ns
