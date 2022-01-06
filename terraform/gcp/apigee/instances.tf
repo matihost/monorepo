@@ -1,16 +1,23 @@
 
 resource "google_apigee_instance" "instance" {
-  name = "${var.env}-${google_apigee_organization.org.name}-${local.zone}"
+  name = "${var.env}-${google_apigee_organization.org.name}-${var.region}"
 
-  # location has to be zone for trial subscription, or region for paid subscription
-  location    = local.zone
-  description = "Apigee Runtime Instance in ${local.zone}"
+  # only single instance per region is possible
+  location    = var.region
+  description = "Apigee Runtime Instance in ${var.region}"
   org_id      = google_apigee_organization.org.id
 
   # disk encyption only for paid subscription only
   # disk_encryption_key_name = google_kms_crypto_key.apigee-key.id
+  # evaluation/trial subscription are only SLASH_22 or SLASH_23
   peering_cidr_range = "SLASH_22"
 }
+
+# TODO enable when Google provider 4.6.0 is released
+# resource "google_apigee_nat_address" "instance-nat-1" {
+#   instance_id  = google_apigee_instance.instance.id
+#   name  = "${google_apigee_instance.google_apigee_instance.name}-nat-1"
+# }
 
 resource "google_apigee_environment" "env" {
   name         = var.env
@@ -37,7 +44,7 @@ resource "google_dns_record_set" "instance-dns" {
 
 resource "google_apigee_envgroup" "envgroup" {
   name      = var.env
-  hostnames = [google_dns_record_set.instance-dns.name]
+  hostnames = [trimsuffix(google_dns_record_set.instance-dns.name, ".")]
   org_id    = google_apigee_organization.org.id
 }
 

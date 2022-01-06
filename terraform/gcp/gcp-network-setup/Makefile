@@ -34,7 +34,7 @@ pre-all:
 clean: ## clean Terraform cached plugins and data
 	rm -rf .terraform* terraform.tfstate*
 
-upgrade-terraform-provider-version:
+upgrade-terraform-provider-version: pre-all
 
 
 help: ## show usage and tasks (default)

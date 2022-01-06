@@ -4,13 +4,21 @@ CURRENT_PROJECT := $(shell gcloud config get-value project)
 
 TF_VAR_project := $(CURRENT_PROJECT)
 
-# uncomment to run terraform in debug mode
-# TF_LOG := DEBUG
+DEBUG := false
+ifeq ($(strip $(DEBUG)),true)
+	TF_LOG := DEBUG
+endif
 
-apply: init-terraform prepare ## deploy ApigeeX
+APPROVE := true
+ifeq ($(strip $(APPROVE)),true)
+	APPROVE_STR := -auto-approve
+endif
+
+
+apply: init-terraform prepare ## deploy ApigeeX, usage: make apply [DEBUG=true APPROVE=false]
 	@terraform validate && \
 	terraform plan -lock=false && \
-	terraform apply -auto-approve
+	terraform apply $(APPROVE_STR)
 
 show-state: ## show terraform.state
 	terraform state list

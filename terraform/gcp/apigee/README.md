@@ -23,14 +23,7 @@ ApigeeX installation consists of:
 ## Usage
 
 ```bash
-# deploy OpenVPN Gateway in GCP VPC
+# deploy ApigeeX, usage: make apply [DEBUG=true APPROVE=false]
 make apply
 
-# setup Open VPN and forwards DNS in GCP to client VPN network DNS nameserver
-make apply-with-dns-forwarding ZONE=vpnclient.zone.com IP=10.8.0.2
-
-# connect to to VPN, press Ctrl+C to disconnect
-make connect-to-vpn
-# or
-./connect-to-vpn.sh
 ```
