@@ -26,4 +26,18 @@ make install
 
 # remove
 make uninstall
+
+# clean build leftovers
+make clean
+
+# builds docker image
+make build-image
+# push image with tag to quay.io repository (assume docker login quay.io has been perfomed)
+make push-image
+
+# run image locally
+make run-container
+
+# make run container locally with shell as entrypoint
+make run-container-bash
 ```

@@ -43,11 +43,16 @@ setup(
     packages=find_packages(where="src"),  # Required
     python_requires=">=3.9, <4",
     install_requires=[
-        "requests>=2.25.1, <3",
+        "requests>=2.27.1, <3",
+        "flask>=2.0.2, <3",
+        "waitress>=2.0.0, <3",
     ],  # Optional
     dependency_links=[],
     entry_points={
-        "console_scripts": ["exchange-rate=exchange_rate.cli.exchange_rate:main", ],
+        "console_scripts": [
+            "exchange-rate=exchange_rate.cli.exchange_rate:main",
+            "exchange-rate-web=exchange_rate.cli.exchange_rate_web:main",
+        ],
     },
     project_urls={"Source": "https://github.com/matihost/learning/", },  # Optional
 )
