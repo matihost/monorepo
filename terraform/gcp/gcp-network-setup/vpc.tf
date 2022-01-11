@@ -1,3 +1,9 @@
+# set enable-oslogin metadata on project level to add this metadata to each VM created within GCP project
+resource "google_compute_project_metadata_item" "os-login" {
+  key   = "enable-oslogin"
+  value = "TRUE"
+}
+
 resource "google_compute_network" "private" {
   name                    = "private-vpc"
   auto_create_subnetworks = "false"
