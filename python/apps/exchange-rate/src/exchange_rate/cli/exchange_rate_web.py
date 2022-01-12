@@ -5,13 +5,13 @@ Show Foreign Currency/PLN pair.
 It is based on Polish Central Bank (NBP) fixing exchange rate.
 """
 from datetime import date
+import logging
+from waitress import serve
+from flask import Flask, jsonify, make_response
 
 from exchange_rate.helpers.version import package_version
 from exchange_rate.exchange_rate_to_pln import ExchangeRateToPLN
 
-from waitress import serve
-from flask import Flask, jsonify, make_response
-import logging
 
 app = Flask(__name__)
 logger = logging.getLogger('waitress')
@@ -31,9 +31,9 @@ def exchanges(currency, convert_date):
 @app.route('/about')
 def about():
     """Expose /about GET endpoint."""
-    r = make_response(_DESCRIPTION)
-    r.mimetype = 'text/plain'
-    return r
+    response = make_response(_DESCRIPTION)
+    response.mimetype = 'text/plain'
+    return response
 
 
 @app.route('/version')

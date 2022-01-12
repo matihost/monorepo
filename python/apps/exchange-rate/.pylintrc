@@ -1,2 +1,6 @@
+# sample pylint config: https://github.com/PyCQA/pylint/blob/main/pylintrc
 [MESSAGES CONTROL]
 disable=C0114,C0115,C0116,W0511
+
+[FORMAT]
+max-line-length=120
