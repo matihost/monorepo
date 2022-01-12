@@ -1,0 +1,38 @@
+# yamllint disable-file
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "app.fullname" . }}-webconsole
+  namespace: {{ include "app.namespace" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+spec:
+  ports:
+  - protocol: TCP
+    port: 443
+    targetPort: 9443
+  selector:
+    {{- include "app.selectorLabels" . | nindent 6 }}
+  sessionAffinity: None
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "app.fullname" . }}
+  namespace: {{ include "app.namespace" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  ports:
+  - protocol: TCP
+    port: 1414
+    targetPort: 1414
+  selector:
+    {{- include "app.selectorLabels" . | nindent 6 }}
+  sessionAffinity: None
+  type: LoadBalancer
+---

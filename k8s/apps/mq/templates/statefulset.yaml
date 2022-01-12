@@ -1,0 +1,80 @@
+# yamllint disable-file
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "app.fullname" . }}
+  namespace: {{ include "app.namespace" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  serviceName: mq
+  selector:
+    matchLabels:
+      {{- include "app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "app.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name | default "default" }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
+          env:
+          - name: MQ_DEV
+            value: "true"
+          - name: LICENSE
+            value: "accept"
+          - name: MQ_QMGR_NAME
+            value: {{ .Release.Name | upper }}
+          - name: MQ_MULTI_INSTANCE
+            value: "false"
+          - name: LOG_FORMAT
+            value: "basic"
+          - name: MQ_ENABLE_METRICS
+            value: "true"
+          - name: DEBUG
+            value: "false"
+          - name: MQ_ENABLE_TRACE_STRMQM
+            value: "false"
+          - name: MQ_EPHEMERAL_PREFIX
+            value: "/run/mqm"
+          - name: MQ_GRACE_PERIOD
+            value: "30"
+          - name: MQ_ADMIN_PASSWORD
+            value: "todo"
+          - name: MQ_APP_PASSWORD
+            value: "todo"
+          ports:
+            - name: mq-manager
+              containerPort: 1414
+              protocol: TCP
+            - name: mq-webconsole
+              containerPort: 9443
+              protocol: TCP
+            - name: mq-metrics
+              containerPort: 9157
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: mq-manager
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: "/ibmmq/console/login.html"
+              port: mq-webconsole
+              scheme: HTTPS
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      terminationGracePeriodSeconds: 30

@@ -8,3 +8,4 @@ controller:
   ## Only for Kubernetes >= 1.18
   ## New Ingresses without an ingressClassName field specified will be assigned the class specified in `controller.ingressClass`.
   setAsDefaultIngress: true
+  enableTLSPassthrough: true

@@ -1,0 +1,21 @@
+---
+image:
+  repository: ibmcom/mq
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+namespaceOverride: ""
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  name: default
+
+webconsole:
+  ingress:
+    enabled: true
+    version: v1  # in case GKE 1.18 or lower - it does not support v1 ingress yet - use ingress version: v1beta1
+    class: "" # assume default impl, use gce-internal for GKE Internal LoadBalancer, use istio or nginx when Istio or Nginx installed
+
+    annotations: {}
+    host: webconsole.mq.learning.minikube.testing
