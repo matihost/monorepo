@@ -53,13 +53,14 @@
     <groovy.version>3.0.9</groovy.version>
     <spock.version>2.0-groovy-3.0</spock.version>
 
-    <!-- Scala -->
-    <scala.compat.version>2.13</scala.compat.version>
-    <scala.version>${scala.compat.version}.8</scala.version>
-    <!-- TODO fix scala.spec2.version and scata.test.version incompatibilities in transitive dependencies-->
-    <scala.spec2.version>4.13.2</scala.spec2.version>
+    <!-- Scala 3-->
+    <scala.compat.version>3</scala.compat.version>
+    <scala.version>${scala.compat.version}.1.0</scala.version>
+    <scala.spec2.version>5.0.0-RC-22</scala.spec2.version>
     <scala.test.version>3.2.10</scala.test.version>
     <scala.test.plus.version>3.2.10.0</scala.test.plus.version>
+    <!-- Scala 3 still depends on Scala 2 for backward compatibility -->
+    <scala2.version>2.13.8</scala2.version>
   </properties>
 
   <profiles>
@@ -227,18 +228,8 @@
                 <goal>testCompile</goal>
               </goals>
               <configuration>
-                <args>
-                  <!-- When scala-lang dependency is 3.x then enabling below two can be-->
-                  <!-- used for attempt to migration-->
-                  <!-- https://docs.scala-lang.org/scala3/guides/migration/tooling-migration-mode.html -->
-                  <!-- <arg>-source:3.0-migration</arg>
-                  <arg>-rewrite</arg> -->
-                  <!-- Option of Scala 2.13 compiler to force some Scala 3 construct -->
-                  <arg>-Xsource:3</arg>
-                  <!-- Remaining parameters-->
-                  <arg>-dependencyfile</arg>
-                  <arg>${project.build.directory}/.scala_dependencies</arg>
-                </args>
+                <scalaVersion>${scala.version}</scalaVersion>
+                <scalaCompatVersion>${scala.version}</scalaCompatVersion>
               </configuration>
             </execution>
           </executions>
@@ -405,29 +396,39 @@
         <scope>test</scope>
       </dependency>
 
-      <!-- Scala -->
+      <!-- Scala 3-->
+      <dependency>
+        <groupId>org.scala-lang</groupId>
+        <artifactId>scala3-library_3</artifactId>
+        <version>${scala.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.scala-lang</groupId>
+        <artifactId>scala3-compiler_3</artifactId>
+        <version>${scala.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.scala-lang</groupId>
+          <artifactId>scala3-interfaces</artifactId>
+          <version>${scala.version}</version>
+      </dependency>
+      <!-- Workaround for dependency inconsistence between org.specs2:specs2-junit_3 and org.scalatest:scalatest_3-->
+      <dependency>
+        <groupId>org.scala-lang.modules</groupId>
+        <artifactId>scala-xml_3</artifactId>
+        <version>2.0.1</version>
+      </dependency>
+
+      <!-- Scala 3 still depends on Scala 2 for backward compatibility -->
       <dependency>
         <groupId>org.scala-lang</groupId>
         <artifactId>scala-library</artifactId>
-        <version>${scala.version}</version>
+        <version>${scala2.version}</version>
       </dependency>
-      <!-- Workaround for mismatch in transitive dependencies within org.specs2:specs2-core_2.13 to scala-reflect -->
       <dependency>
         <groupId>org.scala-lang</groupId>
         <artifactId>scala-reflect</artifactId>
-        <version>${scala.version}</version>
-      </dependency>
-      <!-- Workaround for mismatch in transitive dependencies within org.scalatest:scalatest_2.13 to scala-compiler -->
-      <dependency>
-        <groupId>org.scala-lang</groupId>
-        <artifactId>scala-compiler</artifactId>
-        <version>${scala.version}</version>
-      </dependency>
-       <!-- Workaround for mismatch between scala-compiler and mockito dependency -->
-      <dependency>
-        <groupId>net.java.dev.jna</groupId>
-        <artifactId>jna</artifactId>
-        <version>5.9.0</version>
+        <version>${scala2.version}</version>
       </dependency>
 
       <dependency>

@@ -11,7 +11,7 @@
   <dependencies>
     <dependency>
       <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
+      <artifactId>scala3-library_3</artifactId>
       <version>${scala.version}</version>
     </dependency>
 
@@ -68,8 +68,12 @@
         <artifactId>scalatest-maven-plugin</artifactId>
         <configuration>
           <!-- Comma separated list of JUnit test class names to execute -->
-          <!-- TODO uncomment when   at org.scalatest.tools.Runner$.doRunRunRunDaDoRunRun(Runner.scala:1208) is fixed -->
-          <!--jUnitClasses>samples.AppTest</jUnitClasses-->
+          <jUnitClasses>
+            samples.AppTest,
+            samples.MySpecTest,
+            samples.StackSuite,
+            samples.ListSuite
+          </jUnitClasses>
         </configuration>
       </plugin>
     </plugins>
