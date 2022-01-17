@@ -202,7 +202,7 @@
         <plugin>
           <groupId>org.codehaus.gmavenplus</groupId>
           <artifactId>gmavenplus-plugin</artifactId>
-          <version>1.13.0</version>
+          <version>1.13.1</version>
           <executions>
             <execution>
               <goals>
@@ -219,7 +219,7 @@
         <plugin>
           <groupId>net.alchim31.maven</groupId>
           <artifactId>scala-maven-plugin</artifactId>
-          <version>4.5.4</version>
+          <version>4.5.6</version>
           <executions>
             <execution>
               <goals>
@@ -268,7 +268,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
-          <version>3.0.0-M3</version>
+          <version>3.0.0</version>
           <executions>
             <execution>
               <id>enforce-maven</id>
@@ -322,8 +322,12 @@
         <!-- Versions can be taken from  mvn -T1 versions:display-plugin-updates -->
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.8.1</version>
+          <version>3.9.0</version>
           <configuration>
+            <!-- The -release option ensures that the code is compiled following the rules of the programming language of the specified release,
+            and that generated classes target the release as well as the public API of that release.
+            This means that, unlike the -source and -target options,
+            the compiler will detect and generate an error when using APIs that don't exist in previous releases of Java SE. -->
             <release>${java.version}</release>
           </configuration>
         </plugin>
@@ -350,7 +354,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>3.0.0-M1</version>
+          <version>3.0.0-M2</version>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
@@ -358,11 +362,11 @@
         </plugin>
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.2.0</version>
+          <version>3.2.2</version>
         </plugin>
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.9.1</version>
+          <version>3.10.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -412,6 +416,18 @@
         <groupId>org.scala-lang</groupId>
         <artifactId>scala-reflect</artifactId>
         <version>${scala.version}</version>
+      </dependency>
+      <!-- Workaround for mismatch in transitive dependencies within org.scalatest:scalatest_2.13 to scala-compiler -->
+      <dependency>
+        <groupId>org.scala-lang</groupId>
+        <artifactId>scala-compiler</artifactId>
+        <version>${scala.version}</version>
+      </dependency>
+       <!-- Workaround for mismatch between scala-compiler and mockito dependency -->
+      <dependency>
+        <groupId>net.java.dev.jna</groupId>
+        <artifactId>jna</artifactId>
+        <version>5.9.0</version>
       </dependency>
 
       <dependency>
