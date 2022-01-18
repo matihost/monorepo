@@ -75,6 +75,14 @@ spec:
               path: "/ibmmq/console/login.html"
               port: mq-webconsole
               scheme: HTTPS
+          volumeMounts:
+            - name: mqsc #The name(key) value must match pod volumes name(key) value
+              mountPath: /etc/mqm/25-config.mqsc
+              subPath: 25-config.mqsc
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       terminationGracePeriodSeconds: 30
+      volumes:
+        - name: mqsc
+          configMap:
+            name: {{ include "app.fullname" . }}-config

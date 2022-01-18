@@ -11,6 +11,9 @@ fullnameOverride: ""
 serviceAccount:
   name: default
 
+mq:
+  configPath: "config.mqsc"
+
 resources:
   limits:
     cpu: 2

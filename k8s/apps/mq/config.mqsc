@@ -1,0 +1,2 @@
+* Define service channel accessible by mqm user (local)
+DEFINE CHANNEL(TEST.SVRCONN) CHLTYPE(SVRCONN) MCAUSER('mqm')

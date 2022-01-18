@@ -1,0 +1,15 @@
+# yamllint disable-file
+---
+{{- $config := .Files.Glob .Values.mq.configPath }}
+{{- if $config }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "app.fullname" . }}-config
+  namespace: {{ include "app.namespace" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+data:
+  25-config.mqsc: |-
+{{ .Files.Get .Values.mq.configPath | indent 4}}
+{{- end }}
