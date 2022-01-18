@@ -17,7 +17,7 @@ spec:
   selector:
     {{- include "app.selectorLabels" . | nindent 6 }}
   sessionAffinity: None
-  type: LoadBalancer
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service

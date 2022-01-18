@@ -1,0 +1,45 @@
+# yamllint disable-file
+{{- $fullName := include "app.fullname" . -}}
+{{- if .Values.webconsole.istio.enabled }}
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: {{ $fullName }}-webconsole
+  namespace: {{ include "app.namespace" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - hosts:
+    - webconsole.{{ .Release.Name }}.{{ include "app.name" . }}.{{ include "app.namespace" . }}.{{ .Values.webconsole.istio.hostSuffix }}
+    port:
+      name: https
+      number: 443
+      protocol: HTTPS
+    tls:
+      mode: PASSTHROUGH
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ $fullName }}-webconsole
+  namespace: {{ include "app.namespace" . }}
+spec:
+  gateways:
+  - {{ include "app.namespace" . }}/{{ $fullName }}-webconsole
+  hosts:
+  - webconsole.{{ .Release.Name }}.{{ include "app.name" . }}.{{ include "app.namespace" . }}.{{ .Values.webconsole.istio.hostSuffix }}
+  tls:
+  - match:
+    - port: 443
+      sniHosts:
+      - webconsole.{{ .Release.Name }}.{{ include "app.name" . }}.{{ include "app.namespace" . }}.{{ .Values.webconsole.istio.hostSuffix }}
+    route:
+    - destination:
+        host: {{ $fullName }}-webconsole.{{ include "app.namespace" . }}.svc.cluster.local
+        port:
+          number: 443
+{{- end }}

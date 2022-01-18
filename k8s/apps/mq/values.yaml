@@ -11,11 +11,17 @@ fullnameOverride: ""
 serviceAccount:
   name: default
 
-webconsole:
-  ingress:
-    enabled: true
-    version: v1  # in case GKE 1.18 or lower - it does not support v1 ingress yet - use ingress version: v1beta1
-    class: "" # assume default impl, use gce-internal for GKE Internal LoadBalancer, use istio or nginx when Istio or Nginx installed
+resources:
+  limits:
+    cpu: 2
+    memory: 768Mi
+    ephemeral-storage: "4Gi"
+  requests:
+    cpu: 200m
+    memory: 384Mi
+    ephemeral-storage: "2Gi"
 
-    annotations: {}
-    host: webconsole.mq.learning.minikube.testing
+webconsole:
+  istio:
+    enabled: false
+    hostSuffix: testing.minikube
