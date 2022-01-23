@@ -10,7 +10,7 @@ ApigeeX installation consists of:
 
 * Single Apigee Environment called `dev`
 
-* Single Apigee Environment Group consisting `dev` Environment visible via DNS `api.dev.gcp.testing`.
+* Single Apigee Environment Group consisting `dev` Environment visible via DNS `api.dev.gcp.testing` and provided DNS via EXTERNAL_DNS variable.
 
 * GCP DNS record `api.dev.gcp.testing` pointing to Apigee Instance private IP.
   So that Apigee instance is available via <https://api.dev.gcp.testing> from within VPC.
@@ -23,7 +23,6 @@ ApigeeX installation consists of:
 ## Usage
 
 ```bash
-# deploy ApigeeX, usage: make apply [DEBUG=true APPROVE=false]
-make apply
-
+# deploy ApigeeX, usage: make apply EXTERNAL_DNS=api.some.com [DEBUG=true APPROVE=false]
+make apply EXTERNAL_DNS=api.some.com
 ```

@@ -50,3 +50,9 @@ variable "env" {
   default     = "dev"
   description = "Environment, also default environment"
 }
+
+
+variable "external_dns" {
+  type        = string
+  description = "External DNS Apigee is exposed, sample api.dev.some.com"
+}

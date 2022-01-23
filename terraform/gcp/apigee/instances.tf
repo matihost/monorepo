@@ -44,7 +44,7 @@ resource "google_dns_record_set" "instance-dns" {
 
 resource "google_apigee_envgroup" "envgroup" {
   name      = var.env
-  hostnames = [trimsuffix(google_dns_record_set.instance-dns.name, ".")]
+  hostnames = [trimsuffix(google_dns_record_set.instance-dns.name, "."), var.external_dns]
   org_id    = google_apigee_organization.org.id
 }
 
