@@ -37,7 +37,7 @@ resource "google_compute_instance" "bastion" {
     initialize_params {
       # # OpsAgents support only LTS
       # https://cloud.google.com/monitoring/agent/ops-agent?hl=en_US#supported_operating_systems
-      image = "ubuntu-os-cloud/ubuntu-minimal-2104"
+      image = "ubuntu-os-cloud/ubuntu-minimal-2110"
     }
   }
 
