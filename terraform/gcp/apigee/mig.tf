@@ -22,6 +22,39 @@ resource "google_compute_region_instance_group_manager" "apigee-mig-group-manage
   }
 }
 
+
+resource "google_compute_backend_service" "apigee-mig" {
+  affinity_cookie_ttl_sec = "0"
+
+  backend {
+    balancing_mode               = "UTILIZATION"
+    capacity_scaler              = "1"
+    group                        = google_compute_region_instance_group_manager.apigee-mig-group-manager.instance_group
+    max_connections              = "0"
+    max_connections_per_endpoint = "0"
+    max_connections_per_instance = "0"
+    max_rate                     = "0"
+    max_rate_per_endpoint        = "0"
+    max_rate_per_instance        = "0"
+    max_utilization              = "0.8"
+  }
+
+  connection_draining_timeout_sec = "300"
+  enable_cdn                      = "false"
+  health_checks                   = [google_compute_health_check.apigee-mig-health-check.self_link]
+  load_balancing_scheme           = "EXTERNAL"
+
+  log_config {
+    enable = "false"
+  }
+
+  name             = "mig-${var.env}-${google_apigee_organization.org.name}-${var.region}"
+  port_name        = "https"
+  protocol         = "HTTPS"
+  session_affinity = "NONE"
+  timeout_sec      = "300"
+}
+
 # Global, common to all regions, resources
 
 resource "google_compute_instance_template" "apigee-mig-template" {

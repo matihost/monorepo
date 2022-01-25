@@ -9,11 +9,14 @@ resource "google_apigee_instance" "instance" {
 
   # disk encyption only for paid subscription only
   # disk_encryption_key_name = google_kms_crypto_key.apigee-key.id
+
   # evaluation/trial subscription are only SLASH_22 or SLASH_23
-  peering_cidr_range = "SLASH_22"
+  # peering_cidr_range = "SLASH_22"
+  ip_range = "10.9.0.0/22"
+
 }
 
-# TODO enable when Google provider 4.6.0 is released
+# TODO enable when Google provider releases apigee nat resource
 # resource "google_apigee_nat_address" "instance-nat-1" {
 #   instance_id  = google_apigee_instance.instance.id
 #   name  = "${google_apigee_instance.google_apigee_instance.name}-nat-1"

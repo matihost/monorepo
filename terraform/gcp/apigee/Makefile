@@ -15,7 +15,7 @@ ifeq ($(strip $(APPROVE)),true)
 endif
 
 
-apply: init-terraform prepare ## deploy ApigeeX, usage: make apply EXTERNAL_DNS=api.some.com [DEBUG=true APPROVE=false]
+apply: init-terraform prepare-tls ## deploy ApigeeX, usage: make apply EXTERNAL_DNS=api.some.com [DEBUG=true APPROVE=false]
 ifndef EXTERNAL_DNS
 	$(error Env EXTERNAL_DNS is not defined. Usage make apply EXTERNAL_DNS=api.some.com [DEBUG=true APPROVE=false])
 endif
@@ -28,17 +28,22 @@ show-state: ## show terraform.state
 	terraform show
 
 destroy: ## destroy ApigeeX resources
-	terraform plan && terraform destroy -auto-approve
+	terraform plan && terraform destroy -auto-approve && \
+	rm -rf target
 
-google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
+google-authentication: ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
 	gcloud auth application-default login
 
 init-terraform:
 	terraform init -upgrade=true
 
-prepare:
-	@[ -e "$(HOME)/.ssh/id_rsa.cloud.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.cloud.vm; }
+
+prepare-tls:
+ifndef EXTERNAL_DNS
+	$(error Env EXTERNAL_DNS is not defined. Usage make apply EXTERNAL_DNS=api.some.com [DEBUG=true APPROVE=false])
+endif
+	@[ -e "target/$(EXTERNAL_DNS).crt" ] || { mkdir -p target; openssl req -x509 -sha256 -days 365 -subj "/C=PL/ST=ML/L=CityName/O=myorg/OU=Central/CN=$(EXTERNAL_DNS)" -newkey rsa:2048 -nodes -keyout target/$(EXTERNAL_DNS).key -out target/$(EXTERNAL_DNS).crt; }
 
 clean: ## clean Terraform cached plugins and data
 	rm -rf .terraform* terraform.tfstate*

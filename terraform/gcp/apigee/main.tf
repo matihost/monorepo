@@ -25,7 +25,10 @@ data "google_dns_managed_zone" "main-zone" {
 }
 
 locals {
-  zone = "${var.region}-${var.zone_letter}"
+  zone                      = "${var.region}-${var.zone_letter}"
+  external_dns_name         = replace(var.external_dns, ".", "-")
+  external_tls_key_filename = var.external_tls_key != "" ? var.external_tls_key : "target/${var.external_dns}.key"
+  external_tls_crt_filename = var.external_tls_crt != "" ? var.external_tls_crt : "target/${var.external_dns}.crt"
 }
 
 variable "region" {
@@ -55,4 +58,16 @@ variable "env" {
 variable "external_dns" {
   type        = string
   description = "External DNS Apigee is exposed, sample api.dev.some.com"
+}
+
+variable "external_tls_key" {
+  type        = string
+  default     = ""
+  description = "External DNS Apigee TLS Key file path"
+}
+
+variable "external_tls_crt" {
+  type        = string
+  default     = ""
+  description = "External DNS Apigee TLS Crt file path"
 }
