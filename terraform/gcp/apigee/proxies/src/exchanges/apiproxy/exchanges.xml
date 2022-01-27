@@ -1,0 +1,16 @@
+<APIProxy revision="5" name="exchanges">
+    <DisplayName></DisplayName>
+    <Description>Exchange rates</Description>
+    <CreatedAt>1643146802432</CreatedAt>
+    <LastModifiedAt>1643146802432</LastModifiedAt>
+    <BasePaths>/exchanges</BasePaths>
+    <Policies>
+        <Policy>add-cors</Policy>
+    </Policies>
+    <ProxyEndpoints>
+        <ProxyEndpoint>default</ProxyEndpoint>
+    </ProxyEndpoints>
+    <TargetEndpoints>
+        <TargetEndpoint>default</TargetEndpoint>
+    </TargetEndpoints>
+</APIProxy>

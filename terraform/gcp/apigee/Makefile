@@ -49,17 +49,17 @@ clean: ## clean Terraform cached plugins and data
 	rm -rf .terraform* terraform.tfstate*
 
 
-deploy-provider: ## deploys exchange-rate-web app as container on VM
+deploy-exchanges-provider: ## deploys exchange-rate-web app as container on VM (sample Apigee targetServer for exchanges API proxy)
 	gcloud compute instances create-with-container exchange-rate-web \
     --container-image quay.io/matihost/exchange-rate:latest --container-restart-policy=always \
     --subnet private-subnet-us-east1 --zone us-east1-b --no-address --metadata enable-oslogin=TRUE \
     --machine-type=e2-micro \
     --image-project=cos-cloud --image-family=cos-stable --boot-disk-size=10GB
 
-destroy-provider: ## destroy exchange-rate-web VM
+destroy-exchanges-provider: ## destroy exchange-rate-web VM
 	gcloud compute instances delete exchange-rate-web --zone us-east1-b --quiet
 
-deploy-echoserver:
+deploy-echoserver: ## deploys exchange-rate-web app as container on VM (sample Apigee targetServer for exchanges API proxy)
 	gcloud compute instances create-with-container echoserver-web \
     --container-image k8s.gcr.io/echoserver:1.10 --container-restart-policy=always \
     --subnet private-subnet-us-east1 --zone us-east1-b --no-address --metadata enable-oslogin=TRUE \
@@ -69,6 +69,9 @@ deploy-echoserver:
 
 destroy-echoserver: ## destroy exchange-rate-web VM
 	gcloud compute instances delete echoserver-web --zone us-east1-b --quiet
+
+deploy-api-proxies: ## deploy all API proxies from proxies directory (exchanges and echoserver) on Apigee
+	cd proxies && $(MAKE) deploy-all
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
