@@ -27,8 +27,10 @@ Playbooks:
 * K8S and Helm modules
 
   ```bash
-  rm -rf ~/.ansible/collections/ansible_collections/community/kubernetes && \
-  ansible-galaxy collection install community.kubernetes
+  rm -rf ~/.ansible/collections/ansible_collections/kubernetes && \
+  rm -rf ~/.ansible/collections/ansible_collections/community && \
+  ansible-galaxy collection install kubernetes.core
+  ansible-galaxy collection install community.general
   ```
 
 * In case of GKE workload identity configured for Jenkins `ci` namespaces Kubernetes Service Accounts (KSAs)

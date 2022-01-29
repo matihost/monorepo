@@ -2,7 +2,7 @@
 - hosts: localhost
   become: false
   collections:
-  - community.kubernetes
+  - kubernetes.core
   - community.general
   vars:
     files: "{{ playbook_dir }}/files"

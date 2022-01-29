@@ -66,8 +66,11 @@ spec:
               containerPort: 9157
               protocol: TCP
           livenessProbe:
-            tcpSocket:
-              port: mq-manager
+            exec:
+              command:
+              - chkmqready
+            # tcpSocket:
+            #   port: mq-manager
             initialDelaySeconds: 5
             periodSeconds: 10
           readinessProbe:
@@ -75,6 +78,7 @@ spec:
               path: "/ibmmq/console/login.html"
               port: mq-webconsole
               scheme: HTTPS
+
           volumeMounts:
             - name: mqsc #The name(key) value must match pod volumes name(key) value
               mountPath: /etc/mqm/25-config.mqsc

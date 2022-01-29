@@ -15,8 +15,9 @@ Deploys OPA Gatekeeper along with:
 ```bash
 pip3 install --user ansible
 pip3 install --user openshift kubernetes
+rm -rf ~/.ansible/collections/ansible_collections/kubernetes && \
 rm -rf ~/.ansible/collections/ansible_collections/community && \
-ansible-galaxy collection install community.kubernetes
+ansible-galaxy collection install kubernetes.core
 ansible-galaxy collection install community.general
 ```
 

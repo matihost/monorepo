@@ -1,6 +1,4 @@
 DEBUG := false
-
-DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	DEBUG_FLAG := --debug
 endif
