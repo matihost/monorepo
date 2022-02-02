@@ -42,4 +42,8 @@ make deploy-echoserver
 
 # deploy all API proxies from proxies directory (sample exchanges and echoserver) on Apigee
 make deploy-api-proxies
+
+# test API over Apigee
+make test-echoserver EXTERNAL_DNS=api.some.com
+make test-exchangerate EXTERNAL_DNS=api.some.com
 ```

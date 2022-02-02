@@ -73,6 +73,18 @@ destroy-echoserver: ## destroy exchange-rate-web VM
 deploy-api-proxies: ## deploy all API proxies from proxies directory (exchanges and echoserver) on Apigee
 	cd proxies && $(MAKE) deploy-all
 
+test-echoserver: ## test echo server API over Apigee
+ifndef DNS
+	$(error Env DNS is not defined. Usage make apply DNS=api.some.com)
+endif
+	curl -k https://$(DNS)/echoserver
+
+test-exchangerate: ## test exchange rate API over Apigee (get today USD/PLN fixing pair)
+ifndef DNS
+	$(error Env DNS is not defined. Usage make apply DNS=api.some.com)
+endif
+	curl -k https://$(DNS)/exchanges/USD/$(shell date -I)
+
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
