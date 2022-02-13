@@ -44,6 +44,6 @@ make deploy-echoserver
 make deploy-api-proxies
 
 # test API over Apigee
-make test-echoserver EXTERNAL_DNS=api.some.com
-make test-exchangerate EXTERNAL_DNS=api.some.com
+make test-echoserver DNS=api.some.com
+make test-exchangerate DNS=api.some.com
 ```

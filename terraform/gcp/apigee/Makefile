@@ -27,26 +27,29 @@ show-state: ## show terraform.state
 	terraform state list
 	terraform show
 
-destroy: ## destroy ApigeeX resources
-	terraform plan && terraform destroy -auto-approve && \
+destroy: init-terraform ## destroy ApigeeX resources
+ifndef EXTERNAL_DNS
+	$(error Env EXTERNAL_DNS is not defined. Usage make apply EXTERNAL_DNS=api.some.com [DEBUG=true APPROVE=false])
+endif
+	-cd proxies && $(MAKE) undeploy-all
+	terraform plan -var='external_dns=$(EXTERNAL_DNS)' && terraform destroy -auto-approve -var='external_dns=$(EXTERNAL_DNS)' && \
 	rm -rf target
 
 google-authentication: ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
 	gcloud auth application-default login
 
+clean: ## clean Terraform cached plugins and data
+	rm -rf target .terraform* terraform.tfstate*
+
 init-terraform:
 	terraform init -upgrade=true
-
 
 prepare-tls:
 ifndef EXTERNAL_DNS
 	$(error Env EXTERNAL_DNS is not defined. Usage make apply EXTERNAL_DNS=api.some.com [DEBUG=true APPROVE=false])
 endif
 	@[ -e "target/$(EXTERNAL_DNS).crt" ] || { mkdir -p target; openssl req -x509 -sha256 -days 365 -subj "/C=PL/ST=ML/L=CityName/O=myorg/OU=Central/CN=$(EXTERNAL_DNS)" -newkey rsa:2048 -nodes -keyout target/$(EXTERNAL_DNS).key -out target/$(EXTERNAL_DNS).crt; }
-
-clean: ## clean Terraform cached plugins and data
-	rm -rf .terraform* terraform.tfstate*
 
 
 deploy-exchanges-provider: ## deploys exchange-rate-web app as container on VM (sample Apigee targetServer for exchanges API proxy)

@@ -32,9 +32,9 @@ show-state: ## show terraform.state
 	terraform state list
 	terraform show
 
-destroy: ## destroy Minecraft Server resources
+destroy: init-terraform ## destroy Minecraft Server resources
+	terraform destroy -auto-approve -var='server_rcon_pass=whatever_as_we_destroy' -var='server_op_user=whatever_as_we_destroy' && \
 	rm -rf target
-	terraform destroy -auto-approve -var='server_rcon_pass=whatever_as_we_destroy' -var='server_op_user=whatever_as_we_destroy'
 
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
