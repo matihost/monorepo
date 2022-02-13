@@ -26,6 +26,7 @@ spec:
             cpu: 500m
         hpaSpec:
           minReplicas: {{ 2 if options.gke_mode|default(false) else 1 }}
+          maxReplicas: {{ 2 if options.gke_mode|default(false) else 1 }}
         replicaCount: {{ 2 if options.gke_mode|default(false) else 1 }}
         env:
           # https://istio.io/latest/docs/reference/commands/pilot-agent/#envvars

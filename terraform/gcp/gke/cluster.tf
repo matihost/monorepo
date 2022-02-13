@@ -4,7 +4,7 @@ data "google_container_engine_versions" "versions" {
   # run: gcloud container get-server-config
   # to see available versions
   location       = local.location
-  version_prefix = "1.21."
+  version_prefix = "1.22."
 
   project = var.project
 }
@@ -47,6 +47,11 @@ resource "google_container_cluster" "gke" {
     # network_policy_config {
     #   disabled = false
     # }
+
+    gcp_filestore_csi_driver_config {
+      enabled = true
+    }
+
     dns_cache_config {
       enabled = true
     }

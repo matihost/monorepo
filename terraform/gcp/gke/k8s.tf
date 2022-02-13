@@ -1,6 +1,7 @@
 
 module "gke_auth" {
-  source = "terraform-google-modules/kubernetes-engine/google//modules/auth"
+  source  = "terraform-google-modules/kubernetes-engine/google//modules/auth"
+  version = ">= 19"
 
   project_id   = var.project
   cluster_name = local.gke_name
@@ -12,35 +13,54 @@ module "gke_auth" {
 }
 resource "local_file" "kubeconfig" {
   content  = module.gke_auth.kubeconfig_raw
-  filename = "${path.module}/.terraform/kubeconfig"
+  filename = "${path.module}/target/${local.gke_name}/kubeconfig"
 }
 
-provider "kubernetes" {
-  load_config_file = false
+# Normally Kubernetes and Helm could be init via
+# But when K8S TF is used when TF is created it leads to error upon second run
+# https://itnext.io/terraform-dont-use-kubernetes-provider-with-your-cluster-resource-d8ec5319d14a
+#
+# data "google_container_cluster" "my_cluster" {
+#   name     = local.gke_name
+#   location = local.location
+# }
+# provider "kubernetes" {
+#   load_config_file = false
 
-  host  = "https://${google_container_cluster.gke.endpoint}"
-  token = data.google_client_config.current.access_token
-  cluster_ca_certificate = base64decode(
-    google_container_cluster.gke.master_auth[0].cluster_ca_certificate,
-  )
+#   host  = "https://${data.google_container_cluster.gke.endpoint}"
+#   token = data.google_client_config.current.access_token
+#   cluster_ca_certificate = base64decode(
+#     data.google_container_cluster.gke.master_auth[0].cluster_ca_certificate,
+#   )
+# }
+
+# provider "helm" {
+#   kubernetes {
+#     host  = "https://${data.google_container_cluster.gke.endpoint}"
+#     token = data.google_client_config.current.access_token
+#     cluster_ca_certificate = base64decode(
+#       data.google_container_cluster.gke.master_auth[0].cluster_ca_certificate,
+#     )
+#   }
+# }
+
+provider "kubernetes" {
+  config_paths = ["${path.module}/target/${local.gke_name}/kubeconfig", "~/.kube/config"]
 }
 
 provider "helm" {
   kubernetes {
-    host  = "https://${google_container_cluster.gke.endpoint}"
-    token = data.google_client_config.current.access_token
-    cluster_ca_certificate = base64decode(
-      google_container_cluster.gke.master_auth[0].cluster_ca_certificate,
-    )
+    config_paths = ["${path.module}/target/${local.gke_name}/kubeconfig", "~/.kube/config"]
   }
 }
+
 
 resource "null_resource" "cluster-config-script" {
   triggers = {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = "${path.module}/cluster-config/cluster-config.sh"
+    command = "${path.module}/cluster-config/cluster-config.sh ${path.module}/target/${local.gke_name}/kubeconfig"
   }
 
   depends_on = [
@@ -58,7 +78,7 @@ resource "helm_release" "cluster-config" {
   create_namespace = true
 
   depends_on = [
-    null_resource.cluster-config-script
+    null_resource.cluster-config-script,
   ]
 }
 
@@ -67,7 +87,7 @@ resource "helm_release" "external-dns" {
   # Ensure deployment starts when GKE Node Pool is provisioned
   depends_on = [
     google_container_cluster.gke,
-    google_container_node_pool.gke_nodes
+    google_container_node_pool.gke_nodes,
   ]
   wait       = true
   timeout    = 360

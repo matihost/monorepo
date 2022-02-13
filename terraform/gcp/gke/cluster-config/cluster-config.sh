@@ -13,8 +13,8 @@ function disable_default_storageclass() {
 # Main
 set -x
 
-[ -f .terraform/kubeconfig ] && {
-  export KUBECONFIG=.terraform/kubeconfig
+[ -f "${1?:1st parameter has to be path to kubeconfig}" ] && {
+  export KUBECONFIG="${1}"
 }
 
 import_existing_object_to_helm nl default cluster-config cluster-config

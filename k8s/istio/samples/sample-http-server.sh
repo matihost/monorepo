@@ -50,7 +50,7 @@ EOF
 
   # sidecar is not necessary when only Ingress is used from istio
   kubectl apply -f - <<EOF
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -65,8 +65,10 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: httpbin
-          servicePort: 8000
+          service:
+            name: httpbin
+            port:
+              number: 8000
         path: /
         pathType: Prefix
   # Istio support Ingresses with TLS but secret has to be in istio-system namespace

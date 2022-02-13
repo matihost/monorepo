@@ -62,9 +62,12 @@ resource "google_container_node_pool" "gke_internal_ingress_nodes" {
     disk_type    = random_id.internal_pool_random.keepers.disk_type
     disk_size_gb = random_id.internal_pool_random.keepers.disk_size_gb
 
+    gcfs_config {
+      enabled = true
+    }
     # since 1.20 usage of docker as container engine is deprecated
     # valid image types: gcloud container get-server-config
-    image_type = "UBUNTU_CONTAINERD"
+    image_type = "COS_CONTAINERD"
 
     metadata = {
       // Set metadata on the VM to supply more entropy
@@ -171,9 +174,12 @@ resource "google_container_node_pool" "gke_external_ingress_nodes" {
     disk_type    = random_id.external_pool_random.keepers.disk_type
     disk_size_gb = random_id.external_pool_random.keepers.disk_size_gb
 
+    gcfs_config {
+      enabled = true
+    }
     # since 1.20 usage of docker as container engine is deprecated
     # valid image types: gcloud container get-server-config
-    image_type = "UBUNTU_CONTAINERD"
+    image_type = "COS_CONTAINERD"
 
     metadata = {
       // Set metadata on the VM to supply more entropy

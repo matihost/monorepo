@@ -53,6 +53,7 @@ resource "google_compute_backend_service" "istio-https" {
 
 resource "google_compute_health_check" "istio-status" {
   provider = google-beta
+  project  = var.project
 
   check_interval_sec = "10"
   healthy_threshold  = "2"

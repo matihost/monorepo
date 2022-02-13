@@ -26,8 +26,15 @@ TF_VAR_cluster_name := $(CLUSTER_NAME)
 TF_VAR_region := $(REGION)
 TF_VAR_zone_letter := $(ZONE_LETTER)
 
-# uncomment to run terraform in debug mode
-# TF_LOG := DEBUG
+DEBUG := false
+ifeq ($(strip $(DEBUG)),true)
+	TF_LOG := DEBUG
+endif
+
+APPROVE := true
+ifeq ($(strip $(APPROVE)),true)
+	APPROVE_STR := -auto-approve
+endif
 
 ensure-cluster-shared1: ## create/update cluster shared1-dev in us-central1-a
 	@-terraform workspace new shared1@$(CURRENT_PROJECT) &>/dev/null
@@ -64,7 +71,7 @@ scale-up-shared2:  ## scale up to 1 node cluster shared2-dev in us-east1-b
 apply: init-terraform ## setup GKE cluster
 	@terraform validate && \
 	terraform plan -lock=false && \
-	terraform apply -auto-approve && \
+	terraform apply $(APPROVE_STR) && \
 	[ -n "$(MASTER_ACCESS_CIRDS)" ] && \
     gcloud container clusters get-credentials $(CLUSTER_NAME)-dev --zone $(REGION)-$(ZONE_LETTER) || \
     echo "Run 'source access-gke.sh' to setup GKE access for kubectl etc. commands in current shell";
@@ -80,15 +87,15 @@ show-state: ## show terraform.state
 	terraform state list
 	terraform show
 
-destroy: ## destroy GKE resources
-	terraform plan && terraform destroy -auto-approve
+destroy: init-terraform ## destroy GKE resources
+	terraform plan && terraform destroy $(APPROVE_STR)
 
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
 	gcloud auth application-default login
 
 clean: ## clean Terraform cached plugins and data
-	rm -rf .terraform* terraform.tfstate*
+	rm -rf .terraform* terraform.tfstate* target
 
 init-terraform:
 	terraform init -upgrade=true
