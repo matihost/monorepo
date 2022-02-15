@@ -88,7 +88,7 @@ show-state: ## show terraform.state
 	terraform show
 
 destroy: init-terraform ## destroy GKE resources
-	terraform plan && terraform destroy $(APPROVE_STR)
+	terraform destroy $(APPROVE_STR)
 
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init

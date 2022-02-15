@@ -1,3 +1,5 @@
+.EXPORT_ALL_VARIABLES:
+
 CURRENT_PROJECT := $(shell gcloud config get-value project)
 
 apply: prepare ## setup user IAM roles and binding
@@ -6,6 +8,15 @@ apply: prepare ## setup user IAM roles and binding
 	terraform validate && \
 	terraform plan -lock=false && \
 	terraform apply -auto-approve
+
+use-editor-sa: # create and switch to gcloug configuration using editor sa
+	@-terraform output -raw sa-editor-key > /tmp/editor.json
+	@-gcloud config configurations create $(CURRENT_PROJECT)-editor-sa 2>/dev/null
+	-gcloud config configurations activate $(CURRENT_PROJECT)-editor-sa
+	-gcloud auth activate-service-account editor@$(CURRENT_PROJECT).iam.gserviceaccount.com --key-file=/tmp/editor.json --project=$(CURRENT_PROJECT)
+	-gcloud config set compute/region us-central1
+	-gcloud config set compute/zone us-central1-a
+	@-rm -rf /tmp/editor.json
 
 
 show-state: ## show terraform.state
