@@ -25,6 +25,9 @@ resources:
     ephemeral-storage: "2Gi"
 
 webconsole:
+  admin_pass: default
+  # User app password for accessing queues is optional
+  # app_pass: optional
   istio:
     enabled: false
     hostSuffix: testing.minikube

@@ -49,12 +49,22 @@ spec:
             value: "false"
           - name: MQ_EPHEMERAL_PREFIX
             value: "/run/mqm"
+          - name: MQ_ENABLE_EMBEDDED_WEB_SERVER
+            value: "true"
           - name: MQ_GRACE_PERIOD
             value: "30"
           - name: MQ_ADMIN_PASSWORD
-            value: "todo"
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "app.fullname" . }}-secret
+                key: admin-pass
+          {{- if .Values.webconsole.app_pass }}
           - name: MQ_APP_PASSWORD
-            value: "todo"
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "app.fullname" . }}-secret
+                key: app-pass
+          {{- end }}
           ports:
             - name: mq-manager
               containerPort: 1414
