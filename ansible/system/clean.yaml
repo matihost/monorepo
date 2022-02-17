@@ -88,6 +88,11 @@
           done
           CRICTL_PRUNE_OUTPUT="$(crictl rmi -a 2>&1 | grep -v 'No images to remove')"
         fi
+        if [[ "${CRICTL_PRUNE_OUTPUT}" == *"context deadline exceeded"* ]]; then
+          echo 'runtime-endpoint: unix:///var/run/containerd/containerd.sock
+      image-endpoint: unix:///var/run/containerd/containerd.sock' > /etc/crictl.yaml
+          CRICTL_PRUNE_OUTPUT="$(crictl rmi -a 2>&1 | grep -v 'No images to remove')"
+        fi
         if [ -n "${CRICTL_PRUNE_OUTPUT}" ]; then
           echo "${CRICTL_PRUNE_OUTPUT}"
         fi
