@@ -15,6 +15,9 @@ In particular:
 # to login to GCP as human user
 make google-authentication
 
-# to create IAM objects, in particular SA with editor role and switch current active configuration to use it
+# to create IAM objects, in particular SA with editor role
 make apply
+
+# swittch current gcloud configuration to use editor SA
+make use-editor-sa
 ```

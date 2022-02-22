@@ -1,12 +1,12 @@
 
-data "google_kms_key_ring" "keyring" {
-  name     = "${var.region}-keyring"
-  location = var.region
+data "google_kms_key_ring" "us-keyring" {
+  name     = "us-keyring"
+  location = "us"
 }
 
 data "google_kms_crypto_key" "apigee-key" {
-  name     = "apigee-enc-key"
-  key_ring = data.google_kms_key_ring.keyring.id
+  name     = "apigee-us-db-enc-key"
+  key_ring = data.google_kms_key_ring.us-keyring.id
 }
 
 resource "google_project_service_identity" "apigee-sa" {

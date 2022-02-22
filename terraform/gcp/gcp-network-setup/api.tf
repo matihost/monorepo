@@ -1,7 +1,7 @@
 # containerfilesystem - required by: https://cloud.google.com/kubernetes-engine/docs/how-to/image-streaming
 
 locals {
-  apis = ["servicenetworking", ]
+  apis = ["servicenetworking", "dns"]
 }
 
 resource "google_project_service" "apis" {

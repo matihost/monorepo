@@ -10,7 +10,7 @@ data "google_kms_key_ring" "gke-keyring" {
 # etcd encryption key
 data "google_kms_crypto_key" "gke-etcd-enc-key" {
   count    = var.encrypt_etcd ? 1 : 0
-  name     = "gke-etcd-enc-key"
+  name     = "gke-${var.region}-etcd-enc-key"
   key_ring = data.google_kms_key_ring.gke-keyring[0].id
 }
 

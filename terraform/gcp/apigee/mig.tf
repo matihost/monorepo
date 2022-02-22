@@ -70,7 +70,7 @@ resource "google_compute_instance_template" "apigee-mig-template" {
   }
 
   metadata = {
-    apigee_runtime_endpoint = google_apigee_instance.instance.host
+    apigee_runtime_endpoint = google_apigee_instance.instance[var.region].host
     enable-oslogin          = "TRUE"
     startup-script          = file("${path.module}/mig-startup-script.sh")
   }

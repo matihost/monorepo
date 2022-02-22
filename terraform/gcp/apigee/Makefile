@@ -11,7 +11,9 @@ endif
 
 APPROVE := true
 ifeq ($(strip $(APPROVE)),true)
-	APPROVE_STR := -auto-approve
+	MODE := apply -auto-approve
+else
+	MODE := plan
 endif
 
 
@@ -20,8 +22,7 @@ ifndef EXTERNAL_DNS
 	$(error Env EXTERNAL_DNS is not defined. Usage make apply EXTERNAL_DNS=api.some.com [DEBUG=true APPROVE=false])
 endif
 	@terraform validate && \
-	terraform plan -lock=false -var='external_dns=$(EXTERNAL_DNS)' && \
-	terraform apply $(APPROVE_STR) -var='external_dns=$(EXTERNAL_DNS)'
+	terraform $(MODE) -var='external_dns=$(EXTERNAL_DNS)'
 
 show-state: ## show terraform.state
 	terraform state list

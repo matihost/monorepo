@@ -1,19 +1,49 @@
+locals {
+  regions = toset([
+    var.region
+  ])
+  envs = toset(var.envs)
+}
+
+data "google_kms_key_ring" "keyring" {
+  for_each = local.regions
+  name     = "${each.key}-keyring"
+  location = each.key
+}
+
+data "google_kms_crypto_key" "disk-key" {
+  for_each = local.regions
+  name     = "apigee-${each.key}-disk-enc-key"
+  key_ring = data.google_kms_key_ring.keyring[each.key].id
+}
+
+resource "google_kms_crypto_key_iam_binding" "apigee-disk-keyuser" {
+  for_each      = local.regions
+  crypto_key_id = data.google_kms_crypto_key.disk-key[each.key].id
+  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+
+  members = [
+    "serviceAccount:${google_project_service_identity.apigee-sa.email}",
+  ]
+}
 
 resource "google_apigee_instance" "instance" {
-  name = "${var.env}-${google_apigee_organization.org.name}-${var.region}"
+  for_each = local.regions
+
+  name = "${var.env}-${google_apigee_organization.org.name}-${each.key}"
 
   # only single instance per region is possible
-  location    = var.region
-  description = "Apigee Runtime Instance in ${var.region}"
+  location    = each.key
+  description = "Apigee Runtime Instance in ${each.key}"
   org_id      = google_apigee_organization.org.id
 
-  # disk encyption only for paid subscription only
-  # disk_encryption_key_name = google_kms_crypto_key.apigee-key.id
+  disk_encryption_key_name = data.google_kms_crypto_key.disk-key[each.key].id
 
-  # evaluation/trial subscription are only SLASH_22 or SLASH_23
-  # peering_cidr_range = "SLASH_22"
   ip_range = "10.9.0.0/22"
 
+  depends_on = [
+    google_kms_crypto_key_iam_binding.apigee-disk-keyuser,
+  ]
 }
 
 # TODO enable when Google provider releases apigee nat resource
@@ -23,15 +53,19 @@ resource "google_apigee_instance" "instance" {
 # }
 
 resource "google_apigee_environment" "env" {
-  name         = var.env
-  description  = "Apigee Environment: ${var.env}"
-  display_name = var.env
+  for_each = local.envs
+
+  name         = each.key
+  description  = "Apigee Environment: ${each.key}"
+  display_name = each.key
   org_id       = google_apigee_organization.org.id
 }
 
 resource "google_apigee_instance_attachment" "intance-env-attachment" {
-  instance_id = google_apigee_instance.instance.id
-  environment = google_apigee_environment.env.name
+  for_each = local.envs
+
+  instance_id = google_apigee_instance.instance[var.region].id
+  environment = google_apigee_environment.env[each.key].name
 }
 
 resource "google_dns_record_set" "instance-dns" {
@@ -41,7 +75,7 @@ resource "google_dns_record_set" "instance-dns" {
 
   managed_zone = data.google_dns_managed_zone.main-zone.name
 
-  rrdatas = [google_apigee_instance.instance.host]
+  rrdatas = [google_apigee_instance.instance[var.region].host]
 }
 
 
@@ -52,6 +86,7 @@ resource "google_apigee_envgroup" "envgroup" {
 }
 
 resource "google_apigee_envgroup_attachment" "envgroup-attachment" {
+  for_each    = local.envs
   envgroup_id = google_apigee_envgroup.envgroup.id
-  environment = google_apigee_environment.env.name
+  environment = google_apigee_environment.env[each.key].name
 }

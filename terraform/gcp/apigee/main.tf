@@ -51,7 +51,13 @@ variable "project" {
 variable "env" {
   type        = string
   default     = "dev"
-  description = "Environment, also default environment"
+  description = "Deployment Environment"
+}
+
+variable "envs" {
+  type        = list(string)
+  default     = ["dev-1", "dev-2"]
+  description = "Apigee Environments"
 }
 
 

@@ -9,7 +9,7 @@ apply: prepare ## setup user IAM roles and binding
 	terraform plan -lock=false && \
 	terraform apply -auto-approve
 
-use-editor-sa: # create and switch to gcloug configuration using editor sa
+use-editor-sa: ## create new gcloud configuration with editor Google Service Account
 	@-terraform output -raw sa-editor-key > /tmp/editor.json
 	@-gcloud config configurations create $(CURRENT_PROJECT)-editor-sa 2>/dev/null
 	-gcloud config configurations activate $(CURRENT_PROJECT)-editor-sa
