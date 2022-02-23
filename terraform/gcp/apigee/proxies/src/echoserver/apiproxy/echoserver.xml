@@ -1,14 +1,12 @@
-<APIProxy revision="1" name="echoserver">
-    <DisplayName></DisplayName>
-    <Description></Description>
-    <CreatedAt>1642889757859</CreatedAt>
-    <LastModifiedAt>1642889757859</LastModifiedAt>
-    <BasePaths>/echoserver</BasePaths>
+<APIProxy name="echoserver">
+    <DisplayName>Echoserver API</DisplayName>
+    <Description>Echoserver API</Description>
     <Policies>
         <Policy>add-cors</Policy>
     </Policies>
     <ProxyEndpoints>
-        <ProxyEndpoint>default</ProxyEndpoint>
+        <ProxyEndpoint>echo</ProxyEndpoint>
+        <ProxyEndpoint>echoserver</ProxyEndpoint>
     </ProxyEndpoints>
     <TargetEndpoints>
         <TargetEndpoint>default</TargetEndpoint>

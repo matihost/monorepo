@@ -1,5 +1,5 @@
 TOKEN := $(shell gcloud auth print-access-token)
-APIGEE_ENV := dev
+APIGEE_ENV := dev-1
 APIGEE_ORG := $(shell gcloud config get-value project)
 
 PROXY := $(shell find src -mindepth 1 -maxdepth 1 -type d | sed  's/src\///')

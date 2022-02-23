@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="AM-AddOriginalBasePathHeader">
+    <DisplayName>AM-AddOriginalBasePathHeader</DisplayName>
+    <AssignTo createNew="false" type="request"/>
+    <Set>
+        <Headers>
+            <Header name="X-Original-BasePath">{proxy.basepath}</Header>
+        </Headers>
+    </Set>
+</AssignMessage>

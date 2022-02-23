@@ -4,6 +4,24 @@ Import API proxy into Apigee and retrieving API proxy deployments.
 
 A fork of https://github.com/apigee/api-platform-samples/blob/master/tools/deploy.py
 limited to importing API proxy only and updated to Python3
+
+To debug under VS Code:
+
+Add Run and Debug configuration (https://code.visualstudio.com/docs/python/debugging):
+{
+  "name": "Python: Attach",
+  "type": "python",
+  "request": "attach",
+  "connect": {
+    "host": "localhost",
+    "port": 5678
+  }
+}
+
+And run app with:
+
+python -m debugpy --listen 5678 --wait-for-client ./uploadApiProxy.py -n echoserver \
+  -e dev-1 -t `gcloud auth print-access-token` -o `gcloud config get-value project` -d src/echoserver
 """
 import getopt
 import http.client
@@ -56,13 +74,15 @@ def getDeployments():
         return None
 
     ret = list()
-    deployments = json.load(resp)['deployments']
-    for deployment in deployments:
-        envName = deployment['environment']
-        revNum = deployment['revision']
-        deployStartTime = deployment['deployStartTime']
-        status = {'environment': envName, 'revision': revNum, 'deployStartTime': deployStartTime}
-        ret.append(status)
+    parsed_response = json.load(resp)
+    if 'deployments' in parsed_response:
+        deployments = parsed_response['deployments']
+        for deployment in deployments:
+            envName = deployment['environment']
+            revNum = deployment['revision']
+            deployStartTime = deployment['deployStartTime']
+            status = {'environment': envName, 'revision': revNum, 'deployStartTime': deployStartTime}
+            ret.append(status)
     return ret
 
 

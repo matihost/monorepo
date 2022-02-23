@@ -1,9 +1,6 @@
-<APIProxy revision="5" name="exchanges">
-    <DisplayName></DisplayName>
-    <Description>Exchange rates</Description>
-    <CreatedAt>1643146802432</CreatedAt>
-    <LastModifiedAt>1643146802432</LastModifiedAt>
-    <BasePaths>/exchanges</BasePaths>
+<APIProxy name="exchanges">
+    <DisplayName>Exchange rates API</DisplayName>
+    <Description>Expose average exchange rates from Polish National Bank</Description>
     <Policies>
         <Policy>add-cors</Policy>
     </Policies>

@@ -14,6 +14,6 @@
         <Response/>
     </PostFlow>
     <HTTPTargetConnection>
-        <URL>http://10.14.0.5:8080/exchanges</URL>
+        <URL>http://10.14.0.3:8080/exchanges</URL>
     </HTTPTargetConnection>
 </TargetEndpoint>
