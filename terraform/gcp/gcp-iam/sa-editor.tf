@@ -11,6 +11,29 @@ resource "google_project_iam_member" "editor-rolebinding" {
 }
 
 
+# Minimum set of roles to SSH to machine as SA
+resource "google_project_iam_member" "editor-ssh-user" {
+  project = var.project
+
+  role   = "roles/compute.osAdminLogin"
+  member = "serviceAccount:${google_service_account.editor.email}"
+}
+
+resource "google_project_iam_member" "editor-service-account-user" {
+  project = var.project
+
+  role   = "roles/iam.serviceAccountUser"
+  member = "serviceAccount:${google_service_account.editor.email}"
+}
+
+resource "google_project_iam_member" "editor-iap-accessor-user" {
+  project = var.project
+
+  role   = "roles/iap.tunnelResourceAccessor"
+  member = "serviceAccount:${google_service_account.editor.email}"
+}
+
+
 resource "google_service_account_key" "editor-key" {
   service_account_id = google_service_account.editor.name
 }

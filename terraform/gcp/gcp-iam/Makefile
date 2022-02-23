@@ -2,12 +2,23 @@
 
 CURRENT_PROJECT := $(shell gcloud config get-value project)
 
+DEBUG := false
+ifeq ($(strip $(DEBUG)),true)
+	TF_LOG := DEBUG
+endif
+
+APPROVE := true
+ifeq ($(strip $(APPROVE)),true)
+	MODE := apply -auto-approve
+else
+	MODE := plan
+endif
+
 apply: prepare ## setup user IAM roles and binding
 	export TF_VAR_project=$(CURRENT_PROJECT) && \
 	terraform init -upgrade=true && \
 	terraform validate && \
-	terraform plan -lock=false && \
-	terraform apply -auto-approve
+	terraform $(MODE)
 
 use-editor-sa: ## create new gcloud configuration with editor Google Service Account
 	@-terraform output -raw sa-editor-key > /tmp/editor.json

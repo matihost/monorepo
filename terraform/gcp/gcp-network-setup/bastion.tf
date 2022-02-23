@@ -99,20 +99,28 @@ resource "google_project_iam_member" "bastion-gke-admin" {
   member = "serviceAccount:${google_service_account.bastion.email}"
 }
 
-# allows to gcloud SSH to VM (but they need to be running with same SA)
+# allows to gcloud SSH to VM (compute.osLogin - to allow to login to non-root, compute.osAdminLogin to allow to sudo su - to root)
 resource "google_project_iam_member" "bastion-oslogin-user" {
   project = var.project
 
-  role   = "roles/compute.osLogin"
+  role   = "roles/compute.osAdminLogin"
   member = "serviceAccount:${google_service_account.bastion.email}"
 }
 
-# allows gcloud ssh to other VMs running with different GSA from bastion VM
+# allows gcloud ssh to other VMs running with different GSA from bastion VM (only with --internal-ip)
 # gcloud compute <vm-name> --zone=<zone> --internal-ip
 resource "google_project_iam_member" "bastion-service-account-user" {
   project = var.project
 
   role   = "roles/iam.serviceAccountUser"
+  member = "serviceAccount:${google_service_account.bastion.email}"
+}
+
+# to allow to gcloud ssh to other VMs via IAP tunnel (without --internal-ip)
+resource "google_project_iam_member" "bastion-iap-accessor-user" {
+  project = var.project
+
+  role   = "roles/iap.tunnelResourceAccessor"
   member = "serviceAccount:${google_service_account.bastion.email}"
 }
 
@@ -150,11 +158,11 @@ output "bastion_instance_zone" {
 }
 
 output "bastion_instance_ssh_cmd" {
-  value = format("gcloud compute ssh %s --zone=%s", google_compute_instance.bastion.name, google_compute_instance.bastion.zone)
+  value = format("gcloud compute ssh %s --tunnel-through-iap --zone=%s", google_compute_instance.bastion.name, google_compute_instance.bastion.zone)
 }
 
 
 
 output "bastion_tunnel_to_proxy" {
-  value = format("gcloud compute ssh %s --zone=%s -- -o ExitOnForwardFailure=yes -M -S /tmp/sslsock -L8787:127.0.0.1:8787 -f sleep 36000", google_compute_instance.bastion.name, google_compute_instance.bastion.zone)
+  value = format("gcloud compute ssh %s --tunnel-through-iap --zone=%s -- -o ExitOnForwardFailure=yes -M -S /tmp/sslsock -L8787:127.0.0.1:8787 -f sleep 36000", google_compute_instance.bastion.name, google_compute_instance.bastion.zone)
 }
