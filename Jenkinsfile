@@ -142,7 +142,7 @@ spec:
         stage('Build :: Golang') {
           steps {
             container("golang"){
-              dir("go"){
+              dir("go/learning"){
                 echo "Building ${pwd()}..."
                 sh """
                   export GOCACHE=/home/jenkins/agent/workspace/.gocache

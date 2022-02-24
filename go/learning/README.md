@@ -17,7 +17,7 @@ Go lang 1.17.x+
 Ubuntu
 
 ```bash
-sudo apt -y install golang-1.16
+sudo apt -y install golang-1.17
 sudo apt -y install golang-golang-x-tools
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 ```

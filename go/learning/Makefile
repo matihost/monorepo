@@ -1,5 +1,5 @@
 PROJECT := "github.com/matihost/learning"
-REPOSITORY := "go"
+REPOSITORY := "go/learning"
 CMD_PACKAGE_NAME := "language"
 
 DIR := $(shell pwd )
@@ -15,7 +15,7 @@ list-dependencies: ## list all modules dependencies including transient ones
 show-dependency-graph: ## show dependency graph
 	go mod graph
 
-remove-unused-dependencies: ## remove unused dependencies
+update-dependencies: ## update dependencies
 	go mod tidy
 
 clean: ## removes compiled application and vendor directory

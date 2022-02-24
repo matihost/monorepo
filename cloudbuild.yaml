@@ -29,7 +29,7 @@ steps:
 - name: mirror.gcr.io/library/golang:latest
   waitFor: ['-']
   entrypoint: 'bash'
-  dir: "go"
+  dir: "go/language"
   env: ["GOCACHE=/go"]
   args:
   - '-eEuo'
