@@ -11,6 +11,23 @@ function install_software() {
   apt -y install -y openjdk-17-jre-headless inotify-tools
 }
 
+# Configure Cloud Ops JMX integration to retrieve JMX Metrics from Java application
+# Assumes Java App is run with:
+# -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.rmi.port=9999 -Djava.rmi.server.hostname=127.0.0.1
+function configure_jmx_metrics() {
+  echo "metrics:
+  receivers:
+    jvm:
+      type: jvm
+      endpoint: localhost:9999
+  service:
+    pipelines:
+      jvm:
+        receivers:
+          - jvm" >/etc/google-cloud-ops-agent/config.yaml
+  systemctl restart google-cloud-ops-agent
+}
+
 function download_minecraft_data() {
   gsutil cp "gs://${GS_BUCKET}/${MINECRAFT_SERVER_NAME}/minecraft-config-template.tar.xz" /tmp
   cd /tmp || exit 6
@@ -35,4 +52,5 @@ systemctl is-enabled minecraft-server.service &>/dev/null || {
   download_minecraft_data
   install_minecraft_server
   enable_minecraft_server_service
+  configure_jmx_metrics
 }

@@ -96,7 +96,7 @@ resource "google_service_account" "minecraft-server" {
 resource "google_project_iam_member" "minecraft-server-oslogin-user" {
   project = var.project
 
-  role   = "roles/compute.osLogin"
+  role   = "roles/compute.osAdminLogin"
   member = "serviceAccount:${google_service_account.minecraft-server.email}"
 }
 

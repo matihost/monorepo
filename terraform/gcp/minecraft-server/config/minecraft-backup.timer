@@ -1,6 +1,6 @@
 # /etc/systemd/system/minecraft-backup.timer
 [Unit]
-Description==Minecraft Server Backup Runner Timer
+Description=Minecraft Server Backup Runner Timer
 
 # hourly with 5 min randomization
 [Timer]

@@ -4,11 +4,21 @@ CURRENT_PROJECT := $(shell gcloud config get-value project)
 
 TF_VAR_project := $(CURRENT_PROJECT)
 
+DEBUG := false
+ifeq ($(strip $(DEBUG)),true)
+	TF_LOG := DEBUG
+endif
+
+APPROVE := true
+ifeq ($(strip $(APPROVE)),true)
+	MODE := apply -auto-approve
+else
+	MODE := plan
+endif
 
 apply: pre-all ## setup VPC
 	@terraform validate && \
-	terraform plan -lock=false && \
-	terraform apply -auto-approve
+	terraform $(MODE)
 
 ssh: ## ssh to VPC bastion host
 	eval $(shell terraform output bastion_instance_ssh_cmd)
