@@ -20,6 +20,7 @@ all:
           terraform_ubuntu_version: "hirsute"
           # virtualbox_ubuntu_version: "{{ ansible_distribution_release }}"
           virtualbox_ubuntu_version: "hirsute"
+          mq: 9.2.5.0
         virtual_interface_ip: 192.168.10.1
         update_cache_timeout: 300
         systemd_journal:
@@ -616,6 +617,24 @@ all:
                 grep tag_name | cut -d '"' -f 4)/terraformer-${PROVIDER}-linux-amd64
               chmod +x terraformer-${PROVIDER}-linux-amd64
               sudo mv terraformer-${PROVIDER}-linux-amd64 /usr/local/bin/terraformer
+            }
+        - name: ibm-mq-client
+          become: true
+          command: |
+            # TODO consider full server version
+            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/mqadv_dev925_ubuntu_x86-64.tar.gz
+            # TODO add detect a new version
+            [ -e /opt/mqm ] || {
+              rm -rf /tmp/mq && mkdir -p /tmp/mq && cd /tmp/mq
+              curl -sSL https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/{{ versions.mq }}-IBM-MQC-Redist-LinuxX64.tar.gz |
+                tar -zx
+              export genmqpkg_inc{sdk,tls,man,adm}=1
+              rm -rf /opt/mqm
+              ./bin/genmqpkg.sh -b /opt/mqm
+              [ "$(grep -c 'opt/mqm' ~/.bashrc)" -gt 0 ] || {
+                echo 'PATH=/opt/mqm/bin:${PATH}' >> ~/.bashrc
+              }
+              rm -rf /tmp/mq
             }
         - name: tflint
           become: false
