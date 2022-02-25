@@ -28,10 +28,10 @@ jobs:
     cache: cargo
   - language: go
     go: "1.17"
-    before_install: cd go
+    before_install: cd go/learning
     script:
     - go build -mod=mod -o .  ./...
-    - go test github.com/matihost/learning/go/pkg/language
+    - go test ./pkg/language
     - ./language
     cache:
       directories:
