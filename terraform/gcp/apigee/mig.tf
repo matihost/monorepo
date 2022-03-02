@@ -1,11 +1,15 @@
 # Regional resources
 resource "google_compute_region_instance_group_manager" "apigee-mig-group-manager" {
+  provider = google-beta
+
   name = "mig-${var.env}-${google_apigee_organization.org.name}-${var.region}"
 
   version {
     instance_template = google_compute_instance_template.apigee-mig-template.id
   }
   base_instance_name = "mig-${var.env}-${google_apigee_organization.org.name}-${var.region}"
+
+  distribution_policy_target_shape = "EVEN"
 
   region = var.region
 
@@ -20,8 +24,43 @@ resource "google_compute_region_instance_group_manager" "apigee-mig-group-manage
     health_check      = google_compute_health_check.apigee-mig-health-check.id
     initial_delay_sec = 120
   }
+
+  update_policy {
+    type                         = "PROACTIVE"
+    instance_redistribution_type = "PROACTIVE"
+    minimal_action               = "REPLACE"
+    max_surge_fixed              = 0
+    max_unavailable_fixed        = 3
+    min_ready_sec                = 30
+    replacement_method           = "RECREATE"
+  }
 }
 
+resource "google_compute_region_autoscaler" "apigee-mig-group-manager-autoscaler" {
+  name   = "mig-${var.env}-${google_apigee_organization.org.name}-${var.region}"
+  target = google_compute_region_instance_group_manager.apigee-mig-group-manager.id
+  region = var.region
+  autoscaling_policy {
+    cooldown_period = "60"
+
+    cpu_utilization {
+      predictive_method = "OPTIMIZE_AVAILABILITY"
+      target            = "0.8"
+    }
+
+    max_replicas = "10"
+    min_replicas = "1"
+    mode         = "ON"
+
+    scale_in_control {
+      max_scaled_in_replicas {
+        fixed = "2"
+      }
+
+      time_window_sec = "600"
+    }
+  }
+}
 
 resource "google_compute_backend_service" "apigee-mig" {
   affinity_cookie_ttl_sec = "0"

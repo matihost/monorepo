@@ -607,6 +607,11 @@ all:
               echo 'plugin_cache_dir = "$HOME/.terraform.d/plugins"' >> ~/.terraformrc
             }
         - name: terraformer
+          desc: |
+            Reverse terraform
+            Sample:
+            terraformer import google --connect=true --regions=`gcloud config get-value compute/region` --projects=`gcloud config get-value project` \
+            --resources=dns,monitoring,addresses,autoscalers,regionAutoscalers,globalForwardingRules,healthChecks,globalAddresses,regionBackendServices,urlMaps,regionSslCertificates,forwardingRules,httpHealthChecks,targetTcpProxies,regionInstanceGroupManagers,targetHttpsProxies,backendServices,sslCertificates
           become: true
           command: |
             CURRENT_VERSION="$(curl -s https://api.github.com/repos/GoogleCloudPlatform/terraformer/releases/latest | grep tag_name | cut -d '"' -f 4)"
@@ -619,6 +624,15 @@ all:
               sudo mv terraformer-${PROVIDER}-linux-amd64 /usr/local/bin/terraformer
             }
         - name: ibm-mq-client
+          desc: |
+            Install minimal MQ client library in /opt/mqm
+            Bare commands are placed on path
+            Sample MQ apps located in /opt/mqm/samp/bin
+
+            To install MQ along with server on Ubuntu follow:
+            https://developer.ibm.com/tutorials/mq-connect-app-queue-manager-ubuntu/
+            or run a script:
+            https://github.com/ibm-messaging/mq-dev-samples/blob/master/gettingStarted/installing-mq-ubuntu/mq-ubuntu-install.sh
           become: true
           command: |
             # TODO consider full server version
@@ -628,7 +642,7 @@ all:
               rm -rf /tmp/mq && mkdir -p /tmp/mq && cd /tmp/mq
               curl -sSL https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/{{ versions.mq }}-IBM-MQC-Redist-LinuxX64.tar.gz |
                 tar -zx
-              export genmqpkg_inc{sdk,tls,man,adm}=1
+              export genmqpkg_inc{sdk,tls,man,adm,samp}=1
               rm -rf /opt/mqm
               ./bin/genmqpkg.sh -b /opt/mqm
               [ "$(grep -c 'opt/mqm' ~/.bashrc)" -gt 0 ] || {
