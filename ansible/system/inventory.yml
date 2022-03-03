@@ -38,6 +38,7 @@ all:
           formulahendry.code-runner
           foxundermoon.shell-format
           GabrielBB.vscode-lombok
+          gitkraken.gitkraken-authentication
           golang.go
           hashicorp.terraform
           joaompinto.asciidoctor-vscode

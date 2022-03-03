@@ -88,11 +88,16 @@ spec:
               path: "/ibmmq/console/login.html"
               port: mq-webconsole
               scheme: HTTPS
-
           volumeMounts:
-            - name: mqsc #The name(key) value must match pod volumes name(key) value
+            - name: mqsc
               mountPath: /etc/mqm/25-config.mqsc
               subPath: 25-config.mqsc
+            - name: mqm
+              mountPath: /mnt/mqm
+            - name: mqm-data
+              mountPath: /mnt/mqm-data
+            - name: mqm-log
+              mountPath: /mnt/mqm-log
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       terminationGracePeriodSeconds: 30
@@ -100,4 +105,33 @@ spec:
         - name: mqsc
           configMap:
             name: {{ include "app.fullname" . }}-config
-        # TODO add PVC for /mnt/mqm /mnt/mqm-data and /mqm-log
+        {{- if not .Values.mq.persistence.enabled }}
+        - name: mqm
+          emptyDir:
+            sizeLimit: {{ .Values.mq.persistence.mqm.size | default "8Gi" | quote }}
+        - name: mqm-data
+          emptyDir:
+            sizeLimit: {{ .Values.mq.persistence.data.size | default "8Gi" | quote }}
+        {{- end }}
+        - name: mqm-log
+          emptyDir:
+            sizeLimit: {{ .Values.mq.persistence.logs.size | default "8Gi" | quote }}
+  volumeClaimTemplates:
+  {{- if .Values.mq.persistence.enabled }}
+  - metadata:
+      name: mqm
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: {{ .Values.mq.persistence.storageClass | default nil | quote }}
+      resources:
+        requests:
+          storage: {{ .Values.mq.persistence.mqm.size | default "8Gi" | quote }}
+  - metadata:
+      name: mqm-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: {{ .Values.mq.persistence.storageClass | default nil | quote }}
+      resources:
+        requests:
+          storage: 8Gi
+  {{- end }}

@@ -8,6 +8,9 @@ Samples:
 # start Minikube with docker minimum set of features (PSP, Nginx Ingress)
 start-minikube.sh --with-docker
 
+# creates PV being a dir under /tmp, useful for creating PV for Minikube
+make create-hostPath-pv PV=pvname NS=namespace
+
 # start Minikube with docker maxmimum set of features (PSP, Nginx Ingress, NetworkPolicy via CNI/Cilium, Istio, Gatekeeper)
 start-minikube.sh --with-docker --with-cni --with-gatekeeper --with-istio
 
@@ -30,4 +33,5 @@ start-minikube.sh --with-crio --with-istio
 # to terminate
 ./stop-minikube.sh
 ./delete-minikube.sh
+
 ```

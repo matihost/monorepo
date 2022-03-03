@@ -13,16 +13,25 @@ serviceAccount:
 
 mq:
   configPath: "config.mqsc"
+  persistence:
+    enabled: false
+    # storageClass: standard
+    data:
+      size: 4Gi
+    mqm:
+      size: 2Gi
+    logs:
+      size: 4Gi
 
 resources:
   limits:
     cpu: 2
     memory: 768Mi
-    ephemeral-storage: "4Gi"
+    ephemeral-storage: "6Gi"
   requests:
     cpu: 200m
     memory: 384Mi
-    ephemeral-storage: "2Gi"
+    ephemeral-storage: "4Gi"
 
 webconsole:
   admin_pass: default
