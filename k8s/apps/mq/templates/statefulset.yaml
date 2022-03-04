@@ -58,7 +58,7 @@ spec:
               secretKeyRef:
                 name: {{ include "app.fullname" . }}-secret
                 key: admin-pass
-          {{- if .Values.webconsole.app_pass }}
+          {{- if .Values.mq.app_pass }}
           - name: MQ_APP_PASSWORD
             valueFrom:
               secretKeyRef:

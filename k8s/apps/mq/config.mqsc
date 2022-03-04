@@ -1,2 +1,26 @@
-* Define service channel accessible by mqm user (local)
-DEFINE CHANNEL(TEST.SVRCONN) CHLTYPE(SVRCONN) MCAUSER('mqm')
+
+* Define queues for Request/Replay between application A and application B
+DEFINE QLOCAL('APPA.RQ.APPB') REPLACE
+DEFINE QLOCAL('APPB.RS.APPA') REPLACE
+
+* Define channels for connection for app A and B
+* Add option MCAUSER('app') so that UserId will be overriden by channel (aka it is zero security, not recommended)
+* W/O MCAUSER Linux user of client app is send as authenticated user, then it is either present on MQ server side, or mapped as below to MW user
+* When Mapping is used, even when user requires password,
+DEFINE CHANNEL('APPA.SVRCONN') CHLTYPE(SVRCONN) REPLACE
+DEFINE CHANNEL('APPB.SVRCONN') CHLTYPE(SVRCONN) REPLACE
+
+* Allow connection throu both apps channels from any location and use channel authentication user
+* Mapping client app linux user (here mati, replace with your linux user) to server authenticated user (app)
+SET CHLAUTH('APPA.SVRCONN') TYPE(ADDRESSMAP) ADDRESS('*') USERSRC(CHANNEL) CHCKCLNT(REQUIRED) DESCR('Allow connection throu APPA.SVRCONN channel') ACTION(REPLACE)
+SET CHLAUTH('APPA.SVRCONN') TYPE(USERMAP) CLNTUSER('mati') USERSRC(MAP) MCAUSER ('app') DESCR ('Allow mati as MQ-app') ACTION(REPLACE)
+
+SET CHLAUTH('APPB.SVRCONN') TYPE(ADDRESSMAP) ADDRESS('*') USERSRC(CHANNEL) CHCKCLNT(REQUIRED) DESCR('Allow connection throu APPB.SVRCONN channel') ACTION(REPLACE)
+SET CHLAUTH('APPB.SVRCONN') TYPE(USERMAP) CLNTUSER('mati') USERSRC(MAP) MCAUSER ('app') DESCR ('Allow mati as MQ-app') ACTION(REPLACE)
+
+* Define channel authentication that it can access connect and can operate on queues or topics
+SET AUTHREC PRINCIPAL('app') OBJTYPE(QMGR) AUTHADD(CONNECT,INQ)
+SET AUTHREC PROFILE('APPA.**') PRINCIPAL('app') OBJTYPE(QUEUE) AUTHADD(BROWSE,GET,INQ,PUT)
+SET AUTHREC PROFILE('APPA.**') PRINCIPAL('app') OBJTYPE(TOPIC) AUTHADD(PUB,SUB)
+SET AUTHREC PROFILE('APPB.**') PRINCIPAL('app') OBJTYPE(QUEUE) AUTHADD(BROWSE,GET,INQ,PUT)
+SET AUTHREC PROFILE('APPB.**') PRINCIPAL('app') OBJTYPE(TOPIC) AUTHADD(PUB,SUB)
