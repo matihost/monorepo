@@ -10,7 +10,7 @@ endif
 MQ_NAME_UPPER := $(shell echo '$(MQ_NAME)' | tr '[:lower:]' '[:upper:]')
 
 
-deploy-on-minikube: ## deploy MQ manager;usage: make deploy-on-minikube MQ_NAME=dev1 [DEBUG=false] [PERSISTENCE=false]
+deploy-on-minikube: ## deploy MQ manager;usage: make deploy-on-minikube [MQ_NAME=dev1] [DEBUG=false] [PERSISTENCE=false]
 	helm upgrade $(DEBUG_FLAG) --install $(MQ_NAME) . -n learning --create-namespace \
 		--set mq.persistence.enabled=$(PERSISTENCE) \
     --set webconsole.istio.hostSuffix="testing.minikube" \
@@ -19,19 +19,22 @@ deploy-on-minikube: ## deploy MQ manager;usage: make deploy-on-minikube MQ_NAME=
 	@INGRESS_IP="$(shell kubectl get svc istio-ingressgateway -n istio-system -o jsonpath="{.status..ip}")" && \
   [ "$$(grep -c "${INGRESS_IP} $(CN)" /etc/hosts)" -eq 0 ] && echo "/etc/hosts updated with MQ webconsole DNS mapping: $(CN)" && sudo -E sh -c "echo \"$${INGRESS_IP} $(CN)\" >> /etc/hosts" || echo "/etc/hosts already updated with DNS mapping: $(CN)"
 
-undeploy: ## undeploy MQ manager;  make undeploy MQ_NAME=dev1
+undeploy: ## undeploy MQ manager;  make undeploy [MQ_NAME=dev1]
 	helm uninstall $(MQ_NAME) -n learning
 
-test-minikube: ## smoke test for MQ web server; usage: make test-minikube MQ_NAME=dev1
+test-web-dashboard: ## smoke test for MQ web server; usage: make test-web-dashboard [MQ_NAME=dev1]
 	curl -ksSL https://$(CN)
 
-test-default-queues: ## run sample MQ put and get apps against default queues in the image
-	@$(MAKE) test-queues CHANNEL=DEV.APP.SVRCONN QUEUE=DEV.QUEUE.1
+test-app-queues: ## run sample MQ put and get apps against app queues; usage: make test-app-queues [MQ_NAME=dev1]
+	@$(MAKE) test-queues MQ_NAME=$(MQ_NAME) CHANNEL=APPA.SVRCONN QUEUE=APPA.RQ.APPB
 
-test-custom-queues: ## run sample MQ put and get apps against custom queues
-	@$(MAKE) test-queues CHANNEL=APPA.SVRCONN QUEUE=APPA.RQ.APPB
-
-test-queues: ## run sample MQ put and get apps against queue; press enter for password, usage: make test-queues CHANNEL=APPA.SVRCONN QUEUE=APPA.RQ.APPB
+test-queues: ## run sample MQ put and get apps against queue; press enter for password, usage: make test-queues [MQ_NAME=dev1] CHANNEL=APPA.SVRCONN QUEUE=APPA.RQ.APPB
+ifndef CHANNEL
+	$(error Env CHANNEL is not defined. Usage make test-queues [MQ_NAME=dev1] CHANNEL=APPA.SVRCONN QUEUE=APPA.RQ.APPB
+endif
+ifndef QUEUE
+	$(error Env QUEUE is not defined. Usage make test-queues [MQ_NAME=dev1] CHANNEL=APPA.SVRCONN QUEUE=APPA.RQ.APPB
+endif
 	@MQ_IP="$(shell kubectl get svc $(MQ_NAME)-mq -n learning -o jsonpath='{.status..ip}')" && \
 	export MQSERVER="$(CHANNEL)/TCP/$${MQ_IP}(1414)" && \
 	export MQSAMP_USER_ID='' && \

@@ -32,7 +32,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
           env:
           - name: MQ_DEV
-            value: "true"
+            value: "false"
           - name: LICENSE
             value: "accept"
           - name: MQ_QMGR_NAME
@@ -90,8 +90,11 @@ spec:
               scheme: HTTPS
           volumeMounts:
             - name: mqsc
-              mountPath: /etc/mqm/25-config.mqsc
-              subPath: 25-config.mqsc
+              mountPath: /etc/mqm/01-admin-config.mqsc
+              subPath: 01-admin-config.mqsc
+            - name: mqsc
+              mountPath: /etc/mqm/02-app-config.mqsc
+              subPath: 02-app-config.mqsc
             - name: mqm
               mountPath: /mnt/mqm
             - name: mqm-data

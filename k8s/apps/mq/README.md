@@ -1,54 +1,41 @@
 # MQ deployment
 
-Sample MQ deployment under K8s
+MQ deployment under K8S.
+
+Prerequisites:
+
+* Assumes Minikube is installed locally. Deploy MQ server as StatefulSet on Minikube. Use `k8s/minikube` for Minikube deploymnet
+
+* Assumes Istio is deployey on Minikube  for MQ Web Dashboard exposure. Use `k8s/istio` for Istio deployment.
+
+* MQ server listener is exposed via Minikube's LoadBalancer on port 1414.
+
+* Ensure MQ client is installed in the current system. See `ansible/system` playbook for how to install it in Ubuntu. Test tasks uses sample application from MQ client.
+
+* Ensure `app-config.mqsc` contains correct Linux user (currently it is `mati` user) mapped to `app` user on MQ server side. MQ client uses IDPWOS type of authentication - which uses current linux user as authentication method.
 
 ## MQ deployment under Minikube
 
 ```bash
-# deploy MQ manager;usage: make deploy-on-minikube MQ_NAME=dev1 [DEBUG=false] [PERSISTENCE=false]
+# deploy MQ manager in Minikube ;usage: make deploy-on-minikube [MQ_NAME=dev1] [DEBUG=false] [PERSISTENCE=false]
 make deploy-on-minikube
-#  undeploy MQ manager; make undeploy MQ_NAME=dev1
+#  undeploy MQ manager; make undeploy [MQ_NAME=dev1]
 make undeploy
-# smoke test for MQ UI web server; usage: make test-minikube MQ_NAME=dev1
-make test-minikube
+#make smoke test for MQ web server; usage: make test-web-dashboard [MQ_NAME=dev1
+make test-web-dashboard
 ```
 
 ## Client testing
 
-Prerequisites:
-
-* Ensure MQ client is installed in the system. See ansible/system playbook for how to install it in Ubuntu.
-
-* Ensure `config.mqsc` contains correct Linux user (currently: mati user) mapped to `app` user on MQ server side.
-
-Then:
-
 ```bash
-# send message and then receive (scripted)
-make test-default-queues
-make test-custom-queues
-make test-queues CHANNEL=APPB.SVRCONN QUEUE=APPB.RS.APPA
+# run sample MQ put and get apps against app queues; usage: make test-app-queues [MQ_NAME=dev1]
+# warning: just press enter when asked for password, do not type any password
+# MQ client uses IDPWOS type of authentication - which uses your linux user name as UserId.
+make test-app-queues
+make test-queues MQ_NAME=dev1 CHANNEL=APPB.SVRCONN QUEUE=APPB.RS.APPA
 ```
 
-Sample send/receive messages for default dev queues:
-
-```bash
-# send sample message
-source setmqenv -s
-export MQSERVER='DEV.APP.SVRCONN/TCP/10.xxx.xxx.xxx(1414)'
-# leave empty so that your Linux user is passed for authentication
-# leave it also empty when MQ server mq.app_pass helm parameter is empty
-# when mq.app_pass is not empty, but your Linux user is mapped to app user on the channel definition (in the sample)
-# then you don't need to provided that password as well
-# when you change this value it has to repsent an user on MQ server side
-export MQSAMP_USER_ID=''
-cd /opt/mqm/samp/bin
-./amqsputc DEV.QUEUE.1 DEV1
-# then to get mesages from queue from mq manager
-./amqsgetc DEV.QUEUE.1 DEV
-```
-
-Sample send/receive messages for config.mqsc defined queues:
+Or you can do it yourself: (IP is MQ server LoadBalancer)
 
 ```bash
 source setmqenv -s

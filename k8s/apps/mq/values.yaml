@@ -12,7 +12,8 @@ serviceAccount:
   name: default
 
 mq:
-  configPath: "config.mqsc"
+  adminConfigPath: "admin-config.mqsc"
+  appConfigPath: "app-config.mqsc"
   # app_pass: optional
   persistence:
     enabled: false

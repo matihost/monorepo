@@ -1,0 +1,52 @@
+** Admin MQ configuration **
+
+* Stop default MQ listener
+STOP LISTENER('SYSTEM.DEFAULT.LISTENER.TCP') IGNSTATE(YES)
+
+* Define dead letter queue, for undeliverable messages
+DEFINE QLOCAL('DEAD.LETTER.QUEUE') REPLACE
+
+* Use a different dead letter queue, for undeliverable messages
+ALTER QMGR DEADQ('DEAD.LETTER.QUEUE')
+
+
+* Connection authentication config
+* AUTHINFO object contain the definitions required to perform certificate revocation checking using OCSP
+* or Certificate Revocation Lists (CRLs) on LDAP servers
+* and the definitions required to enable user ID and password checking.
+* AUTHTYPE - The type of authentication information. Available types :
+*   CRLLDAP - Certificate Revocation List checking is done using LDAP servers.
+*   IDPWLDAP - Connection authentication user ID and password checking is done using an LDAP server.
+*   IDPWOS - Connection authentication user ID and password checking is done using the operating system.
+*   OCSP - Certificate revocation checking is done using OCSP.
+* CHCKCLNT - This attribute determines the authentication requirements for client applications, and is valid only for an AUTHTYPE of IDPWOS or IDPWLDAP. The possible values are:
+*   NONE - No user ID and password checks are made. If any user ID or password is supplied by a client application, the credentials are ignored.
+*   OPTIONAL - Client applications are not required to provide a user ID and password. When authen info is provided, their are checked.
+*   REQUIRED - All client applications must provide a user ID and password in the MQCSP structure. This user ID and password is authenticated by the queue manager against the password store indicated by the AUTHTYPE. The connection will only be allowed to continue if the user ID and password are valid.
+*   REQDADM - All client applications using a privileged user ID must provide a user ID and password in the MQCSP structure. Any locally bound applications using a non-privileged user ID are not required to provide a user ID and password and are treated as with the OPTIONAL setting. Any provided user ID and password are authenticated by the queue manager against the password store indicated by the AUTHTYPE. The connection is only allowed to continue if the user ID and password are valid.
+* CHCKLOCL - This attribute determines the authentication requirements for locally bound applications, and is valid only for an AUTHTYPE of IDPWOS or IDPWLDAP. Available values are the same as for CHCKCLNT.
+* ADOPTCTX - Whether to use the presented credentials as the context for this application. This means that they are used for authorization checks, shown on administrative displays, and appear in messages.
+DEFINE AUTHINFO('APP.AUTHINFO') AUTHTYPE(IDPWOS) CHCKCLNT(REQDADM) CHCKLOCL(OPTIONAL) ADOPTCTX(YES) REPLACE
+ALTER QMGR CONNAUTH('APP.AUTHINFO')
+REFRESH SECURITY(*) TYPE(CONNAUTH)
+
+* Channel for admin access (user admin in)
+DEFINE CHANNEL('ADMIN.SVRCONN') CHLTYPE(SVRCONN) REPLACE
+
+* Authentication rules - block by default everyone, requires explicit opening for particular app channel
+SET CHLAUTH('*') TYPE(ADDRESSMAP) ADDRESS('*') USERSRC(NOACCESS) DESCR('Back-stop rule - Blocks everyone') ACTION(REPLACE)
+* Authentication rules for admin access
+SET CHLAUTH('ADMIN.SVRCONN') TYPE(BLOCKUSER) USERLIST('nobody') DESCR('Allows admins on ADMIN channel') ACTION(REPLACE)
+SET CHLAUTH('ADMIN.SVRCONN') TYPE(USERMAP) CLNTUSER('admin') USERSRC(CHANNEL) DESCR('Allows admin user to connect via ADMIN channel') ACTION(REPLACE)
+SET CHLAUTH('ADMIN.SVRCONN') TYPE(USERMAP) CLNTUSER('admin') USERSRC(MAP) MCAUSER ('mqm') DESCR ('Allow admin as MQ-admin') ACTION(REPLACE)
+
+* Define users which can connect to MQ
+* Note: The user `app` has to be present on MQ server in case
+SET AUTHREC PRINCIPAL('app') OBJTYPE(QMGR) AUTHADD(CONNECT,INQ)
+
+* Fine grained AUTHREC per channel/queue/topic is in app-config.mqsc
+
+
+* Start MQ listener on TCP 1414
+DEFINE LISTENER('LISTENER.TCP') TRPTYPE(TCP) PORT(1414) CONTROL(QMGR) REPLACE
+START LISTENER('LISTENER.TCP') IGNSTATE(YES)
