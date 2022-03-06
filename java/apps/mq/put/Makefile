@@ -1,27 +1,40 @@
-BASE := quay.io/matihost/commandline
+.EXPORT_ALL_VARIABLES:
+
+APP_NAME := put
+BASE := quay.io/matihost/mq/$(APP_NAME)
 TAG := latest
 
-run: ## run command-line
+run: ## run app
 	mvn -am spring-boot:run
 
 build: ## build
 	mvn -am clean package
 
-CURRENCY := USD
-run-jar: ## run built jar; usage: make run-jar [CURRENCY=USD]
+DEBUG := false
+ifeq ($(strip $(DEBUG)),true)
+	DEBUG_FLAG := -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005
+endif
+
+MQ_NAME := dev1
+MQ_PORT := 1414
+MQ_CHANNEL := APPA.SVRCONN
+MQ_QUEUE := APPA.RQ.APPB
+
+MQ_QMNAME := $(shell echo '$(MQ_NAME)' | tr '[:lower:]' '[:upper:]')
+run-jar: ## run built jar, put message on Minikube hosted MQ; usage: make run-jar [DEBUG=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
 	java -XshowSettings:* -XX:+PrintFlagsFinal -XX:NativeMemoryTracking=summary -Xlog:async -Xlog:gc*=debug,gc+ergo*=trace,gc+age*=trace,safepoint*:file=/tmp/command-line.gc.log:level,tags,utctime,uptime,pid:filecount=5,filesize=100m \
-		-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.rmi.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false \
+		$(DEBUG_FLAG) -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.rmi.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false \
 		-XX:OnOutOfMemoryError='kill -9 %p' -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp \
 		-XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:+UseNUMA -XX:+PreserveFramePointer \
 		-Xms128m -Xmx128m \
 		-XX:ThreadStackSize=1024 -XX:MaxDirectMemorySize=3G -XX:MaxMetaspaceSize=64m -XX:ReservedCodeCacheSize=32m -XX:CompressedClassSpaceSize=32m\
-		-jar target/command-line-*.jar --currency=$(CURRENCY)
+		-jar target/*.jar --mq.host="$(shell kubectl get svc $(MQ_NAME)-mq -n learning -o jsonpath='{.status..ip}')" --message=alamakota
 
 build-image: build ## build docker image
 	DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build --build-arg JAR_FILE=target/*.jar -t $(BASE):$(TAG) .
 
 run-container: ## run app from docker
-	docker run -it --rm $(BASE):${TAG}
+	docker run -it --rm $(BASE):${TAG} --env MQ_NAME=$(MQ_QMNAME)
 
 push: ## push image with tag to quay.io repository (assume docker login quay.io has been perfomed)
 	docker push $(BASE):$(TAG)

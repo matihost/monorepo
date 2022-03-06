@@ -61,6 +61,9 @@
     <scala.test.plus.version>3.2.11.0</scala.test.plus.version>
     <!-- Scala 3 still depends on Scala 2 for backward compatibility -->
     <scala2.version>2.13.8</scala2.version>
+
+    <!-- IBM MQ client -->
+    <mq.version>9.2.5.0</mq.version>
   </properties>
 
   <profiles>
@@ -487,6 +490,11 @@
             <artifactId>android-json</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.ibm.mq</groupId>
+        <artifactId>com.ibm.mq.allclient</artifactId>
+        <version>${mq.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
