@@ -59,7 +59,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
-          <version>3.0.0-M3</version>
+          <version>3.0.0</version>
           <executions>
             <execution>
               <id>enforce-maven</id>
@@ -69,6 +69,9 @@
               <configuration>
                 <rules>
                   <dependencyConvergence/>
+                  <requireJavaVersion>
+                    <version>${java.version}</version>
+                  </requireJavaVersion>
                   <requireMavenVersion>
                     <version>${enforce.maven.version}</version>
                   </requireMavenVersion>
@@ -90,7 +93,7 @@
         <plugin>
           <groupId>org.sonatype.ossindex.maven</groupId>
           <artifactId>ossindex-maven-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>3.2.0</version>
           <executions>
             <execution>
               <id>audit-dependencies</id>
@@ -110,7 +113,7 @@
         <!-- Versions can be taken from  mvn -T1 versions:display-plugin-updates -->
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.9.0</version>
+          <version>3.10.0</version>
           <configuration>
             <release>${java.version}</release>
           </configuration>
@@ -147,7 +150,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.10.0</version>
+          <version>3.11.0</version>
         </plugin>
       </plugins>
     </pluginManagement>

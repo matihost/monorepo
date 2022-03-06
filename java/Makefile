@@ -36,6 +36,9 @@ build-submodule: ## build submodule; usage make build-submodule MODULE=mavenModu
 # https://issues.apache.org/jira/browse/MENFORCER-189
 	mvn -s .mvn/settings.xml --show-version -am $(DEBUG_FLAG) -pl :$(MODULE) clean install
 
+clean: ## builds the project
+	mvn -s .mvn/settings.xml --show-version clean
+
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
