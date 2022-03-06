@@ -14,10 +14,11 @@ serviceAccount:
 mq:
   adminConfigPath: "admin-config.mqsc"
   appConfigPath: "app-config.mqsc"
-  # app_pass: optional
+  # svcType: LoadBalancer
+  # app_pass: <none>
   persistence:
     enabled: false
-    # storageClass: standard
+    # storageClass: <default>
     data:
       size: 4Gi
     mqm:

@@ -34,5 +34,5 @@ spec:
   selector:
     {{- include "app.selectorLabels" . | nindent 6 }}
   sessionAffinity: None
-  type: LoadBalancer
+  type: {{ .Values.mq.svcType | default "LoadBalancer" | quote }}
 ---
