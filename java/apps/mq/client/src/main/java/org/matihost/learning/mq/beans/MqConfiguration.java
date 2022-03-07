@@ -3,8 +3,6 @@ package org.matihost.learning.mq.beans;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.Objects;
-
 @ConfigurationProperties("mq")
 public class MqConfiguration {
 

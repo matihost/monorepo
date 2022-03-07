@@ -9,7 +9,7 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <groupId>org.matihost.learning.apps.mq</groupId>
-  <artifactId>put</artifactId>
+  <artifactId>client</artifactId>
   <packaging>jar</packaging>
 
   <!-- use parent from Spring Boot -->

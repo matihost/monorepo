@@ -12,7 +12,7 @@
   <artifactId>mq</artifactId>
   <packaging>pom</packaging>
   <modules>
-    <module>put</module>
+    <module>client</module>
   </modules>
 
 

@@ -1,4 +1,4 @@
-module org.matihost.learning.apps.mq.put {
+module org.matihost.learning.mq.client {
   exports org.matihost.learning.mq.utils;
   exports org.matihost.learning.mq.handlers;
 

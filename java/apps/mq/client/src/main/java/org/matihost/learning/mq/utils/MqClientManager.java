@@ -5,17 +5,16 @@ import com.ibm.msg.client.jms.JmsFactoryFactory;
 import com.ibm.msg.client.wmq.WMQConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.matihost.learning.mq.beans.MqConfiguration;
-import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
+import javax.jms.Queue;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
 public class MqClientManager implements AutoCloseable {
-
   private final JmsConnectionFactory cf;
-  private Map<String, MqConnection> queues = new ConcurrentHashMap<>();
+  private final Map<String, MqConnection> queues = new ConcurrentHashMap<>();
 
   public MqClientManager(MqConfiguration conf) throws JMSException {
     JmsFactoryFactory ff = JmsFactoryFactory.getInstance(WMQConstants.WMQ_PROVIDER);
@@ -36,6 +35,18 @@ public class MqClientManager implements AutoCloseable {
 
   public MqConnection getQueueConnection(String queue) {
     return queues.computeIfAbsent(queue, s -> new MqConnection(cf, s));
+  }
+
+  public MqConnection getQueueConnection(Queue queue) {
+    return new MqConnection(cf, queue);
+  }
+
+  public static String extractQueueName(Queue queue) {
+    try {
+      return queue.getQueueName();
+    } catch (JMSException e) {
+      throw new IllegalStateException(String.format("Unable to retrieve queue name from %s", queue));
+    }
   }
 
   @Override
