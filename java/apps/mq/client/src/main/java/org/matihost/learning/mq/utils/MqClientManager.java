@@ -5,6 +5,8 @@ import com.ibm.msg.client.jms.JmsFactoryFactory;
 import com.ibm.msg.client.wmq.WMQConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.matihost.learning.mq.beans.MqConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jms.JMSException;
 import javax.jms.Queue;
@@ -13,6 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class MqClientManager implements AutoCloseable {
+  private static final Logger logger = LoggerFactory.getLogger(MqClientManager.class);
+
   private final JmsConnectionFactory cf;
   private final Map<String, MqConnection> queues = new ConcurrentHashMap<>();
 
@@ -31,6 +35,7 @@ public class MqClientManager implements AutoCloseable {
     if (StringUtils.isNotEmpty(conf.getSupportedTLSSuite())) {
       cf.setStringProperty(WMQConstants.WMQ_SSL_CIPHER_SUITE, conf.getSupportedTLSSuite());
     }
+    logger.debug("Created JMS Factory with: {}", cf);
   }
 
   public MqConnection getQueueConnection(String queue) {

@@ -3,7 +3,7 @@ FROM eclipse-temurin:17 as jreBuilder
 # build JRE with only modules app depens on
 # + jfr and jcmd tooling (jcmd,jps,jmap,jstack etc.) ~ adds 6 MiB to image size
 RUN jlink \
-        --add-modules java.base,java.xml,java.net.http,java.desktop,jdk.jcmd,jdk.jfr,jdk.management.jfr \
+        --add-modules java.base,java.logging,java.naming,java.net.http,java.desktop,jdk.jcmd,jdk.jfr,jdk.management.jfr \
         --verbose \
         --strip-debug \
         --compress 2 \

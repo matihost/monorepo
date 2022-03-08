@@ -42,7 +42,7 @@ public class MqConfiguration {
   }
 
   public String getChannel() {
-    return ObjectUtils.requireNonEmpty(channel, "MQ channel cannot be empty)");
+    return ObjectUtils.requireNonEmpty(channel, "MQ channel cannot be empty");
   }
 
   public void setChannel(String channel) {
