@@ -1,0 +1,17 @@
+* Block put on queue, aka cause 2051:MQRC_PUT_INHIBITED error
+ALTER QLOCAL('APPA.RQ.APPB') PUT(DISABLED)
+
+* Disable Authen/Authz on connection level and disable Channel Authentication Records
+* Warning: ensure CHANNELS has MCAUSER('app') or MCAUSER('mqm') a user present on MQ server
+# otherwise MQRC_NOT_AUTHORIZED still occurs as traffic cannot be w/o user - and MCAUSER overrides user on channel level
+ALTER QMGR CONNAUTH('') CHLAUTH(DISABLED)
+REFRESH SECURITY(*)
+
+*  show MQ manager config options
+DISPLAY QMGR
+
+* show queue list starting with APP
+DISPLAY QLOCAL(APP*)
+
+* show details about a queue
+DIS QL(APPA.RQ.APPB)

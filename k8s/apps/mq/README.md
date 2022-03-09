@@ -10,7 +10,7 @@ Prerequisites:
 
 * MQ server listener is exposed via Minikube's LoadBalancer on port 1414.
 
-* Ensure MQ client is installed in the current system. See `ansible/system` playbook for how to install it in Ubuntu. Test tasks uses sample application from MQ client.
+* Ensure MQ client is installed in the current system. See `ansible/system` playbook for how to install it in Ubuntu. It is needed for `runmqsc` cli. Also examples uses sample applications from MQ client.
 
 * MQ client uses IDPWOS type of authentication. It means it uses two ways of authentication methods:
 
@@ -31,6 +31,21 @@ make deploy-on-minikube
 make undeploy
 #make smoke test for MQ web server; usage: make test-web-dashboard [MQ_NAME=dev1
 make test-web-dashboard
+```
+
+## Admin tasks
+
+Sample admin commands: [sample-admin-commands.mqsc](sample-admin-commands.mqsc)
+
+```bash
+# open admin console access with ability to run MQ admin commands
+# when asked, provide admin password (default: default)
+make runmqmsc
+```
+
+```bash
+#show MQ log with authentication errors (2035 error tracing)
+make get-authen-errors
 ```
 
 ## Client testing

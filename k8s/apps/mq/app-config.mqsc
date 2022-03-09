@@ -2,7 +2,7 @@
 ** Application related MQ config (queues, channel, authen & authz) **
 
 * Define queues for Request/Replay between application A and application B
-DEFINE QLOCAL('APPA.RQ.APPB') REPLACE
+DEFINE QLOCAL('APPA.RQ.APPB') MAXDEPTH(1000) MAXMSGL(16777216) GET(ENABLED) PUT(ENABLED) REPLACE
 DEFINE QLOCAL('APPB.RS.APPA') REPLACE
 
 

@@ -24,6 +24,14 @@ deploy-on-minikube: ## deploy MQ manager;usage: make deploy-on-minikube [MQ_NAME
 undeploy: ## undeploy MQ manager;  make undeploy [MQ_NAME=dev1]
 	helm uninstall $(MQ_NAME) -n learning
 
+runmqsc: ## open admin console access with ability to run MQ admin commands
+	@MQ_IP="$(shell kubectl get svc $(MQ_NAME)-mq -n learning -o jsonpath='{.status..ip}')" && \
+	export MQSERVER="ADMIN.SVRCONN/TCP/$${MQ_IP}(1414)" && \
+	runmqsc -c $(MQ_NAME_UPPER) -u admin
+
+get-authen-errors: ## show MQ log with authentication errors (2035 error tracing)
+	kubectl exec dev1-mq-0 -n learning -- cat /var/mqm/errors/mqhtpass.json
+
 test-web-dashboard: ## smoke test for MQ web server; usage: make test-web-dashboard [MQ_NAME=dev1]
 	curl -ksSL https://$(CN)
 

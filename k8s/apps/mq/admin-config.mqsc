@@ -9,6 +9,8 @@ DEFINE QLOCAL('DEAD.LETTER.QUEUE') REPLACE
 * Use a different dead letter queue, for undeliverable messages
 ALTER QMGR DEADQ('DEAD.LETTER.QUEUE')
 
+* Set max size of message and message properties to 16 MiB (max is 100 MiB)
+ALTER QMGR MAXMSGL(16777216) MAXPROPL(16777216)
 
 * Connection authentication config
 * AUTHINFO object contain the definitions required to perform certificate revocation checking using OCSP
