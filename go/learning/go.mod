@@ -5,8 +5,8 @@ go 1.17
 require (
 	github.com/pkg/errors v0.9.1
 	go.uber.org/zap v1.21.0
-	google.golang.org/grpc v1.44.0
-	google.golang.org/grpc/examples v0.0.0-20220224182858-328efcc9276e
+	google.golang.org/grpc v1.45.0
+	google.golang.org/grpc/examples v0.0.0-20220311002955-722367c4a737
 )
 
 require (

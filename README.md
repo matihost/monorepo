@@ -10,7 +10,7 @@ Various technology code snippets, home tools:
     * echoserver - Helm setup for echoserver (Minikube/GKE)
     * mq - Helm based setup for IBM MQ (Minikube/GKE)
   * minikube - various script for native Minikube deployment under Ubuntu desktop
-  * gatekeeper - Ansible based GateKeeper deployment for Minkube or GKE
+  * gatekeeper - Ansible based GateKeeper deployment for Minikube or GKE
   * istio - Ansible based Istio deployment for Minikube or GKE
   * jenkins - Ansible based Jenkins deployment for Minikube or GKE
   * okd-3 - Ansible playbooks to setup OpenShift/OKD 3 on VirtualBox VMs
@@ -56,3 +56,4 @@ Various technology code snippets, home tools:
     * automount-cifs - to setup Linux automount svc with home SAMBA NFS
     * setup-opendns  - to setup regular update of OpenDNS with home public ip
 * [rust](rust) - sample Rust example
+* [jenkins](Jenkinsfile), [travis](.travis.yml), [gcp cloudbuild](cloudbuild.yaml) - various Continous Integration toolset integration

@@ -15,31 +15,31 @@ controller:
   installPlugins: false
 {% else %}
   image: "jenkins/jenkins"
-  tag: "2.303.3"
+  tag: "2.332.1"
   initializeOnce: false
   installLatestPlugins: true
   installLatestSpecifiedPlugins: false
   installPlugins:
   - branch-api:2.7.0
-  - kubernetes:1.30.10
-  - workflow-job:2.42
-  - workflow-aggregator:2.6
+  - kubernetes:3546.v6103d89542d6
+  - workflow-job:1174.vdcb_d054cf74a_
+  - workflow-aggregator:2.7
   - cloudbees-disk-usage-simple:0.10
-  - credentials:2.6.1
-  - credentials-binding:1.27
-  - docker-commons:1.17
-  - docker-workflow:1.26
-  - git:4.10.0
-  - configuration-as-code:1.54
-  - timestamper:1.14
-  - github-branch-source:2.11.3
-  - github-oauth:0.34
-  - ldap:2.7
+  - credentials:1074.v60e6c29b_b_44b_
+  - credentials-binding:1.27.1
+  - docker-commons:1.19
+  - docker-workflow:1.28
+  - git:4.10.3
+  - configuration-as-code:1414.v878271fc496f
+  - timestamper:1.17
+  - github-branch-source:1583.v18d333ef7379
+  - github-oauth:0.37
+  - ldap:2.8
   - google-login:1.6
-  - matrix-auth:2.6.8
+  - matrix-auth:3.1
   - authorize-project:1.4.0
-  - prometheus:2.0.10
-  - simple-theme-plugin:0.7
+  - prometheus:2.0.11
+  - simple-theme-plugin:103.va_161d09c38c7
   - jdk-tool:1.5
   - command-launcher:1.6
   - windows-slaves:1.8
@@ -107,53 +107,53 @@ controller:
           authorizationStrategy:
             projectMatrix:
               permissions:
-              - "Agent/Build:admin"
-              - "Agent/Configure:admin"
-              - "Agent/Connect:admin"
-              - "Agent/Create:admin"
-              - "Agent/Delete:admin"
-              - "Agent/Disconnect:admin"
-              - "Agent/ExtendedRead:admin"
-              - "Agent/ExtendedRead:authenticated"
-              - "Credentials/Create:admin"
-              - "Credentials/Delete:admin"
-              - "Credentials/ManageDomains:admin"
-              - "Credentials/Update:admin"
-              - "Credentials/View:admin"
-              - "Job/Build:admin"
-              - "Job/Cancel:admin"
-              - "Job/Configure:admin"
-              - "Job/Create:admin"
-              - "Job/Delete:admin"
-              - "Job/Discover:admin"
-              - "Job/Discover:authenticated"
-              - "Job/ExtendedRead:admin"
-              - "Job/Move:admin"
-              - "Job/Read:admin"
-              - "Job/Read:authenticated"
-              - "Job/Workspace:admin"
-              - "Lockable Resources/Reserve:admin"
-              - "Lockable Resources/Unlock:admin"
-              - "Lockable Resources/View:admin"
-              - "Lockable Resources/View:authenticated"
-              - "Metrics/HealthCheck:admin"
-              - "Metrics/ThreadDump:admin"
-              - "Metrics/View:admin"
-              - "Metrics/View:authenticated"
-              - "Overall/Administer:admin"
-              - "Overall/Read:admin"
-              - "Overall/Read:authenticated"
-              - "Overall/SystemRead:admin"
-              - "Run/Delete:admin"
-              - "Run/Replay:admin"
-              - "Run/Update:admin"
-              - "SCM/Tag:admin"
-              - "View/Configure:admin"
-              - "View/Create:admin"
-              - "View/Delete:admin"
-              - "View/Read:admin"
-              - "View/Read:authenticated"
-              - "Overall/Administer:matihost"
+              - "USER:Agent/Build:admin"
+              - "USER:Agent/Configure:admin"
+              - "USER:Agent/Connect:admin"
+              - "USER:Agent/Create:admin"
+              - "USER:Agent/Delete:admin"
+              - "USER:Agent/Disconnect:admin"
+              - "USER:Agent/ExtendedRead:admin"
+              - "GROUP:Agent/ExtendedRead:authenticated"
+              - "USER:Credentials/Create:admin"
+              - "USER:Credentials/Delete:admin"
+              - "USER:Credentials/ManageDomains:admin"
+              - "USER:Credentials/Update:admin"
+              - "USER:Credentials/View:admin"
+              - "USER:Job/Build:admin"
+              - "USER:Job/Cancel:admin"
+              - "USER:Job/Configure:admin"
+              - "USER:Job/Create:admin"
+              - "USER:Job/Delete:admin"
+              - "USER:Job/Discover:admin"
+              - "GROUP:Job/Discover:authenticated"
+              - "USER:Job/ExtendedRead:admin"
+              - "USER:Job/Move:admin"
+              - "USER:Job/Read:admin"
+              - "GROUP:Job/Read:authenticated"
+              - "USER:Job/Workspace:admin"
+              - "USER:Lockable Resources/Reserve:admin"
+              - "USER:Lockable Resources/Unlock:admin"
+              - "USER:Lockable Resources/View:admin"
+              - "GROUP:Lockable Resources/View:authenticated"
+              - "USER:Metrics/HealthCheck:admin"
+              - "USER:Metrics/ThreadDump:admin"
+              - "USER:Metrics/View:admin"
+              - "GROUP:Metrics/View:authenticated"
+              - "USER:Overall/Administer:admin"
+              - "USER:Overall/Read:admin"
+              - "GROUP:Overall/Read:authenticated"
+              - "USER:Overall/SystemRead:admin"
+              - "USER:Run/Delete:admin"
+              - "USER:Run/Replay:admin"
+              - "USER:Run/Update:admin"
+              - "USER:SCM/Tag:admin"
+              - "USER:View/Configure:admin"
+              - "USER:View/Create:admin"
+              - "USER:View/Delete:admin"
+              - "USER:View/Read:admin"
+              - "GROUP:View/Read:authenticated"
+              - "USER:Overall/Administer:matihost"
       welcome-message: |
         jenkins:
           systemMessage: Welcome to the Matihost CI\CD server.

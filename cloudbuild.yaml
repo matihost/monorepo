@@ -7,7 +7,7 @@ substitutions:
   _MVN_SETTINGS: ".mvn/settings.xml"
 steps:
 - id: algorithms
-  name: maven:3-jdk-17
+  name: maven:3-openjdk-17
   entrypoint: 'bash'
   dir: "algorithms/project-euler"
   args:
@@ -16,7 +16,7 @@ steps:
   - '-c'
   - |-
     mvn -s ${_MVN_SETTINGS} clean install
-- name: maven:3-jdk-17
+- name: maven:3-openjdk-17
   waitFor: ['algorithms']
   entrypoint: 'bash'
   dir: "java"
@@ -26,10 +26,10 @@ steps:
   - '-c'
   - |-
     mvn -s ${_MVN_SETTINGS} clean install
-- name: mirror.gcr.io/library/golang:latest
+- name: golang:1.17
   waitFor: ['-']
   entrypoint: 'bash'
-  dir: "go/language"
+  dir: "go/learning"
   env: ["GOCACHE=/go"]
   args:
   - '-eEuo'

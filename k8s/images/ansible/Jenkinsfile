@@ -31,6 +31,10 @@ spec:
       runAsUser: 0
     command:
     - /busybox/sleep
+    # TODO remove env container when https://github.com/GoogleContainerTools/kaniko/issues/1542 fixed
+    env:
+    - name: container
+      value: "docker"
     args:
     - infinity
     volumeMounts:
