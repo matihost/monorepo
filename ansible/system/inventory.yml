@@ -8,7 +8,7 @@ all:
         versions:
           # represents path to local gems, for example:  ~/.local/share/gem/ruby/2.7.0/bin
           ruby: 2.7.0
-          crio: 1.22
+          crio: 1.23
           # libcontainers && cri-o :: https://github.com/cri-o/cri-o/blob/master/install.md#apt-based-operating-systems
           # use {{ ansible_distribution_version }} instead of current Ubuntu version is supported, otherwise hardcode version (aka: 21.04)
           # TODO change to commented when impish/21.10 is supported Ubuntu
@@ -22,7 +22,7 @@ all:
           virtualbox_ubuntu_version: "hirsute"
           mq: 9.2.5.0
         virtual_interface_ip: 192.168.10.1
-        update_cache_timeout: 300
+        update_cache_timeout: 30
         systemd_journal:
           max_size: 1G
           max_duration: 10days
@@ -107,6 +107,9 @@ all:
         - name: terraform
           repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ versions.terraform_ubuntu_version }} main"
           key_url: https://apt.releases.hashicorp.com/gpg
+        - name: envoy
+          repo: "deb [arch=amd64] https://deb.dl.getenvoy.io/public/deb/ubuntu {{ ansible_distribution_release }} main"
+          key_url: ["https://deb.dl.getenvoy.io/public/gpg.8115BA8E629CC074.key"]
         packages:
         - mc
         - lm-sensors
@@ -166,6 +169,7 @@ all:
         - google-cloud-sdk-cloud-build-local
         - google-cloud-sdk-kpt
         - kubectl
+        - getenvoy-envoy
         # Skipped packages:
         # - skypeforlinux
         # OpenVPN 3 is supported only on Ubuntu LTS: https://openvpn.net/cloud-docs/openvpn-3-client-for-linux/
@@ -650,6 +654,36 @@ all:
                 echo 'PATH=/opt/mqm/bin:${PATH}' >> ~/.bashrc
               }
               rm -rf /tmp/mq
+            }
+        - name: envoy
+          become: true
+          command: |
+            [ -e /etc/envoy-admin.yaml ] || {
+              echo "admin:
+              address:
+                socket_address:
+                  address: 0.0.0.0
+                  port_value: 9901" > /etc/envoy-admin.yaml
+              # TODO add meaninngfull config
+              echo "{}" > /etc/envoy.yaml
+              echo '[Unit]
+            Description=Envoy Proxy
+            Requires=network-online.target
+            After=network-online.target
+
+            [Service]
+            Type=simple
+            #ExecStart=/usr/bin/envoy -c /etc/envoy.yaml --config-yaml "$(cat /etc/envoy-admin.yaml)"
+            ExecStart=/usr/bin/envoy -c /etc/envoy-admin.yaml
+            ExecReload=/bin/kill -HUP $MAINPID
+            ExecStop=/bin/kill -TERM $MAINPID
+            Restart=always
+            RestartSec=30
+
+            [Install]
+            WantedBy=multi-user.target' > /etc/systemd/system/envoy.service
+              systemctl daemon-reload
+              systemctl enable --now envoy
             }
         - name: tflint
           become: false

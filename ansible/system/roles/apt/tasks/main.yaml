@@ -1,15 +1,15 @@
 ---
 - name: Check file_config variable
-  fail:
+  ansible.builtin.fail:
     msg: No file_config variable provided
   when: apt_repo is not defined or apt_repo.name is not defined
 
 - name: Ensure apt key is present
-  apt_key:
+  ansible.builtin.apt_key:
     url: "{{ apt_key }}"
     state: present
   loop: "{{ apt_repo.key_url if (( apt_repo.key_url is defined ) and ( apt_repo.key_url | type_debug == 'list' ))
-    else [ apt_repo.key_url ] if (( apt_repo.key_url is defined ) and ( apt_repo.key_url | type_debug == 'string' )) else [] }}"
+    else [ apt_repo.key_url ] if (( apt_repo.key_url is defined ) and ( apt_repo.key_url | type_debug == 'AnsibleUnsafeText' )) else [] }}"
   loop_control:
     loop_var: apt_key
 
@@ -17,17 +17,17 @@
 - name: Ensure {{ apt_repo.name }} is present as a standard package repository when it is standard repo
   block:
   - name: Ensure {{ apt_repo.name }} is present as a standard package repository when it is standard repo
-    shell: "add-apt-repository -yu {{ apt_repo.name }}"
+    ansible.builtin.shell: "add-apt-repository -yu {{ apt_repo.name }}"
     changed_when: not(shell_out.stdout is search('enabled'))
     register: shell_out
   - name: Ensure mutliverse/universe is not used in partner repository to mitigate https://askubuntu.com/questions/1352857/get-rid-of-apt-update-warnings # noqa command-instead-of-module
-    shell: "sed -i 's/[multiverse |universe ]*partner[ multiverse| universe]*.*/ partner/g' /etc/apt/sources.list"
+    ansible.builtin.shell: "sed -i 's/[multiverse |universe ]*partner[ multiverse| universe]*.*/ partner/g' /etc/apt/sources.list"
     when: apt_repo.name in ['multiverse', 'universe']
     register: shell_out
   when: apt_repo['repo'] is not defined
 
 - name: Ensure package {{ apt_repo.name }} repositories when is external
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "{{ apt_repo.repo }}"
     update_cache: false
     mode: "0644"
