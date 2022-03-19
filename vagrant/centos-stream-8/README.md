@@ -1,7 +1,19 @@
-# CentOS 8 Vagrant VM
+# CentOS 8 Stream Vagrant VM
 
-Provisions locally CentOS 8 via VirtualBox/Vagrant.
-Creates SSH keys automatically on the host (this part assumes apt Ubuntu/Debian
+Provisions locally CentOS 8 Stream via VirtualBox/Vagrant.
+Creates SSH keys automatically on the host for connecting to vagrant via ssh
+
+## Prerequisites
+
+* Vagrant, VirtualBox, sshpass installed
+
+* VirtualBox is allowed to create host networks with ip ranges 172.16.0.0/12. Ensure `/etc/vbox/networks.conf` contains:
+
+  ```txt
+  * 0.0.0.0/0 ::/0
+  ```
+
+## Usage
 
 ```bash
 # run VM

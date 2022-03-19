@@ -162,6 +162,8 @@ all:
         - buildah
         - skopeo
         - terraform
+        - vagrant
+        - sshpass
         - notepadqq
         - teams
         - google-chrome-stable
@@ -219,10 +221,20 @@ all:
               nmcli conn up br0
             }
         - name: vboxuser
-          desc: To ensure VBox can see host USB
+          desc: To ensure VirtualBox can see host USB
           become: false
           command: |
             [ "$(groups |grep -c vboxusers)" -ne 0 ] || sudo usermod -aG vboxusers ${USER}
+        - name: vbox-settings
+          desc: To ensure VirtualBox can create any host network
+          become: true
+          command: |
+            [ -e "/etc/vbox/networks.conf" ] || {
+              cat <<EOF > /etc/vbox/networks.conf
+            * 0.0.0.0/0 ::/0
+            EOF
+              echo "/etc/vbox/networks.conf configured to allow any vbox hostnetwork"
+            }
         - name: git-prompt
           become: false
           command: |

@@ -46,10 +46,10 @@ grub2-mkconfig -o /boot/grub2/grub.cfg
 # sample users
 groupadd testers
 groupadd infra
-for i in {1..3}; do useradd -m -s /bin/bash -g testers test${i}; done
-for i in {1..3}; do echo "test" | passwd --stdin test${i}; done
-for i in {1..3}; do useradd -m -s /bin/bash -g infra infra${i}; done
-for i in {1..3}; do echo "test" | passwd --stdin infra${i}; done
+for i in {1..3}; do useradd -m -s /bin/bash -g testers "test${i}"; done
+for i in {1..3}; do echo "test" | passwd --stdin "test${i}"; done
+for i in {1..3}; do useradd -m -s /bin/bash -g infra "infra${i}"; done
+for i in {1..3}; do echo "test" | passwd --stdin "infra${i}"; done
 
 # sample colaborative directory
 mkdir /src

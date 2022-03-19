@@ -24,7 +24,6 @@ stop: ## stop VM
 destroy: ## destroy VM
 	vagrant destroy -f -g --parallel
 
-
 update-vm: ## check for updates for vagrant box image
 	vagrant box update
 
