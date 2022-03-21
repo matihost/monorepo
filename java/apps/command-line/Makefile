@@ -7,10 +7,20 @@ run: ## run command-line
 build: ## build
 	mvn -am clean package
 
+DEBUG := false
+ifeq ($(strip $(DEBUG)),true)
+	DEBUG_FLAG := -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005
+endif
+
+JMX := false
+ifeq ($(strip $(JMX)),true)
+	JMX_FLAG := -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.local.port=9998 -Dcom.sun.management.jmxremote.rmi.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
+endif
+
 CURRENCY := USD
-run-jar: ## run built jar; usage: make run-jar [CURRENCY=USD]
+run-jar: ## run built jar; usage: make run-jar [CURRENCY=USD] [DEBUG=false] [JMX=false]
 	java -XshowSettings:* -XX:+PrintFlagsFinal -XX:NativeMemoryTracking=summary -Xlog:async -Xlog:gc*=debug,gc+ergo*=trace,gc+age*=trace,safepoint*:file=/tmp/command-line.gc.log:level,tags,utctime,uptime,pid:filecount=5,filesize=100m \
-		-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.rmi.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false \
+		$(JMX_FLAG) $(DEBUG_FLAG)\
 		-XX:OnOutOfMemoryError='kill -9 %p' -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp \
 		-XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:+UseNUMA -XX:+PreserveFramePointer \
 		-Xms128m -Xmx128m \

@@ -12,13 +12,18 @@ ifeq ($(strip $(DEBUG)),true)
 	DEBUG_FLAG := -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005
 endif
 
+JMX := false
+ifeq ($(strip $(JMX)),true)
+	JMX_FLAG := -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.local.port=9998 -Dcom.sun.management.jmxremote.rmi.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
+endif
+
 MQ_NAME := dev1
 MQ_PORT := 1414
 MQ_CHANNEL := APPA.SVRCONN
 MQ_QUEUE := APPA.RQ.APPB
 MQ_QMNAME := $(shell echo '$(MQ_NAME)' | tr '[:lower:]' '[:upper:]')
 
-COMMON_PARAMS := $(DEBUG_FLAG) -jar target/*.jar
+COMMON_PARAMS := $(DEBUG_FLAG) $(JMX_FLAG) -jar target/*.jar
 
 put: ## put message on Minikube hosted MQ; usage: make put [DEBUG=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
 	java $(COMMON_PARAMS) --mode=put --mq.host="$(shell kubectl get svc $(MQ_NAME)-mq -n learning -o jsonpath='{.status..ip}')" --message=alamakota-$(shell date -Is)
@@ -47,9 +52,6 @@ sendAndReceive-container: ## put message on Minikube hosted MQ; usage: make send
 
 getAndReply-container: ## start message listener to receive messages from MQ and reply to JMSReplyTo queue; usage: make getAndReply-container [DEBUG=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
 	docker run -it -e MQ_QMNAME -e MQ_PORT -e MQ_CHANNEL -e MQ_QUEUE --rm $(BASE):${TAG} --mode=getAndReply --mq.host="$(shell kubectl get svc $(MQ_NAME)-mq -n learning -o jsonpath='{.status..ip}')" --message=responsefromcontainer-$(shell date -Is)  --mq.security.username='app'  --mq.security.password='app'
-
-
-
 
 push: ## push image with tag to quay.io repository (assume docker login quay.io has been perfomed)
 	docker push $(BASE):$(TAG)
