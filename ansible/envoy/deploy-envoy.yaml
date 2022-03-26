@@ -23,9 +23,22 @@
     ansible.builtin.copy:
       dest: "/etc/systemd/system/envoy.service"
       src: "{{ files }}/envoy.service"
+
   - name: Ensure Envoy systemd service is restarted
     ansible.builtin.systemd:
       state: restarted
       enabled: true
       daemon_reload: yes
       name: envoy
+  - name: Give Envoy time to start
+    ansible.builtin.pause:
+      seconds: 5
+  - name: Ensure Envoy systemd service is started
+    ansible.builtin.systemd:
+      state: started
+      name: envoy
+    register: envoy_systemd
+    retries: 1
+    delay: 10
+    until: envoy_systemd.status.ActiveState == 'active'
+    failed_when: envoy_systemd.status.ActiveState != 'active'
