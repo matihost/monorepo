@@ -667,36 +667,6 @@ all:
               }
               rm -rf /tmp/mq
             }
-        - name: envoy
-          become: true
-          command: |
-            [ -e /etc/envoy-admin.yaml ] || {
-              echo "admin:
-              address:
-                socket_address:
-                  address: 0.0.0.0
-                  port_value: 9901" > /etc/envoy-admin.yaml
-              # TODO add meaninngfull config
-              echo "{}" > /etc/envoy.yaml
-              echo '[Unit]
-            Description=Envoy Proxy
-            Requires=network-online.target
-            After=network-online.target
-
-            [Service]
-            Type=simple
-            #ExecStart=/usr/bin/envoy -c /etc/envoy.yaml --config-yaml "$(cat /etc/envoy-admin.yaml)"
-            ExecStart=/usr/bin/envoy -c /etc/envoy-admin.yaml
-            ExecReload=/bin/kill -HUP $MAINPID
-            ExecStop=/bin/kill -TERM $MAINPID
-            Restart=always
-            RestartSec=30
-
-            [Install]
-            WantedBy=multi-user.target' > /etc/systemd/system/envoy.service
-              systemctl daemon-reload
-              systemctl enable --now envoy
-            }
         - name: tflint
           become: false
           command: |

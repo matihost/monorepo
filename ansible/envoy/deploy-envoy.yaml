@@ -1,0 +1,31 @@
+---
+- hosts: localhost
+  become: true
+  vars:
+    files: "{{ playbook_dir }}/files"
+  tasks:
+  - name: Ensure Envoy config directory present
+    ansible.builtin.file:
+      path: "/etc/envoy"
+      state: directory
+      owner: root
+      group: root
+      mode: '0755'
+  - name: Ensure Envoy admin config file present
+    ansible.builtin.copy:
+      dest: "/etc/envoy/admin.yaml"
+      content: "{{ lookup('template', files + '/admin.yaml.j2') }}"
+  - name: Ensure Envoy main config file present
+    ansible.builtin.copy:
+      dest: "/etc/envoy/envoy.yaml"
+      content: "{{ lookup('template', files + '/' + envoy.template_config|mandatory) }}"
+  - name: Ensure Envoy systemd config setup
+    ansible.builtin.copy:
+      dest: "/etc/systemd/system/envoy.service"
+      src: "{{ files }}/envoy.service"
+  - name: Ensure Envoy systemd service is restarted
+    ansible.builtin.systemd:
+      state: restarted
+      enabled: true
+      daemon_reload: yes
+      name: envoy

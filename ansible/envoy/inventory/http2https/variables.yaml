@@ -1,0 +1,10 @@
+all:
+  hosts:
+    localhost:
+  vars:
+    admin:
+      port: 9901
+    envoy:
+      port: 10000
+      template_config: http2https.yaml.j2
+      target_url: github.com

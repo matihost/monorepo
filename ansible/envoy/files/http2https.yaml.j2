@@ -1,0 +1,128 @@
+static_resources:
+  listeners:
+  - name: listener_0
+    address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: {{ envoy.port | mandatory }}
+    filter_chains:
+    - filters:
+      - name: envoy.filters.network.http_connection_manager
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+          stat_prefix: ingress_http
+          access_log:
+          - name: envoy.access_loggers.stdout
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog
+              log_format:
+                omit_empty_values: true
+                json_format:
+                  "@timestamp": "%START_TIME%"
+                  client:
+                    address: "%DOWNSTREAM_REMOTE_ADDRESS%"
+                    certificate:
+                      local:
+                        subject: "%DOWNSTREAM_LOCAL_SUBJECT%"
+                        uri_san: "%DOWNSTREAM_LOCAL_URI_SAN%"
+                      peer:
+                        cert_v_end: "%DOWNSTREAM_PEER_CERT_V_END%"
+                        cert_v_start: "%DOWNSTREAM_PEER_CERT_V_START%"
+                        certificate: "%DOWNSTREAM_PEER_CERT%"
+                        issuer: "%DOWNSTREAM_PEER_ISSUER%"
+                        serial: "%DOWNSTREAM_PEER_SERIAL%"
+                        uri_san: "%DOWNSTREAM_PEER_URI_SAN%"
+                    direct:
+                      remote:
+                        address: "%DOWNSTREAM_DIRECT_REMOTE_ADDRESS%"
+                    local:
+                      address: "%DOWNSTREAM_LOCAL_ADDRESS%"
+                    remote:
+                      address_no_port: "%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT%"
+                    sni: "%REQUESTED_SERVER_NAME%"
+                    tls:
+                      cipher: "%DOWNSTREAM_TLS_CIPHER%"
+                      session_id: "%DOWNSTREAM_TLS_SESSION_ID%"
+                      version: "%DOWNSTREAM_TLS_VERSION%"
+                  envoy:
+                    route:
+                      name: "%ROUTE_NAME%"
+                    upstream:
+                      cluster: "%UPSTREAM_CLUSTER%"
+                      localaddress: "%UPSTREAM_LOCAL_ADDRESS%"
+                      transport_failure_reason: "%UPSTREAM_TRANSPORT_FAILURE_REASON%"
+                  host:
+                    hostname: "%HOSTNAME%"
+                  http:
+                    request:
+                      body:
+                        bytes: "%BYTES_RECEIVED%"
+                      duration: "%DURATION%"
+                      duration_req: "%REQUEST_DURATION%"
+                      headers:
+                        accept: "%REQ(ACCEPT)%"
+                        authority: "%REQ(:AUTHORITY)%"
+                        content-length: "%REQ(CONTENT-LENGTH)%"
+                        content-type: "%REQ(CONTENT-TYPE)%"
+                        host: "%REQ(HOST)%"
+                        id: "%REQ(X-REQUEST-ID)%"
+                        session-id: "%REQ(SESSION-ID)%"
+                        correlation-id: "%REQ(CORRELATION-ID)%"
+                        x_forwarded_for: "%REQ(X-FORWARDED-FOR)%"
+                        x_forwarded_proto: "%REQ(X-FORWARDED-PROTO)%"
+                      method: "%REQ(:METHOD)%"
+                      path: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
+                    response:
+                      body:
+                        bytes: "%BYTES_SENT%"
+                      duration_resp: "%RESPONSE_DURATION%"
+                      duration_tx: "%RESPONSE_TX_DURATION%"
+                      flags: "%RESPONSE_FLAGS%"
+                      headers:
+                        access-control-allow-origin: "%RESP(ACCESS-CONTROL-ALLOW-ORIGIN)%"
+                        content-length: "%RESP(CONTENT-LENGTH)%"
+                        content-type: "%RESP(CONTENT-TYPE)%"
+                        date: "%RESP(DATE)%"
+                        server: "%RESP(SERVER)%"
+                      status_code: "%RESPONSE_CODE%"
+                      status_code_details: "%RESPONSE_CODE_DETAILS%"
+                    version: "%PROTOCOL%"
+                  log:
+                    level: "info"  # default envoy log level
+                  network:
+                    direction: "inbound"
+                  server:
+                    address: "%UPSTREAM_HOST%"
+                  user_agent.name: "%REQ(USER-AGENT)%"
+          http_filters:
+          - name: envoy.filters.http.router
+          route_config:
+            name: local_route
+            virtual_hosts:
+            - name: local_service
+              domains: ["*"]
+              routes:
+              - match:
+                  prefix: "/"
+                route:
+                  host_rewrite_literal: {{ envoy.target_url | mandatory }}
+                  cluster: service_envoyproxy_io
+  clusters:
+  - name: service_envoyproxy_io
+    type: LOGICAL_DNS
+    connect_timeout: 30s
+    dns_lookup_family: V4_ONLY
+    load_assignment:
+      cluster_name: service_envoyproxy_io
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: {{ envoy.target_url | mandatory }}
+                port_value: 443
+    transport_socket:
+      name: envoy.transport_sockets.tls
+      typed_config:
+        "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+        sni: {{ envoy.target_url | mandatory }}

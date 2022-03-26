@@ -1,0 +1,18 @@
+[Unit]
+Description=Envoy Proxy
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+# Envoy cannot use /dev/stdout under systemd service
+# https://github.com/envoyproxy/envoy/issues/8297
+ExecStart=bash -c '/usr/bin/envoy -c /etc/envoy/envoy.yaml --config-yaml "$(cat /etc/envoy/admin.yaml)" | tee'
+#ExecStart=bash -c '/usr/bin/envoy -c /etc/envoy/admin.yaml | tee'
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill -TERM $MAINPID
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

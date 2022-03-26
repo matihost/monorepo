@@ -1,0 +1,34 @@
+admin:
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: {{ admin.port | default (9901) }}
+layered_runtime:
+  layers:
+  - name: static_layer_0
+    static_layer:
+      envoy:
+        resource_limits:
+          listener:
+            example_listener_name:
+              connection_limit: 10000
+      overload:
+        global_downstream_max_connections: 50000
+overload_manager:
+  refresh_interval: 0.25s
+  resource_monitors:
+  - name: "envoy.resource_monitors.fixed_heap"
+    typed_config:
+      "@type": type.googleapis.com/envoy.extensions.resource_monitors.fixed_heap.v3.FixedHeapConfig
+      max_heap_size_bytes: 104857600  # 100 MiB
+  actions:
+  - name: "envoy.overload_actions.shrink_heap"
+    triggers:
+    - name: "envoy.resource_monitors.fixed_heap"
+      threshold:
+        value: 0.95
+  - name: "envoy.overload_actions.stop_accepting_requests"
+    triggers:
+    - name: "envoy.resource_monitors.fixed_heap"
+      threshold:
+        value: 0.98
