@@ -1,9 +1,9 @@
-# Learning
+# Matihost's Monorepo
 
 [![License](https://img.shields.io/github/license/matihost/learning.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://app.travis-ci.com/matihost/learning.svg?branch=master)](https://app.travis-ci.com/github/matihost/learning)
 
-Various technology code snippets, home tools:
+Various technology deployments, tools & code:
 
 * [k8s](k8s)
   * helm deployments:
@@ -43,6 +43,7 @@ Various technology code snippets, home tools:
 * [algorithms](algorithms/project-euler) - Java based project solving various <https://projecteuler.net> problems
 * [ansible](ansible)
   * system - script to provision/update and keep clean home Ubuntu based desktop environment
+  * envoy - envoy deployment with various use cases
   * learning - various tricks in Ansible
 * [go](go)
   * learning - various language tricks in Golang
