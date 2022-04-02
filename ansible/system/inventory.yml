@@ -764,6 +764,18 @@ all:
             Categories=Network;WebBrowser;' > ~/.local/share/applications/unsafe-chrome.desktop
               echo "Unsafe Chrome link installed"
             }
+        - name: caprine
+          become: true
+          desc: Ensure latest version of Caprine/unofficial Messenger client for Linux is installed
+          command: |
+            CURRENT_VERSION="$(curl -s https://api.github.com/repos/sindresorhus/caprine/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(dpkg -s caprine 2>/dev/null |grep Version | sed "s/Version: /v/g")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -s https://api.github.com/repos/sindresorhus/caprine/releases/latest | jq -r ".assets[] |
+                select(.name | test(\".deb\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/caprine.deb"
+              apt install /tmp/caprine.deb
+            }
         files_config:
         - file: /etc/gai.conf
           content: |

@@ -1,18 +1,18 @@
 ---
 - name: Ensure left_kernels variable is at least 2
-  set_fact:
+  ansible.builtin.set_fact:
     left_kernels: 2
   when: left_kernels|default(0) < 2
 
 - name: Get last kernel except current one
-  shell: |
+  ansible.builtin.shell: |
     dpkg-query -W -f='${db:Status-Abbrev}${Package}\n' linux-image-*-generic \
     |grep ii | grep -v "$(uname -r)" |sort -nr | cut -f2 -d" " |cut -d"-" -f3-4 |head -n {{ left_kernels }}
   register: kernels
   changed_when: false
 
 - name: Remove kernel
-  apt:
+  ansible.builtin.apt:
     name: linux-*-{{ item }}-*
     state: absent
   when: idx > (left_kernels - 2)

@@ -3,7 +3,7 @@
   gather_facts: true
   tasks:
   - name: Clean systemd journal /var/log/journal logs
-    shell:
+    ansible.builtin.shell:
       journalctl --vacuum-size={{ systemd_journal.max_size }} --vacuum-time={{ systemd_journal.max_duration }} --rotate
     register: journal_clean
     changed_when:
@@ -11,35 +11,35 @@
     - journal_clean.stdout
   - block:
     - name: Update apt cache
-      apt:
+      ansible.builtin.apt:
         update_cache: yes
         force_apt_get: yes
         cache_valid_time: "{{ update_cache_timeout }}"
     - name: Remove dependencies that are no longer required
-      apt:
+      ansible.builtin.apt:
         autoremove: yes
         force_apt_get: yes
     - name: Remove useless packages from the cache
-      apt:
+      ansible.builtin.apt:
         autoclean: true
         force_apt_get: yes
     - name: Clean apt-get
-      shell:
+      ansible.builtin.shell:
         apt-get clean
       args:
         warn: false
       register: apt_clean_result
       changed_when: apt_clean_result.stdout
     - name: Remove old kernels
-      include_role:
+      ansible.builtin.include_role:
         name: remove_old_kernels
     when: ansible_os_family == "Debian"
   - block:
     - name: Remove dependencies that are no longer required from RHEL based system
-      yum:
+      ansible.builtin.yum:
         autoremove: yes
     - name: Remove useless packages from the cache from RHEL based system
-      shell:
+      ansible.builtin.shell:
         yum clean all
       args:
         warn: false
@@ -47,7 +47,7 @@
       changed_when: '"0 files removed" not in yum_result.stdout'
     when: ansible_os_family == "RedHat"
   - name: Clean /var/log rotated logs and dist upgrade logs
-    shell:
+    ansible.builtin.shell:
       find /var/log -type f -regex ".*\.gz$" -delete -print && \
       find /var/log -type f -regex ".*[-,\.][0-9]*$" -delete -print && \
       find /var/log -type f -regex ".*\.old$" -delete -print && \
@@ -55,7 +55,7 @@
     register: log_clean
     changed_when: log_clean.stdout
   - name: Clean all podman (root) and docker containers, images and volumes
-    shell: |
+    ansible.builtin.shell: |
       command -v podman 1>/dev/null 2>/dev/null && {
         PODMAN_PRUNE_OUTPUT="$(podman system prune --all --volumes --force | grep -v -e "Deleted [PCVI]" -e "Total reclaimed space: 0B")"
         if [ -n "${PODMAN_PRUNE_OUTPUT}" ]; then
@@ -75,7 +75,7 @@
     changed_when: clean_out.stdout
     failed_when: false
   - name: Clean all containerd images
-    shell: |
+    ansible.builtin.shell: |
       # When minikube runs on containerd it overrding config with own, fix config to default one.
       command -v crictl 1>/dev/null 2>/dev/null && {
         CRICTL_PRUNE_OUTPUT="$(crictl rmi -a 2>&1 | grep -v 'No images to remove')"
@@ -104,7 +104,7 @@
       executable: /bin/bash
   - block:
     - name: Clean all podman (user) containers, images and volumes
-      shell: |
+      ansible.builtin.shell: |
         command -v podman 1>/dev/null 2>/dev/null && {
           PODMAN_PRUNE_OUTPUT="$(podman system prune --all --volumes --force |grep -v -e "Deleted [PCVI]" -e "Total reclaimed space: 0B")"
           if [ -n "${PODMAN_PRUNE_OUTPUT}" ]; then
@@ -117,11 +117,11 @@
     become: false
   - block:
     - name: Clean Terraform cached plugins
-      shell: |
+      ansible.builtin.shell: |
         TERRAFORM_PLUGINS="${HOME}/.terraform.d/plugins"
         mkdir -p "${TERRAFORM_PLUGINS}"
         command -v terraform 1>/dev/null 2>/dev/null && {
-          rm -rf "${TERRAFORM_PLUGINS}/*"
+          rm -rf ${TERRAFORM_PLUGINS}/*
         }
       register: clean_out
       changed_when: clean_out.stderr
