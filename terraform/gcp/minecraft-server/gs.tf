@@ -30,6 +30,7 @@ resource "google_storage_bucket" "minecraft-data" {
 resource "null_resource" "minecraft-config-template" {
   triggers = {
     always_run = timestamp()
+    dest_file  = "target/minecraft-config-template.tar.xz"
   }
   provisioner "local-exec" {
     command = <<-EOT
@@ -49,16 +50,14 @@ resource "null_resource" "minecraft-config-template" {
   }
 }
 
+
+#  TODO gs bucket object are sometimes removed - but should be updated
+#  https://github.com/hashicorp/terraform-provider-google/issues/10488
+#
 resource "google_storage_bucket_object" "minecraft-config-template-object" {
   name   = "${var.minecraft_server_name}/minecraft-config-template.tar.xz"
-  source = "target/minecraft-config-template.tar.xz"
+  source = null_resource.minecraft-config-template.triggers.dest_file
   bucket = google_storage_bucket.minecraft-data.name
-
-  depends_on = [null_resource.minecraft-config-template]
-
-  lifecycle {
-    create_before_destroy = false
-  }
 }
 
 

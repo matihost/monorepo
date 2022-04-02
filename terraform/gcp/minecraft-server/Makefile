@@ -14,7 +14,16 @@ TF_VAR_external_access_cidrs := ["$(WHOAMI)/32"]
 # uncomment to run terraform in debug mode
 # TF_LOG := DEBUG
 
-apply: init-terraform prepare ## setup Minecraft Server VM, usage make apply PASS=pass_for_minecraft_rcon OP_USER=minecraftusername
+MODE := plan
+ifeq ($(strip $(MODE)),apply)
+	MODE_STR := apply -auto-approve
+else ifeq ($(strip $(MODE)),destroy)
+	MODE_STR := destroy -auto-approve
+else
+	MODE_STR := plan
+endif
+
+run: init-terraform prepare ## setup Minecraft Server VM, usage make run [MODE=plan/apply/destroy] PASS=pass_for_minecraft_rcon OP_USER=minecraftusername
 ifndef PASS
 	$(error Env PASS is not defined. Provider password for Minecraft rcon is required. Usage make apply PASS=pass_for_minecraft_rcon OP_USER=minecraftusername)
 endif
@@ -22,8 +31,7 @@ ifndef OP_USER
 	$(error Env OP_USER is not defined. Minecraft operator/admin user is required. Usage make apply PASS=pass_for_minecraft_rcon OP_USER=minecraftusername)
 endif
 	@terraform validate && \
-	terraform plan -lock=false -var='server_rcon_pass=$(PASS)' -var='server_op_user=$(OP_USER)' && \
-	terraform apply -auto-approve -var='server_rcon_pass=$(PASS)' -var='server_op_user=$(OP_USER)'
+	terraform $(MODE_STR) -var='server_rcon_pass=$(PASS)' -var='server_op_user=$(OP_USER)'
 
 ssh: ## ssh to Minecraft Server instance
 	gcloud compute ssh --strict-host-key-checking=no `gcloud compute instances list --filter="name~'.*$(SERVER_NAME)-minecraft-server-.*$$'" --format=json | jq -rc .[0].name`
@@ -32,9 +40,6 @@ show-state: ## show terraform.state
 	terraform state list
 	terraform show
 
-destroy: init-terraform ## destroy Minecraft Server resources
-	terraform destroy -auto-approve -var='server_rcon_pass=whatever_as_we_destroy' -var='server_op_user=whatever_as_we_destroy' && \
-	rm -rf target
 
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
