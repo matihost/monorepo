@@ -40,7 +40,7 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <maven.test.skip>false</maven.test.skip>
 
-    <spring.boot.version>2.6.4</spring.boot.version>
+    <spring.boot.version>2.6.6</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -50,7 +50,7 @@
     <enforce.maven.version>3.6</enforce.maven.version>
 
     <!-- Groovy -->
-    <groovy.version>3.0.9</groovy.version> <!-- change to 4.0.0 when Spring Boot is migrate to Groovy 4-->
+    <groovy.version>3.0.10</groovy.version> <!-- change to 4.0.0 when Spring Boot is migrate to Groovy 4-->
     <spock.version>2.0-groovy-3.0</spock.version> <!-- change to 2.2-M1-groovy-4.0 when Groovy 4 -->
 
     <!-- Scala 3-->
