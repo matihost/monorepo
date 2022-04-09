@@ -1,6 +1,6 @@
 ---
 image:
-  repository: ibmcom/mq
+  repository: icr.io/ibm-messaging/mq
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 

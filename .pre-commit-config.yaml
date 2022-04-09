@@ -1,7 +1,7 @@
 ---
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.1.0
+  rev: v4.2.0
   hooks:
   - id: trailing-whitespace
   - id: end-of-file-fixer
@@ -27,7 +27,7 @@ repos:
   - id: terraform-validate
   - id: tflint
 - repo: https://github.com/jumanjihouse/pre-commit-hooks
-  rev: 2.1.5
+  rev: 2.1.6
   hooks:
   - id: forbid-binary
     exclude: |

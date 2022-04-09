@@ -16,7 +16,7 @@ Minimum set of features enabled in every Minikube:
 - Minikube Tunnel Loadbalancer along with Nginx Ingress
 - Nginx Ingress Class (--with-nginx) - installs Ngnix Ingress Class
 - Registry, Dashboard
-- NetworkPolicy via CNI/Cilium (--with-cni - for docker container engine it has to be explicitely defined)
+- NetworkPolicy via CNI/Cilium (for docker container engine it has to be explicitely defined with either --with-cni or --with-cilium)
 
 Optional features:
 - K8S Version (--with-version) - default to stable, possible values: stable, latest, same as Minikube's --kubernetes-version
@@ -36,8 +36,14 @@ $(basename "$0") --with-containerd --with-version latest
 # start with Crio as container engine (implies CNI aka enables NetworkPolicy)
 $(basename "$0") --with-crio
 
-# deprecated: start Minikube with docker (CNI enablement has to be defined explicitely)
+# start Minikube with docker w/o CNI
+$(basename "$0") --with-docker
+
+# start Minikube with docker with CNI enablement (Cilium installed via Helm)
 $(basename "$0") --with-docker --with-cni
+
+# start Minikube with docker with CNI/Cilium enablement (Cilium installed via Minikube addon)
+$(basename "$0") --with-docker --with-cilium
 
 # start with Crio as container engine with Istio
 $(basename "$0") --with-crio --with-gatekeeper
@@ -181,6 +187,9 @@ while [[ "$#" -gt 0 ]]; do
   --with-cni)
     EXTRA_PARAMS='--network-plugin=cni'
     ;;
+  --with-cilium)
+    EXTRA_PARAMS='--cni=cilium'
+    ;;
   --with-istio | istio)
     ADDONS="${ADDONS} istio"
     ;;
@@ -260,7 +269,7 @@ if ! minikube status &>/dev/null; then
     # Set cilium/cilium help config: operator.numReplicas=1
     # because there is antiAffinity rule so that minikube cannot run 2 instances on single node
     # shellcheck disable=SC2046
-    helm install cilium cilium/cilium --namespace kube-system --set operator.replicas=1 $([ "${MODE}" == 'crio' ] && echo '--set global.containerRuntime.integration=crio') $([ "${MODE}" == 'containerd' ] && echo '--set global.containerRuntime.integration=containerd')
+    helm install cilium cilium/cilium --namespace kube-system --set operator.replicas=1 --set containerRuntime.integration=auto
   fi
 
   for ADDON in ${ADDONS}; do

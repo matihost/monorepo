@@ -1,18 +1,18 @@
-FROM jenkins/jenkins:2.332.1
+FROM jenkins/jenkins:2.332.2
 RUN jenkins-plugin-cli --verbose --latest true --plugins \
-  branch-api:2.7.0 \
-  kubernetes:3546.v6103d89542d6 \
+  branch-api:2.1044.v2c007e51b_87f \
+  kubernetes:3580.v78271e5631dc \
   workflow-job:1174.vdcb_d054cf74a_ \
   workflow-aggregator:2.7 \
   cloudbees-disk-usage-simple:0.10 \
-  credentials:1074.v60e6c29b_b_44b_ \
+  credentials:1087.v16065d268466 \
   credentials-binding:1.27.1 \
   docker-commons:1.19 \
   docker-workflow:1.28 \
-  git:4.10.3 \
+  git:4.11.0 \
   configuration-as-code:1414.v878271fc496f \
   timestamper:1.17 \
-  github-branch-source:1583.v18d333ef7379 \
+  github-branch-source:1598.v91207e9f9b_4a_ \
   github-oauth:0.37 \
   ldap:2.8 \
   google-login:1.6 \
