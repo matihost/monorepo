@@ -6,18 +6,17 @@ all:
         localhost:
       vars:
         versions:
-          # represents path to local gems, for example:  ~/.local/share/gem/ruby/2.7.0/bin
-          ruby: 2.7.0
+          # represents path to local gems, for example:  ~/.local/share/gem/ruby/3.0.0/bin
+          ruby: 3.0.0
           crio: 1.23
           # libcontainers && cri-o :: https://github.com/cri-o/cri-o/blob/master/install.md#apt-based-operating-systems
           # use {{ ansible_distribution_version }} instead of current Ubuntu version is supported, otherwise hardcode version (aka: 21.04)
-          # TODO change to commented when impish/21.10 is supported Ubuntu
+          # TODO change to commented when jammy/22.04 is supported Ubuntu
           # libcontainers_repo_ubuntu_version: "{{ ansible_distribution_version }}"
           libcontainers_repo_ubuntu_version: "21.04"
           # libcontainers_crio_repo_ubuntu_version: "{{ ansible_distribution_version }}"
           libcontainers_crio_repo_ubuntu_version: "21.04"
-          # terraform_ubuntu_version: "{{ ansible_distribution_release }}"
-          terraform_ubuntu_version: "hirsute"
+          terraform_ubuntu_version: "{{ ansible_distribution_release }}"
           # virtualbox_ubuntu_version: "{{ ansible_distribution_release }}"
           virtualbox_ubuntu_version: "hirsute"
           mq: 9.2.5.0
@@ -112,7 +111,6 @@ all:
         packages:
         - mc
         - lm-sensors
-        - hddtemp
         - psensor
         - inotify-tools
         - brasero
@@ -123,7 +121,6 @@ all:
         - ubuntu-restricted-extras
         - gnome-shell-extensions
         - gnome-tweaks
-        - grub-customizer
         - hplip
         - hplip-gui
         - ddclient
@@ -283,7 +280,7 @@ all:
         - name: ensure-hp-lip
           desc: |
             Ensure the latest hplip is installed from source
-            TODO the latest 3.21.8 cannot be installed on Ubuntu 21.04 out of the box yet: https://bugs.launchpad.net/hplip/+bug/1879353
+            TODO the latest 3.22.2 cannot be installed on Ubuntu 22.04 out of the box yet: https://bugs.launchpad.net/hplip/+bug/1879353
             To install latest HPLIP in advanced mode (without GUI): https://developers.hp.com/hp-linux-imaging-and-printing/KnowledgeBase/InstallHPLIPwithqt5.html
             You need to install the following dependencies
                 PyQt5
