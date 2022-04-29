@@ -760,6 +760,24 @@ all:
             Categories=Network;WebBrowser;' > ~/.local/share/applications/unsafe-chrome.desktop
               echo "Unsafe Chrome link installed"
             }
+        - name: guake link
+          become: false
+          desc: guake link so that it can be add to tweaks autostart
+          command: |
+            [ -e ~/.local/share/applications/guake.desktop  ] || {
+              mkdir -p ~/.local/share/applications
+              echo '[Desktop Entry]
+            Version=1.0
+            Name=Guake
+            GenericName=Guake
+            Comment=Guake
+            Exec=/usr/bin/guake
+            StartupNotify=true
+            Terminal=false
+            Type=Application
+            Categories=Terminal;' > ~/.local/share/applications/guake.desktop
+              echo "Guake link installed"
+            }
         - name: caprine
           become: true
           desc: Ensure latest version of Caprine/unofficial Messenger client for Linux is installed
