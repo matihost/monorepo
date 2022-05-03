@@ -38,7 +38,7 @@ jobs:
       - $HOME/.cache/go-build  # Cache the binaries
       - $HOME/gopath/pkg/mod   # Cache the Go modules
   - language: python
-    python: "3.10"
+    python: "nightly" # contains 3.10-dev, switch to 3.10 when available https://docs.travis-ci.com/user/languages/python/ when
     before_install: cd python/apps/exchange-rate
     install:
     - pip3 install tox
