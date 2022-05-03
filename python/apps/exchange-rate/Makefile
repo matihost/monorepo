@@ -7,7 +7,7 @@ build: ## build
 	tox
 
 install: ## install locally in editable mode
-	pip3 install --user --force-reinstall -e .
+	pip3 install --user --force-reinstall .
 
 uninstall: ## install locally
 	pip3 uninstall -y exchange-rate
