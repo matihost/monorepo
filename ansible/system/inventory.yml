@@ -12,10 +12,8 @@ all:
           # libcontainers && cri-o :: https://github.com/cri-o/cri-o/blob/master/install.md#apt-based-operating-systems
           # use {{ ansible_distribution_version }} instead of current Ubuntu version is supported, otherwise hardcode version (aka: 21.04)
           # TODO change to commented when jammy/22.04 is supported Ubuntu
-          # libcontainers_repo_ubuntu_version: "{{ ansible_distribution_version }}"
           libcontainers_repo_ubuntu_version: "21.04"
-          # libcontainers_crio_repo_ubuntu_version: "{{ ansible_distribution_version }}"
-          libcontainers_crio_repo_ubuntu_version: "21.04"
+          libcontainers_crio_repo_ubuntu_version: "{{ ansible_distribution_version }}"
           terraform_ubuntu_version: "{{ ansible_distribution_release }}"
           # virtualbox_ubuntu_version: "{{ ansible_distribution_release }}"
           virtualbox_ubuntu_version: "hirsute"
