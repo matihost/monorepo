@@ -82,8 +82,8 @@ all:
           repo: >-
             deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian {{ versions.virtualbox_ubuntu_version }} contrib
           key_url:
-          - https://www.virtualbox.org/download/oracle_vbox.asc
-          - https://www.virtualbox.org/download/oracle_vbox_2016.asc
+          - https://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc
+          - https://download.virtualbox.org/virtualbox/debian/oracle_vbox_2016.asc
         - name: libcontainers
           repo: >-
             deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ versions.libcontainers_repo_ubuntu_version }}/ /
