@@ -35,8 +35,11 @@ helm upgrade --install  echoserver . -n learning --set ingress.tls.crt=$(base64 
 ### Local development under Minikube
 
 ```bash
-# deploy echoserver on minikube
+# deploy echoserver on minikube via Helm
 make deploy-minikube
+
+# deploys echoserver on minikube via bash script (kubectl apply)
+make deploy-minikube-via-script
 
 # smoke test echoserver app deployment on minikube
 make test-minikube

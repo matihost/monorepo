@@ -1,5 +1,8 @@
-deploy-minikube: ## deploys echoserver on minikube
+deploy-minikube: ## deploys echoserver on minikube via Helm
 	scripts/deploy-on-minikube.sh
+
+deploy-minikube-via-script: ## deploys echoserver on minikube via bash script (kubectl apply)
+	scripts/deploy-on-minikube-via-script.sh
 
 deploy-gke: ## deploys echoserver on gke (requires current context on some GKE cluster and access to GKE API server, if private prexix with export HTTPS_PROXY=localhost:8888)
 	scripts/deploy-on-gke.sh

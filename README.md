@@ -19,7 +19,6 @@ Various technology deployments, tools & code:
     * jenkins - docker image with Jenkins and predefined plugins, available at: quay.io/matihost/jenkins:lts
     * buildah - experiments with buildah
     * and usually each app has also Makefile task to build its docker image as well
-  * scripts - various small tools for K8S
 
 * [terraform](terraform)
   * gcp - Terraform deployment for GCP
@@ -39,6 +38,7 @@ Various technology deployments, tools & code:
     * aws-alb - Application Load Balancer usage
     * aws-jenkins - Jenkins deployment as AWS VMs, Packer images for Jenkins Agents
     * aws-lambda - sample AWS Lambda emulating a client hitting EC2 instance with AWS ApiGateway exposure
+* [scripts](scripts) - various bash scripts (tools for TLS handling, K8S etc.)
 * [vagrant](vagrant)  - CentOS VM buildout with Vagrant with various Linux networking tools examples
 * [algorithms](algorithms/project-euler) - Java based project solving various <https://projecteuler.net> problems
 * [ansible](ansible)
