@@ -11,7 +11,7 @@ import static org.matihost.learning.java.utils.XmlUtils.parseXml;
 
 public class NBPExchangeRate {
   private static final String EXCHANGE_RATE_FOR_CURRENCY_XPATH = "/tabela_kursow/pozycja[kod_waluty=$currencyCode]/kurs_sredni";
-  private static final String NBP_TABLE_A_URL = "http://www.nbp.pl/kursy/xml/LastA.xml";
+  private static final String NBP_TABLE_A_URL = "https://www.nbp.pl/kursy/xml/LastA.xml";
 
   private Document currentExchangeRatesToPLN;
 

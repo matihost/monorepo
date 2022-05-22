@@ -1,7 +1,7 @@
 package org.matihost.learning.groovy
 
 class NBPExchangeRates {
-  private static final String NBP_TABLE_A_URL = "http://www.nbp.pl/kursy/xml/LastA.xml";
+  private static final String NBP_TABLE_A_URL = "https://www.nbp.pl/kursy/xml/LastA.xml";
 
   def exchangeRates = new XmlSlurper().parse(NBP_TABLE_A_URL)
 
