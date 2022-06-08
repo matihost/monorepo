@@ -37,7 +37,7 @@ spec:
           - name: ENABLE_STACKDRIVER_MONITORING
             value: "{{ options.gke_mode|default(false) }}"
     cni:
-      enabled: true
+      enabled: {{ options.gke_mode|default(cni.enable|default(true))  }}
       namespace: {{ "kube-system" if options.gke_mode|default(false) else "istio-system" }}
     ingressGateways:
     - name: istio-ingressgateway

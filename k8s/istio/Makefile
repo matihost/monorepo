@@ -1,4 +1,7 @@
-deploy-on-minikube: ## deploys Istio on Minikube (assumes kubecontext points to Minikube )
+deploy-on-minikube-on-docker: ## deploys Istio on Minikube with Docker without CNI enabled (assumes kubecontext points to Minikube )
+	ansible-playbook -i inventory/minikube deploy-istio.yaml -v -e "{\"cni\": {\"enable\": false}}"
+
+deploy-on-minikube-with-cni: ## deploys Istio on Minikube with CNI deployed (assumes kubecontext points to Minikube )
 	ansible-playbook -i inventory/minikube deploy-istio.yaml -v
 
 deploy-on-gke: ## deploys Istio on GKE with internal ingress only(assumes kubecontext points to GKE cluster )

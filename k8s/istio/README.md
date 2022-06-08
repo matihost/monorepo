@@ -34,8 +34,10 @@ ansible-galaxy collection install community.general
 ## Running
 
 ```bash
-# Deploys Istio on Minikube (assumes current kubecontext points to Minikube)
-make deploy-on-minikube
+# Deploys Istio on Minikube (assumes current kubecontext points to Minikube) and CNI is enabled (contained or crio)
+make deploy-on-minikube-with-cni
+#  Deploys Istio on Minikube on docker w/o CNI
+make deploy-on-minikube-on-docker
 
 # undeploys Istio from minikube (assumes current kubecontext points to Minikube)
 make undeploy-from-minikube

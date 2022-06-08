@@ -45,6 +45,7 @@ all:
           ms-toolsai.jupyter
           ms-toolsai.jupyter-keymap
           ms-toolsai.jupyter-renderers
+          ms-vscode.makefile-tools
           Pivotal.vscode-boot-dev-pack
           Pivotal.vscode-spring-boot
           redhat.fabric8-analytics
@@ -409,7 +410,7 @@ all:
             [ -e /usr/bin/runc ] || { ln -s /usr/sbin/runc /usr/bin/runc; echo "runc path fixed"; }
             [ -e /usr/bin/conmon ] || { sudo ln -s /usr/libexec/podman/conmon /usr/bin/conmon; echo "conmon path fixed"; }
         - name: crictl
-          become: false
+          become: true
           command: |
             VERSION=$(git ls-remote -t https://github.com/kubernetes-sigs/cri-tools.git | cut -d'/' -f3 |sort -n |tail -n 1)
             [[ -x /usr/local/bin/crictl && "$(/usr/local/bin/crictl --version)" =~ ${VERSION} ]] || {
@@ -451,8 +452,8 @@ all:
         - name: cilium-cli
           become: false
           command: |
-            CURRENT_VERSION="$(curl -s https://github.com/cilium/cilium-cli/releases/latest |grep tag | sed -E 's/.*v([0-9\.]+).*/\1/')"
-            INSTALLED_VERSION="$(cilium version | grep cilium-cli: | sed -E 's/^cilium.* v([0-9\.]+).*/\1/')"
+            CURRENT_VERSION="$(curl -s https://api.github.com/repos/cilium/cilium-cli/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(cilium version | grep cilium-cli: | sed -E 's/^cilium.* (v[0-9\.]+).*/\1/')"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl -L --remote-name-all https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz{,.sha256sum}
               sha256sum --check cilium-linux-amd64.tar.gz.sha256sum
