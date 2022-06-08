@@ -40,7 +40,7 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <maven.test.skip>false</maven.test.skip>
 
-    <spring.boot.version>2.6.6</spring.boot.version>
+    <spring.boot.version>2.7.0</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -50,15 +50,15 @@
     <enforce.maven.version>3.6</enforce.maven.version>
 
     <!-- Groovy -->
-    <groovy.version>3.0.10</groovy.version> <!-- change to 4.0.0 when Spring Boot is migrate to Groovy 4-->
+    <groovy.version>3.0.11</groovy.version> <!-- change to 4.0.0 when Spring Boot is migrate to Groovy 4-->
     <spock.version>2.0-groovy-3.0</spock.version> <!-- change to 2.2-M1-groovy-4.0 when Groovy 4 -->
 
     <!-- Scala 3-->
     <scala.compat.version>3</scala.compat.version>
-    <scala.version>${scala.compat.version}.1.1</scala.version>
+    <scala.version>${scala.compat.version}.1.2</scala.version>
     <scala.spec2.version>5.0.0</scala.spec2.version>
-    <scala.test.version>3.2.11</scala.test.version>
-    <scala.test.plus.version>3.2.11.0</scala.test.plus.version>
+    <scala.test.version>3.2.12</scala.test.version>
+    <scala.test.plus.version>3.2.12.0</scala.test.plus.version>
     <!-- Scala 3 still depends on Scala 2 for backward compatibility -->
     <scala2.version>2.13.8</scala2.version>
 
@@ -223,7 +223,7 @@
         <plugin>
           <groupId>net.alchim31.maven</groupId>
           <artifactId>scala-maven-plugin</artifactId>
-          <version>4.5.6</version>
+          <version>4.6.2</version>
           <executions>
             <execution>
               <goals>
@@ -316,7 +316,7 @@
         <!-- Versions can be taken from  mvn -T1 versions:display-plugin-updates -->
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.10.0</version>
+          <version>3.10.1</version>
           <configuration>
             <!-- The -release option ensures that the code is compiled following the rules of the programming language of the specified release,
             and that generated classes target the release as well as the public API of that release.
@@ -328,7 +328,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.0.0-M5</version>
+          <version>3.0.0-M7</version>
           <configuration>
             <skipTests>${maven.test.skip}</skipTests>
           </configuration>
@@ -336,11 +336,11 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>3.0.0-M5</version>
+          <version>3.0.0-M7</version>
         </plugin>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>3.2.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>
@@ -360,7 +360,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.11.0</version>
+          <version>4.0.0-M1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

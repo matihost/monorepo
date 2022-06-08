@@ -7,6 +7,7 @@ module org.matihost.learning.apps.commandline {
   // logging
   requires org.slf4j;
   // spring
+  requires spring.core;
   requires spring.beans;
   requires spring.context;
   requires transitive spring.boot;
