@@ -18,7 +18,7 @@ resource "google_compute_instance" "vm" {
 
   boot_disk {
     initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-minimal-2004-lts"
+      image = "ubuntu-os-cloud/ubuntu-minimal-2204-lts"
     }
   }
 

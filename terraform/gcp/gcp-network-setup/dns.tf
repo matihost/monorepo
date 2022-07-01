@@ -22,6 +22,15 @@ resource "google_dns_managed_zone" "main-zone" {
   }
 }
 
+
+# so that peered networks forward DNS queries of dns_suffix to this network Cloud DNS
+resource "google_service_networking_peered_dns_domain" "name" {
+  name       = var.env
+  network    = google_compute_network.private.name
+  dns_suffix = google_dns_managed_zone.main-zone.dns_name
+  service    = "servicenetworking.googleapis.com"
+}
+
 resource "google_dns_policy" "allow-inbound-query-forwarding" {
   name = "allow-inbound-query-forwarding"
 

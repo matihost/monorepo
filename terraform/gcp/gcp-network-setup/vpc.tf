@@ -5,8 +5,9 @@ resource "google_compute_project_metadata_item" "os-login" {
 }
 
 resource "google_compute_network" "private" {
-  name                    = "private-vpc"
-  auto_create_subnetworks = "false"
+  name                     = "private-vpc"
+  auto_create_subnetworks  = "false"
+  enable_ula_internal_ipv6 = "true"
 
   depends_on = [
     google_project_service.apis
@@ -24,8 +25,11 @@ resource "google_compute_subnetwork" "private1" {
   ip_cidr_range = "10.10.0.0/16"
 
   private_ip_google_access = true
-  # TODO seems not working?
-  private_ipv6_google_access = true
+  # TODO field not used yet
+  private_ipv6_google_access = "DISABLE_GOOGLE_ACCESS"
+
+  stack_type       = "IPV4_IPV6"
+  ipv6_access_type = "INTERNAL"
 
   # max pods: 32,766
   secondary_ip_range {
@@ -56,8 +60,11 @@ resource "google_compute_subnetwork" "private2" {
   ip_cidr_range = "10.14.0.0/16"
 
   private_ip_google_access = true
-  # TODO seems not working?
-  private_ipv6_google_access = true
+  # TODO field not used yet
+  private_ipv6_google_access = "DISABLE_GOOGLE_ACCESS"
+
+  stack_type       = "IPV4_IPV6"
+  ipv6_access_type = "INTERNAL"
 
   secondary_ip_range {
     range_name    = "pod-range-0"
@@ -87,8 +94,11 @@ resource "google_compute_subnetwork" "private3" {
   ip_cidr_range = "10.15.0.0/16"
 
   private_ip_google_access = true
-  # TODO seems not working?
-  private_ipv6_google_access = true
+  # TODO field not used yet
+  private_ipv6_google_access = "DISABLE_GOOGLE_ACCESS"
+
+  stack_type       = "IPV4_IPV6"
+  ipv6_access_type = "INTERNAL"
 
   secondary_ip_range {
     range_name    = "pod-range-0"
