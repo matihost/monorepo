@@ -20,7 +20,7 @@ registry: txt
 
 
 ## Replica count
-replicas: 1
+replicaCount: 1
 
 serviceAccount:
   create: true
@@ -34,9 +34,9 @@ rbac:
   create: true
   clusterRole: true
   apiVersion: v1
-  pspEnabled: true
+  pspEnabled: false
 
-securityContext: {}
+containerSecurityContext: {}
 podSecurityContext:
   fsGroup: 1001
   runAsUser: 1001
