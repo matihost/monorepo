@@ -73,8 +73,20 @@ function ensureCrictlPresent() {
     rm -f "crictl-${CRICTL_VERSION}-linux-amd64.tar.gz"
   )
 }
+function ensureCriDockerdPresent() {
+  [ -x /usr/bin/cri-dockerd ] || (
+    # shellcheck disable=SC1091
+    . /etc/os-release
+
+    curl -s https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest | jq -r ".assets[] |
+      select(.name | test(\"ubuntu-${VERSION_CODENAME}_amd64.deb\")) | .browser_download_url" |
+      xargs curl -s -L -o "/tmp/cri-dockerd.deb"
+    apt install /tmp/cri-dockerd.deb
+  )
+}
+
 function ensureCrioPresent() {
-  CRIO_VERSION=1.22
+  CRIO_VERSION=1.24
 
   [ -x /usr/bin/crio ] || (
     # shellcheck disable=SC1091
@@ -217,6 +229,7 @@ containerd)
   ;;
 docker)
   ensureDockerCGroupSystemD
+  ensureCriDockerdPresent
   ;;
 *)
   usage
