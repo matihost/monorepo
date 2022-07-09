@@ -54,19 +54,17 @@ make <TASK>
 ```bash
 # setup GKE cluster and other accompanied resources and expose Kube Master API via ExternalIP
 # but limits access only from this laptop public ip
-make apply
-# which is equivalent for
-make apply CLUSTER_NAME=shared REGION=us-central1 ZONE_LETTER=a MASTER_CIDR := "172.16.0.32/28"
+make run CLUSTER_NAME=shared REGION=us-central1 ZONE_LETTER=a MASTER_CIDR := "172.16.0.32/28"
 
 # opens tunnel via bastion, export HTTP_PROXY=http://localhost:8888 to use it in the shell
-make open-tunnel
+make open-tunnel CLUSTER_NAME=shared REGION=us-central1 ZONE_LETTER=a
 
 # creates ~/.kube/config context to for GKE cluster
-make setup-kubecontext
+make setup-kubecontext CLUSTER_NAME=shared REGION=us-central1 ZONE_LETTER=a
 
 # create GKE cluster w/o public IP for Master Kube API
 # GKE API would available only internall or via bastion node
-make MASTER_PUBLIC_IP=false MASTER_ACCESS_CIRDS="[]"
+make run CLUSTER_NAME=shared REGION=us-central1 ZONE_LETTER=a MASTER_PUBLIC_IP=false MASTER_ACCESS_CIRDS="[]"
 
 # in that case in order to access it from laptop it requires to setup SSH tunnel to proxy located on bastion VM and configure kube commands to access private GKE cluster freely
 source access-gke.sh
@@ -80,5 +78,5 @@ make show-state
 # terminates all GCP resources created with apply task
 # Warning: Ensure you shut down all apps and their GCP resources (mainly ingresses, dns record sets)
 # Because it will prevent cluster from build shutdown completely
-make destroy
+make run MODE=destroy CLUSTER_NAME=shared REGION=us-central1 ZONE_LETTER=a
 ```

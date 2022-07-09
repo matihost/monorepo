@@ -4,24 +4,33 @@ CURRENT_PROJECT := $(shell gcloud config get-value project)
 
 TF_VAR_project := $(CURRENT_PROJECT)
 
+DEBUG := false
+ifeq ($(strip $(DEBUG)),true)
+	TF_LOG := DEBUG
+endif
 
-apply: pre-all ## setup project Monitoring
+MODE := apply
+ifeq ($(strip $(MODE)),apply)
+	MODE_STR := apply -auto-approve
+else ifeq ($(strip $(MODE)),destroy)
+	MODE_STR := destroy -auto-approve
+else
+	MODE_STR := plan
+endif
+
+run: init-terraform ## setup project Monitoring
 	@terraform validate && \
-	terraform plan -lock=false && \
-	terraform apply -auto-approve
+	terraform ${MODE_STR}
 
 show-state: ## show terraform.state
 	terraform state list
 	terraform show
 
-destroy: pre-all ## destroy resources
-	terraform destroy -auto-approve
-
 google-authentication: ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
 	gcloud auth application-default login
 
-pre-all:
+init-terraform:
 	terraform init -upgrade=true
 
 clean: ## clean Terraform cached plugins and data

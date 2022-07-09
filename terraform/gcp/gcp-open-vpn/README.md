@@ -39,7 +39,7 @@ TODOs/Limitations:
 
 ```bash
 # deploy OpenVPN Gateway in GCP VPC
-make apply
+make run
 
 # setup Open VPN and forwards DNS in GCP to client VPN network DNS nameserver
 make apply-with-dns-forwarding ZONE=vpnclient.zone.com IP=10.8.0.2

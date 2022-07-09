@@ -1,11 +1,29 @@
+.EXPORT_ALL_VARIABLES:
+
 CURRENT_PROJECT := $(shell gcloud config get-value project)
 
-apply: prepare ## setup free-tier eliglible Ubuntu instance
-	export TF_VAR_project=$(CURRENT_PROJECT) && \
-	terraform init -upgrade=true && \
-	terraform validate && \
-	terraform plan -lock=false && \
-	terraform apply -auto-approve
+TF_VAR_project := $(CURRENT_PROJECT)
+
+DEBUG := false
+ifeq ($(strip $(DEBUG)),true)
+	TF_LOG := DEBUG
+endif
+
+MODE := apply
+ifeq ($(strip $(MODE)),apply)
+	MODE_STR := apply -auto-approve
+else ifeq ($(strip $(MODE)),destroy)
+	MODE_STR := destroy -auto-approve
+else
+	MODE_STR := plan
+endif
+
+init-terraform:
+	terraform init -upgrade=true
+
+run: init-terraform prepare ## setup free-tier eliglible Ubuntu instance, make run [MODE=apply]
+	@terraform validate && \
+	terraform $(MODE_STR)
 
 
 CURRENT_ACCOUNT_SSH_USER := $(shell gcloud config get-value account | sed -E "s/[.@]/_/g")
@@ -25,9 +43,6 @@ show-state: ## show terraform.state
 	terraform state list
 	terraform show
 
-destroy: ## destroy VM instance
-	export TF_VAR_project=$(CURRENT_PROJECT) && \
-	terraform plan && terraform destroy -auto-approve
 
 prepare:
 	@[ -e "$(HOME)/.ssh/id_rsa.cloud.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.cloud.vm; }

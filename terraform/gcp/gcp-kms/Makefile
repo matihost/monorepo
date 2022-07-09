@@ -9,22 +9,22 @@ ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
 endif
 
-APPROVE := true
-ifeq ($(strip $(APPROVE)),true)
-	APPROVE_STR := -auto-approve
+MODE := apply
+ifeq ($(strip $(MODE)),apply)
+	MODE_STR := apply -auto-approve
+else ifeq ($(strip $(MODE)),destroy)
+	MODE_STR := destroy -auto-approve
+else
+	MODE_STR := plan
 endif
 
-apply: init-terraform ## setup KMS
+run: init-terraform ## setup KMS
 	@terraform validate && \
-	terraform apply $(APPROVE_STR)
-
+	terraform ${MODE_STR}
 
 show-state: ## show terraform.state
 	terraform state list
 	terraform show
-
-destroy: ## destroy resources
-	terraform plan && terraform destroy -auto-approve
 
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init

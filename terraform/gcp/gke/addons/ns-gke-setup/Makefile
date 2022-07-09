@@ -1,6 +1,7 @@
 .EXPORT_ALL_VARIABLES:
 
 CURRENT_PROJECT := $(shell gcloud config get-value project)
+
 CLUSTER_NAME := shared1
 
 KSAS := ["default"]
@@ -14,11 +15,24 @@ TF_VAR_gsa_roles := ${ROLES}
 TF_VAR_kns_sas := $(KSAS)
 TF_VAR_kns := $(KNS)
 
+DEBUG := false
+ifeq ($(strip $(DEBUG)),true)
+	TF_LOG := DEBUG
+endif
 
-apply: pre-all ## configures Worflow Identity and Config Connector for GKE namespace
+MODE := apply
+ifeq ($(strip $(MODE)),apply)
+	MODE_STR := apply -auto-approve
+else ifeq ($(strip $(MODE)),destroy)
+	MODE_STR := destroy -auto-approve
+else
+	MODE_STR := plan
+endif
+
+
+run: pre-all ## configures Worflow Identity and Config Connector for GKE namespace
 	@terraform validate && \
-	terraform plan -lock=false && \
-	terraform apply -auto-approve
+	terraform $(MODE_STR)
 
 destroy: ## removes GSA and binding making Config Connector disabled
 	terraform plan && terraform destroy -auto-approve
@@ -27,12 +41,11 @@ google-authentication: prepare ## authenticate to GCP and prepare Application De
 	gcloud init
 	gcloud auth application-default login
 
-pre-all:
+pre-all: init-terraform
 	rm -rf target
 ifndef KNS
 	$(error KNS is mandatory)
 endif
-	terraform init -upgrade=true
 	-@terraform workspace new $(KNS)@$(CURRENT_PROJECT) &>/dev/null
 	terraform workspace select $(KNS)@$(CURRENT_PROJECT)
 
@@ -43,11 +56,14 @@ test: # configure NS default with SA default wiht workflow identity
 	kubectl get storagebucket -n default
 
 apply-for-istio-system:
-	$(MAKE) apply CLUSTER_NAME=shared1 KNS=istio-system KSAS='["default","istio-egressgateway-service-account","istio-external-ingressgateway-service-account","istio-ingressgateway-service-account","istio-reader-service-account","istiod-service-account"]'
+	$(MAKE) run CLUSTER_NAME=shared1 KNS=istio-system KSAS='["default","istio-egressgateway-service-account","istio-external-ingressgateway-service-account","istio-ingressgateway-service-account","istio-reader-service-account","istiod-service-account"]'
 
 
 apply-for-sample-istio:
-	$(MAKE) apply CLUSTER_NAME=shared1 KNS=sample-istio KSAS='["default","httpbin"]'
+	$(MAKE) run CLUSTER_NAME=shared1 KNS=sample-istio KSAS='["default","httpbin"]'
+
+init-terraform:
+	terraform init -upgrade=true
 
 clean: ## clean Terraform cached plugins and data
 	rm -rf .terraform* terraform.tfstate*

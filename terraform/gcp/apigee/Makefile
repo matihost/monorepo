@@ -9,15 +9,21 @@ ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
 endif
 
-APPROVE := true
-ifeq ($(strip $(APPROVE)),true)
-	MODE := apply -auto-approve
+MODE := apply
+ifeq ($(strip $(MODE)),apply)
+	MODE_STR := apply -auto-approve
+else ifeq ($(strip $(MODE)),destroy)
+	MODE_STR := destroy -auto-approve
 else
-	MODE := plan
+	MODE_STR := plan
 endif
 
+show-state: ## show terraform.state
+	terraform state list
+	terraform show
 
-apply: init-terraform prepare-tls ## deploy ApigeeX, usage: make apply EXTERNAL_DNS=api.some.com [DEBUG=true APPROVE=false]
+
+run: init-terraform prepare-tls ## deploy ApigeeX, usage: make run EXTERNAL_DNS=api.some.com [DEBUG=true APPROVE=false]
 ifndef EXTERNAL_DNS
 	$(error Env EXTERNAL_DNS is not defined. Usage make apply EXTERNAL_DNS=api.some.com [DEBUG=true APPROVE=false])
 endif

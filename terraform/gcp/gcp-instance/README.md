@@ -19,7 +19,7 @@ make google-authentication
 
 ```bash
 # deploy VM instance and related resources
-make apply
+make run
 
 # connects to VM intances Nginx
 make test
@@ -34,7 +34,7 @@ make gssh
 make show-state
 
 # terminates all GCP resources created with apply task
-make destroy
+make run MODE=destroy
 ```
 
 ## Troublesshoot

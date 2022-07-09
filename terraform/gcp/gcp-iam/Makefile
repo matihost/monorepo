@@ -2,23 +2,27 @@
 
 CURRENT_PROJECT := $(shell gcloud config get-value project)
 
+TF_VAR_project := $(CURRENT_PROJECT)
+
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
 endif
 
-APPROVE := true
-ifeq ($(strip $(APPROVE)),true)
-	MODE := apply -auto-approve
+MODE := apply
+ifeq ($(strip $(MODE)),apply)
+	MODE_STR := apply -auto-approve
+else ifeq ($(strip $(MODE)),destroy)
+	MODE_STR := destroy -auto-approve
 else
-	MODE := plan
+	MODE_STR := plan
 endif
 
-apply: prepare ## setup user IAM roles and binding
+run: init-terraform prepare ## setup user IAM roles and binding
 	export TF_VAR_project=$(CURRENT_PROJECT) && \
 	terraform init -upgrade=true && \
 	terraform validate && \
-	terraform $(MODE)
+	terraform $(MODE_STR)
 
 use-editor-sa: ## create new gcloud configuration with editor Google Service Account
 	@-terraform output -raw sa-editor-key > /tmp/editor.json
@@ -34,9 +38,9 @@ show-state: ## show terraform.state
 	terraform state list
 	terraform show
 
-destroy: ## destroy resources
-	export TF_VAR_project=$(CURRENT_PROJECT) && \
-	terraform plan && terraform destroy -auto-approve
+
+init-terraform:
+	terraform init -upgrade=true
 
 prepare:
 	@[ -e "$(HOME)/.ssh/id_rsa.cloud.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.cloud.vm; }

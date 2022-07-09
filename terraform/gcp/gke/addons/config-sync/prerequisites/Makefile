@@ -1,23 +1,34 @@
 .EXPORT_ALL_VARIABLES:
 
 CURRENT_PROJECT := $(shell gcloud config get-value project)
+
 TF_VAR_project := $(CURRENT_PROJECT)
 
+DEBUG := false
+ifeq ($(strip $(DEBUG)),true)
+	TF_LOG := DEBUG
+endif
 
-apply: pre-all # installs prerequisites for Standalone Config Sync on GKE
+MODE := apply
+ifeq ($(strip $(MODE)),apply)
+	MODE_STR := apply -auto-approve
+else ifeq ($(strip $(MODE)),destroy)
+	MODE_STR := destroy -auto-approve
+else
+	MODE_STR := plan
+endif
+
+init-terraform:
+	terraform init -upgrade=true
+
+run: init-terraform ## installs prerequisites for Standalone Config Sync on GKE, usage: make run [MODE=apply]
 	@terraform validate && \
-	terraform plan -lock=false && \
-	terraform apply -auto-approve
+	terraform $(MODE_STR)
 
-destroy: ## unregister Standalone Config Sync from GKE
-	terraform plan && terraform destroy -auto-approve
-
-google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
+google-authentication:  ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
 	gcloud auth application-default login
 
-pre-all:
-	terraform init -upgrade=true
 
 
 help: ## show usage and tasks (default)

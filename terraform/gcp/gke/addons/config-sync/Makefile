@@ -6,7 +6,7 @@ TF_VAR_project := $(CURRENT_PROJECT)
 
 TF_VAR_cluster_name := $(CLUSTER_NAME)
 
-apply: pre-all prerequisites ## installs Standalone Config Sync on GKE
+apply: init-terraform prerequisites ## installs Standalone Config Sync on GKE
 	@terraform validate && \
 	terraform plan -lock=false && \
 	terraform apply -auto-approve
@@ -20,14 +20,13 @@ destroy: ## uninstalls Standalone Config Sync
 	kubectl delete configmanagement config-management
 	sleep 30
 	kubectl delete -f target/config-sync-operator.yaml
-	terraform plan && terraform destroy -auto-approve
+	terraform plan && terraform destroy -auto-approve && 	rm -rf target
 
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
 	gcloud auth application-default login
 
-pre-all:
-	rm -rf target
+init-terraform:
 	terraform init -upgrade=true
 
 prerequisites:

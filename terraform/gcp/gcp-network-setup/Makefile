@@ -9,16 +9,21 @@ ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
 endif
 
-APPROVE := true
-ifeq ($(strip $(APPROVE)),true)
-	MODE := apply -auto-approve
+MODE := apply
+ifeq ($(strip $(MODE)),apply)
+	MODE_STR := apply -auto-approve
+else ifeq ($(strip $(MODE)),destroy)
+	MODE_STR := destroy -auto-approve
 else
-	MODE := plan
+	MODE_STR := plan
 endif
 
-apply: pre-all ## setup VPC
+init-terraform:
+	terraform init -upgrade=true
+
+run: init-terraform ## setup VPC: make run [MODE=apply]
 	@terraform validate && \
-	terraform $(MODE)
+	terraform $(MODE_STR)
 
 ssh: ## ssh to VPC bastion host
 	eval $(shell terraform output bastion_instance_ssh_cmd)
@@ -38,13 +43,13 @@ google-authentication: ## authenticate to GCP and prepare Application Default Cr
 	gcloud init
 	gcloud auth application-default login
 
-pre-all:
+init-terraform:
 	terraform init -upgrade=true
 
 clean: ## clean Terraform cached plugins and data
 	rm -rf .terraform* terraform.tfstate*
 
-upgrade-terraform-provider-version: pre-all
+upgrade-terraform-provider-version: init-terraform
 
 
 help: ## show usage and tasks (default)
