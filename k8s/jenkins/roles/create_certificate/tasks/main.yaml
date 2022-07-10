@@ -1,42 +1,42 @@
 ---
 - name: Check certificate_def variable
-  fail:
+  ansible.builtin.fail:
     msg: No certificate_def with cn variable provided
   when: certificate_def is not defined or certificate_def.cn is not defined
 
 - name: Calculate certificate file name
-  set_fact:
-    tls_file_name: "{{ certificate_def.tls_name|default(certificate_def.cn) }}"
+  ansible.builtin.set_fact:
+    tls_file_name: "{{ certificate_def.tls_name | default(certificate_def.cn) }}"
 
 - name: Check whether certificate is already created
-  stat:
+  ansible.builtin.stat:
     path: "{{ cert_base_path }}/{{ tls_file_name }}.crt"
   register: cert_stat
 
 - name: Ensure "{{ cert_base_path }}/{{ tls_file_name }}.crt is present
   block:
   - name: Generate an OpenSSL private key for Jenkins CN={{ certificate_def.cn }}
-    openssl_privatekey:
+    ansible.builtin.openssl_privatekey:
       path: "{{ cert_base_path }}/{{ tls_file_name }}.pem"
-      size: "{{ certificate_def.size|default(cert_size) }}"
+      size: "{{ certificate_def.size | default(cert_size) }}"
       mode: '644'
   - name: Generate an OpenSSL Certificate Signing Request for CN={{ certificate_def.cn }}
-    openssl_csr:
+    ansible.builtin.openssl_csr:
       path: "{{ cert_base_path }}/{{ tls_file_name }}.csr"
       privatekey_path: "{{ cert_base_path }}/{{ tls_file_name }}.pem"
       common_name: "{{ certificate_def.cn }}"
       mode: '644'
   - name: Generate a Self Signed OpenSSL certificate for CN={{ certificate_def.cn }}
-    openssl_certificate:
+    ansible.builtin.openssl_certificate:
       path: "{{ cert_base_path }}/{{ tls_file_name }}.crt"
       privatekey_path: "{{ cert_base_path }}/{{ tls_file_name }}.pem"
       csr_path: "{{ cert_base_path }}/{{ tls_file_name }}.csr"
       provider: selfsigned
   no_log: true
-  when: not(cert_stat.stat.exists is defined and cert_stat.stat.exists)
+  when: not( cert_stat.stat.exists is defined and cert_stat.stat.exists )
 
 - name: Set tls fact
-  set_fact:
+  ansible.builtin.set_fact:
     tls:
       key: "{{ lookup('file', cert_base_path + '/' + tls_file_name + '.pem') | string | b64encode }}"
       crt: "{{ lookup('file', cert_base_path + '/' + tls_file_name + '.crt') | string | b64encode }}"

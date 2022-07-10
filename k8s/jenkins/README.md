@@ -51,6 +51,7 @@ or
 deploy-jenkins.sh minikube -p password-for-jenkins
 
 # deploy to gke
+# (assumption your gcloud context point to the same project where your k8s context points to GKE)
 deploy-jenkins.sh -e gke -p password-for-jenkins
 
 

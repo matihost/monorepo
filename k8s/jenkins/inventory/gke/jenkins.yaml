@@ -1,4 +1,7 @@
 gke_mode: true
+gke:
+  region: "us-central1"
+  zone_letter: "a"
 jenkins_service_type: ClusterIP
 jenkins_ingress:
   host: jenkins.ci.internal.gke.shared1.dev.gcp.testing

@@ -169,6 +169,20 @@ controller:
             elements:
               - cssUrl:
                   url: "https://tobix.github.io/jenkins-neo2-theme/dist/neo-light.css"
+serviceAccount:
+  name: "{{ namespace }}-jenkins"
+  create: true
+{% if gke_mode is sameas true %}
+  annotations:
+    iam.gke.io/gcp-service-account: "{{ namespace }}-jenkins@{{ lookup('pipe', 'gcloud config get-value project') }}.iam.gserviceaccount.com"
+{% endif %}
+serviceAccountAgent:
+  name: "{{ namespace }}-agent"
+  create: true
+{% if gke_mode is sameas true %}
+  annotations:
+    iam.gke.io/gcp-service-account: "{{ namespace }}-agent@{{ lookup('pipe', 'gcloud config get-value project') }}.iam.gserviceaccount.com"
+{% endif %}
 agent:
   #TODO jenkins/inbound-agent mirrored image dissapeared from mirror.gcr.io
   # image: "mirror.gcr.io/jenkins/inbound-agent"
@@ -182,3 +196,6 @@ agent:
     limits:
       cpu: "{{ jenkins_agent_max_cpu|default('2') }}"
       memory: "{{ jenkins_agent_max_memory|default('1Gi') }}"
+persistence:
+  enabled: true
+  size: 16Gi

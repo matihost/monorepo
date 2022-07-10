@@ -4,19 +4,40 @@
   - kubernetes.core
   tasks:
   - name: Check mandatory variables
-    fail:
+    ansible.builtin.fail:
       msg: Variable {{ item }} was not provided
     when: vars[item] is undefined
     loop:
     - env
 
   - name: Load {{ env }} variables files
-    include_vars:
+    ansible.builtin.include_vars:
       dir: "{{ inventory_dir }}/{{ env }}"
       depth: 1
       extensions:
       - yaml
       - yml
+
+  - name: Get current GCP project
+    ansible.builtin.shell: gcloud config get-value project
+    register: gcp_project_out
+    changed_when: false
+    when: gke_mode is sameas true
+
+  - name: Set GCP project fact
+    ansible.builtin.set_fact:
+      gcp_project: "{{ gcp_project_out.stdout }}"
+    when: gke_mode | default(false)
+
+  - name: Run Terraform to setup GCP prerequisites for Jenkins deployment
+    ansible.builtin.terraform:
+      project_path: 'files/gke'
+      state: present
+      workspace: "default"
+      force_init: true
+      variables: "{{ gke | mandatory
+        | combine({'project': gcp_project}) }}"
+    when: gke_mode | default(false)
 
   - name: Ensure Jenkins helm dependencies are in place
     k8s:
@@ -28,16 +49,16 @@
 
   - name: Ensure Jenkins CN={{ jenkins_ingress.host }} Secret is present
     block:
-    - name: Ensure Jenkins CN={{jenkins_ingress.host }} is present
+    - name: "Ensure Jenkins CN={{ jenkins_ingress.host }} is present"
       block:
-      - name: Ensure Jenkins CN={{ jenkins_ingress.host }} is present
-        include_role:
+      - name: "Ensure Jenkins CN={{ jenkins_ingress.host }} is present"
+        ansible.builtin.include_role:
           name: create_certificate
         vars:
           certificate_def:
             cn: "{{ jenkins_ingress.host }}"
       become: true
-    - name: Ensure TLS Secret {{ jenkins_ingress .secretName }} is present in namespace {{ namespace }}
+    - name: Ensure TLS Secret {{ jenkins_ingress.secretName }} is present in namespace {{ namespace }}
       k8s:
         state: present
         definition:
@@ -83,7 +104,7 @@
       wait_timeout: 600
 
   - name: Ensure Jenkins Ingress DNS is resolvable locally
-    shell: |
+    ansible.builtin.shell: |
       while [ -z "$(kubectl get ingress {{ namespace }}-jenkins -n {{ namespace }} -o jsonpath="{.status..ip}" | xargs)"  ]; do
         sleep 1;
         echo "Awaiting for LoadBalancer for Ingress..."

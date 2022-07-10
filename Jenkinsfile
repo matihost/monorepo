@@ -2,6 +2,7 @@
 pipeline {
   agent {
     kubernetes {
+      inheritFrom "default"
       label validLabel("learning-${env.BRANCH_NAME}") // subsequent builds from the same branch will reuse pods
       idleMinutes 60 // pod will be available to reuse for 1 h
       //Ensures all containers use the same user id as jnlp container to mitigate issue
