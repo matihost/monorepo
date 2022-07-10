@@ -199,3 +199,13 @@ agent:
 persistence:
   enabled: true
   size: 16Gi
+{% if gke_mode is sameas true %}
+backup:
+  enabled: true
+  serviceAccount:
+    create: false
+    name: "{{ namespace }}-jenkins"
+  schedule: "0 * * * *" # runs every hour
+  destination: "gcs://{{ gcp_project }}-{{ namespace }}-jenkins-server-data/jenkins-backup"
+  onlyJobs: false
+{% endif %}
