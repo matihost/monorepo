@@ -9,10 +9,8 @@ function usage() {
 
 Starts Minikube in bare / none mode. Assumes latest Ubuntu.
 
-Mandatory option:
-- Container runtime selection (--with-containerd, --with-crio, --with-docker (deprecated since k8s 1.20))
-
 Minimum set of features enabled in every Minikube:
+- Container runtime selection (--with-containerd, --with-crio, --with-docker) - by default Docker cri-dockerd is selected.
 - Minikube Tunnel Loadbalancer along with Nginx Ingress
 - Nginx Ingress Class (--with-nginx) - installs Ngnix Ingress Class
 - Registry, Dashboard
@@ -27,6 +25,9 @@ Optional deprecated features:
 - Enable PodSecurityPolicies (deprecated since k8s 1.21) (--with-psp | psp)
 
 Samples:
+# start default bare/none driver Minikube with docker w/o CNI
+$(basename "$0")
+
 # start Minikube with containerd minimum set of features
 $(basename "$0") --with-containerd
 
@@ -36,8 +37,6 @@ $(basename "$0") --with-containerd --with-version latest
 # start with Crio as container engine (implies CNI aka enables NetworkPolicy)
 $(basename "$0") --with-crio
 
-# start Minikube with docker w/o CNI
-$(basename "$0") --with-docker
 
 # start Minikube with docker with CNI enablement (Cilium installed via Helm)
 $(basename "$0") --with-docker --with-cni
@@ -165,7 +164,7 @@ function addNginxIngress() {
 
 ensureMinikubePresent
 K8S_VERSION='stable'
-MODE=''
+MODE='docker'
 
 # TODO csi-hostpath-driver faild with containerd
 # - VolumeSnaphots via csi-hostpath-driver.

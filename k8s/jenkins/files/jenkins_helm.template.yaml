@@ -9,40 +9,41 @@ namespaceOverride: ci
 controller:
 {% if use_prebuild_jenkins_image is sameas true %}
   image: "quay.io/matihost/jenkins"
-  tag: "2.332.3"  # has to be semver compliant
+  tag: "2.346.1"  # has to be semver compliant
   imagePullPolicy: Always
   initializeOnce: true
   installPlugins: false
 {% else %}
   image: "jenkins/jenkins"
-  tag: "2.332.3"
+  tag: "2.346.1"
   initializeOnce: false
   installLatestPlugins: true
   installLatestSpecifiedPlugins: false
   installPlugins:
   - branch-api:2.1046.v0ca_37783ecc5
-  - kubernetes:3580.v78271e5631dc
-  - workflow-job:1180.v04c4e75dce43
-  - workflow-aggregator:578.vf9a_f99755f4a_
+  - pipeline-stage-view:2.24
+  - kubernetes:3651.v908e7db_10d06
+  - workflow-job:1203.v7b_7023424efe
+  - workflow-aggregator:590.v6a_d052e5a_a_b_5
   - cloudbees-disk-usage-simple:0.10
-  - credentials:1087.1089.v2f1b_9a_b_040e4
+  - credentials:1139.veb_9579fca_33b_
   - credentials-binding:523.vd859a_4b_122e6
   - docker-commons:1.19
-  - docker-workflow:1.28
-  - git:4.11.1
-  - configuration-as-code:1429.v09b_044a_c93de
-  - timestamper:1.17
-  - github-branch-source:1628.vb_2f51293cb_78
-  - github-oauth:0.38
-  - ldap:2.9
+  - docker-workflow:1.29
+  - git:4.11.3
+  - configuration-as-code:1464.vd8507b_82e41a_
+  - timestamper:1.18
+  - github-branch-source:1656.v77eddb_b_e95df
+  - github-oauth:0.39
+  - ldap:2.10
   - google-login:1.6
-  - matrix-auth:3.1.2
+  - matrix-auth:3.1.5
   - authorize-project:1.4.0
   - prometheus:2.0.11
   - simple-theme-plugin:103.va_161d09c38c7
   - jdk-tool:1.5
-  - command-launcher:81.v9c2cb_cb_db_392
-  - windows-slaves:1.8
+  - command-launcher:84.v4a_97f2027398
+  - windows-slaves:1.8.1
 {% endif %}
   servicePort: 80
   serviceType: {{ jenkins_service_type|default("NodePort") }}
@@ -105,6 +106,11 @@ controller:
           authorizationStrategy:
             projectMatrix:
               permissions:
+              - "GROUP:Job/Discover:authenticated"
+              - "GROUP:Job/Read:authenticated"
+              - "GROUP:Metrics/View:authenticated"
+              - "GROUP:Overall/Read:authenticated"
+              - "GROUP:View/Read:authenticated"
               - "USER:Agent/Build:admin"
               - "USER:Agent/Configure:admin"
               - "USER:Agent/Connect:admin"
@@ -112,7 +118,6 @@ controller:
               - "USER:Agent/Delete:admin"
               - "USER:Agent/Disconnect:admin"
               - "USER:Agent/ExtendedRead:admin"
-              - "GROUP:Agent/ExtendedRead:authenticated"
               - "USER:Credentials/Create:admin"
               - "USER:Credentials/Delete:admin"
               - "USER:Credentials/ManageDomains:admin"
@@ -124,23 +129,16 @@ controller:
               - "USER:Job/Create:admin"
               - "USER:Job/Delete:admin"
               - "USER:Job/Discover:admin"
-              - "GROUP:Job/Discover:authenticated"
               - "USER:Job/ExtendedRead:admin"
               - "USER:Job/Move:admin"
               - "USER:Job/Read:admin"
-              - "GROUP:Job/Read:authenticated"
               - "USER:Job/Workspace:admin"
-              - "USER:Lockable Resources/Reserve:admin"
-              - "USER:Lockable Resources/Unlock:admin"
-              - "USER:Lockable Resources/View:admin"
-              - "GROUP:Lockable Resources/View:authenticated"
               - "USER:Metrics/HealthCheck:admin"
               - "USER:Metrics/ThreadDump:admin"
               - "USER:Metrics/View:admin"
-              - "GROUP:Metrics/View:authenticated"
               - "USER:Overall/Administer:admin"
+              - "USER:Overall/Administer:matihost"
               - "USER:Overall/Read:admin"
-              - "GROUP:Overall/Read:authenticated"
               - "USER:Overall/SystemRead:admin"
               - "USER:Run/Delete:admin"
               - "USER:Run/Replay:admin"
@@ -150,8 +148,6 @@ controller:
               - "USER:View/Create:admin"
               - "USER:View/Delete:admin"
               - "USER:View/Read:admin"
-              - "GROUP:View/Read:authenticated"
-              - "USER:Overall/Administer:matihost"
       welcome-message: |
         jenkins:
           systemMessage: Welcome to the Matihost CI\CD server.
