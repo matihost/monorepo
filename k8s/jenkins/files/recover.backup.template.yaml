@@ -1,0 +1,30 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: "{{ namespace }}-jenkins-backup-recover"
+  name: "{{ namespace }}-jenkins-backup-recover"
+  namespace: "{{ namespace }}"
+spec:
+  template:
+    metadata:
+      labels:
+        app: "{{ namespace }}-jenkins-backup-recover"
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: "{{ namespace }}-jenkins"
+      containers:
+      - name: jenkins-backup-recover
+        image: maorfr/skbn
+        command: ["skbn"]
+        args:
+        - "cp"
+        - "--src"
+        - "gcs://{{ gcp_project }}-{{ namespace }}-jenkins-server-data/jenkins-backup/{{ backup_id }}"
+        - "--dst"
+        - "k8s://{{ namespace }}/{{ namespace }}-jenkins-0/jenkins/var/jenkins_home"
+        imagePullPolicy: IfNotPresent
+
+# TODO wait on Job to finish
+# TODO then trigger Jenkins Manage Jenkins-> Reload Configuration from Disk, then press OK.

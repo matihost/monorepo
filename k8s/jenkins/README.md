@@ -54,7 +54,9 @@ deploy-jenkins.sh minikube -p password-for-jenkins
 # (assumption your gcloud context point to the same project where your k8s context points to GKE)
 deploy-jenkins.sh -e gke -p password-for-jenkins
 
-
 # ensure Jobs for env are present
 ensure-jobs.sh -e minikube -p password-for-jenkins
+
+# recover backup (only for GKE environment) from backup id
+recover-from-backup.sh -e gke -b 20220710154200
 ```

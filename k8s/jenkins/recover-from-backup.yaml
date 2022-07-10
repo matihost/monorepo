@@ -1,0 +1,39 @@
+---
+- hosts: local
+  collections:
+  - kubernetes.core
+  tasks:
+  - name: Check mandatory variables
+    ansible.builtin.fail:
+      msg: Variable {{ item }} was not provided
+    when: vars[item] is undefined
+    loop:
+    - env
+    - backup_id
+
+  - name: Load {{ env }} variables files
+    ansible.builtin.include_vars:
+      dir: "{{ inventory_dir }}/{{ env }}"
+      depth: 1
+      extensions:
+      - yaml
+      - yml
+
+  - name: Get current GCP project
+    ansible.builtin.shell: gcloud config get-value project
+    register: gcp_project_out
+    changed_when: false
+    when: gke_mode is sameas true
+
+  - name: Set GCP project fact
+    ansible.builtin.set_fact:
+      gcp_project: "{{ gcp_project_out.stdout }}"
+    when: gke_mode | default(false)
+
+  - name: Create recover backup Job
+    k8s:
+      state: present
+      definition: "{{ lookup('template', '{{ files }}/recover.backup.template.yaml') }}"
+      validate:
+        fail_on_error: true
+        strict: true
