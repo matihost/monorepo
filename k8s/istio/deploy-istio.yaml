@@ -10,27 +10,27 @@
     enable_external_ingress_node_pool: "{{ ingress_external_gateway.enable|default(false) and ingress_external_gateway.enable_node_selector|default(false) }}"
   tasks:
   - name: Get current GCP project
-    shell: gcloud config get-value project
+    ansible.builtin.shell: gcloud config get-value project
     register: gcp_project_out
     changed_when: false
 
   - name: Set GCP project fact
-    set_fact:
+    ansible.builtin.set_fact:
       gcp_project: "{{ gcp_project_out.stdout }}"
 
 
   - name: Ensure Istio main directory present
-    file:
+    ansible.builtin.file:
       path: "{{ lookup('env', 'HOME') }}/.istio"
       state: directory
 
   - name: Check .istio/current exists
-    stat:
+    ansible.builtin.stat:
       path: "{{ lookup('env', 'HOME') }}/.istio/current"
     register: istio_installed
 
   - name: Ensure Istio downloaded
-    shell: |
+    ansible.builtin.shell: |
       cd ~/.istio
       curl -sL https://istio.io/downloadIstio | sh -
       cd istio-*
@@ -53,7 +53,7 @@
         strict: true
 
   - name: Ensure tcp:15017 is open on GKE nodes
-    shell: |
+    ansible.builtin.shell: |
       FIREWALL_NAME=$(gcloud compute firewall-rules list --filter="name~'{{ options.gke.cluster_name|mandatory }}-.*-master'" --format="value(name)")
       [ -z "${FIREWALL_NAME}" ] && {
         echo "Missing cluster {{ options.gke.cluster_name }} master firewall rule"
@@ -70,11 +70,10 @@
       state: present
       workspace: "default"
       force_init: true
-      variables: "{{ options.gke|mandatory
-        |combine({'project': gcp_project})
-        |combine({'enable_internal_ingress_node_pool': ingress_gateway.enable_node_selector|default(false)|string|lower})
-        |combine({'enable_external_ingress_node_pool': enable_external_ingress_node_pool|string|lower})
-      }}"
+      variables: "{{ options.gke | mandatory
+        | combine({'project': gcp_project})
+        | combine({'enable_internal_ingress_node_pool': ingress_gateway.enable_node_selector | default(false) | string | lower})
+        | combine({'enable_external_ingress_node_pool': enable_external_ingress_node_pool | string | lower}) }}"
     when: options.gke_mode|default(false)
 
   - name: Deploy Istio Operator Helm chart
@@ -128,7 +127,7 @@
     register: operator_status
 
   - name: Fail when Istio Operator didn't start properly
-    fail:
+    ansible.builtin.fail:
       msg: |
         Istio Operator didn't install Istio components properly
         Check istiooperator pod logs in istio-operator namespace
@@ -137,7 +136,7 @@
   - name: Ensure CN={{ internal_wildcard_cn }} TLS is present
     block:
     - name: Ensure CN={{ internal_wildcard_cn }} TLS is present
-      include_role:
+      ansible.builtin.include_role:
         name: create_certificate
       vars:
         certificate_def:
@@ -168,15 +167,15 @@
         strict: true
 
   - name: Set external wildcard  variables
-    set_fact:
+    ansible.builtin.set_fact:
       external_wildcard_cn: "*.{{ ingress_external_gateway.default_dns_suffix }}"
-      external_wildcard_name: "wildcard-{{ ingress_external_gateway.default_dns_suffix|replace('.','-') }}"
-    when: ingress_external_gateway.enable|default(false)
+      external_wildcard_name: "wildcard-{{ ingress_external_gateway.default_dns_suffix | replace('.','-') }}"
+    when: ingress_external_gateway.enable | default(false)
 
   - name: Ensure CN=* TLS is present
     block:
     - name: Ensure CN=* TLS is present
-      include_role:
+      ansible.builtin.include_role:
         name: create_certificate
       vars:
         certificate_def:
@@ -211,12 +210,12 @@
     when: ingress_external_gateway.enable|default(false)
 
   - name: Ensure VirtualServices are exposed
-    include_role:
+    ansible.builtin.include_role:
       name: expose_virtual_svc
     vars:
       wildcard_dns_suffix: "{{ ingress_gateway.default_dns_suffix }}"
       vs: "{{ item }}"
-    loop: "{{ ingress_gateway.virtual_services|default([]) }}"
+    loop: "{{ ingress_gateway.virtual_services | default([]) }}"
 
   - name: Ensure Istio ClusterRoles present
     k8s:
@@ -229,7 +228,7 @@
   - name: Ensure CN={{ external_wildcard_cn }} TLS is present
     block:
     - name: Ensure CN={{ external_wildcard_cn }} TLS is present
-      include_role:
+      ansible.builtin.include_role:
         name: create_certificate
       vars:
         certificate_def:
@@ -244,14 +243,13 @@
       state: present
       workspace: "default"
       force_init: true
-      variables: "{{ options.gke|mandatory
-        |combine({'project': gcp_project})
-        |combine({'enable_external_ingress_node_pool': enable_external_ingress_node_pool|string|lower})
-        |combine({'external_wildcard_cn': external_wildcard_cn|default(\"\")})
-        |combine({'external_wildcard_name': external_wildcard_name|default(\"\")})
-        |combine({'external_wildcard_tls_key': tls.key|default(\"\")|b64decode})
-        |combine({'external_wildcard_tls_crt': tls.crt|default(\"\")|b64decode})
-      }}"
+      variables: "{{ options.gke | mandatory
+        | combine({'project': gcp_project})
+        | combine({'enable_external_ingress_node_pool': enable_external_ingress_node_pool | string | lower})
+        | combine({'external_wildcard_cn': external_wildcard_cn | default(\"\")})
+        | combine({'external_wildcard_name': external_wildcard_name | default(\"\")})
+        | combine({'external_wildcard_tls_key': tls.key | default(\"\") | b64decode})
+        | combine({'external_wildcard_tls_crt': tls.crt | default(\"\") | b64decode}) }}"
     when:
     - options.gke_mode|default(false)
     - enable_external_ingress_node_pool

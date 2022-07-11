@@ -2,6 +2,7 @@
 - hosts: local
   collections:
   - kubernetes.core
+  gather_facts: true
   tasks:
   - name: Check mandatory variables
     ansible.builtin.fail:
@@ -30,6 +31,11 @@
       gcp_project: "{{ gcp_project_out.stdout }}"
     when: gke_mode | default(false)
 
+  - name: Set jenkins_recover_job_name fact
+    ansible.builtin.set_fact:
+      jenkins_recover_job_name: "{{ namespace }}-jenkins-backup-recover-{{ ansible_date_time.epoch }}"
+    when: gke_mode | default(false)
+
   - name: Create recover backup Job
     k8s:
       state: present
@@ -37,3 +43,65 @@
       validate:
         fail_on_error: true
         strict: true
+
+  - name: Ensure recover backup Job is finished
+    k8s_info:
+      api_version: batch/v1
+      kind: Job
+      name: "{{ jenkins_recover_job_name }}"
+      namespace: "{{ namespace }}"
+    register: job_status
+    until: job_status.resources[0].status is defined
+      and (job_status.resources[0].status.conditions[0]|default({})).type|default("") == "Complete"
+      and job_status.resources[0].status.succeeded == 1
+    retries: 66  # 11 minutes timeout
+    delay: 10
+    ignore_errors: yes
+
+
+  - name: Get final recover backup Job status
+    k8s_info:
+      api_version: batch/v1
+      kind: Job
+      name: "{{ jenkins_recover_job_name }}"
+      namespace: "{{ namespace }}"
+    register: job_status
+
+  - name: Fail when recover job didn't finished properly
+    fail:
+      msg: |
+        {{ jenkins_recover_job_name }} job didn't finish correctly
+    when: not(job_status.resources[0].status is defined
+      and (job_status.resources[0].status.conditions[0]|default({})).type|default("") == "Complete"
+      and job_status.resources[0].status.succeeded == 1)
+
+  - name: Get Jenkins crump
+    uri:
+      url: "https://{{ jenkins_ingress.host }}//crumbIssuer/api/xml?xpath=concat(//crumbRequestField,\":\",//crumb)"
+      validate_certs: no
+      force_basic_auth: yes
+      user: "{{ jenkins_admin_user|default('admin') }}"
+      password: "{{ jenkins_admin_pass|mandatory }}"
+      method: GET
+      status_code: 200
+      return_content: true
+    register: crump_result
+
+
+  - name: Ensure Jenkins reloaded from disk
+    uri:
+      url: https://{{ jenkins_ingress.host }}/reload
+      validate_certs: no
+      force_basic_auth: yes
+      user: "{{ jenkins_admin_user|default('admin') }}"
+      password: "{{ jenkins_admin_pass|mandatory }}"
+      method: POST
+      body_format: form-urlencoded
+      body:
+        Jenkins-Crumb: "{{ crump_result.content.split(':')[1] }}"
+      headers:
+        Jenkins-Crumb: "{{ crump_result.content.split(':')[1] }}"
+        Cookie: "{{ crump_result.set_cookie }}"
+      status_code: 302
+      return_content: false
+    register: job_result

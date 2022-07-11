@@ -8,13 +8,12 @@ resource "google_storage_bucket" "jenkins-data" {
   storage_class = "REGIONAL"
 
   versioning {
-    enabled = true
+    enabled = false
   }
 
   lifecycle_rule {
     condition {
-      # keep  24 versions of a file, aka max 24 backups
-      num_newer_versions = 24
+      age = 2
     }
     action {
       type = "Delete"

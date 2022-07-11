@@ -58,5 +58,5 @@ deploy-jenkins.sh -e gke -p password-for-jenkins
 ensure-jobs.sh -e minikube -p password-for-jenkins
 
 # recover backup (only for GKE environment) from backup id
-recover-from-backup.sh -e gke -b 20220710154200
+recover-from-backup.sh -e gke -p password-for-jenkins -b 20220710154200
 ```

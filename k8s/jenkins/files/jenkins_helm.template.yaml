@@ -205,7 +205,7 @@ backup:
   serviceAccount:
     create: false
     name: "{{ namespace }}-jenkins"
-  schedule: "0 * * * *" # runs every hour
+  schedule: "0 2 * * *" # at 2am
   destination: "gcs://{{ gcp_project }}-{{ namespace }}-jenkins-server-data/jenkins-backup"
-  onlyJobs: false
+  onlyJobs: true
 {% endif %}

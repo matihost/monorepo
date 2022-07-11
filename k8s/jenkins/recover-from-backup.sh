@@ -21,7 +21,7 @@ Assumes gcloud is point to gcproject where GKE is deployed
 
 Samples:
 # recover backup from GCS
-$(basename "$0") -e gke --backup-id 20220710154200
+$(basename "$0") -e gke -p admin_pass --backup-id 20220710154200
 "
 }
 
@@ -41,6 +41,10 @@ while [[ "$#" -gt 0 ]]; do
     BACKUP_ID="$2"
     shift
     ;;
+  -p | --jenkins_admin_pass)
+    PASS="$2"
+    shift
+    ;;
   *) PARAMS+=("$1") ;; # save it in an array for later
   esac
   shift
@@ -49,9 +53,9 @@ set -- "${PARAMS[@]}" # restore positional parameters
 
 ENV=${ENV:-${PARAMS[0]}}
 
-if [[ -z "$ENV" || -z "$BACKUP_ID" ]]; then
+if [[ -z "$ENV" || -z "$BACKUP_ID" || -z "$PASS" ]]; then
   usage
   exit 1
 fi
 
-ansible-playbook recover-from-backup.yaml -v -e env="${ENV}" -e backup_id="${BACKUP_ID}"
+ansible-playbook recover-from-backup.yaml -v -e env="${ENV}" -e jenkins_admin_pass="${PASS}" -e backup_id="${BACKUP_ID}"

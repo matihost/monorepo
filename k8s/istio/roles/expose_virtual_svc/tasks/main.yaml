@@ -1,6 +1,6 @@
 ---
 - name: Validate input variable
-  fail:
+  ansible.builtin.fail:
     msg: No vs or wildcard_dns_suffix are not provided properly
   when: vs is not defined or vs.name is not defined or vs.svc is not defined or vs.svc.port is not defined or vs.svc.fqdn is not defined or wildcard_dns_suffix is not defined
 
