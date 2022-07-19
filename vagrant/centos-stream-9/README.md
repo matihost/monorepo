@@ -1,4 +1,4 @@
-# CentOS 8 Stream Vagrant VM
+# CentOS 9 Stream Vagrant VM
 
 Provisions locally CentOS 8 Stream via VirtualBox/Vagrant.
 Creates SSH keys automatically on the host for connecting to vagrant via ssh

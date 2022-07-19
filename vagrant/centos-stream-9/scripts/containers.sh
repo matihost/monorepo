@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-yum -y module install container-tools
+yum -y install container-tools
 
 # configure rootless containers
 # increase user namespaces
@@ -12,7 +12,7 @@ echo "net.ipv4.ip_unprivileged_port_start=0" >/etc/sysctl.d/unprivport.conf
 sysctl -p /etc/sysctl.d/unprivport.conf
 
 # example of system level container service
-echo 'FROM registry.access.redhat.com/ubi8/ubi
+echo 'FROM registry.access.redhat.com/ubi9/ubi
 USER root
 RUN yum update -y
 RUN yum install httpd -y &&  yum clean all

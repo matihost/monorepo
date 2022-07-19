@@ -97,11 +97,11 @@ stratis filesystem create pool1 sfs1
 # it would work if stratis start successfulyl upon reboot
 # but autofs has to be used instead
 mkdir -p /mnt/stratis
-echo '#/stratis/pool1/sfs1 /mnt/stratis/sfs1                       xfs     defaults,nofail,x-systemd.requires=stratisd.service        0 0' >>/etc/fstab
+echo '#/dev/stratis/pool1/sfs1 /mnt/stratis/sfs1                       xfs     defaults,nofail,x-systemd.requires=stratisd.service        0 0' >>/etc/fstab
 
 echo "/mnt/stratis /etc/auto.stratis" >/etc/auto.master.d/stratis.autofs
 # fstype option is required when mounting local volumes
-echo "sfs1 -fstype=xfs,rw :/stratis/pool1/sfs1" >/etc/auto.stratis
+echo "sfs1 -fstype=xfs,rw :/dev/stratis/pool1/sfs1" >/etc/auto.stratis
 
 systemctl reload autofs.service
 

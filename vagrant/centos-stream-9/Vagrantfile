@@ -2,14 +2,44 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
+  # config.vm.provider "virtualbox" do |v|
+  #   v.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
+  # end
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "bento/centos-stream-8"
+  config.vm.box = "centos/centos-stream-9"
 
-  (0..4).each do |i|
+  # The url from where the 'config.vm.box' box will be fetched if it
+  # doesn't already exist on the user's system.
+  config.vm.box_url = "https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-Vagrant-9-20220718.0.x86_64.vagrant-virtualbox.box"
+
+  config.vm.hostname = "centos"
+
+  # CentOS Stream 9 box has primary controle type IDE with a limit of up to 4 discks
+  (0..2).each do |i|
     config.vm.disk :disk, size: "5GB", name: "disk-#{i}"
   end
+
+  # create additional SATA controler for remaining disks
+  config.vm.provider "virtualbox" do |vb|
+    vb.customize ["storagectl", :id, "--name", "SATA", "--add", "sata"]
+    (3..4).each do |i|
+      vb.customize ['createmedium', 'disk',
+      '--filename',   "/tmp/disk-#{i}.vmdk",
+      '--size',       5 * 1024,
+      '--format', "VMDK"]
+      vb.customize ['storageattach', :id,
+      '--storagectl',      "SATA",
+      '--port',            i - 3,
+      '--device',          "0",
+      '--type',            "hdd",
+      '--medium',          "/tmp/disk-#{i}.vmdk"]
+    end
+  end
+
+
+
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -49,7 +79,9 @@ Vagrant.configure("2") do |config|
   # end
 
   config.vm.provider "virtualbox" do |vb|
-    vb.cpus = 4
+    vb.cpus = 8
+    vb.memory = 4 * 1024
+    vb.default_nic_type = "virtio"
   end
 
   # Update each time VM is started
@@ -59,9 +91,6 @@ Vagrant.configure("2") do |config|
 
   # Install software once (with run: "once" as default provisioner option)
   config.vm.provision "shell", inline: <<-SHELL
-    # switch to CentOS 8 Stream
-    #yum -y install centos-release-stream && yum update
-
     # install basic edit tools
     yum -y install bash-completion man-pages vim
   SHELL

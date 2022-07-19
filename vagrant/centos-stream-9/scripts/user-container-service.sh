@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-DOCKERFILE='FROM registry.access.redhat.com/ubi8/ubi
+DOCKERFILE='FROM registry.access.redhat.com/ubi9/ubi
 USER root
 LABEL maintainer="John Doe"
 # Update image
-RUN yum update --disablerepo=* --enablerepo=ubi-8-appstream --enablerepo=ubi-8-baseos -y && rm -rf /var/cache/yum
-RUN yum install --disablerepo=* --enablerepo=ubi-8-appstream --enablerepo=ubi-8-baseos httpd -y && rm -rf /var/cache/yum
+RUN yum update
+RUN yum install --disablerepo=* --enablerepo=ubi-9-appstream --enablerepo=ubi-9-baseos httpd -y && rm -rf /var/cache/yum
 # Add default Web page and expose port
 RUN echo "The Web Server is Running" > /var/www/html/index.html
 EXPOSE 80
@@ -30,7 +30,7 @@ rm -rf /tmp/mywebi
 # and ideally expose some port on host on host
 podman create --name=webi -it --rm -p 81:80 localhost/vagrant/webi:latest
 # allow user-land systemd services survice user logout
-loginctl enable-linger vagrant
+sudo loginctl enable-linger vagrant
 
 # generate
 podman generate systemd -n --new --files webi

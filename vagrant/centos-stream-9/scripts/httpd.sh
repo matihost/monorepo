@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # install Apache
-yum -y module install httpd
+yum -y install httpd mod_ssl
 
 # set default ServerName in main Apache config file to allow it start w/o warnings
 sed -i -E 's/^#ServerName .*$/ServerName centos:80/g' /etc/httpd/conf/httpd.conf

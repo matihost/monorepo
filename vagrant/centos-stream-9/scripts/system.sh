@@ -67,3 +67,6 @@ setfacl -m d:u::rwx /src
 setfacl -m d:g::rwx /src
 setfacl -m d:o::r-x /src
 setfacl -m d:g:infra:rwx /src
+
+# install semanage SE linux tools
+yum -y install policycoreutils-python-utils
