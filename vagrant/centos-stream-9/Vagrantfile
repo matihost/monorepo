@@ -23,18 +23,23 @@ Vagrant.configure("2") do |config|
 
   # create additional SATA controler for remaining disks
   config.vm.provider "virtualbox" do |vb|
-    vb.customize ["storagectl", :id, "--name", "SATA", "--add", "sata"]
+    unless File.exist?(File.expand_path(".vagrant/centos-3.vmdk"))
+      puts "**** Adding SATA Controller *****"
+      vb.customize ["storagectl", :id, "--name", "SATA", "--add", "sata"]
+      (3..4).each do |i|
+        vb.customize ['createmedium', 'disk',
+        '--filename',   ".vagrant/centos-#{i}.vmdk",
+        '--size',       5 * 1024,
+        '--format', "VMDK"]
+      end
+    end
     (3..4).each do |i|
-      vb.customize ['createmedium', 'disk',
-      '--filename',   "/tmp/disk-#{i}.vmdk",
-      '--size',       5 * 1024,
-      '--format', "VMDK"]
       vb.customize ['storageattach', :id,
       '--storagectl',      "SATA",
       '--port',            i - 3,
       '--device',          "0",
       '--type',            "hdd",
-      '--medium',          "/tmp/disk-#{i}.vmdk"]
+      '--medium',          ".vagrant/centos-#{i}.vmdk"]
     end
   end
 

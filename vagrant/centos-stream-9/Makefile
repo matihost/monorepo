@@ -12,6 +12,9 @@ run: ## run VM
 ssh: ## ssh to VM
 	vagrant ssh
 
+direct-ssh: ## ssh to VM directly via ssh command
+	ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa.vagrant.vm vagrant@172.30.250.3
+
 restart: ## restart VM with reloading Vagrantfile content w/o enforcing once provisioners
 	vagrant reload
 

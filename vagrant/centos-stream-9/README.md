@@ -1,6 +1,6 @@
 # CentOS 9 Stream Vagrant VM
 
-Provisions locally CentOS 8 Stream via VirtualBox/Vagrant.
+Provisions locally CentOS 9 Stream via VirtualBox/Vagrant.
 Creates SSH keys automatically on the host for connecting to vagrant via ssh
 
 ## Prerequisites
@@ -22,7 +22,7 @@ man run
 # ssh to VM via vagrant
 make ssh
 # or directly via ssh (keys are automatically provisioned upon initial VM boot)
-ssh vagrant@172.30.250.3
+make direct-ssh
 
 #  restart VM with reloading Vagrantfile content w/o enforcing once provisioners
 make restart
