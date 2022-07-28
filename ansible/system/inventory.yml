@@ -230,6 +230,13 @@ all:
             EOF
               echo "/etc/vbox/networks.conf configured to allow any vbox hostnetwork"
             }
+        - name: vagrant plugins
+          desc: To ensure Vagrant plugins are installed
+          become: false
+          command: |
+            [ "$(vagrant plugin list |grep -c vagrant-vbguest)" -ne 0 ] || {
+              vagrant plugin install vagrant-vbguest
+            }
         - name: git-prompt
           become: false
           command: |

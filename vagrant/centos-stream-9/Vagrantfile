@@ -2,10 +2,6 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  # config.vm.provider "virtualbox" do |v|
-  #   v.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
-  # end
-
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
   config.vm.box = "centos/centos-stream-9"
@@ -16,7 +12,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.hostname = "centos"
 
-  # CentOS Stream 9 box has primary controle type IDE with a limit of up to 4 discks
+  # CentOS Stream 9 box has primary controle type IDE with a limit of up to 4 disks in total
   (0..2).each do |i|
     config.vm.disk :disk, size: "5GB", name: "disk-#{i}"
   end
@@ -24,7 +20,6 @@ Vagrant.configure("2") do |config|
   # create additional SATA controler for remaining disks
   config.vm.provider "virtualbox" do |vb|
     unless File.exist?(File.expand_path(".vagrant/centos-3.vmdk"))
-      puts "**** Adding SATA Controller *****"
       vb.customize ["storagectl", :id, "--name", "SATA", "--add", "sata"]
       (3..4).each do |i|
         vb.customize ['createmedium', 'disk',
@@ -85,8 +80,24 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider "virtualbox" do |vb|
     vb.cpus = 8
-    vb.memory = 4 * 1024
+    vb.memory = 5 * 1024
     vb.default_nic_type = "virtio"
+    # TODO switch check_guest_additions auto_update flags when CentOS Stream 9 VB Guest works
+    if Vagrant.has_plugin?("vagrant-vbguest") then
+      vb.check_guest_additions = false
+      # config.vbguest.iso_path = "https://download.virtualbox.org/virtualbox/#{VBOX_VERSION}/VBoxGuestAdditions_#{VBOX_VERSION}.iso"
+      config.vbguest.auto_update = false
+      config.vbguest.installer_options = { allow_kernel_upgrade: true }
+      config.vbguest.installer_arguments = %w{--nox11 --keep}
+      config.vbguest.installer_hooks[:before_install] = ["yum install -y epel-release", "sleep 1"]
+    end
+
+    if "#{ENV['GUI']}" == "true"
+      vb.gui = true
+      vb.customize ["modifyvm", :id, "--accelerate3d", "off"]
+      vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
+      vb.customize ["modifyvm", :id, "--vram", "128"]
+    end
   end
 
   # Update each time VM is started
@@ -97,7 +108,7 @@ Vagrant.configure("2") do |config|
   # Install software once (with run: "once" as default provisioner option)
   config.vm.provision "shell", inline: <<-SHELL
     # install basic edit tools
-    yum -y install bash-completion man-pages vim
+    yum -y install epel-release bash-completion man-pages vim
   SHELL
 
   config.vm.provision "shell", run: "once", path: "scripts/system.sh"
@@ -106,6 +117,9 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", run: "once", path: "scripts/nfs.sh"
   config.vm.provision "shell", run: "once", path: "scripts/httpd.sh"
   config.vm.provision "shell", run: "once", path: "scripts/containers.sh"
+  if "#{ENV['GUI']}" == "true"
+    config.vm.provision "shell", run: "once", path: "scripts/gui.sh"
+  end
   config.vm.provision "shell", run: "once", path: "scripts/user-container-service.sh", privileged: false
 
 

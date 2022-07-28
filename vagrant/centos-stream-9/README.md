@@ -7,6 +7,8 @@ Creates SSH keys automatically on the host for connecting to vagrant via ssh
 
 * Vagrant, VirtualBox, sshpass installed
 
+* `vagrant plugin install vagrant-vbguest` installed
+
 * VirtualBox is allowed to create host networks with ip ranges 172.16.0.0/12. Ensure `/etc/vbox/networks.conf` contains:
 
   ```txt
