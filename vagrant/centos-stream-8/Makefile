@@ -18,6 +18,12 @@ ssh: ## ssh to VM
 direct-ssh: ## ssh to VM directly via ssh command
 	ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa.vagrant.vm vagrant@172.30.250.3
 
+direct-run:
+	VBoxManage startvm centos-stream-8 --type headless
+
+direct-run-with-gui:
+	VBoxManage startvm centos-stream-8 --type gui
+
 restart: ## restart VM with reloading Vagrantfile content w/o enforcing once provisioners
 	vagrant reload
 

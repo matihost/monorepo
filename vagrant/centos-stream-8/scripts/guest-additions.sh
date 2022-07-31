@@ -18,7 +18,7 @@ grep vbox /proc/modules
 
 yum -y install gcc kernel-devel kernel-headers make bzip2 perl elfutils-libelf-devel
 
-curl -sSL https://download.virtualbox.org/virtualbox/6.1.36/VBoxGuestAdditions_6.1.36.iso -o /tmp/vboxadditions.iso
+curl -sSL https://download.virtualbox.org/virtualbox/${VBOX_VERSION}/VBoxGuestAdditions_${VBOX_VERSION}.iso -o /tmp/vboxadditions.iso
 WORK_DIR="$(mktemp -d)"
 mount /tmp/vboxadditions.iso "${WORK_DIR}"
 cd "${WORK_DIR}" || exit

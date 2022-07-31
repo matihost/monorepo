@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
-yum -y install container-tools
+. /etc/os-release
+
+if [[ "${VERSION}" -eq 8 ]]; then
+  yum -y module install container-tools
+else
+  yum -y install container-tools
+fi
 
 # configure rootless containers
 # increase user namespaces
