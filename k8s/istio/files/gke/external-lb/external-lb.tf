@@ -13,7 +13,7 @@ resource "google_compute_global_forwarding_rule" "https_lb_fr" {
   name                  = "external-https-lb"
   ip_address            = google_compute_global_address.https_lb[0].address
   ip_protocol           = "TCP"
-  load_balancing_scheme = "EXTERNAL"
+  load_balancing_scheme = "EXTERNAL_MANAGED"
   port_range            = "443-443"
   target                = google_compute_target_https_proxy.https_lb_https_proxy[0].self_link
 }

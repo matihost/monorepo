@@ -7,11 +7,10 @@ resource "google_compute_global_address" "apigee-xlb" {
 resource "google_compute_global_forwarding_rule" "apigee-xlb-https" {
   ip_address            = google_compute_global_address.apigee-xlb.address
   ip_protocol           = "TCP"
-  load_balancing_scheme = "EXTERNAL"
+  load_balancing_scheme = "EXTERNAL_MANAGED"
   name                  = "api-${var.env}-${google_apigee_organization.org.name}-https"
   port_range            = "443-443"
   target                = google_compute_target_https_proxy.apigee-xlb-https.self_link
-  # "${data.terraform_remote_state.targetHttpsProxies.outputs.google_compute_target_https_proxy_tfer--api-dev-matihost-mooo-com-target-proxy_self_link}"
 }
 
 resource "google_compute_target_https_proxy" "apigee-xlb-https" {
@@ -19,8 +18,6 @@ resource "google_compute_target_https_proxy" "apigee-xlb-https" {
   quic_override    = "NONE"
   ssl_certificates = [google_compute_ssl_certificate.apigee-xlb.self_link]
   url_map          = google_compute_url_map.apigee-mig.self_link
-  # ssl_certificates = ["https://www.googleapis.com/compute/v1/projects/matihack1/global/sslCertificates/api-dev-matihost-mooo-com"]
-  # url_map          = "${data.terraform_remote_state.urlMaps.outputs.google_compute_url_map_tfer--api-dev-matihost-mooo-com_self_link}"
 }
 
 resource "google_compute_ssl_certificate" "apigee-xlb" {
@@ -43,7 +40,7 @@ resource "google_compute_url_map" "apigee-mig" {
 resource "google_compute_global_forwarding_rule" "apigee-xlb-http" {
   ip_address            = google_compute_global_address.apigee-xlb.address
   ip_protocol           = "TCP"
-  load_balancing_scheme = "EXTERNAL"
+  load_balancing_scheme = "EXTERNAL_MANAGED"
   name                  = "api-${var.env}-${google_apigee_organization.org.name}-http2https-redirect"
   port_range            = "80-80"
   target                = google_compute_target_http_proxy.apigee-xlb-http.self_link

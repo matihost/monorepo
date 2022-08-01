@@ -36,7 +36,7 @@ resource "google_compute_backend_service" "istio-https" {
   connection_draining_timeout_sec = "300"
   enable_cdn                      = "false"
   health_checks                   = [google_compute_health_check.istio-status.self_link]
-  load_balancing_scheme           = "EXTERNAL"
+  load_balancing_scheme           = "EXTERNAL_MANAGED"
 
   log_config {
     enable      = "true"
