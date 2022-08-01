@@ -8,5 +8,5 @@ all:
         namespace: ci
         chart_version: "4.1.13"
         jenkins_service_type: ClusterIP
-        use_prebuild_jenkins_image: false
+        use_prebuild_jenkins_image: true
         ingress_version: v1
