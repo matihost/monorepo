@@ -1,5 +1,14 @@
 MQ_NAME := dev1
-CN := webconsole.$(MQ_NAME).mq.learning.testing.minikube
+
+K8S := minikube
+
+ifeq ($(strip $(K8S)),gke)
+	HOST_SUFFIX := internal.gke.shared1.dev.gcp.testing
+else ifeq ($(strip $(K8S)),minikube)
+	HOST_SUFFIX := testing.minikube
+endif
+
+CN := webconsole.$(MQ_NAME).mq.learning.$(HOST_SUFFIX)
 APP_PASS := app
 
 PERSISTENCE := false
@@ -11,15 +20,19 @@ endif
 MQ_NAME_UPPER := $(shell echo '$(MQ_NAME)' | tr '[:lower:]' '[:upper:]')
 
 
-deploy-on-minikube: ## deploy MQ manager;usage: make deploy-on-minikube [MQ_NAME=dev1] [APP_PASS=app] [PERSISTENCE=false] [DEBUG=false]
+deploy: ## deploy MQ manager;usage: make deploy [K8S=minikube] [MQ_NAME=dev1] [APP_PASS=app] [PERSISTENCE=false] [DEBUG=false]
 	helm upgrade $(DEBUG_FLAG) --install $(MQ_NAME) . -n learning --create-namespace \
 		--set mq.persistence.enabled=$(PERSISTENCE) \
-    --set webconsole.istio.hostSuffix="testing.minikube" \
+    --set webconsole.istio.hostSuffix="$(HOST_SUFFIX)" \
     --set webconsole.istio.enabled=true \
 		--set mq.app_pass='$(APP_PASS)'
-
+ifeq ($(strip $(K8S)),gke)
+	 echo "MQ webconsole available under https://$(CN)"
+else ifeq ($(strip $(K8S)),minikube)
 	@INGRESS_IP="$(shell kubectl get svc istio-ingressgateway -n istio-system -o jsonpath="{.status..ip}")" && \
   [ "$$(grep -c "${INGRESS_IP} $(CN)" /etc/hosts)" -eq 0 ] && echo "/etc/hosts updated with MQ webconsole DNS mapping: $(CN)" && sudo -E sh -c "echo \"$${INGRESS_IP} $(CN)\" >> /etc/hosts" || echo "/etc/hosts already updated with DNS mapping: $(CN)"
+endif
+
 
 undeploy: ## undeploy MQ manager;  make undeploy [MQ_NAME=dev1]
 	helm uninstall $(MQ_NAME) -n learning

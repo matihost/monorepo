@@ -25,11 +25,15 @@ Prerequisites:
 ## MQ deployment under Minikube
 
 ```bash
-# deploy MQ manager;usage: make deploy-on-minikube [MQ_NAME=dev1] [APP_PASS=app] [PERSISTENCE=false] [DEBUG=false]
-make deploy-on-minikube
+# deploy MQ manager on Minikube;usage: make deploy [K8S=minikube] [MQ_NAME=dev1] [APP_PASS=app] [PERSISTENCE=false] [DEBUG=false]
+make deploy
+
+# deploy MQ manager on GKE;usage: make deploy K8S=gke [MQ_NAME=dev1] [APP_PASS=app] [PERSISTENCE=false] [DEBUG=false]
+make deploy K8S=gke
+
 #  undeploy MQ manager; make undeploy [MQ_NAME=dev1]
 make undeploy
-#make smoke test for MQ web server; usage: make test-web-dashboard [MQ_NAME=dev1
+#make smoke test for MQ web server; usage: make test-web-dashboard [K8S=minikube] [MQ_NAME=dev1]
 make test-web-dashboard
 ```
 

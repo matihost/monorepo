@@ -2,5 +2,5 @@ apiVersion: v2
 name: mq
 description: A Helm chart for IBM MQ deployment
 type: application
-version: 0.2.0
-appVersion: 9.2.5.0-r1
+version: 0.3.0
+appVersion: 9.3.0.0-r2

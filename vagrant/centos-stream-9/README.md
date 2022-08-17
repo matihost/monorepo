@@ -21,6 +21,9 @@ Creates SSH keys automatically on the host for connecting to vagrant via ssh
 # run VM
 man run
 
+# run VM with GUI and Guest Additions
+man run
+
 # ssh to VM via vagrant
 make ssh
 # or directly via ssh (keys are automatically provisioned upon initial VM boot)
@@ -38,8 +41,8 @@ make stop
 # remove VM from disk
 make destroy
 
-# check for updates for vagrant box image
-make update-vm
+# cleans base box so that if Vagrant file contains newer base box it will be downloaded
+make ensure-latest-base-vm
 
 # show usage and tasks (default)
 make help
