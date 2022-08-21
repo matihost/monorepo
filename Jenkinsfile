@@ -3,6 +3,10 @@ pipeline {
   agent {
     kubernetes {
       inheritFrom "default"
+      // by default workspaceVolume is emptyDir
+      // https://www.jenkins.io/doc/pipeline/steps/kubernetes/#podtemplate-define-a-podtemplate-to-use-in-the-kubernetes-plugin
+      // ReadWriteOnce and default storageClass is enough for build even with parallel stages as all agent containers are part of the same pod
+      workspaceVolume dynamicPVC(requestsSize: "20Gi", accessModes: "ReadWriteOnce")
       label validLabel("learning-${env.BRANCH_NAME}") // subsequent builds from the same branch will reuse pods
       idleMinutes 60 // pod will be available to reuse for 1 h
       //Ensures all containers use the same user id as jnlp container to mitigate issue
@@ -16,6 +20,7 @@ metadata:
 spec:
   securityContext:
     runAsUser: 1000
+    fsGroup: 1000
   containers:
   - name: maven-jdk17
     image: maven:3-openjdk-17
