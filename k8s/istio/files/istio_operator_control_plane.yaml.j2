@@ -30,9 +30,6 @@ spec:
         replicaCount: {{ 2 if options.gke_mode|default(false) else 1 }}
         env:
           # https://istio.io/latest/docs/reference/commands/pilot-agent/#envvars
-          # Sets the mesh-wide trace sampling percentage. Should be 0.0 - 100.0. Precision to 0.01. Default is 1.0.
-          - name: PILOT_TRACE_SAMPLING
-            value: "100"
           # Anthos Service Mesh addon
           - name: ENABLE_STACKDRIVER_MONITORING
             value: "{{ options.gke_mode|default(false) }}"
@@ -41,7 +38,7 @@ spec:
       namespace: {{ "kube-system" if options.gke_mode|default(false) else "istio-system" }}
     ingressGateways:
     - name: istio-ingressgateway
-      namespace: istio-system
+      namespace: istio-ingress
       enabled: true
       k8s:
         hpaSpec:
@@ -57,9 +54,8 @@ spec:
           effect: "NoSchedule"
 {% endif %}
     - name: istio-external-ingressgateway
-      namespace: istio-system
+      namespace: istio-ingress
       enabled: {{ ingress_external_gateway.enable|default(false) }}
-      # namespace: custom-ns
       label:
         istio: external-ingressgateway
       k8s:
@@ -117,6 +113,7 @@ spec:
 {% endif %}
     egressGateways:
     - name: istio-egressgateway
+      namespace: istio-egress
       enabled: {{ egress_gateway.enable|default(false) }}
       #k8s:
       #  nodeSelector:

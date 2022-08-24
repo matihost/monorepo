@@ -2,9 +2,9 @@ all:
   hosts:
     localhost:
   vars:
-    operator:
+    istio:
       hub: "gcr.io/istio-release"
-      tag: "1.14.3"
+      version: "1.14.3"
     ingress_class:
       enable: true
       default: false

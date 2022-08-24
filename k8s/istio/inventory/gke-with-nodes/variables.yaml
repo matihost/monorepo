@@ -7,7 +7,7 @@ all:
       version: "1.14.3"
     ingress_gateway:
       max_pods: 20
-      enable_node_selector: false
+      enable_node_selector: true
       default_dns_suffix: "internal.gke.{{ options.gke.cluster_name|replace('-','.') }}.gcp.testing"
       serviceAnnotations:
         cloud.google.com/load-balancer-type: Internal

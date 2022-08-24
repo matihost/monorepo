@@ -46,7 +46,7 @@ EOF
   mkdir -p /tmp/istio-certs
   CN="httpbin.${INTERNAL_DNS_SUFFIX}"
   openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "/tmp/istio-certs/${CN}.crt" -newkey rsa:2048 -nodes -keyout "/tmp/istio-certs/${CN}.key"
-  kubectl create -n istio-system secret tls httpbin-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
+  kubectl create -n istio-ingress secret tls httpbin-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
 
   # sidecar is not necessary when only Ingress is used from istio
   kubectl apply -f - <<EOF
@@ -71,7 +71,7 @@ spec:
               number: 8000
         path: /
         pathType: Prefix
-  # Istio support Ingresses with TLS but secret has to be in istio-system namespace
+  # Istio support Ingresses with TLS but secret has to be in istio-ingress namespace
   tls:
   - hosts:
     - httpbin.${INTERNAL_DNS_SUFFIX}
@@ -128,13 +128,13 @@ EOF
 }
 
 function exposeSampleAppViaInternalIstioNatively() {
-  # TLS certificates has to be in namespace where ingressgateway is deployed (istio-system)
+  # TLS certificates has to be in namespace where ingressgateway is deployed (istio-ingress)
   CN="api.${INTERNAL_DNS_SUFFIX}"
   openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "/tmp/istio-certs/${CN}.crt" -newkey rsa:2048 -nodes -keyout "/tmp/istio-certs/${CN}.key"
-  kubectl create -n istio-system secret tls api-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
+  kubectl create -n istio-ingress secret tls api-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
   CN="http.${INTERNAL_DNS_SUFFIX}"
   openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "/tmp/istio-certs/${CN}.crt" -newkey rsa:2048 -nodes -keyout "/tmp/istio-certs/${CN}.key"
-  kubectl create -n istio-system secret tls http-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
+  kubectl create -n istio-ingress secret tls http-credential --key="/tmp/istio-certs/${CN}.key" --cert="/tmp/istio-certs/${CN}.crt"
 
   kubectl apply -f - <<EOF
 apiVersion: networking.istio.io/v1beta1
@@ -234,7 +234,7 @@ EOF
 }
 
 function exposeSampleAppExternally() {
-  # TLS certificates has to be in namespace where ingressgateway is deployed (istio-system)
+  # TLS certificates has to be in namespace where ingressgateway is deployed (istio-ingress)
   CN="http.${EXTERNAL_DNS_SUFFIX}"
 
   kubectl apply -f - <<EOF
@@ -247,7 +247,7 @@ spec:
   hosts:
   - "http.${EXTERNAL_DNS_SUFFIX}"
   gateways:
-  - istio-system/external-wildcard-gateway
+  - istio-ingress/external-wildcard-gateway
   - mesh # applies to all the sidecars in the mesh
   http:
   - route:

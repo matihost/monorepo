@@ -25,7 +25,7 @@ Optional deprecated features:
 - Enable PodSecurityPolicies (deprecated since k8s 1.21) (--with-psp | psp)
 
 Samples:
-# start default bare/none driver Minikube with docker w/o CNI
+# start default bare/none driver Minikube with docker with CNI enablement (Cilium installed via Helm)
 $(basename "$0")
 
 # start Minikube with containerd minimum set of features
@@ -36,10 +36,6 @@ $(basename "$0") --with-containerd --with-version latest
 
 # start with Crio as container engine (implies CNI aka enables NetworkPolicy)
 $(basename "$0") --with-crio
-
-
-# start Minikube with docker with CNI enablement (Cilium installed via Helm)
-$(basename "$0") --with-docker --with-cni
 
 # start Minikube with docker with CNI/Cilium enablement (Cilium installed via Minikube addon)
 $(basename "$0") --with-docker --with-cilium
@@ -173,7 +169,7 @@ MODE='docker'
 # hostpath.csi.k8s.io - to be used for e.g. snapshot class definitions.
 # ADDONS="registry dashboard volumesnapshots csi-hostpath-driver"
 ADDONS="registry dashboard nginx"
-EXTRA_PARAMS=''
+EXTRA_PARAMS='--network-plugin=cni'
 export ADMISSION_PLUGINS="NamespaceExists"
 
 while [[ "$#" -gt 0 ]]; do
@@ -194,8 +190,6 @@ while [[ "$#" -gt 0 ]]; do
     ;;
   --with-docker | docker | d)
     MODE='docker'
-    ;;
-  --with-cni)
     EXTRA_PARAMS='--network-plugin=cni'
     ;;
   --with-cilium)
@@ -220,11 +214,11 @@ case "${MODE}" in
 crio)
   ensureCrictlPresent
   ensureCrioPresent
-  EXTRA_PARAMS='--container-runtime=cri-o --network-plugin=cilium'
+  EXTRA_PARAMS='--container-runtime=cri-o --network-plugin=cni'
   ;;
 containerd)
   ensureCrictlPresent
-  EXTRA_PARAMS='--container-runtime=containerd --network-plugin=cilium'
+  EXTRA_PARAMS='--container-runtime=containerd --network-plugin=cni'
   ;;
 docker)
   ensureDockerCGroupSystemD

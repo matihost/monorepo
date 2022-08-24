@@ -44,6 +44,24 @@
       kind: Namespace
       state: present
 
+  - name: Ensure istio-egress namespace present
+    k8s:
+      name: istio-egress
+      api_version: v1
+      kind: Namespace
+      state: present
+
+  - name: Ensure istio-ingress namespace with istio-injection present
+    k8s:
+      state: present
+      definition:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: istio-ingress
+          labels:
+            istio-injection: enabled
+
   - name: Ensure PodSecurityPolicy present for Istio CNI Daemon Set
     k8s:
       state: present
@@ -54,7 +72,7 @@
 
   - name: Ensure tcp:15017 is open on GKE nodes
     ansible.builtin.shell: |
-      FIREWALL_NAME=$(gcloud compute firewall-rules list --filter="name~'{{ options.gke.cluster_name|mandatory }}-.*-master'" --format="value(name)")
+      FIREWALL_NAME=$(gcloud compute firewall-rules list --filter="name~'{{ options.gke.cluster_name | mandatory }}-.*-master'" --format="value(name)")
       [ -z "${FIREWALL_NAME}" ] && {
         echo "Missing cluster {{ options.gke.cluster_name }} master firewall rule"
         echo "Unable to open Istio CNI port to be accessed by masters"
@@ -85,14 +103,14 @@
       wait: true
       wait_timeout: "5m0s"
       values:
-        hub: "{{ operator.hub }}"
-        tag: "{{ operator.tag }}"
+        hub: "{{ istio.hub }}"
+        tag: "{{ istio.version }}"
 
 
   - name: Ensure Istio ControlPlane operator configured
     k8s:
       state: present
-      definition: "{{ lookup('template', '{{ files }}/control_plane.yaml.j2') }}"
+      definition: "{{ lookup('template', '{{ files }}/istio_operator_control_plane.yaml.j2') }}"
       validate:
         fail_on_error: true
         strict: true
@@ -143,7 +161,7 @@
           cn: "{{ internal_wildcard_cn }}"
           tls_name: wildcard.{{ ingress_gateway.default_dns_suffix }}
     become: true
-  - name: Ensure TLS Secret internal-wildcard-gateway-tls is present in namespace istio-system
+  - name: Ensure TLS Secret internal-wildcard-gateway-tls is present in namespace istio-ingress
     k8s:
       state: present
       definition:
@@ -151,7 +169,7 @@
         kind: Secret
         metadata:
           name: internal-wildcard-gateway-tls
-          namespace: istio-system
+          namespace: istio-ingress
         data:
           tls.crt: "{{ tls.crt }}"
           tls.key: "{{ tls.key }}"
@@ -169,7 +187,7 @@
   - name: Set external wildcard  variables
     ansible.builtin.set_fact:
       external_wildcard_cn: "*.{{ ingress_external_gateway.default_dns_suffix }}"
-      external_wildcard_name: "wildcard-{{ ingress_external_gateway.default_dns_suffix | replace('.','-') }}"
+      external_wildcard_name: "wildcard-{{ ingress_external_gateway.default_dns_suffix | replace('.', '-') }}"
     when: ingress_external_gateway.enable | default(false)
 
   - name: Ensure CN=* TLS is present
@@ -184,7 +202,7 @@
     become: true
     when: ingress_external_gateway.enable|default(false)
 
-  - name: Ensure TLS Secret for external global wildcard gateway is present in namespace istio-system
+  - name: Ensure TLS Secret for external global wildcard gateway is present in namespace istio-ingress
     k8s:
       state: present
       definition:
@@ -192,7 +210,7 @@
         kind: Secret
         metadata:
           name: external-wildcard-gateway-tls
-          namespace: istio-system
+          namespace: istio-ingress
         data:
           tls.crt: "{{ tls.crt }}"
           tls.key: "{{ tls.key }}"

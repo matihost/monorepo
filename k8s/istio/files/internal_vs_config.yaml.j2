@@ -3,7 +3,7 @@ apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
   name: internal-wildcard-gateway
-  namespace: istio-system
+  namespace: istio-ingress
 spec:
   selector:
     istio: ingressgateway # use Istio default gateway implementation
@@ -31,7 +31,7 @@ apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
   name: kubernetes
-  namespace: istio-system
+  namespace: istio-ingress
 spec:
   selector:
     istio: ingressgateway # use istio default ingress gateway
@@ -49,12 +49,12 @@ apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: kubernetes
-  namespace: istio-system
+  namespace: istio-ingress
 spec:
   hosts:
   - "kubernetes.{{ ingress_gateway.default_dns_suffix }}"
   gateways:
-  - istio-system/kubernetes
+  - istio-ingress/kubernetes
   tls:
   - match:
     - port: 443

@@ -80,7 +80,7 @@ metadata:
   name: grpc-server
 spec:
   gateways:
-  - istio-system/internal-wildcard-gateway
+  - istio-ingress/internal-wildcard-gateway
   - mesh
   hosts:
   - "grpc.sample-istio.${INTERNAL_DNS_SUFFIX}"
