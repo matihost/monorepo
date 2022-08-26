@@ -3,10 +3,11 @@
 
 ## Discovery Settings
 pilot:
-  autoscaleEnabled: true
-  minReplicas: {{ 2 if options.gke_mode|default(false) else 1 }}
-  maxReplicas: {{ 2 if options.gke_mode|default(false) else 1 }}
-  replicaCount: {{ 2 if options.gke_mode|default(false) else 1 }}
+  # TODO enable when istiod is capable to define max hpa value
+  autoscaleEnabled: false
+  minReplicas: {{ istio.istiod.minReplicas|default(1) }}
+  maxReplicas: {{ istio.istiod.maxReplicas|default(1) }}
+  replicaCount: {{ istio.istiod.minReplicas|default(1) }}
   rollingMaxSurge: 100%
   rollingMaxUnavailable: 25%
 
@@ -21,6 +22,9 @@ pilot:
   resources:
     requests:
       cpu: 500m
+      memory: 2048Mi
+    limits:
+      cpu: 1
       memory: 2048Mi
 
   # full list of envs https://github.com/istio/istio/blob/master/pilot/pkg/features/pilot.go
@@ -224,7 +228,8 @@ global:
   # enable pod disruption budget for the control plane, which is used to
   # ensure Istio control plane components are gradually upgraded or recovered.
   defaultPodDisruptionBudget:
-    enabled: true
+    # TODO renenable for clusters which does need to be sized to zero
+    enabled: false
     # The values aren't mutable due to a current PodDisruptionBudget limitation
     # minAvailable: 1
 

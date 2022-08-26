@@ -1,8 +1,3 @@
-
-
-
-
-
 resource "null_resource" "cluster-config-script" {
   triggers = {
     always_run = timestamp()

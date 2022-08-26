@@ -4,7 +4,7 @@ data "google_container_engine_versions" "versions" {
   # run: gcloud container get-server-config
   # to see available versions
   location       = local.location
-  version_prefix = "1.23."
+  version_prefix = "1.24."
 
   project = var.project
 }
@@ -78,10 +78,10 @@ resource "google_container_cluster" "gke" {
 
 
   cluster_autoscaling {
-    enabled = var.enable_auto_nodepools
+    enabled = var.autoscalling
 
     dynamic "resource_limits" {
-      for_each = var.enable_auto_nodepools ? [1] : []
+      for_each = var.autoscalling ? [1] : []
       content {
         resource_type = "cpu"
         minimum       = 0
@@ -90,7 +90,7 @@ resource "google_container_cluster" "gke" {
     }
 
     dynamic "resource_limits" {
-      for_each = var.enable_auto_nodepools ? [1] : []
+      for_each = var.autoscalling ? [1] : []
       content {
         resource_type = "memory"
         minimum       = 0
@@ -385,9 +385,12 @@ resource "google_container_node_pool" "gke_nodes" {
     }
   }
 
-  autoscaling {
-    min_node_count = 1
-    max_node_count = 5
+  dynamic "autoscaling" {
+    for_each = var.autoscalling ? [1] : []
+    content {
+      min_node_count = 0
+      max_node_count = 5
+    }
   }
 
   lifecycle {

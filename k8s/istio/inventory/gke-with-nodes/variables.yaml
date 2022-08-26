@@ -5,6 +5,9 @@ all:
     istio:
       hub: "gcr.io/istio-release"
       version: "1.14.3"
+      istiod:
+        minReplicas: 1
+        maxReplicas: 1
     ingress_gateway:
       max_pods: 20
       enable_node_selector: true

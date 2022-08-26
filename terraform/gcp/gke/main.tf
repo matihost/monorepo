@@ -98,10 +98,10 @@ variable "external_dns_k8s_sa_name" {
 }
 
 
-variable "enable_auto_nodepools" {
+variable "autoscalling" {
   type        = bool
   default     = false
-  description = "Enable auto NodePools provisioning"
+  description = "Enable auto NodePools provisioning and autoscalling of cluster"
 }
 
 variable "enable_pod_security_policy" {
