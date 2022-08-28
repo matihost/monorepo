@@ -95,6 +95,11 @@ spec:
             - name: mqsc
               mountPath: /etc/mqm/02-app-config.mqsc
               subPath: 02-app-config.mqsc
+            {{- if .Values.mq.tls.key }}
+            - name: mqtls
+              mountPath: "/etc/mqm/pki/keys/{{ .Release.Name }}"
+              readOnly: true
+            {{- end }}
             - name: mqm
               mountPath: /mnt/mqm
             - name: mqm-data
@@ -108,6 +113,11 @@ spec:
         - name: mqsc
           configMap:
             name: {{ include "app.fullname" . }}-config
+        {{- if .Values.mq.tls.key }}
+        - name: mqtls
+          secret:
+            secretName: {{ include "app.fullname" . }}-tls-secret
+        {{- end }}
         {{- if not .Values.mq.persistence.enabled }}
         - name: mqm
           emptyDir:

@@ -25,6 +25,9 @@ mq:
       size: 2Gi
     logs:
       size: 4Gi
+  # tls:
+  #   key: ...
+  #   crt: ...
 
 resources:
   limits:

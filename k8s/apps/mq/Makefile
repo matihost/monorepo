@@ -20,12 +20,14 @@ endif
 MQ_NAME_UPPER := $(shell echo '$(MQ_NAME)' | tr '[:lower:]' '[:upper:]')
 
 
-deploy: ## deploy MQ manager;usage: make deploy [K8S=minikube] [MQ_NAME=dev1] [APP_PASS=app] [PERSISTENCE=false] [DEBUG=false]
+deploy: prerequisites ## deploy MQ manager;usage: make deploy [K8S=minikube] [MQ_NAME=dev1] [APP_PASS=app] [PERSISTENCE=false] [DEBUG=false]
 	helm upgrade $(DEBUG_FLAG) --install $(MQ_NAME) . -n learning --create-namespace \
 		--set mq.persistence.enabled=$(PERSISTENCE) \
-    --set webconsole.istio.hostSuffix="$(HOST_SUFFIX)" \
-    --set webconsole.istio.enabled=true \
-		--set mq.app_pass='$(APP_PASS)'
+		--set webconsole.istio.hostSuffix="$(HOST_SUFFIX)" \
+		--set webconsole.istio.enabled=true \
+		--set mq.app_pass='$(APP_PASS)' \
+		--set-file mq.tls.key=target/$(MQ_NAME).key \
+		--set-file mq.tls.crt=target/$(MQ_NAME).crt
 ifeq ($(strip $(K8S)),gke)
 	 echo "MQ webconsole available under https://$(CN)"
 else ifeq ($(strip $(K8S)),minikube)
@@ -64,6 +66,12 @@ endif
 	cd /opt/mqm/samp/bin && \
 	./amqsput $(QUEUE) $(MQ_NAME_UPPER) && \
 	./amqsget $(QUEUE) $(MQ_NAME_UPPER)
+
+
+prerequisites:
+	mkdir -p target
+	openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "target/${MQ_NAME}.crt" -newkey rsa:2048 -nodes -keyout "target/${MQ_NAME}.key"
+
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
