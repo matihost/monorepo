@@ -43,9 +43,9 @@ setup(
     packages=find_packages(where="src"),  # Required
     python_requires=">=3.10, <4",
     install_requires=[
-        "requests>=2.27.1, <3",
-        "flask>=2.0.2, <3",
-        "waitress>=2.0.0, <3",
+        "requests>=2.28.1, <3",
+        "flask>=2.1.2, <3",
+        "waitress>=2.1.1, <3",
     ],  # Optional
     dependency_links=[],
     entry_points={

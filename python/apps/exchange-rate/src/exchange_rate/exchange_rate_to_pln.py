@@ -18,7 +18,7 @@ class ExchangeRateToPLN:  # pylint: disable=too-few-public-methods
 
     def __init__(self):
         """Retrieve exchange rates from Polish NBP."""
-        response = requests.get(self.__NPB_FIXING_URL).text
+        response = requests.get(self.__NPB_FIXING_URL, timeout=10).text
         self.__nbp_rates_xml = ET.fromstring(response)
 
     def __get_rate_for_today(self, currency):
@@ -29,7 +29,7 @@ class ExchangeRateToPLN:  # pylint: disable=too-few-public-methods
     def __get_rate_for_date(self, currency: str, convert_date: date):
         # TODO handle errors
         response = requests.get(self.__NBP_API_URL.format(currency, convert_date.isoformat()),
-                                headers={'Accept': 'application/json'},).text
+                                headers={'Accept': 'application/json'}, timeout=10).text
         response_json = json.loads(response)
         return str(response_json['rates'][0]['mid'])
 

@@ -74,14 +74,13 @@ def ensure_direct_mapping_present():
 
 def ensure_mapping2url_present(url, mount_path, user, password):
     """Convert mount data to autofs mapping."""
-    desired_line = "{1} -fstype=cifs,user={2},password={3},rw,vers=1.0 :{0}\n"\
-        .format(url, mount_path, user, password)
+    desired_line = f"{mount_path} -fstype=cifs,user={user},password={password},rw,vers=1.0 :{url}\n"
     direct_filename = '/etc/auto.direct'
     current_config = read_file(direct_filename, ignore_error=True)
     # TODO what is file mapping is already there
     if desired_line not in current_config:
         # TODO ensure mount directory is present except the last directory
-        print('Writing {0} with {1} mapping to {2}'.format(direct_filename, url, mount_path))
+        print(f"Writing {direct_filename} with {url} mapping to {mount_path}")
         write_file(direct_filename, desired_line, mode='a')
         return True
     return False
