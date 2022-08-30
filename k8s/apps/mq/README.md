@@ -4,11 +4,13 @@ MQ deployment under K8S.
 
 Prerequisites:
 
-* Assumes Minikube is installed locally. Deploy MQ server as StatefulSet on Minikube. Use `k8s/minikube` for Minikube deployment
+* Assumes Minikube or GKE deployment. Deploy MQ server as StatefulSet on Minikube. Use `k8s/minikube` for Minikube deployment
 
-* Assumes Istio is deployey on Minikube  for MQ Web Dashboard exposure. Use `k8s/istio` for Istio deployment.
+* Assumes Istio is deployed for MQ Web Dashboard exposure. Use `k8s/istio` for Istio deployment.
 
-* MQ server listener is exposed via Minikube's LoadBalancer on port 1414.
+* MQ server listener is exposed via Service LoadBalancer on port 1414.
+
+* When TLS needed to be used to access queues, TLS option needs to be used during MQ provisioning.
 
 * Ensure MQ client is installed in the current system. See `ansible/system` playbook for how to install it in Ubuntu. It is needed for `runmqsc` cli. Also examples uses sample applications from MQ client.
 
@@ -25,10 +27,10 @@ Prerequisites:
 ## MQ deployment under Minikube
 
 ```bash
-# deploy MQ manager on Minikube;usage: make deploy [K8S=minikube] [MQ_NAME=dev1] [APP_PASS=app] [PERSISTENCE=false] [DEBUG=false]
+# deploy MQ manager on Minikube;usage: make deploy [K8S=minikube] [MQ_NAME=dev1] [APP_PASS=app] [TLS=true] [PERSISTENCE=false] [DEBUG=false]
 make deploy
 
-# deploy MQ manager on GKE;usage: make deploy K8S=gke [MQ_NAME=dev1] [APP_PASS=app] [PERSISTENCE=false] [DEBUG=false]
+# deploy MQ manager on GKE;usage: make deploy K8S=gke [MQ_NAME=dev1] [APP_PASS=app] [TLS=true] [PERSISTENCE=false] [DEBUG=false]
 make deploy K8S=gke
 
 #  undeploy MQ manager; make undeploy [MQ_NAME=dev1]
@@ -45,6 +47,14 @@ Sample admin commands: [sample-admin-commands.mqsc](sample-admin-commands.mqsc)
 # open admin console access with ability to run MQ admin commands
 # when asked, provide admin password (default: default)
 make runmqmsc
+```
+
+```bash
+# open admin console access via CDDT json file with ability to run MQ admin commands
+make runmqsc-via-ccdt
+
+# open admin console accessed via TLS with ability to run MQ admin commands
+make runmqsc-via-tls
 ```
 
 ```bash

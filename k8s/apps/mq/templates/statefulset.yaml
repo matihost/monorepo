@@ -95,7 +95,7 @@ spec:
             - name: mqsc
               mountPath: /etc/mqm/02-app-config.mqsc
               subPath: 02-app-config.mqsc
-            {{- if .Values.mq.tls.key }}
+            {{- if .Values.mq.tls.enabled }}
             - name: mqtls
               mountPath: "/etc/mqm/pki/keys/{{ .Release.Name }}"
               readOnly: true
@@ -113,7 +113,7 @@ spec:
         - name: mqsc
           configMap:
             name: {{ include "app.fullname" . }}-config
-        {{- if .Values.mq.tls.key }}
+        {{- if .Values.mq.tls.enabled }}
         - name: mqtls
           secret:
             secretName: {{ include "app.fullname" . }}-tls-secret

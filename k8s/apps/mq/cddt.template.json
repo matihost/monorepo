@@ -1,0 +1,17 @@
+{
+  "channel": [
+    {
+      "name": "ADMIN.SVRCONN",
+      "clientConnection": {
+        "connection": [
+          {
+            "host": "${MQ_IP}",
+            "port": 1414
+          }
+        ],
+        "queueManager": "${MQ_NAME_UPPER}"
+      },
+      "type": "clientConnection"
+    }
+  ]
+}

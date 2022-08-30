@@ -1,0 +1,20 @@
+{
+  "channel": [
+    {
+      "name": "ADMIN.TLS.SVRCONN",
+      "clientConnection": {
+        "connection": [
+          {
+            "host": "${MQ_IP}",
+            "port": 1414
+          }
+        ],
+        "queueManager": "${MQ_NAME_UPPER}"
+      },
+      "transmissionSecurity": {
+        "cipherSpecification": "ANY_TLS13_OR_HIGHER"
+      },
+      "type": "clientConnection"
+    }
+  ]
+}

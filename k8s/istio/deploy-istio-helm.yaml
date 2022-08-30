@@ -91,7 +91,7 @@
 
   - name: Deploy {{ istio.version }} version of istio/gateway chart inside istio-ingress namespace
     helm:
-      name: "istio-ingress"
+      name: "istio-ingressgateway"
       chart_ref: istio/gateway
       chart_version: "{{ istio.version }}"
       release_namespace: "istio-ingress"
