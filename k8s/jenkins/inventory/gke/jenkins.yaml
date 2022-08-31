@@ -6,7 +6,7 @@ jenkins_service_type: ClusterIP
 jenkins_ingress:
   host: jenkins.ci.internal.gke.shared1.dev.gcp.testing
   class: istio
-  secretName: internal-wildcard-gateway-tls  # in case of ingress class istio this secret has to already be present in istio-system namespace
+  secretName: internal-wildcard-gateway-tls  # in case of ingress class istio this secret has to already be present in istio-ingress namespace
 jenkins_jobs:
 - name: learning
   description: Learning Multibranch Pipeline

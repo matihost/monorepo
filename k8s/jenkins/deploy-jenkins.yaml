@@ -72,7 +72,7 @@
             tls.key: "{{ tls.key }}"
           type: kubernetes.io/tls
       no_log: true
-    when: jenkins_ingress.class != "istio" # assuming using existing secret present in istio-system namespace
+    when: jenkins_ingress.class != "istio" # assuming using existing secret present in istio-ingress namespace
 
 
   - name: Deploy {{ chart_version }} version of Jenkins chart inside {{ namespace }} namespace
@@ -103,17 +103,19 @@
       wait: true
       wait_timeout: 600
 
-  - name: Ensure Jenkins Ingress DNS is resolvable locally
-    ansible.builtin.shell: |
-      while [ -z "$(kubectl get ingress {{ namespace }}-jenkins -n {{ namespace }} -o jsonpath="{.status..ip}" | xargs)"  ]; do
-        sleep 1;
-        echo "Awaiting for LoadBalancer for Ingress..."
-      done
-      INGRESS_IP=`kubectl get ingress {{ namespace }}-jenkins -n {{ namespace }} -o jsonpath="{.status..ip}"`
-      CHANGED=`grep -c "${INGRESS_IP} {{ jenkins_ingress }}" /etc/hosts`
-      [ "${CHANGED}" -eq 0 ] && {
-        echo "update hosts" && sudo -E sh -c "echo \"${INGRESS_IP} {{ jenkins_ingress.host }}\" >> /etc/hosts"
-      } || echo "hosts already present"
-    register: hosts_result
-    changed_when: '"update hosts" in hosts_result.stdout'
-    when: env == "minikube"
+  #  TODO  Minikube stops setting LoadBalancer address on Ingress objects
+  #
+  # - name: Ensure Jenkins Ingress DNS is resolvable locally
+  #   ansible.builtin.shell: |
+  #     while [ -z "$(kubectl get ingress {{ namespace }}-jenkins -n {{ namespace }} -o jsonpath="{.status..ip}" | xargs)"  ]; do
+  #       sleep 1;
+  #       echo "Awaiting for LoadBalancer for Ingress..."
+  #     done
+  #     INGRESS_IP=`kubectl get ingress {{ namespace }}-jenkins -n {{ namespace }} -o jsonpath="{.status..ip}"`
+  #     CHANGED=`grep -c "${INGRESS_IP} {{ jenkins_ingress }}" /etc/hosts`
+  #     [ "${CHANGED}" -eq 0 ] && {
+  #       echo "update hosts" && sudo -E sh -c "echo \"${INGRESS_IP} {{ jenkins_ingress.host }}\" >> /etc/hosts"
+  #     } || echo "hosts already present"
+  #   register: hosts_result
+  #   changed_when: '"update hosts" in hosts_result.stdout'
+  #   when: env == "minikube"
