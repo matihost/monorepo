@@ -168,6 +168,8 @@ all:
         - google-cloud-sdk-kpt
         - kubectl
         - getenvoy-envoy
+        # requirement for Jetbrains Toolbox
+        - libfuse2
         # Skipped packages:
         # - skypeforlinux
         # OpenVPN 3 is supported only on Ubuntu LTS: https://openvpn.net/cloud-docs/openvpn-3-client-for-linux/

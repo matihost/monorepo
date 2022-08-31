@@ -32,8 +32,10 @@ public class MqClientManager implements AutoCloseable {
     cf.setBooleanProperty(WMQConstants.USER_AUTHENTICATION_MQCSP, conf.getSecurity().isMqscpAuthenMode());
     cf.setStringProperty(WMQConstants.USERID, conf.getSecurity().getUsername());
     cf.setStringProperty(WMQConstants.PASSWORD, conf.getSecurity().getPassword());
-    if (StringUtils.isNotEmpty(conf.getSupportedTLSSuite())) {
-      cf.setStringProperty(WMQConstants.WMQ_SSL_CIPHER_SUITE, conf.getSupportedTLSSuite());
+    if (conf.isTls()) {
+      cf.setStringProperty(WMQConstants.WMQ_SSL_CIPHER_SUITE, "*TLS13");
+      // in case other vendor of JDK than IBM is in use
+      System.setProperty("com.ibm.mq.cfg.useIBMCipherMappings", "false");
     }
     logger.debug("Created JMS Factory with: {}", cf);
   }

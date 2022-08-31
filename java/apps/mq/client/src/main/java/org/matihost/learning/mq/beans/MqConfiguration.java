@@ -12,7 +12,7 @@ public class MqConfiguration {
   private String qmName;
   private String channel;
 
-  private String supportedTLSSuite;  // empty means no TLS, possible value: *TLS12
+  private boolean tls;  // empty means no TLS, possible value: *TLS12
 
   private final Security security = new Security();
 
@@ -53,12 +53,12 @@ public class MqConfiguration {
     return security;
   }
 
-  public String getSupportedTLSSuite() {
-    return supportedTLSSuite;
+  public boolean isTls() {
+    return tls;
   }
 
-  public void setSupportedTLSSuite(String supportedTLSSuite) {
-    this.supportedTLSSuite = supportedTLSSuite;
+  public void setTls(boolean tls) {
+    this.tls = tls;
   }
 
   public static class Security {

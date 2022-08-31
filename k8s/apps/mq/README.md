@@ -33,6 +33,9 @@ make deploy
 # deploy MQ manager on GKE;usage: make deploy K8S=gke [MQ_NAME=dev1] [APP_PASS=app] [TLS=true] [PERSISTENCE=false] [DEBUG=false]
 make deploy K8S=gke
 
+# deploy MQ with custom TLS certificate
+make deploy TLS=true
+
 #  undeploy MQ manager; make undeploy [MQ_NAME=dev1]
 make undeploy
 #make smoke test for MQ web server; usage: make test-web-dashboard [K8S=minikube] [MQ_NAME=dev1]

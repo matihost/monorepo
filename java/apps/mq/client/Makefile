@@ -22,19 +22,24 @@ MQ_PORT := 1414
 MQ_CHANNEL := APPA.SVRCONN
 MQ_QUEUE := APPA.RQ.APPB
 MQ_QMNAME := $(shell echo '$(MQ_NAME)' | tr '[:lower:]' '[:upper:]')
+MQ_TLS := false
+ifeq ($(strip $(MQ_TLS)),true)
+  MQ_CHANNEL := APPA.TLS.SVRCONN
+	TLS_PARAMS := -Djavax.net.ssl.trustStoreType=pkcs12 -Djavax.net.ssl.trustStore=target/$(MQ_NAME).pfx -Djavax.net.ssl.trustStorePassword=default
+endif
 
-COMMON_PARAMS := $(DEBUG_FLAG) $(JMX_FLAG) -jar target/*.jar
+COMMON_PARAMS := $(DEBUG_FLAG) $(JMX_FLAG) $(TLS_PARAMS) -jar target/*.jar
 
-put: ## put message on Minikube hosted MQ; usage: make put [DEBUG=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
+put: setup-keystore ## put message on Minikube hosted MQ; usage: make put [DEBUG=false MQ_TLS=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
 	java $(COMMON_PARAMS) --mode=put --mq.host="$(shell kubectl get svc $(MQ_NAME)-mq -n learning -o jsonpath='{.status..ip}')" --message=alamakota-$(shell date -Is)
 
-get: ## start message listener to receive messages from MQ hosted on Minikube; usage: make get [DEBUG=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
+get: setup-keystore ## start message listener to receive messages from MQ hosted on Minikube; usage: make get [DEBUG=false MQ_TLS=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
 	java $(COMMON_PARAMS) --mode=get --mq.host="$(shell kubectl get svc $(MQ_NAME)-mq -n learning -o jsonpath='{.status..ip}')"
 
-sendAndReceive: ## put message on Minikube hosted MQ and awaits for response; usage: make put [DEBUG=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
+sendAndReceive: setup-keystore ## put message on Minikube hosted MQ and awaits for response; usage: make put [DEBUG=false MQ_TLS=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
 	java $(COMMON_PARAMS) --mode=sendAndReceive --mq.host="$(shell kubectl get svc $(MQ_NAME)-mq -n learning -o jsonpath='{.status..ip}')" --message=alamakota-$(shell date -Is) --replyQueue=APPB.RS.APPA
 
-getAndReply: ## start message listener to receive messages from MQ and reply to JMSReplyTo queue; usage: make getAndReply [DEBUG=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
+getAndReply: setup-keystore ## start message listener to receive messages from MQ and reply to JMSReplyTo queue; usage: make getAndReply [DEBUG=false MQ_TLS=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
 	java $(COMMON_PARAMS) --mode=getAndReply --mq.host="$(shell kubectl get svc $(MQ_NAME)-mq -n learning -o jsonpath='{.status..ip}')" --message=kotmaale-$(shell date -Is)
 
 
@@ -55,6 +60,12 @@ getAndReply-container: ## start message listener to receive messages from MQ and
 
 push: ## push image with tag to quay.io repository (assume docker login quay.io has been perfomed)
 	docker push $(BASE):$(TAG)
+
+setup-keystore: ## setup keystore with tls cert from MQ deployement
+ifeq ($(strip $(MQ_TLS)),true)
+	@rm -rf target/$(MQ_NAME).pfx
+	keytool -keystore target/$(MQ_NAME).pfx -storetype pkcs12 -importcert -file "../../../../k8s/apps/mq/target/$(MQ_NAME).crt" -alias server-certificate -storepass default -noprompt
+endif
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))

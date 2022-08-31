@@ -97,6 +97,7 @@ create-certificate: ## create self-signe certificate with CN being MQ_NAME
 	openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "target/${MQ_NAME}.crt" -newkey rsa:2048 -nodes -keyout "target/${MQ_NAME}.key"
 
 
+
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 
