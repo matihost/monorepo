@@ -41,6 +41,11 @@ make sendAndReceive-container
 make sendAndReceive MQ_TLS=true
 make sendAndReceive-container MQ_TLS=true
 
+# sample with using MQ CDDT config file
+make sendAndReceive-with-cddt
+make sendAndReceive-with-tls-cddt MQ_TLS=true
+
+
 # start message listener to receive messages from MQ and reply to JMSReplyTo queue; usage: make put [DEBUG=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
 make getAndReply
 make getAndReply-container

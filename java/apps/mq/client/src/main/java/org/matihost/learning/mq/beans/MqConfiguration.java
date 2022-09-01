@@ -3,9 +3,12 @@ package org.matihost.learning.mq.beans;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.net.URL;
+
 @ConfigurationProperties("mq")
 public class MqConfiguration {
 
+  private URL cddtUrl;
   private String host;
   private int port = 1414;
 
@@ -59,6 +62,14 @@ public class MqConfiguration {
 
   public void setTls(boolean tls) {
     this.tls = tls;
+  }
+
+  public URL getCddtUrl() {
+    return cddtUrl;
+  }
+
+  public void setCddtUrl(URL cddtUrl) {
+    this.cddtUrl = cddtUrl;
   }
 
   public static class Security {

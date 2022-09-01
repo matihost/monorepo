@@ -36,11 +36,22 @@ put: setup-keystore ## put message on Minikube hosted MQ; usage: make put [DEBUG
 get: setup-keystore ## start message listener to receive messages from MQ hosted on Minikube; usage: make get [DEBUG=false MQ_TLS=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
 	java $(COMMON_PARAMS) --mode=get --mq.host="$(shell kubectl get svc $(MQ_NAME)-mq -n learning -o jsonpath='{.status..ip}')"
 
-sendAndReceive: setup-keystore ## put message on Minikube hosted MQ and awaits for response; usage: make put [DEBUG=false MQ_TLS=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
+sendAndReceive: setup-keystore ## put message on Minikube hosted MQ and awaits for response; usage: make sendAndReceive [DEBUG=false MQ_TLS=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
 	java $(COMMON_PARAMS) --mode=sendAndReceive --mq.host="$(shell kubectl get svc $(MQ_NAME)-mq -n learning -o jsonpath='{.status..ip}')" --message=alamakota-$(shell date -Is) --replyQueue=APPB.RS.APPA
 
 getAndReply: setup-keystore ## start message listener to receive messages from MQ and reply to JMSReplyTo queue; usage: make getAndReply [DEBUG=false MQ_TLS=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
 	java $(COMMON_PARAMS) --mode=getAndReply --mq.host="$(shell kubectl get svc $(MQ_NAME)-mq -n learning -o jsonpath='{.status..ip}')" --message=kotmaale-$(shell date -Is)
+
+
+sendAndReceive-with-cddt: setup-keystore ## put message on Minikube hosted MQ and awaits for response; usage: make sendAndReceive-with-cddt [DEBUG=false MQ_TLS=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
+	sed 's/$${MQ_NAME_UPPER}/$(MQ_QMNAME)/g' cddt.template.json > target/$(MQ_NAME).cddt.json && \
+	sed -i 's/$${MQ_IP}/$(shell kubectl get svc $(MQ_NAME)-mq -n learning -o jsonpath='{.status..ip}')/g' target/$(MQ_NAME).cddt.json && \
+	java $(COMMON_PARAMS) --mode=sendAndReceive --mq.cddtUrl="file://$(shell pwd)/target/$(MQ_NAME).cddt.json" --message=alamakota-$(shell date -Is) --replyQueue=APPB.RS.APPA
+
+sendAndReceive-with-tls-cddt: setup-keystore ## put message on Minikube hosted MQ and awaits for response; usage: make sendAndReceive MQ_TLS=true [DEBUG=fals MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
+	sed 's/$${MQ_NAME_UPPER}/$(MQ_QMNAME)/g' cddt.tls.template.json > target/$(MQ_NAME).tls.cddt.json && \
+	sed -i 's/$${MQ_IP}/$(shell kubectl get svc $(MQ_NAME)-mq -n learning -o jsonpath='{.status..ip}')/g' target/$(MQ_NAME).tls.cddt.json && \
+	java $(COMMON_PARAMS) --mode=sendAndReceive --mq.cddtUrl="file://$(shell pwd)/target/$(MQ_NAME).tls.cddt.json" --message=alamakota-$(shell date -Is) --replyQueue=APPB.RS.APPA -Djavax.net.ssl.trustStoreType=pkcs12 -Djavax.net.ssl.trustStore=target/$(MQ_NAME).pfx -Djavax.net.ssl.trustStorePassword=default
 
 
 build-image: build ## build docker image

@@ -15,6 +15,7 @@ module org.matihost.learning.mq.client {
   requires org.apache.commons.lang3;
   requires com.ibm.mq.allclient;
   requires javax.jms.api;
+  requires java.naming;
 
   // to let Spring and Test framework access non public members
   opens org.matihost.learning.mq to spring.core, spring.beans, spring.context, org.mockito;

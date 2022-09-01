@@ -1,5 +1,6 @@
 package org.matihost.learning.mq.utils;
 
+import com.ibm.mq.jms.MQConnectionFactory;
 import com.ibm.msg.client.jms.JmsConnectionFactory;
 import com.ibm.msg.client.jms.JmsFactoryFactory;
 import com.ibm.msg.client.wmq.WMQConstants;
@@ -10,33 +11,44 @@ import org.slf4j.LoggerFactory;
 
 import javax.jms.JMSException;
 import javax.jms.Queue;
+import java.net.URL;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 
 public class MqClientManager implements AutoCloseable {
   private static final Logger logger = LoggerFactory.getLogger(MqClientManager.class);
 
-  private final JmsConnectionFactory cf;
+  static {
+    // in case other vendor of JDK than IBM is in use
+    System.setProperty("com.ibm.mq.cfg.useIBMCipherMappings", "false");
+  }
+
+  private final MQConnectionFactory cf;
   private final Map<String, MqConnection> queues = new ConcurrentHashMap<>();
 
   public MqClientManager(MqConfiguration conf) throws JMSException {
     JmsFactoryFactory ff = JmsFactoryFactory.getInstance(WMQConstants.WMQ_PROVIDER);
-    cf = ff.createConnectionFactory();
-    cf.setStringProperty(WMQConstants.WMQ_HOST_NAME, conf.getHost());
-    cf.setIntProperty(WMQConstants.WMQ_PORT, conf.getPort());
-    cf.setStringProperty(WMQConstants.WMQ_CHANNEL, conf.getChannel());
-    cf.setIntProperty(WMQConstants.WMQ_CONNECTION_MODE, WMQConstants.WMQ_CM_CLIENT);
-    cf.setStringProperty(WMQConstants.WMQ_QUEUE_MANAGER, conf.getQmName());
+    cf = (MQConnectionFactory)ff.createConnectionFactory();
+    URL cddtUrl = conf.getCddtUrl();
+    if (cddtUrl != null){
+      cf.setCCDTURL(cddtUrl);
+      cf.setStringProperty(WMQConstants.WMQ_QUEUE_MANAGER, conf.getQmName());
+    } else {
+      cf.setStringProperty(WMQConstants.WMQ_HOST_NAME, conf.getHost());
+      cf.setIntProperty(WMQConstants.WMQ_PORT, conf.getPort());
+      cf.setStringProperty(WMQConstants.WMQ_CHANNEL, conf.getChannel());
+      cf.setIntProperty(WMQConstants.WMQ_CONNECTION_MODE, WMQConstants.WMQ_CM_CLIENT);
+      cf.setStringProperty(WMQConstants.WMQ_QUEUE_MANAGER, conf.getQmName());
+      if (conf.isTls()) {
+        cf.setStringProperty(WMQConstants.WMQ_SSL_CIPHER_SUITE, "*TLS13");
+      }
+    }
     cf.setStringProperty(WMQConstants.WMQ_APPLICATIONNAME, conf.getSecurity().getApplicationName());
     cf.setBooleanProperty(WMQConstants.USER_AUTHENTICATION_MQCSP, conf.getSecurity().isMqscpAuthenMode());
     cf.setStringProperty(WMQConstants.USERID, conf.getSecurity().getUsername());
     cf.setStringProperty(WMQConstants.PASSWORD, conf.getSecurity().getPassword());
-    if (conf.isTls()) {
-      cf.setStringProperty(WMQConstants.WMQ_SSL_CIPHER_SUITE, "*TLS13");
-      // in case other vendor of JDK than IBM is in use
-      System.setProperty("com.ibm.mq.cfg.useIBMCipherMappings", "false");
-    }
     logger.debug("Created JMS Factory with: {}", cf);
   }
 
