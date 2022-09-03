@@ -22,18 +22,18 @@ controller:
   installPlugins:
   - branch-api:2.1046.v0ca_37783ecc5
   - pipeline-stage-view:2.24
-  - kubernetes:3697.v771155683e38
+  - kubernetes:3704.va_08f0206b_95e
   - workflow-job:1207.ve6191ff089f8
   - workflow-aggregator:590.v6a_d052e5a_a_b_5
   - cloudbees-disk-usage-simple:170.va_fd5b_4ee6858
-  - credentials:1139.veb_9579fca_33b_
+  - credentials:1143.vb_e8b_b_ceee347
   - credentials-binding:523.vd859a_4b_122e6
-  - docker-commons:1.19
+  - docker-commons:1.21
   - docker-workflow:521.v1a_a_dd2073b_2e
-  - git:4.11.4
+  - git:4.11.5
   - configuration-as-code:1512.vb_79d418d5fc8
-  - timestamper:1.18
-  - github-branch-source:1677.v731f745ea_0cf
+  - timestamper:1.19
+  - github-branch-source:1687.v7618247e672d
   - github-oauth:0.39
   - ldap:2.12
   - google-login:1.6

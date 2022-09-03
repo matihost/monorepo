@@ -19,6 +19,7 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
+    excludedNamespaces: ["kube-system"]
 ---
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPAllowedUsers
@@ -33,9 +34,9 @@ spec:
     runAsUser:
       rule: MustRunAsNonRoot
     runAsGroup:
-      rule: MustRunAsNonRoot
+      rule: RunAsAny
     supplementalGroups:
-      rule: MustRunAsNonRoot
+      rule: RunAsAny
     fsGroup:
       rule: RunAsAny
 ---

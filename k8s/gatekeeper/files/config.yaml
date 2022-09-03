@@ -22,6 +22,7 @@ spec:
         - cluster-config
         # istio
         - istio-system
+        - istio-ingress
         # gatekeeper
         - gatekeeper-system
       processes: ["*"]
@@ -30,9 +31,6 @@ spec:
       - group: ""
         version: "v1"
         kind: "Namespace"
-      - group: "extensions"
-        version: "v1beta1"
-        kind: "Ingress"
       - group: "networking.k8s.io"
         version: "v1"
         kind: "Ingress"

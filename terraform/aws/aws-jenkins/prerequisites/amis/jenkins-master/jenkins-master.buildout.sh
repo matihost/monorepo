@@ -4,24 +4,25 @@ export JENKINS_PLUGIN_MANAGER_VERSION="2.12.8"
 export JENKINS_PLUGINS="ec2 \
   branch-api:2.1046.v0ca_37783ecc5 \
   pipeline-stage-view:2.24 \
-  workflow-job:1203.v7b_7023424efe \
+
+  workflow-job:1207.ve6191ff089f8 \
   workflow-aggregator:590.v6a_d052e5a_a_b_5 \
-  cloudbees-disk-usage-simple:0.10 \
-  credentials:1139.veb_9579fca_33b_\
+  cloudbees-disk-usage-simple:170.va_fd5b_4ee6858 \
+  credentials:1143.vb_e8b_b_ceee347 \
   credentials-binding:523.vd859a_4b_122e6 \
-  docker-commons:1.19 \
-  docker-workflow:1.29 \
-  git:4.11.3 \
-  configuration-as-code:1464.vd8507b_82e41a_ \
-  timestamper:1.18 \
-  github-branch-source:1656.v77eddb_b_e95df \
+  docker-commons:1.21 \
+  docker-workflow:521.v1a_a_dd2073b_2e \
+  git:4.11.5 \
+  configuration-as-code:1512.vb_79d418d5fc8 \
+  timestamper:1.19 \
+  github-branch-source:1687.v7618247e672d \
   github-oauth:0.39 \
-  ldap:2.10 \
+  ldap:2.12 \
   matrix-auth:3.1.5 \
   authorize-project:1.4.0 \
   prometheus:2.0.11 \
   simple-theme-plugin:103.va_161d09c38c7 \
-  jdk-tool:1.5 \
+  jdk-tool:55.v1b_32b_6ca_f9ca \
   command-launcher:84.v4a_97f2027398 \
   windows-slaves:1.8.1"
 

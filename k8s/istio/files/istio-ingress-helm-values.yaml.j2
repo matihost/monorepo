@@ -93,6 +93,8 @@ tolerations:
   effect: "NoSchedule"
 {% endif %}
 
+topologySpreadConstraints: []
+
 affinity: {}
 
 # If specified, the gateway will act as a network gateway for the given network.

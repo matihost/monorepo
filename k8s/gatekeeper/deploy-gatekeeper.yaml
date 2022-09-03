@@ -24,14 +24,14 @@
       workspace: "default"
       force_init: true
       variables: "{{ options.gke|mandatory
-        |combine({'project': gcp_project})
-      }}"
+        |combine({'project': gcp_project}) }}"
     when: options.gke_mode|default(false)
 
-  - name: Deploy OPA Gatekeeper Helm chart
+  - name: Deploy OPA Gatekeeper Helm chart with version {{ gatekeeper.chart_variables.version }}
     helm:
       name: "gatekeeper"
       chart_ref: "gatekeeper/gatekeeper"
+      chart_version: "{{ gatekeeper.chart_variables.version }}"
       release_namespace: "gatekeeper-system"
       create_namespace: true
       wait: true

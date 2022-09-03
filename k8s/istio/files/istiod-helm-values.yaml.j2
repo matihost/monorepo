@@ -5,8 +5,8 @@
 pilot:
   # TODO enable when istiod is capable to define max hpa value
   autoscaleEnabled: false
-  minReplicas: {{ istio.istiod.minReplicas|default(1) }}
-  maxReplicas: {{ istio.istiod.maxReplicas|default(1) }}
+  autoscaleMin: {{ istio.istiod.minReplicas|default(1) }}
+  autoscaleMax: {{ istio.istiod.maxReplicas|default(1) }}
   replicaCount: {{ istio.istiod.minReplicas|default(1) }}
   rollingMaxSurge: 100%
   rollingMaxUnavailable: 25%
@@ -68,7 +68,6 @@ pilot:
   # Additional labels to apply to the deployment.
   deploymentLabels: {}
 
-
   ## Mesh config settings
 
   # Install the mesh config map, generated from values.yaml.
@@ -77,7 +76,6 @@ pilot:
 
   # Additional labels to apply on the pod level for monitoring and logging configuration.
   podLabels: {}
-
 
 sidecarInjectorWebhook:
   # You can use the field called alwaysInjectSelector and neverInjectSelector which will always inject the sidecar or
@@ -299,6 +297,8 @@ global:
   # set of DNS settings than the normal application pods (e.g., in
   # multicluster scenarios).
   # NOTE: If using templates, follow the pattern in the commented example below.
+  #podDNSSearchNamespaces:
+  #- global
 
   # Kubernetes >=v1.11.0 will create two PriorityClass, including system-cluster-critical and
   # system-node-critical, it is better to configure this in order to make sure your Istio pods
@@ -329,7 +329,6 @@ global:
     #     Redirect only selected ports:            --includeInboundPorts="80,8080"
     excludeInboundPorts: ""
     includeInboundPorts: "*"
-
 
     # istio egress capture allowlist
     # https://istio.io/docs/tasks/traffic-management/egress.html#calling-external-services-directly
@@ -405,7 +404,7 @@ global:
   # discovery charts are enabled.
   externalIstiod: false
 
-  #  Configure a remote cluster as the config cluster for an external istiod.
+  # Configure a remote cluster as the config cluster for an external istiod.
   configCluster: false
 
   # Configure the policy for validating JWT.
@@ -510,8 +509,8 @@ global:
       # Host:Port for submitting traces to the Datadog agent.
       address: "$(HOST_IP):8126"
     lightstep:
-      address: ""                # example: lightstep-satellite:443
-      accessToken: ""            # example: abcdefg1234567
+      address: "" # example: lightstep-satellite:443
+      accessToken: "" # example: abcdefg1234567
     stackdriver:
       # enables trace output to stdout.
       debug: false

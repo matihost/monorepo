@@ -23,19 +23,45 @@ kind: ConstraintTemplate
 metadata:
   name: k8spspprivilegedcontainer
   annotations:
-    description: Controls running of privileged containers.
+    description: >-
+      Controls the ability of any container to enable privileged mode.
+      Corresponds to the `privileged` field in a PodSecurityPolicy. For more
+      information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#privileged
 spec:
   crd:
     spec:
       names:
         kind: K8sPSPPrivilegedContainer
+      validation:
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Controls the ability of any container to enable privileged mode.
+            Corresponds to the `privileged` field in a PodSecurityPolicy. For more
+            information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#privileged
+          properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8spspprivileged
 
+        import data.lib.exempt_container.is_exempt
+
         violation[{"msg": msg, "details": {}}] {
             c := input_containers[_]
+            not is_exempt(c)
             c.securityContext.privileged
             msg := sprintf("Privileged container is not allowed: %v, securityContext: %v", [c.name, c.securityContext])
         }
@@ -47,13 +73,42 @@ spec:
         input_containers[c] {
             c := input.review.object.spec.initContainers[_]
         }
+
+        input_containers[c] {
+            c := input.review.object.spec.ephemeralContainers[_]
+        }
+      libs:
+        - |
+          package lib.exempt_container
+
+          is_exempt(container) {
+              exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+              img := container.image
+              exemption := exempt_images[_]
+              _matches_exemption(img, exemption)
+          }
+
+          _matches_exemption(img, exemption) {
+              not endswith(exemption, "*")
+              exemption == img
+          }
+
+          _matches_exemption(img, exemption) {
+              endswith(exemption, "*")
+              prefix := trim_suffix(exemption, "*")
+              startswith(img, prefix)
+          }
 ---
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8spspallowedusers
   annotations:
-    description: Controls the user and group IDs of the container.
+    description: >-
+      Controls the user and group IDs of the container and some volumes.
+      Corresponds to the `runAsUser`, `runAsGroup`, `supplementalGroups`, and
+      `fsGroup` fields in a PodSecurityPolicy. For more information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#users-and-groups
 spec:
   crd:
     spec:
@@ -61,72 +116,131 @@ spec:
         kind: K8sPSPAllowedUsers
       validation:
         openAPIV3Schema:
+          type: object
+          description: >-
+            Controls the user and group IDs of the container and some volumes.
+            Corresponds to the `runAsUser`, `runAsGroup`, `supplementalGroups`, and
+            `fsGroup` fields in a PodSecurityPolicy. For more information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#users-and-groups
           properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
             runAsUser:
               type: object
+              description: "Controls which user ID values are allowed in a Pod or container-level SecurityContext."
               properties:
                 rule:
                   type: string
+                  description: "A strategy for applying the runAsUser restriction."
+                  enum:
+                    - MustRunAs
+                    - MustRunAsNonRoot
+                    - RunAsAny
                 ranges:
                   type: array
+                  description: "A list of user ID ranges affected by the rule."
                   items:
                     type: object
+                    description: "The range of user IDs affected by the rule."
                     properties:
                       min:
                         type: integer
+                        description: "The minimum user ID in the range, inclusive."
                       max:
                         type: integer
+                        description: "The maximum user ID in the range, inclusive."
             runAsGroup:
               type: object
+              description: "Controls which group ID values are allowed in a Pod or container-level SecurityContext."
               properties:
                 rule:
                   type: string
+                  description: "A strategy for applying the runAsGroup restriction."
+                  enum:
+                    - MustRunAs
+                    - MayRunAs
+                    - RunAsAny
                 ranges:
                   type: array
+                  description: "A list of group ID ranges affected by the rule."
                   items:
                     type: object
+                    description: "The range of group IDs affected by the rule."
                     properties:
                       min:
                         type: integer
+                        description: "The minimum group ID in the range, inclusive."
                       max:
                         type: integer
+                        description: "The maximum group ID in the range, inclusive."
             supplementalGroups:
               type: object
+              description: "Controls the supplementalGroups values that are allowed in a Pod or container-level SecurityContext."
               properties:
                 rule:
                   type: string
+                  description: "A strategy for applying the supplementalGroups restriction."
+                  enum:
+                    - MustRunAs
+                    - MayRunAs
+                    - RunAsAny
                 ranges:
                   type: array
+                  description: "A list of group ID ranges affected by the rule."
                   items:
                     type: object
+                    description: "The range of group IDs affected by the rule."
                     properties:
                       min:
                         type: integer
+                        description: "The minimum group ID in the range, inclusive."
                       max:
                         type: integer
+                        description: "The maximum group ID in the range, inclusive."
             fsGroup:
               type: object
+              description: "Controls the fsGroup values that are allowed in a Pod or container-level SecurityContext."
               properties:
                 rule:
                   type: string
+                  description: "A strategy for applying the fsGroup restriction."
+                  enum:
+                    - MustRunAs
+                    - MayRunAs
+                    - RunAsAny
                 ranges:
                   type: array
+                  description: "A list of group ID ranges affected by the rule."
                   items:
                     type: object
+                    description: "The range of group IDs affected by the rule."
                     properties:
                       min:
                         type: integer
+                        description: "The minimum group ID in the range, inclusive."
                       max:
                         type: integer
+                        description: "The maximum group ID in the range, inclusive."
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8spspallowedusers
 
+        import data.lib.exempt_container.is_exempt
+
         violation[{"msg": msg}] {
           fields := ["runAsUser", "runAsGroup", "supplementalGroups", "fsGroup"]
           field := fields[_]
           container := input_containers[_]
+          not is_exempt(container)
           msg := get_type_violation(field, container)
         }
 
@@ -241,13 +355,41 @@ spec:
         input_containers[c] {
           c := input.review.object.spec.initContainers[_]
         }
+        input_containers[c] {
+            c := input.review.object.spec.ephemeralContainers[_]
+        }
+      libs:
+        - |
+          package lib.exempt_container
+
+          is_exempt(container) {
+              exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+              img := container.image
+              exemption := exempt_images[_]
+              _matches_exemption(img, exemption)
+          }
+
+          _matches_exemption(img, exemption) {
+              not endswith(exemption, "*")
+              exemption == img
+          }
+
+          _matches_exemption(img, exemption) {
+              endswith(exemption, "*")
+              prefix := trim_suffix(exemption, "*")
+              startswith(img, prefix)
+          }
 ---
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8spspvolumetypes
   annotations:
-    description: Controls usage of volume types.
+    description: >-
+      Restricts mountable volume types to those specified by the user.
+      Corresponds to the `volumes` field in a PodSecurityPolicy. For more
+      information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
 spec:
   crd:
     spec:
@@ -256,8 +398,15 @@ spec:
       validation:
         # Schema for the `parameters` field
         openAPIV3Schema:
+          type: object
+          description: >-
+            Restricts mountable volume types to those specified by the user.
+            Corresponds to the `volumes` field in a PodSecurityPolicy. For more
+            information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
           properties:
             volumes:
+              description: "`volumes` is an array of volume types. All volume types can be enabled using `*`."
               type: array
               items:
                 type: string
@@ -287,7 +436,11 @@ kind: ConstraintTemplate
 metadata:
   name: k8spsphostnetworkingports
   annotations:
-    description: Controls usage of host networking and ports.
+    description: >-
+      Controls usage of host network namespace by pod containers. Specific
+      ports must be specified. Corresponds to the `hostNetwork` and
+      `hostPorts` fields in a PodSecurityPolicy. For more information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
 spec:
   crd:
     spec:
@@ -296,52 +449,105 @@ spec:
       validation:
         # Schema for the `parameters` field
         openAPIV3Schema:
+          type: object
+          description: >-
+            Controls usage of host network namespace by pod containers. Specific
+            ports must be specified. Corresponds to the `hostNetwork` and
+            `hostPorts` fields in a PodSecurityPolicy. For more information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
           properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
             hostNetwork:
+              description: "Determines if the policy allows the use of HostNetwork in the pod spec."
               type: boolean
             min:
+              description: "The start of the allowed port range, inclusive."
               type: integer
             max:
+              description: "The end of the allowed port range, inclusive."
               type: integer
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8spsphostnetworkingports
 
+        import data.lib.exempt_container.is_exempt
+
         violation[{"msg": msg, "details": {}}] {
-          input_share_hostnetwork(input.review.object)
-          msg := sprintf("The specified hostNetwork and hostPort are not allowed, pod: %v. Allowed values: %v", [input.review.object.metadata.name, input.parameters])
+            input_share_hostnetwork(input.review.object)
+            msg := sprintf("The specified hostNetwork and hostPort are not allowed, pod: %v. Allowed values: %v", [input.review.object.metadata.name, input.parameters])
         }
 
         input_share_hostnetwork(o) {
-          not input.parameters.hostNetwork
-          o.spec.hostNetwork
+            not input.parameters.hostNetwork
+            o.spec.hostNetwork
         }
 
         input_share_hostnetwork(o) {
-          hostPort := input_containers[_].ports[_].hostPort
-          hostPort < input.parameters.min
+            hostPort := input_containers[_].ports[_].hostPort
+            hostPort < input.parameters.min
         }
 
         input_share_hostnetwork(o) {
-          hostPort := input_containers[_].ports[_].hostPort
-          hostPort > input.parameters.max
+            hostPort := input_containers[_].ports[_].hostPort
+            hostPort > input.parameters.max
         }
 
         input_containers[c] {
-          c := input.review.object.spec.containers[_]
+            c := input.review.object.spec.containers[_]
+            not is_exempt(c)
         }
 
         input_containers[c] {
-          c := input.review.object.spec.initContainers[_]
+            c := input.review.object.spec.initContainers[_]
+            not is_exempt(c)
         }
+
+        input_containers[c] {
+            c := input.review.object.spec.ephemeralContainers[_]
+            not is_exempt(c)
+        }
+      libs:
+        - |
+          package lib.exempt_container
+
+          is_exempt(container) {
+              exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+              img := container.image
+              exemption := exempt_images[_]
+              _matches_exemption(img, exemption)
+          }
+
+          _matches_exemption(img, exemption) {
+              not endswith(exemption, "*")
+              exemption == img
+          }
+
+          _matches_exemption(img, exemption) {
+              endswith(exemption, "*")
+              prefix := trim_suffix(exemption, "*")
+              startswith(img, prefix)
+          }
 ---
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8spsphostfilesystem
   annotations:
-    description: Controls usage of the host filesystem.
+    description: >-
+      Controls usage of the host filesystem. Corresponds to the
+      `allowedHostPaths` field in a PodSecurityPolicy. For more information,
+      see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
 spec:
   crd:
     spec:
@@ -350,16 +556,25 @@ spec:
       validation:
         # Schema for the `parameters` field
         openAPIV3Schema:
+          type: object
+          description: >-
+            Controls usage of the host filesystem. Corresponds to the
+            `allowedHostPaths` field in a PodSecurityPolicy. For more information,
+            see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
           properties:
             allowedHostPaths:
               type: array
+              description: "An array of hostpath objects, representing paths and read/write configuration."
               items:
                 type: object
                 properties:
-                  readOnly:
-                    type: boolean
                   pathPrefix:
                     type: string
+                    description: "The path prefix that the host volume must match."
+                  readOnly:
+                    type: boolean
+                    description: "when set to true, any container volumeMounts matching the pathPrefix must include `readOnly: true`."
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
@@ -415,10 +630,18 @@ spec:
         # This allows "/foo", "/foo/", "/foo/bar" etc., but
         # disallows "/fool", "/etc/foo" etc.
         path_matches(prefix, path) {
-            a := split(trim(prefix, "/"), "/")
-            b := split(trim(path, "/"), "/")
+            a := path_array(prefix)
+            b := path_array(path)
             prefix_matches(a, b)
         }
+        path_array(p) = out {
+            p != "/"
+            out := split(trim(p, "/"), "/")
+        }
+        # This handles the special case for "/", since
+        # split(trim("/", "/"), "/") == [""]
+        path_array("/") = []
+
         prefix_matches(a, b) {
             count(a) <= count(b)
             not any_not_equal_upto(a, b, count(a))
@@ -445,13 +668,21 @@ spec:
         input_containers[c] {
             c := input.review.object.spec.initContainers[_]
         }
+
+        input_containers[c] {
+            c := input.review.object.spec.ephemeralContainers[_]
+        }
 ---
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8suniqueingresshost
   annotations:
-    description: Requires all Ingress hosts to be unique.
+    description: >-
+      Requires all Ingress rule hosts to be unique.
+
+      Does not handle hostname wildcards:
+      https://kubernetes.io/docs/concepts/services-networking/ingress/
 spec:
   crd:
     spec:
@@ -471,7 +702,7 @@ spec:
           input.review.kind.kind == "Ingress"
           re_match("^(extensions|networking.k8s.io)$", input.review.kind.group)
           host := input.review.object.spec.rules[_].host
-          other := data.inventory.namespace[ns][otherapiversion]["Ingress"][name]
+          other := data.inventory.namespace[_][otherapiversion]["Ingress"][name]
           re_match("^(extensions|networking.k8s.io)/.+$", otherapiversion)
           other.spec.rules[_].host == host
           not identical(other, input.review)
@@ -483,7 +714,10 @@ kind: ConstraintTemplate
 metadata:
   name: k8sblocknodeport
   annotations:
-    description: Disallows all Services with type NodePort.
+    description: >-
+      Disallows all Services with type NodePort.
+
+      https://kubernetes.io/docs/concepts/services-networking/service/#nodeport
 spec:
   crd:
     spec:
@@ -513,12 +747,15 @@ spec:
         kind: K8sRequiredProbes
       validation:
         openAPIV3Schema:
+          type: object
           properties:
             probes:
+              description: "A list of probes that are required (ex: `readinessProbe`)"
               type: array
               items:
                 type: string
             probeTypes:
+              description: "The probe must define a field listed in `probeType` in order to satisfy the constraint (ex. `tcpSocket` satisfies `['tcpSocket', 'exec']`)"
               type: array
               items:
                 type: string
@@ -528,86 +765,30 @@ spec:
         package k8srequiredprobes
 
         probe_type_set = probe_types {
-          probe_types := {type | type := input.parameters.probeTypes[_]}
+            probe_types := {type | type := input.parameters.probeTypes[_]}
         }
 
         violation[{"msg": msg}] {
-          container := input.review.object.spec.containers[_]
-          probe := input.parameters.probes[_]
-          probe_is_missing(container, probe)
-          msg := get_violation_message(container, input.review, probe)
+            container := input.review.object.spec.containers[_]
+            probe := input.parameters.probes[_]
+            probe_is_missing(container, probe)
+            msg := get_violation_message(container, input.review, probe)
         }
 
         probe_is_missing(ctr, probe) = true {
-          not ctr[probe]
+            not ctr[probe]
         }
 
         probe_is_missing(ctr, probe) = true {
-          probe_field_empty(ctr, probe)
+            probe_field_empty(ctr, probe)
         }
 
         probe_field_empty(ctr, probe) = true {
-          probe_fields := {field | ctr[probe][field]}
-          diff_fields := probe_type_set - probe_fields
-          count(diff_fields) == count(probe_type_set)
+            probe_fields := {field | ctr[probe][field]}
+            diff_fields := probe_type_set - probe_fields
+            count(diff_fields) == count(probe_type_set)
         }
 
         get_violation_message(container, review, probe) = msg {
-          msg := sprintf("Container <%v> in your <%v> <%v> has no <%v>", [container.name, review.kind.kind, review.object.metadata.name, probe])
-        }
----
-apiVersion: templates.gatekeeper.sh/v1
-kind: ConstraintTemplate
-metadata:
-  name: k8srequiredprobes
-  annotations:
-    description: Requires Pods to have readiness and/or liveness probes.
-spec:
-  crd:
-    spec:
-      names:
-        kind: K8sRequiredProbes
-      validation:
-        openAPIV3Schema:
-          properties:
-            probes:
-              type: array
-              items:
-                type: string
-            probeTypes:
-              type: array
-              items:
-                type: string
-  targets:
-    - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8srequiredprobes
-
-        probe_type_set = probe_types {
-          probe_types := {type | type := input.parameters.probeTypes[_]}
-        }
-
-        violation[{"msg": msg}] {
-          container := input.review.object.spec.containers[_]
-          probe := input.parameters.probes[_]
-          probe_is_missing(container, probe)
-          msg := get_violation_message(container, input.review, probe)
-        }
-
-        probe_is_missing(ctr, probe) = true {
-          not ctr[probe]
-        }
-
-        probe_is_missing(ctr, probe) = true {
-          probe_field_empty(ctr, probe)
-        }
-
-        probe_field_empty(ctr, probe) = true {
-          probe_fields := {field | ctr[probe][field]}
-          diff_fields := probe_type_set - probe_fields
-          count(diff_fields) == count(probe_type_set)
-        }
-
-        get_violation_message(container, review, probe) = msg {
-          msg := sprintf("Container <%v> in your <%v> <%v> has no <%v>", [container.name, review.kind.kind, review.object.metadata.name, probe])
+            msg := sprintf("Container <%v> in your <%v> <%v> has no <%v>", [container.name, review.kind.kind, review.object.metadata.name, probe])
         }

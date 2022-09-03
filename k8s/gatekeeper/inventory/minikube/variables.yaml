@@ -5,3 +5,4 @@ all:
     gatekeeper:
       chart_variables:
         replicas: 1
+        version: "3.9.0"
