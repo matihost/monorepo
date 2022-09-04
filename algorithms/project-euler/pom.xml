@@ -115,6 +115,10 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.10.1</version>
           <configuration>
+            <!-- The -release option ensures that the code is compiled following the rules of the programming language of the specified release,
+            and that generated classes target the release as well as the public API of that release.
+            This means that, unlike the -source and -target options,
+            the compiler will detect and generate an error when using APIs that don't exist in previous releases of Java SE. -->
             <release>${java.version}</release>
           </configuration>
         </plugin>

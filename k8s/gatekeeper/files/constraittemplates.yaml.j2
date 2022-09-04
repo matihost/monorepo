@@ -18,6 +18,8 @@ spec:
           msg := sprintf("REVIEW OBJECT: %v\nDATA OBJECT: %v\n", [input.review, data.inventory])
         }
 ---
+# Generic templates and constraints taken from:
+# https://github.com/open-policy-agent/gatekeeper-library
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:

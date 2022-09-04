@@ -10,6 +10,8 @@ spec:
       - apiGroups: [""]
         kinds: ["Namespace"]
 ---
+# Generic templates and constraints taken from:
+# https://github.com/open-policy-agent/gatekeeper-library
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPPrivilegedContainer
 metadata:

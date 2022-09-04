@@ -40,7 +40,7 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <maven.test.skip>false</maven.test.skip>
 
-    <spring.boot.version>2.7.2</spring.boot.version>
+    <spring.boot.version>2.7.3</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -51,11 +51,11 @@
 
     <!-- Groovy -->
     <groovy.version>3.0.12</groovy.version> <!-- change to 4.0.0 when Spring Boot is migrate to Groovy 4-->
-    <spock.version>2.1-groovy-3.0</spock.version> <!-- change to 2.2-M1-groovy-4.0 when Groovy 4 -->
+    <spock.version>2.2-groovy-3.0</spock.version> <!-- change to 2.2-M1-groovy-4.0 when Groovy 4 -->
 
     <!-- Scala 3-->
     <scala.compat.version>3</scala.compat.version>
-    <scala.version>${scala.compat.version}.1.3</scala.version>
+    <scala.version>${scala.compat.version}.2.0</scala.version>
     <scala.spec2.version>5.0.7</scala.spec2.version>
     <scala.test.version>3.2.13</scala.test.version>
     <scala.test.plus.version>3.2.13.0</scala.test.plus.version>
@@ -414,12 +414,6 @@
           <groupId>org.scala-lang</groupId>
           <artifactId>scala3-interfaces</artifactId>
           <version>${scala.version}</version>
-      </dependency>
-      <!-- Workaround for dependency inconsistence between org.specs2:specs2-junit_3 and org.scalatest:scalatest_3-->
-      <dependency>
-        <groupId>org.scala-lang.modules</groupId>
-        <artifactId>scala-xml_3</artifactId>
-        <version>2.0.1</version>
       </dependency>
 
       <!-- Scala 3 still depends on Scala 2 for backward compatibility -->
