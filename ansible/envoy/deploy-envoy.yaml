@@ -24,6 +24,26 @@
       dest: "/etc/systemd/system/envoy.service"
       src: "{{ files }}/envoy.service"
 
+  - name: Ensure TLS for Envoy is present
+    block:
+    - name: "Ensure self-signed TLS CN={{ envoy.tls.cn }} is present"
+      ansible.builtin.include_role:
+        name: create_certificate
+      vars:
+        certificate_def:
+          cn: "{{ envoy.tls.cn }}"
+    - name: Ensure Envoy TLS key file present
+      ansible.builtin.copy:
+        dest: "/etc/envoy/tls.key"
+        content: "{{ tls.key | b64decode }}"
+    - name: Ensure Envoy TLS cert file present
+      ansible.builtin.copy:
+        dest: "/etc/envoy/tls.crt"
+        content: "{{ tls.crt | b64decode }}"
+    become: true
+    when: envoy.tls.cn is defined and envoy.tls.cn
+
+
   - name: Ensure Envoy systemd service is restarted
     ansible.builtin.systemd:
       state: restarted

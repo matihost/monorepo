@@ -4,7 +4,8 @@ Deployment of Envoy as systemd service
 
 Deploys Envoy:
 
-* http2https - forwarding local http port to remote https endpoint
+* http2https -  exposing envoy on HTTP and routing to HTTPS server
+* https2many -  exposing envoy on HTTPS and routing to HTTP or HTTPS server
 
 ## Prerequisites
 
@@ -19,6 +20,9 @@ pip3 install --user ansible
 ## Running
 
 ```bash
-# deploy envoy with http2https config
+# deploys envoy exposing envoy on HTTP and routing to HTTPS server
 make deploy-http2https-envoy
+
+# deploys envoy exposing envoy on HTTPS and routing to HTTP or HTTPS server
+make deploy-https2many-envoy
 ```
