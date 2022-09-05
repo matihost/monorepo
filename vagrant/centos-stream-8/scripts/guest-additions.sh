@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VBOX_VERSION="6.1.36"
+VBOX_VERSION="6.1.38"
 # disable SELinux to prevent https://www.virtualbox.org/ticket/19756
 sed -i 's/SELINUX=.*/SELINUX=permissive/g' /etc/selinux/config
 # to disable SELinux for current run

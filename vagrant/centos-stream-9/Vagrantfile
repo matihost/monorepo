@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
-  config.vm.box_url = "https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-Vagrant-9-20220808.1.x86_64.vagrant-virtualbox.box"
+  config.vm.box_url = "https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-Vagrant-9-20220829.0.x86_64.vagrant-virtualbox.box"
 
   config.vm.hostname = "centos9"
 
@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
   # create additional SATA controler for remaining disks
   config.vm.provider "virtualbox" do |vb|
     unless File.exist?(File.expand_path(".vagrant/centos-3.vmdk"))
-      vb.customize ["storagectl", :id, "--name", "SATA", "--add", "sata"]
+      vb.customize ["storagectl", :id, "--name", "SATA", "--add", "sata", "--hostiocache", "on"]
       (3..4).each do |i|
         vb.customize ['createmedium', 'disk',
         '--filename',   ".vagrant/centos-#{i}.vmdk",
@@ -92,7 +92,7 @@ Vagrant.configure("2") do |config|
       config.vbguest.installer_options = { allow_kernel_upgrade: true }
       # config.vbguest.installer_options = { running_kernel_modules: ["vboxguest"] }
       config.vbguest.installer_arguments = %w{--nox11 --keep}
-      VBOX_VERSION="6.1.36"
+      VBOX_VERSION="6.1.38"
       config.vbguest.installer_hooks[:before_install] = ["yum install -y epel-release policycoreutils-python-utils",
       "sed -i 's/SELINUX=.*/SELINUX=permissive/g' /etc/selinux/config",
       "setenforce Permissive",
@@ -119,7 +119,7 @@ Vagrant.configure("2") do |config|
 
     if "#{ENV['GUI']}" == "true"
       vb.gui = true
-      vb.customize ["modifyvm", :id, "--accelerate3d", "off"]
+      vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
       vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
       vb.customize ["modifyvm", :id, "--vram", "128"]
     end

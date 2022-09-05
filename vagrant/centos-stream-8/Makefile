@@ -9,7 +9,7 @@ status: # show currently run VM
 run: ## run VM
 	vagrant up
 
-run-with-gui:
+run-with-gui: ## run VM with GUI
 	GUI=true vagrant up
 
 ssh: ## ssh to VM

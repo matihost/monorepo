@@ -651,6 +651,20 @@ all:
                 grep tag_name | cut -d '"' -f 4)/terraformer-${PROVIDER}-linux-amd64
               chmod +x terraformer-${PROVIDER}-linux-amd64
               sudo mv terraformer-${PROVIDER}-linux-amd64 /usr/local/bin/terraformer
+              echo "Terraformer has been installed"
+            }
+        - name: terragrunt
+          become: true
+          desc: Ensure latest version of Terragrnt is installed
+          command: |
+            CURRENT_VERSION="$(curl -s https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(terragrunt --version 2>/dev/null | sed -E 's/.* version (.*)/\1/g')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -s https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r ".assets[] |
+                select(.name | test(\"linux_amd64\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/usr/local/bin/terragrunt"
+              chmod a+x /usr/local/bin/terragrunt
+              echo "Terragrun has been installed"
             }
         - name: ibm-mq-client
           desc: |
@@ -665,7 +679,7 @@ all:
           become: true
           command: |
             # TODO consider full server version
-            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/mqadv_dev925_ubuntu_x86-64.tar.gz
+            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/mqadv_dev930_ubuntu_x86-64.tar.gz
             # TODO add detect a new version
             [ -e /opt/mqm ] || {
               rm -rf /tmp/mq && mkdir -p /tmp/mq && cd /tmp/mq

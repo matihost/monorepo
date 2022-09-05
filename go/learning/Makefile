@@ -15,7 +15,7 @@ list-dependencies: ## list all modules dependencies including transient ones
 show-dependency-graph: ## show dependency graph
 	go mod graph
 
-update-dependencies: ## update dependencies
+update-dependencies: clean ## update dependencies, remove requires section from go.mod before running it
 	go mod tidy
 
 clean: ## removes compiled application and vendor directory

@@ -92,7 +92,7 @@ Vagrant.configure("2") do |config|
       config.vbguest.installer_options = { allow_kernel_upgrade: true }
       # config.vbguest.installer_options = { running_kernel_modules: ["vboxguest"] }
       config.vbguest.installer_arguments = %w{--nox11 --keep}
-      VBOX_VERSION="6.1.36"
+      VBOX_VERSION="6.1.38"
       config.vbguest.installer_hooks[:before_install] = ["yum install -y epel-release policycoreutils-python-utils",
       "sed -i 's/SELINUX=.*/SELINUX=permissive/g' /etc/selinux/config",
       "setenforce Permissive",
