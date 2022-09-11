@@ -307,6 +307,10 @@
             </execution>
           </executions>
           <configuration>
+            <excludeVulnerabilityIds>
+              <exclude>CVE-2022-25857</exclude>
+              <exclude>CVE-2022-38752</exclude>
+            </excludeVulnerabilityIds>
             <reportFile>${project.build.directory}/audit-report.json</reportFile>
           </configuration>
         </plugin>
