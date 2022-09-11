@@ -4,8 +4,7 @@ export JENKINS_PLUGIN_MANAGER_VERSION="2.12.8"
 export JENKINS_PLUGINS="ec2 \
   branch-api:2.1046.v0ca_37783ecc5 \
   pipeline-stage-view:2.24 \
-
-  workflow-job:1207.ve6191ff089f8 \
+  workflow-job:1232.v5a_4c994312f1 \
   workflow-aggregator:590.v6a_d052e5a_a_b_5 \
   cloudbees-disk-usage-simple:170.va_fd5b_4ee6858 \
   credentials:1143.vb_e8b_b_ceee347 \
@@ -14,8 +13,8 @@ export JENKINS_PLUGINS="ec2 \
   docker-workflow:521.v1a_a_dd2073b_2e \
   git:4.11.5 \
   configuration-as-code:1512.vb_79d418d5fc8 \
-  timestamper:1.19 \
-  github-branch-source:1687.v7618247e672d \
+  timestamper:1.20 \
+  github-branch-source:1694.vd46793a_c4a_57 \
   github-oauth:0.39 \
   ldap:2.12 \
   matrix-auth:3.1.5 \
