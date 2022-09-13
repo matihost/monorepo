@@ -9,7 +9,6 @@ SERVER_NAME := prod-01
 TF_VAR_minecraft_server_name := $(SERVER_NAME)
 TF_VAR_project := $(CURRENT_PROJECT)
 TF_VAR_region := $(REGION)
-TF_VAR_external_access_cidrs := ["$(WHOAMI)/32"]
 
 # uncomment to run terraform in debug mode
 # TF_LOG := DEBUG

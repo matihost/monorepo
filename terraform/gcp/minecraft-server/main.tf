@@ -4,9 +4,6 @@ provider "google" {
   project = var.project
 }
 
-data "google_client_config" "current" {}
-data "google_project" "current" {
-}
 data "google_compute_network" "private" {
   name = "private-vpc"
 }
@@ -37,16 +34,10 @@ variable "project" {
   description = "GCP Project For Deployment"
 }
 
-variable "external_access_cidrs" {
-  type        = list(string)
-  default     = ["0.0.0.0/0"]
-  description = "The public CIDR IP which is allowed to access Minecraft server"
-}
-
 variable "minecraft_server_url" {
   type        = string
-  default     = "https://launcher.mojang.com/v1/objects/c8f83c5655308435b3dcf03c06d9fe8740a77469/server.jar"
-  description = "Minecraft server.jar version 1.18.2, downloadable from: https://www.minecraft.net/pl-pl/download/server"
+  default     = "https://piston-data.mojang.com/v1/objects/f69c284232d7c7580bd89a5a4931c3581eae1378/server.jar"
+  description = "Minecraft server.jar version 1.19.2, downloadable from: https://www.minecraft.net/pl-pl/download/server"
 }
 
 variable "minecraft_server_name" {

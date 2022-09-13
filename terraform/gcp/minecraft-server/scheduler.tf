@@ -37,7 +37,7 @@ resource "google_cloud_scheduler_job" "stop-cron" {
 
 resource "google_cloud_scheduler_job" "start-cron" {
   name        = "${var.minecraft_server_name}-server-start-cron"
-  description = "Shutdown Minecraft ${var.minecraft_server_name} instance group"
+  description = "Start Minecraft ${var.minecraft_server_name} instance group"
   schedule    = "05 10 * * *"
   time_zone   = "Europe/Warsaw"
 
@@ -77,7 +77,7 @@ resource "google_storage_bucket_object" "minecraft-code" {
   depends_on = [null_resource.scheduler-code]
 }
 
-
+# TODO migrate to google_cloudfunctions2_function
 resource "google_cloudfunctions_function" "minecraft-lifecycle-executor" {
   name        = "${var.minecraft_server_name}-minecraft-lifecycle-executor"
   description = "Minecraft server ${var.minecraft_server_name} lifecycle executor"
