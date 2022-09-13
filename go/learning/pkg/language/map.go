@@ -1,7 +1,7 @@
 package language
 
 import (
-	lang "github.com/matihost/learning/go/internal/language"
+	lang "github.com/matihost/monorepo/go/learning/internal/language"
 	"strings"
 )
 

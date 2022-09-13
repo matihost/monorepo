@@ -4,7 +4,7 @@ package language
 
 import (
 	"fmt"
-	basic "github.com/matihost/learning/go/internal/language"
+	basic "github.com/matihost/monorepo/go/learning/internal/language"
 )
 
 // Abs - Value of interface type can hold any value that implements those methods.

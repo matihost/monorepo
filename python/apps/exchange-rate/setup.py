@@ -27,7 +27,7 @@ setup(
     description="A sample Python project showing exchange rate between two currencies",  # Optional
     long_description=long_description,  # Optional
     long_description_content_type="text/markdown",  # Optional (see note above)
-    url="https://github.com/matihost/learning",  # Optional
+    url="https://github.com/matihost/monorepo",  # Optional
     author="matihost",  # Optional
     classifiers=[  # Optional
         "Development Status :: 3 - Alpha",
@@ -54,5 +54,5 @@ setup(
             "exchange-rate-web=exchange_rate.cli.exchange_rate_web:main",
         ],
     },
-    project_urls={"Source": "https://github.com/matihost/learning/", },  # Optional
+    project_urls={"Source": "https://github.com/matihost/monorepo/", },  # Optional
 )

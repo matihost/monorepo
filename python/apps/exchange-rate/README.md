@@ -6,7 +6,7 @@ Shows foreign currency exchange rate to PLN (default: USD/PLN) based on Polish C
 
 ```bash
 # install
-pip3 install --user 'git+https://github.com/matihost/learning.git#egg=exchange-rate&subdirectory=python/apps/exchange-rate'
+pip3 install --user 'git+https://github.com/matihost/monorepo.git#egg=exchange-rate&subdirectory=python/apps/exchange-rate'
 
 # shows USD/PLN exchange rate
 exchange-rate

@@ -2,7 +2,7 @@ package language
 
 import (
 	"fmt"
-	lang "github.com/matihost/learning/go/internal/language"
+	lang "github.com/matihost/monorepo/go/learning/internal/language"
 	"math"
 )
 

@@ -4,12 +4,12 @@
 //
 // The name of package "main" here is special exception - even for downloading the code
 // the package has to be
-// go get github.com/matihost/learning/go/cmd/language
+// go get github.com/matihost/monorepo/go/learning/cmd/language
 //
 // The library specific packages has normal name (the last directory) and can imported
 //
-// For more language structure go to github.com/matihost/learning/go/internal/language and
-// github.com/matihost/learning/go/pkg/language
+// For more language structure go to github.com/matihost/monorepo/go/learning/internal/language and
+// github.com/matihost/monorepo/go/learning/pkg/language
 package main
 
 // importing other packages from standard library or other sources
@@ -30,10 +30,10 @@ import (
 	// convention is to use "internal" subpackage for code not intended for other apps do import
 	// convention is that last word should represent the app code is intended for
 	// do not split code to too many packages like in Java
-	basic "github.com/matihost/learning/go/internal/language"
+	basic "github.com/matihost/monorepo/go/learning/internal/language"
 
 	// convention is to keep code for other apps to import in "pkg" subpackage
-	lang "github.com/matihost/learning/go/pkg/language"
+	lang "github.com/matihost/monorepo/go/learning/pkg/language"
 )
 
 // In Go, a name is exported if it begins with a capital letter.

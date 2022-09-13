@@ -12,13 +12,13 @@ jenkins_jobs:
   description: Learning Multibranch Pipeline
   type: multibranch
   git:
-    scm: https://github.com/matihost/learning.git
+    scm: https://github.com/matihost/monorepo.git
     jenkinsfile: Jenkinsfile
 - name: ansible-image
   description: Ansible Image Build
   type: multibranch
   git:
-    scm: https://github.com/matihost/learning.git
+    scm: https://github.com/matihost/monorepo.git
     jenkinsfile: k8s/images/ansible/Jenkinsfile
 - name: learning-github
   description: Learning GitHub Pipeline

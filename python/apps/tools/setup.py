@@ -26,7 +26,7 @@ setup(
     description="Project with CLI tools: setup-opendns, automount-cifs",  # Optional
     long_description=long_description,  # Optional
     long_description_content_type="text/markdown",  # Optional (see note above)
-    url="https://github.com/matihost/learning",  # Optional
+    url="https://github.com/matihost/monorepo",  # Optional
     author="matihost",  # Optional
     classifiers=[  # Optional
         "Development Status :: 3 - Alpha",
@@ -55,5 +55,5 @@ setup(
             "setup-opendns=tools.cli.setup_opendns:main",
         ],
     },
-    project_urls={"Source": "https://github.com/matihost/learning/", },  # Optional
+    project_urls={"Source": "https://github.com/matihost/monorepo/", },  # Optional
 )

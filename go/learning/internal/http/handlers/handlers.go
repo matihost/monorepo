@@ -3,7 +3,8 @@ package handlers
 import (
 	"fmt"
 	"net/http"
-	lang "github.com/matihost/learning/go/pkg/language"
+
+	lang "github.com/matihost/monorepo/go/learning/pkg/language"
 )
 
 type HttpHandler struct {
@@ -18,8 +19,6 @@ func (v *HttpHandler) Headers(w http.ResponseWriter, req *http.Request) {
 	headers := getHeaders(req)
 	lang.WriteJSON(w, *headers)
 }
-
-
 
 func getHeaders(r *http.Request) *map[string]string {
 	hdr := make(map[string]string, len(r.Header))

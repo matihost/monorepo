@@ -1,4 +1,4 @@
-module github.com/matihost/learning/go
+module github.com/matihost/monorepo/go/learning
 
 go 1.18
 
@@ -6,7 +6,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	go.uber.org/zap v1.23.0
 	google.golang.org/grpc v1.49.0
-	google.golang.org/grpc/examples v0.0.0-20220902210910-60a3a7e969c4
+	google.golang.org/grpc/examples v0.0.0-20220912222029-21f0259e42b5
 )
 
 require (

@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	handler "github.com/matihost/learning/go/internal/http/handlers"
+	handler "github.com/matihost/monorepo/go/learning/internal/http/handlers"
 )
 
 var (

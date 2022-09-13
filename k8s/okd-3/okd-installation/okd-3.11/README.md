@@ -39,7 +39,7 @@ sudo yum install ansible
 ```bash
 ssh root@master
 mkdir -p ~/src && cd ~/src
-git clone https://github.com/matihost/learning
+git clone https://github.com/matihost/monorepo
 cd learning/openshift/okd-installation/okd-3.11
 
 make dependencies

@@ -1,6 +1,6 @@
 # Go
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/matihost/learning)](https://goreportcard.com/report/github.com/matihost/learning)
+[![Go Report Card](https://goreportcard.com/badge/github.com/matihost/monorepo/go/learning)](https://goreportcard.com/report/github.com/matihost/monorepo/go/learning)
 
 Various Go applications showing Go lang structure, concepts, sample libraries usage (gRPC server/client, HTTP server), build, dependency management etc.
 
@@ -12,12 +12,12 @@ However it supports GOPATH style of building as well though [Dep](https://golang
 
 ## Prerequisites
 
-Go lang 1.17.x+
+Go lang 1.18.x+
 
 Ubuntu
 
 ```bash
-sudo apt -y install golang-1.17
+sudo apt -y install golang-1.18
 sudo apt -y install golang-golang-x-tools
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 ```
@@ -81,8 +81,8 @@ sudo systemctl enable docker
 ## Installing
 
 ```bash
-go get github.com/matihost/learning/go/cmd/language
-go get github.com/matihost/learning/go/cmd/http-server
+go get github.com/matihost/monorepo/go/learning/cmd/language
+go get github.com/matihost/monorepo/go/learning/cmd/http-server
 ```
 
 ## Building from code

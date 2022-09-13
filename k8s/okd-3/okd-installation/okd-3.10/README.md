@@ -39,7 +39,7 @@ sudo yum install ansible
 ```bash
 ssh root@master
 mkdir -p ~/src && cd ~/src
-git clone https://github.com/matihost/learning
+git clone https://github.com/matihost/monorepo
 cd learning/openshift/okd-installation/okd-3.10
 
 make dependencies
@@ -51,7 +51,7 @@ make upgrade-from-3.9
 ```bash
 ssh root@master
 mkdir -p ~/src && cd ~/src
-git clone https://github.com/matihost/learning
+git clone https://github.com/matihost/monorepo
 cd learning/ansible/okd-installation/okd-3.10
 
 make dependencies

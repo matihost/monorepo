@@ -1,7 +1,7 @@
 # Matihost's Monorepo
 
-[![License](https://img.shields.io/github/license/matihost/learning.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://app.travis-ci.com/matihost/learning.svg?branch=master)](https://app.travis-ci.com/github/matihost/learning)
+[![License](https://img.shields.io/github/license/matihost/monorepo.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://app.travis-ci.com/matihost/monorepo.svg?branch=master)](https://app.travis-ci.com/github/matihost/monorepo)
 
 Various technology deployments, tools & code:
 

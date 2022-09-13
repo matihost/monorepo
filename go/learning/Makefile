@@ -1,4 +1,4 @@
-PROJECT := "github.com/matihost/learning"
+PROJECT := "github.com/matihost/monorepo"
 REPOSITORY := "go/learning"
 CMD_PACKAGE_NAME := "language"
 

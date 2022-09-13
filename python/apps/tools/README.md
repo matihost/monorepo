@@ -12,7 +12,7 @@ Contains CLI Python made tools:
 # so that scripts will be in /usr/local/bin accessible by root
 # scripts does not require to run with sudo, but they switch internally to root so that global installation is desired
 
-sudo pip3 install 'git+https://github.com/matihost/learning.git#egg=tools&subdirectory=python/apps/tools'
+sudo pip3 install 'git+https://github.com/matihost/monorepo.git#egg=tools&subdirectory=python/apps/tools'
 
 # enable OpenDNS public IP sync for OpenDNS Home1 labeled network for particular user
 setup-opendns -u opendns@user.com -p password Home1

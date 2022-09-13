@@ -10,7 +10,7 @@
   <description>Various Java, Groovy, Scala Learning Apps Tools</description>
 
   <issueManagement>
-    <url>https://github.com/matihost/learning/issues</url>
+    <url>https://github.com/matihost/monorepo/issues</url>
     <system>GitHub Issues</system>
   </issueManagement>
 
@@ -23,9 +23,9 @@
   </licenses>
 
   <scm>
-    <url>https://github.com/matihost/learning</url>
-    <connection>scm:git:git://github.com/matihost/learning.git</connection>
-    <developerConnection>scm:git:git@github.com:matihost/learning.git</developerConnection>
+    <url>https://github.com/matihost/monorepo</url>
+    <connection>scm:git:git://github.com/matihost/monorepo.git</connection>
+    <developerConnection>scm:git:git@github.com:matihost/monorepo.git</developerConnection>
   </scm>
 
   <modules>
@@ -158,6 +158,10 @@
       <plugin>
         <groupId>org.sonatype.ossindex.maven</groupId>
         <artifactId>ossindex-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.basepom.maven</groupId>
+        <artifactId>duplicate-finder-maven-plugin</artifactId>
       </plugin>
     </plugins>
     <pluginManagement>
@@ -381,6 +385,20 @@
           <configuration>
             <multiRelease>9</multiRelease>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.basepom.maven</groupId>
+          <artifactId>duplicate-finder-maven-plugin</artifactId>
+          <version>1.5.1</version>
+          <executions>
+            <execution>
+              <id>default</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
