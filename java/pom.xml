@@ -313,8 +313,11 @@
           <configuration>
           <!-- TODO snakeyaml 1.30 vulnerabilities  -remove exclude when springboot updates snakeyaml > 1.30  -->
             <excludeVulnerabilityIds>
-              <exclude>CWE-787</exclude>
-              <exclude>CVE-400</exclude>
+              <exclude>CVE-2022-25857</exclude>
+              <exclude>CVE-2022-38749</exclude>
+              <exclude>CVE-2022-38751</exclude>
+              <exclude>CVE-2022-38752</exclude>
+              <exclude>CVE-2022-38750</exclude>
             </excludeVulnerabilityIds>
             <reportFile>${project.build.directory}/audit-report.json</reportFile>
           </configuration>
