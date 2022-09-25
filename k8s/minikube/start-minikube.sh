@@ -22,7 +22,6 @@ Optional features:
 Optional deprecated features:
 - Istio (--with-istio) - install base Istio w/o meaningful config, go to k8s/istio dir to install istio fully
 - OPA Gatekeeper (--with-gatekeeper) - install base Gatekeeper w/o meaningful config, go to k8s/gatekeeper dir to install OPA Gatekeeper fully
-- Enable PodSecurityPolicies (deprecated since k8s 1.21) (--with-psp | psp)
 
 Samples:
 # start default bare/none driver Minikube with docker with CNI enablement (Cilium installed via Helm)
@@ -81,7 +80,7 @@ function ensureCriDockerdPresent() {
 }
 
 function ensureCrioPresent() {
-  CRIO_VERSION=1.24
+  CRIO_VERSION=1.25
 
   [ -x /usr/bin/crio ] || (
     # shellcheck disable=SC1091
@@ -147,10 +146,6 @@ function addNginxIngress() {
     helm repo update
   }
   [ "$(kubectl config current-context)" == "minikube" ] && {
-    [[ "${ADMISSION_PLUGINS}" == *PodSecurityPolicy* ]] && {
-      # start Nginx ingress with PodSecurityPolicy: https://kubernetes.github.io/ingress-nginx/examples/psp/
-      kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/docs/examples/psp/psp.yaml
-    }
     helm upgrade --install -f ngnix.values.yaml ingress-nginx nginx-stable/nginx-ingress -n ingress-nginx --create-namespace || {
       echo "Unable to install NGNIX, ngnix / k8s incompatibility? check NGinx Helm"
       exit 1
@@ -200,9 +195,6 @@ while [[ "$#" -gt 0 ]]; do
     ;;
   --with-gatekeeper | gatekeeper)
     ADDONS="${ADDONS} gatekeeper"
-    ;;
-  --with-psp | psp)
-    export ADMISSION_PLUGINS="${ADMISSION_PLUGINS},PodSecurityPolicy"
     ;;
   *) PARAMS+=("$1") ;; # save it in an array for later
   esac
@@ -257,7 +249,7 @@ if ! minikube status &>/dev/null; then
     --extra-config=apiserver.enable-admission-plugins="${ADMISSION_PLUGINS}" \
     --extra-config=kubelet.resolv-conf=/run/systemd/resolve/resolv.conf \
     --extra-config=kubelet.cgroup-driver=systemd \
-    --addons=pod-security-policy \
+    --addons=volumesnapshots \
     ${EXTRA_PARAMS}
 
   sudo chmod -R a+rwx /etc/kubernetes &&

@@ -199,7 +199,7 @@ pdb:
 service: {}
 disabledBuiltins: ["{http.send}"]
 psp:
-  enabled: true
+  enabled: {{ 'true' if lookup('pipe', 'kubectl version -o json | jq -r .serverVersion.minor') | int < 25 else 'false' }}
 upgradeCRDs:
   enabled: true
   tolerations: []

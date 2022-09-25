@@ -40,9 +40,9 @@
     k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/recover.backup.template.yaml') }}"
-      validate:
-        fail_on_error: true
-        strict: true
+      # validate:
+      #   fail_on_error: true
+      #   strict: true
 
   - name: Ensure recover backup Job is finished
     k8s_info:

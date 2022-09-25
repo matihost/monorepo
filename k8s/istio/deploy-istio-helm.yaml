@@ -33,6 +33,7 @@
       validate:
         fail_on_error: true
         strict: true
+    when: lookup('pipe', 'kubectl version -o json | jq -r .serverVersion.minor') | int < 25
 
   - name: Ensure tcp:15017 is open on GKE nodes
     ansible.builtin.shell: |
@@ -44,7 +45,7 @@
         exit 1
       }
       gcloud compute firewall-rules update "${FIREWALL_NAME}" --allow tcp:10250,tcp:443,tcp:15017
-    when: options.gke_mode|default(false)
+    when: options.gke_mode | default(false)
 
   - name: Run Terraform to setup GCP prerequisites for Istio deployment
     terraform:
@@ -56,7 +57,7 @@
         | combine({'project': gcp_project})
         | combine({'enable_internal_ingress_node_pool': ingress_gateway.enable_node_selector | default(false) | string | lower})
         | combine({'enable_external_ingress_node_pool': enable_external_ingress_node_pool | string | lower}) }}"
-    when: options.gke_mode|default(false)
+    when: options.gke_mode | default(false)
 
   - name: Deploy {{ istio.version }} version of istio/base chart inside istio-system namespace
     helm:
@@ -114,9 +115,10 @@
     k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/ingress_class.yaml.j2') }}"
-      validate:
-        fail_on_error: true
-        strict: true
+      # TODO uncomment when kubernetes-validate supports k8s > 1.24
+      # validate:
+      #   fail_on_error: true
+      #   strict: true
 
 
   - name: Ensure CN={{ internal_wildcard_cn }} TLS is present
@@ -148,9 +150,10 @@
     k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/internal_vs_config.yaml.j2') }}"
-      validate:
-        fail_on_error: true
-        strict: true
+      # TODO uncomment when kubernetes-validate supports k8s > 1.24
+      # validate:
+      #   fail_on_error: true
+      #   strict: true
 
   # - name: Set external wildcard  variables
   #   ansible.builtin.set_fact:
@@ -207,9 +210,9 @@
     k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/roles.yaml.j2') }}"
-      validate:
-        fail_on_error: true
-        strict: true
+      # validate:
+      #   fail_on_error: true
+      #   strict: true
 
   # - name: Ensure CN={{ external_wildcard_cn }} TLS is present
   #   block:

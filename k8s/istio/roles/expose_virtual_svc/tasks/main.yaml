@@ -8,6 +8,6 @@
   k8s:
     state: present
     definition: "{{ lookup('template', role_path + '/files/virtual_svc.yaml.j2') }}"
-    validate:
-      fail_on_error: true
-      strict: true
+    # validate:
+    #   fail_on_error: true
+    #   strict: true

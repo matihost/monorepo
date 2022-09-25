@@ -64,6 +64,7 @@ kind: Ingress
 metadata:
   name: echoserver
   annotations:
+    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   tls:

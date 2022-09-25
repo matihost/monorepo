@@ -8,7 +8,7 @@ all:
         versions:
           # represents path to local gems, for example:  ~/.local/share/gem/ruby/3.0.0/bin
           ruby: 3.0.0
-          crio: 1.24
+          crio: 1.25
           # libcontainers && cri-o :: https://github.com/cri-o/cri-o/blob/master/install.md#apt-based-operating-systems
           # use {{ ansible_distribution_version }} instead of current Ubuntu version is supported, otherwise hardcode version (aka: 21.04)
           # TODO change to commented when jammy/22.04 is supported Ubuntu
@@ -17,7 +17,7 @@ all:
           terraform_ubuntu_version: "{{ ansible_distribution_release }}"
           virtualbox_ubuntu_version: "{{ ansible_distribution_release }}"
           cri_dockerd_ubuntu_version: "{{ ansible_distribution_release }}"
-          mq: 9.3.0.0
+          mq: 9.3.0.1
         virtual_interface_ip: 192.168.10.1
         update_cache_timeout: 30
         systemd_journal:

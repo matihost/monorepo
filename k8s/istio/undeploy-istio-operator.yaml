@@ -22,9 +22,9 @@
     k8s:
       state: absent
       definition: "{{ lookup('template', '{{ files }}/roles.yaml.j2') }}"
-      validate:
-        fail_on_error: true
-        strict: true
+      # validate:
+      #   fail_on_error: true
+      #   strict: true
 
   - name: Set external wildcard  variables
     set_fact:
@@ -54,18 +54,18 @@
     k8s:
       state: absent
       definition: "{{ lookup('template', '{{ files }}/ingress_class.yaml.j2') }}"
-      validate:
-        fail_on_error: true
-        strict: true
+      # validate:
+      #   fail_on_error: true
+      #   strict: true
 
 
   - name: Ensure Istio ControlPlane operator removed
     k8s:
       state: absent
       definition: "{{ lookup('template', '{{ files }}/istio_operator_control_plane.yaml.j2') }}"
-      validate:
-        fail_on_error: true
-        strict: true
+      # validate:
+      #   fail_on_error: true
+      #   strict: true
 
   - name: Undeploy Istio Operator Helm chart
     helm:
@@ -101,6 +101,7 @@
       validate:
         fail_on_error: true
         strict: true
+    when: lookup('pipe', 'kubectl version -o json | jq -r .serverVersion.minor')|int < 25
 
 
   - name: Ensure istio-system namespace removed

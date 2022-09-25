@@ -6,7 +6,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: {{ $fullName }}
-  namespace: {{ if eq .Values.ingress.class "istio" }} istio-system {{ else }} {{ include "app.namespace" . }} {{ end }}
+  namespace: {{ if eq .Values.ingress.class "istio" }} istio-ingress {{ else }} {{ include "app.namespace" . }} {{ end }}
   labels:
     {{- include "app.labels" . | nindent 4 }}
 data:
@@ -22,13 +22,13 @@ metadata:
   labels:
     {{- include "app.labels" . | nindent 4 }}
   annotations:
-    {{- if .Values.ingress.class }}
-    kubernetes.io/ingress.class: {{ .Values.ingress.class }}
-    {{- end }}
     {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
+{{- if .Values.ingress.class }}
+  ingressClassName:  {{ .Values.ingress.class }}
+{{- end }}
   tls:
   - hosts:
     - {{ .Values.ingress.host }}

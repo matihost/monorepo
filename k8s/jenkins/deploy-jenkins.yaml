@@ -43,9 +43,9 @@
     k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/prerequisites.template.yaml') }}"
-      validate:
-        fail_on_error: true
-        strict: true
+      # validate:
+      #   fail_on_error: true
+      #   strict: true
 
   - name: Ensure Jenkins CN={{ jenkins_ingress.host }} Secret is present
     block:
