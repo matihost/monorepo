@@ -3,4 +3,4 @@ name: mq
 description: A Helm chart for IBM MQ deployment
 type: application
 version: 0.3.0
-appVersion: 9.3.0.0-r3
+appVersion: 9.3.0.1-r1

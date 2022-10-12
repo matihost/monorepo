@@ -52,6 +52,10 @@ resource "google_container_cluster" "gke" {
       enabled = true
     }
 
+    gke_backup_agent_config {
+      enabled = false
+    }
+
     dns_cache_config {
       enabled = true
     }
@@ -67,6 +71,7 @@ resource "google_container_cluster" "gke" {
     config_connector_config {
       enabled = true
     }
+
   }
 
   # when https://cloud.google.com/kubernetes-engine/docs/how-to/dataplane-v2 enabled
@@ -136,9 +141,6 @@ resource "google_container_cluster" "gke" {
   }
   networking_mode = "VPC_NATIVE"
 
-  logging_config {
-    enable_components = ["SYSTEM_COMPONENTS", "WORKLOADS"]
-  }
 
   master_auth {
     client_certificate_config {
@@ -164,6 +166,15 @@ resource "google_container_cluster" "gke" {
       }
     }
   }
+
+  node_pool_defaults {
+    node_config_defaults {
+      gcfs_config {
+        enabled = true
+      }
+    }
+  }
+
 
   pod_security_policy_config {
     enabled = var.enable_pod_security_policy
@@ -192,8 +203,17 @@ resource "google_container_cluster" "gke" {
   min_master_version = data.google_container_engine_versions.versions.release_channel_default_version["RAPID"]
 
   monitoring_config {
+    enable_components = ["SYSTEM_COMPONENTS", "APISERVER", "CONTROLLER_MANAGER", "SCHEDULER"]
+
+    managed_prometheus {
+      enabled = true
+    }
+  }
+
+  logging_config {
     enable_components = ["SYSTEM_COMPONENTS", "WORKLOADS"]
   }
+
   release_channel {
     channel = "RAPID"
   }
@@ -340,6 +360,10 @@ resource "google_container_node_pool" "gke_nodes" {
       enabled = true
     }
 
+    gvnic {
+      enabled = true
+    }
+
     # since 1.20 usage of docker as container engine is deprecated
     # valid image types: gcloud container get-server-config
     image_type = "COS_CONTAINERD"
@@ -388,8 +412,8 @@ resource "google_container_node_pool" "gke_nodes" {
   dynamic "autoscaling" {
     for_each = var.autoscalling ? [1] : []
     content {
-      min_node_count = 0
-      max_node_count = 5
+      total_min_node_count = 0
+      total_max_node_count = 5
     }
   }
 

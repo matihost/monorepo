@@ -46,11 +46,15 @@ resource "google_apigee_instance" "instance" {
   ]
 }
 
-# TODO enable when Google provider releases apigee nat resource
-# resource "google_apigee_nat_address" "instance-nat-1" {
-#   instance_id  = google_apigee_instance.instance.id
-#   name  = "${google_apigee_instance.google_apigee_instance.name}-nat-1"
-# }
+
+# A NAT address is a static external IP address used for Internet egress traffic
+# otherwise ephemeral ip is used for external traffic
+resource "google_apigee_nat_address" "instance-nat" {
+  for_each = local.regions
+
+  instance_id = google_apigee_instance.instance[each.key].id
+  name        = "${google_apigee_instance.instance[each.key].name}-egress-nat-ip"
+}
 
 resource "google_apigee_environment" "env" {
   for_each = local.envs
@@ -59,6 +63,9 @@ resource "google_apigee_environment" "env" {
   description  = "Apigee Environment: ${each.key}"
   display_name = each.key
   org_id       = google_apigee_organization.org.id
+
+  deployment_type = "PROXY"
+  api_proxy_type  = "PROGRAMMABLE"
 }
 
 resource "google_apigee_instance_attachment" "intance-env-attachment" {

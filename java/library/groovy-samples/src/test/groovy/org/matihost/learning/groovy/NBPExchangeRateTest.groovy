@@ -11,7 +11,7 @@ class NBPExchangeRateTest extends Specification {
 
     where:
     currency | exchangeRate
-    "USD"    | 4.99
+    "USD"    | 5.99
     "EUR"    | 5.99
   }
 
