@@ -2,7 +2,7 @@
 
 Various playbooks for Ubuntu machine management.
 
-Supported Ubuntu distribution: **22.04 (jammy)**
+Supported Ubuntu distribution: **22.10 (kinetic)**
 
 ## Prerequisites
 

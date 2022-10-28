@@ -10,12 +10,13 @@ all:
           ruby: 3.0.0
           crio: 1.25
           # libcontainers && cri-o :: https://github.com/cri-o/cri-o/blob/master/install.md#apt-based-operating-systems
-          # use {{ ansible_distribution_version }} instead of current Ubuntu version is supported, otherwise hardcode version (aka: 21.04)
-          # TODO change to commented when jammy/22.04 is supported Ubuntu
-          libcontainers_repo_ubuntu_version: "{{ ansible_distribution_version }}"
-          libcontainers_crio_repo_ubuntu_version: "{{ ansible_distribution_version }}"
-          terraform_ubuntu_version: "{{ ansible_distribution_release }}"
-          virtualbox_ubuntu_version: "{{ ansible_distribution_release }}"
+          # use {{ ansible_distribution_version }} instead of current Ubuntu version is supported, otherwise hardcode version (aka: 22.04)
+          # TODO change to {{ ansible_distribution_version }} when kinetic/22.10 is supported Ubuntu
+          libcontainers_repo_ubuntu_version: "22.04"
+          libcontainers_crio_repo_ubuntu_version: "22.04"
+          # TODO change to {{ ansible_distribution_release }} when kinetic/22.10 is supported Ubuntu
+          terraform_ubuntu_version: "jammy"
+          virtualbox_ubuntu_version: "jammy"
           cri_dockerd_ubuntu_version: "{{ ansible_distribution_release }}"
           mq: 9.3.0.1
         virtual_interface_ip: 192.168.10.1
@@ -99,7 +100,7 @@ all:
           repo: "deb [arch=amd64] https://packages.cloud.google.com/apt cloud-sdk main"
           key_url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
         - name: openvpn
-          repo: "deb [arch=amd64] https://swupdate.openvpn.net/community/openvpn3/repos focal main"
+          repo: "deb [arch=amd64] https://swupdate.openvpn.net/community/openvpn3/repos jammy main"
           key_url: https://swupdate.openvpn.net/repos/openvpn-repo-pkg-key.pub
         - name: terraform
           repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ versions.terraform_ubuntu_version }} main"
@@ -123,7 +124,7 @@ all:
         - hplip
         - hplip-gui
         - ddclient
-        - golang-1.18-go
+        - golang-1.19-go
         - golang-golang-x-tools
         - python3-pip
         - graphviz
@@ -289,7 +290,7 @@ all:
         - name: ensure-hp-lip
           desc: |
             Ensure the latest hplip is installed from source
-            TODO the latest 3.22.2 cannot be installed on Ubuntu 22.04 out of the box yet: https://bugs.launchpad.net/hplip/+bug/1879353
+            TODO the latest 3.22.6 cannot be installed on Ubuntu 22.10 out of the box yet: https://bugs.launchpad.net/hplip/+bug/1879353
             To install latest HPLIP in advanced mode (without GUI): https://developers.hp.com/hp-linux-imaging-and-printing/KnowledgeBase/InstallHPLIPwithqt5.html
             You need to install the following dependencies
                 PyQt5
