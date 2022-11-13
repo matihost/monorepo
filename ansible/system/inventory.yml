@@ -18,7 +18,7 @@ all:
           terraform_ubuntu_version: "jammy"
           virtualbox_ubuntu_version: "jammy"
           cri_dockerd_ubuntu_version: "{{ ansible_distribution_release }}"
-          mq: 9.3.0.1
+          mq: 9.3.1.0
         virtual_interface_ip: 192.168.10.1
         update_cache_timeout: 30
         systemd_journal:
@@ -35,17 +35,19 @@ all:
           eamodio.gitlens
           formulahendry.code-runner
           foxundermoon.shell-format
-          GabrielBB.vscode-lombok
           golang.go
           hashicorp.terraform
           joaompinto.asciidoctor-vscode
           ms-azuretools.vscode-docker
           ms-kubernetes-tools.vscode-kubernetes-tools
+          ms-python.isort
           ms-python.python
           ms-python.vscode-pylance
           ms-toolsai.jupyter
           ms-toolsai.jupyter-keymap
           ms-toolsai.jupyter-renderers
+          ms-toolsai.vscode-jupyter-cell-tags
+          ms-toolsai.vscode-jupyter-slideshow
           ms-vscode.makefile-tools
           Pivotal.vscode-boot-dev-pack
           Pivotal.vscode-spring-boot
@@ -57,11 +59,13 @@ all:
           streetsidesoftware.code-spell-checker
           techer.open-in-browser
           tomoki1207.pdf
+          VisualStudioExptTeam.intellicode-api-usage-examples
           VisualStudioExptTeam.vscodeintellicode
           vscjava.vscode-java-debug
           vscjava.vscode-java-dependency
           vscjava.vscode-java-pack
           vscjava.vscode-java-test
+          vscjava.vscode-lombok
           vscjava.vscode-maven
           vscjava.vscode-spring-boot-dashboard
           vscjava.vscode-spring-initializr
@@ -290,7 +294,7 @@ all:
         - name: ensure-hp-lip
           desc: |
             Ensure the latest hplip is installed from source
-            TODO the latest 3.22.6 cannot be installed on Ubuntu 22.10 out of the box yet: https://bugs.launchpad.net/hplip/+bug/1879353
+            TODO the latest 3.22.10 cannot be installed on Ubuntu 22.10 out of the box yet: https://bugs.launchpad.net/hplip/+bug/1879353
             To install latest HPLIP in advanced mode (without GUI): https://developers.hp.com/hp-linux-imaging-and-printing/KnowledgeBase/InstallHPLIPwithqt5.html
             You need to install the following dependencies
                 PyQt5
@@ -680,7 +684,7 @@ all:
           become: true
           command: |
             # TODO consider full server version
-            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/mqadv_dev930_ubuntu_x86-64.tar.gz
+            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/mqadv_dev931_ubuntu_x86-64.tar.gz
             # TODO add detect a new version
             [ -e /opt/mqm ] || {
               rm -rf /tmp/mq && mkdir -p /tmp/mq && cd /tmp/mq
@@ -698,7 +702,7 @@ all:
           become: false
           command: |
             CURRENT_VERSION="$(curl -s "https://api.github.com/repos/terraform-linters/tflint/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"v([^"]+)".*/\1/')"
-            INSTALLED_VERSION="$(tflint --version 2>/dev/null |  sed -E 's/.*version ([^"]+)/\1/')"
+            INSTALLED_VERSION="$(tflint --version 2>/dev/null | grep version |  sed -E 's/.*version ([^"]+)/\1/')"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh |bash
             }

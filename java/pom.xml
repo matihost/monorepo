@@ -63,7 +63,7 @@
     <scala2.version>2.13.9</scala2.version>
 
     <!-- IBM MQ client -->
-    <mq.version>9.3.0.1</mq.version>
+    <mq.version>9.3.1.0</mq.version>
   </properties>
 
   <profiles>
