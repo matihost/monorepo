@@ -1,5 +1,7 @@
 package org.matihost.learning.groovy
 
+import groovy.xml.XmlSlurper
+
 class NBPExchangeRates {
   private static final String NBP_TABLE_A_URL = "https://www.nbp.pl/kursy/xml/LastA.xml";
 

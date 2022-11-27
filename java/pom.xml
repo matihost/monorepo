@@ -40,7 +40,8 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <maven.test.skip>false</maven.test.skip>
 
-    <spring.boot.version>2.7.4</spring.boot.version>
+    <!-- Spring Boot -->
+    <spring.boot.version>3.0.0</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -49,18 +50,17 @@
     <!-- Travis CI openjdk17 image has build in Maven 3.6.3 -->
     <enforce.maven.version>3.6</enforce.maven.version>
 
-    <!-- Groovy -->
-    <groovy.version>3.0.13</groovy.version> <!-- change to 4.0.0 when Spring Boot is migrate to Groovy 4-->
-    <spock.version>2.2-groovy-3.0</spock.version> <!-- change to 2.2-M1-groovy-4.0 when Groovy 4 -->
+    <!-- Spock -->
+    <spock.version>2.3-groovy-4.0</spock.version>
 
     <!-- Scala 3-->
     <scala.compat.version>3</scala.compat.version>
     <scala.version>${scala.compat.version}.2.0</scala.version>
-    <scala.spec2.version>5.0.7</scala.spec2.version>
-    <scala.test.version>3.2.13</scala.test.version>
-    <scala.test.plus.version>3.2.13.0</scala.test.plus.version>
+    <scala.spec2.version>5.2.0</scala.spec2.version>
+    <scala.test.version>3.2.14</scala.test.version>
+    <scala.test.plus.version>3.2.14.0</scala.test.plus.version>
     <!-- Scala 3 still depends on Scala 2 for backward compatibility -->
-    <scala2.version>2.13.9</scala2.version>
+    <scala2.version>2.13.10</scala2.version>
 
     <!-- IBM MQ client -->
     <mq.version>9.3.1.0</mq.version>
@@ -99,6 +99,54 @@
                 </plugin>
             </plugins>
         </build>
+    </profile>
+    <profile>
+      <id>native</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-maven-plugin</artifactId>
+              <configuration>
+                <image>
+                  <builder>paketobuildpacks/builder:tiny</builder>
+                  <env>
+                    <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+                  </env>
+                </image>
+              </configuration>
+              <executions>
+                <execution>
+                  <id>process-aot</id>
+                  <goals>
+                    <goal>process-aot</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+            <plugin>
+              <groupId>org.graalvm.buildtools</groupId>
+              <artifactId>native-maven-plugin</artifactId>
+              <configuration>
+                <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+                <metadataRepository>
+                  <enabled>true</enabled>
+                </metadataRepository>
+                <requiredVersion>22.3</requiredVersion>
+              </configuration>
+              <executions>
+                <execution>
+                  <id>add-reachability-metadata</id>
+                  <goals>
+                    <goal>add-reachability-metadata</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
     </profile>
   </profiles>
 
@@ -167,6 +215,12 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.graalvm.buildtools</groupId>
+          <artifactId>native-maven-plugin</artifactId>
+          <version>0.9.18</version>
+          <extensions>true</extensions>
+        </plugin>
+        <plugin>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
           <version>${spring.boot.version}</version>
@@ -210,14 +264,18 @@
         <plugin>
           <groupId>org.codehaus.gmavenplus</groupId>
           <artifactId>gmavenplus-plugin</artifactId>
-          <version>1.13.1</version>
+          <version>2.1.0</version>
           <executions>
             <execution>
               <goals>
                 <goal>addSources</goal>
                 <goal>addTestSources</goal>
+                <goal>generateStubs</goal>
                 <goal>compile</goal>
+                <goal>generateTestStubs</goal>
                 <goal>compileTests</goal>
+                <goal>removeStubs</goal>
+                <goal>removeTestStubs</goal>
               </goals>
             </execution>
           </executions>
@@ -245,7 +303,7 @@
         <plugin>
           <groupId>org.scalatest</groupId>
           <artifactId>scalatest-maven-plugin</artifactId>
-          <version>2.1.0</version>
+          <version>2.2.0</version>
           <configuration>
             <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
             <junitxml>.</junitxml>
@@ -311,13 +369,9 @@
             </execution>
           </executions>
           <configuration>
-          <!-- TODO snakeyaml 1.30 vulnerabilities  -remove exclude when springboot updates snakeyaml > 1.30  -->
+          <!-- TODO test-ng vulnerability -->
             <excludeVulnerabilityIds>
-              <exclude>CVE-2022-25857</exclude>
-              <exclude>CVE-2022-38749</exclude>
-              <exclude>CVE-2022-38751</exclude>
-              <exclude>CVE-2022-38752</exclude>
-              <exclude>CVE-2022-38750</exclude>
+              <exclude>CVE-2022-4065</exclude>
             </excludeVulnerabilityIds>
             <reportFile>${project.build.directory}/audit-report.json</reportFile>
           </configuration>
@@ -335,6 +389,7 @@
             This means that, unlike the -source and -target options,
             the compiler will detect and generate an error when using APIs that don't exist in previous releases of Java SE. -->
             <release>${java.version}</release>
+            <parameters>true</parameters>
           </configuration>
         </plugin>
         <plugin>
@@ -369,6 +424,13 @@
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.2.2</version>
+          <configuration>
+            <archive>
+              <manifest>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+            </archive>
+          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
@@ -411,13 +473,6 @@
 
   <dependencyManagement>
     <dependencies>
-      <!-- Groovy -->
-      <dependency>
-        <groupId>org.codehaus.groovy</groupId>
-        <artifactId>groovy-all</artifactId>
-        <version>${groovy.version}</version>
-        <type>pom</type>
-      </dependency>
       <dependency>
         <groupId>org.spockframework</groupId>
         <artifactId>spock-core</artifactId>

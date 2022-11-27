@@ -26,15 +26,19 @@ show-modules-dependencies: ## show java modules dependencies
 	mvn -T1 -s .mvn/settings.xml clean compile test-compile jdeps:jdkinternals jdeps:test-jdkinternals
 
 build: ## builds the project
-	mvn -s .mvn/settings.xml --show-version clean install
+	mvn -s .mvn/settings.xml --show-version $(DEBUG_FLAG) clean install
+
+build-native: ## builds the project with GrallVM SpringBoot support
+	mvn -s .mvn/settings.xml --show-version $(DEBUG_FLAG) clean install -Pnative
+
 
 build-fast: ## builds the project w/o compiling and running tests
-	mvn -s .mvn/settings.xml --show-version clean install -PskipTests
+	mvn -s .mvn/settings.xml --show-version $(DEBUG_FLAG) clean install -PskipTests
 
 build-submodule: ## build submodule; usage make build-submodule MODULE=mavenModule [DEBUG=false]
 # -am added to allow running submodule with enforcer plugin under Maven 3
 # https://issues.apache.org/jira/browse/MENFORCER-189
-	mvn -s .mvn/settings.xml --show-version -am $(DEBUG_FLAG) -pl :$(MODULE) clean install
+	mvn -s .mvn/settings.xml --show-version -am $(DEBUG_FLAG) -pl :$(MODULE) clean install -Pnative
 
 clean: ## builds the project
 	mvn -s .mvn/settings.xml --show-version clean
