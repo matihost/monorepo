@@ -1,21 +1,22 @@
 ---
 - hosts: local
   gather_facts: true
+  name: Setup Ubuntu based Desktop system
   tasks:
   - name: Ensure ~/bin is present
-    file:
-      path: "{{ lookup('env','HOME') }}/bin"
+    ansible.builtin.file:
+      path: "{{ lookup('env', 'HOME') }}/bin"
       state: directory
     become: false
   - name: Ensure package repositories
-    include_role:
+    ansible.builtin.include_role:
       name: apt
     vars:
       apt_repo: "{{ item }}"
     loop: "{{ repositories }}"
 
   - name: Ensure required packages are latest
-    apt:
+    ansible.builtin.apt:
       name: "{{ packages }}"
       state: latest
       update_cache: true
@@ -23,50 +24,48 @@
       force_apt_get: yes
 
   - name: Install required snaps
-    snap:
+    community.general.snap:
       name: "{{ snaps }}"
   - name: Install required classic snaps
-    snap:
+    community.general.snap:
       name: "{{ item }}"
       classic: true
-    loop: "{{ classic_snaps|default([]) }}"
+    loop: "{{ classic_snaps | default([]) }}"
   - name: Update snap packages
-    shell: snap refresh
+    ansible.builtin.shell: snap refresh
     register: snap_result
     ignore_errors: true
-    changed_when: not(snap_result.stderr is search('All snaps up to date.'))
+    changed_when: not (snap_result.stderr is search('All snaps up to date.'))
 
   - name: Install root level CLIs
-    shell: "{{ item.command }}"
+    ansible.builtin.shell: "{{ item.command }}"
     register: cli_result
     changed_when: cli_result.stdout
     args:
-      warn: false
       executable: /bin/bash
     ignore_errors: true
-    loop: "{{ clis|selectattr('become','equalto',true)|list }}"
+    loop: "{{ clis | selectattr('become', 'equalto', true) | list }}"
 
   - block:
     - name: Install required Python modules in user directory
-      pip:
+      ansible.builtin.pip:
         name: "{{ item }}"
         extra_args: --user
         state: latest
       loop: "{{ pips }}"
     - name: Install user level CLIs
-      shell: "{{ item.command }}"
+      ansible.builtin.shell: "{{ item.command }}"
       register: cli_result
       changed_when: cli_result.stdout
       args:
-        warn: false
         executable: /bin/bash
       ignore_errors: true
-      loop: "{{ clis|selectattr('become','equalto',false)|list }}"
+      loop: "{{ clis | selectattr('become', 'equalto', false) | list }}"
     become: false
 
   - name: Ensure files config is desired
-    include_role:
+    ansible.builtin.include_role:
       name: file_config
     vars:
       file_config: "{{ item }}"
-    loop: "{{ files_config|default([]) }}"
+    loop: "{{ files_config | default([]) }}"

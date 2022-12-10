@@ -8,13 +8,14 @@
   ansible.builtin.apt_key:
     url: "{{ apt_key }}"
     state: present
-  loop: "{{ apt_repo.key_url if (( apt_repo.key_url is defined ) and ( apt_repo.key_url | type_debug == 'list' ))
-    else [ apt_repo.key_url ] if (( apt_repo.key_url is defined ) and ( apt_repo.key_url | type_debug == 'AnsibleUnsafeText' )) else [] }}"
+  loop: "{{ apt_repo.key_url if ((apt_repo.key_url is defined) and (apt_repo.key_url | type_debug == 'list'))
+    else [apt_repo.key_url] if ((apt_repo.key_url is defined) and (apt_repo.key_url | type_debug == 'AnsibleUnsafeText')) else [] }}"
   loop_control:
     loop_var: apt_key
 
 # https://github.com/ansible/ansible/issues/48714 apt_repository module does not support standard repositories
 - name: Ensure {{ apt_repo.name }} is present as a standard package repository when it is standard repo
+  when: apt_repo['repo'] is not defined
   block:
   - name: Ensure {{ apt_repo.name }} is present as a standard package repository when it is standard repo
     ansible.builtin.shell: "add-apt-repository -yu {{ apt_repo.name }}"
@@ -24,7 +25,7 @@
     ansible.builtin.shell: "sed -i 's/[multiverse |universe ]*partner[ multiverse| universe]*.*/ partner/g' /etc/apt/sources.list"
     when: apt_repo.name in ['multiverse', 'universe']
     register: shell_out
-  when: apt_repo['repo'] is not defined
+
 
 - name: Ensure package {{ apt_repo.name }} repositories when is external
   ansible.builtin.apt_repository:

@@ -94,7 +94,7 @@ all:
           repo: >-
             deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ versions.libcontainers_repo_ubuntu_version }}/ /
           key_url: >-
-            https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x{{ ansible_distribution }}_{{ versions.libcontainers_repo_ubuntu_version }}/Release.key
+            https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ versions.libcontainers_repo_ubuntu_version }}/Release.key
         - name: libcontainers-crio
           repo: >-
             deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ versions.crio }}/x{{ ansible_distribution }}_{{ versions.libcontainers_crio_repo_ubuntu_version }}/ /

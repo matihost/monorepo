@@ -1,62 +1,61 @@
 ---
 - hosts: local
   gather_facts: true
+  name: Updates system software versions
   tasks:
   - block:
     - name: Update packages for Debian based distribution
-      apt:
+      ansible.builtin.apt:
         name: "*"
         state: latest
         update_cache: yes
         cache_valid_time: "{{ update_cache_timeout }}"
         force_apt_get: yes
     - name: Upgrade all packages to the latest version in Debian distribution
-      apt:
+      ansible.builtin.apt:
         upgrade: dist
         force_apt_get: yes
     - name: Remove dependencies that are no longer required from Debian based system
-      apt:
+      ansible.builtin.apt:
         autoremove: yes
         force_apt_get: yes
     - name: Remove useless packages from the cache from Debian based system
-      apt:
+      ansible.builtin.apt:
         autoclean: yes
         force_apt_get: yes
     when: ansible_os_family == "Debian"
 
   - block:
     - name: Update packages for RHEL based distribution
-      yum:
+      ansible.builtin.yum:
         name: "*"
         update_cache: yes
         state: latest
     - name: Remove dependencies that are no longer required from RHEL based system
-      yum:
+      ansible.builtin.yum:
         autoremove: yes
     - name: Remove useless packages from the cache from RHEL based system
-      shell:
+      ansible.builtin.shell:
         yum clean all
-      args:
-        warn: false
       register: yum_result
       changed_when: '"0 files removed" not in yum_result.stdout'
     when: ansible_os_family == "RedHat"
 
   - name: Check whether snap is present on the machine
-    shell: which snap
+    ansible.builtin.shell: which snap
     ignore_errors: true
     changed_when: false
     register: snap_presence
 
   - name: Update snap packages
-    shell: snap refresh
+    ansible.builtin.shell: snap refresh
     register: snap_result
-    changed_when: not(snap_result.stderr is search('All snaps up to date.'))
+    changed_when: not (snap_result.stderr is search('All snaps up to date.'))
     when: snap_presence.rc == 0
 
   - block:
     - name: Update SDKMan and its installations
-      shell: "bash -ic 'sdk selfupdate && sdk update && sdk ug'"
+      ansible.builtin.shell: "bash -ic 'sdk selfupdate && sdk update && sdk ug'"
       register: sdk_result
       ignore_errors: true
       changed_when:
@@ -65,11 +64,11 @@
 
   - block:
     - name: Check whether helm is present on the machine
-      shell: which helm
+      ansible.builtin.shell: which helm
       ignore_errors: true
       changed_when: false
       register: helm_presence
     - name: Update helm repositories
-      shell: helm repo update
+      ansible.builtin.shell: helm repo update
       when: helm_presence.rc == 0
     become: false

@@ -51,7 +51,7 @@
     <enforce.maven.version>3.6</enforce.maven.version>
 
     <!-- Spock -->
-    <spock.version>2.3-groovy-4.0</spock.version>
+    <spock.version>2.4-M1-groovy-4.0</spock.version>
 
     <!-- Scala 3-->
     <scala.compat.version>3</scala.compat.version>
@@ -369,9 +369,9 @@
             </execution>
           </executions>
           <configuration>
-          <!-- TODO test-ng vulnerability -->
+          <!-- TODO snake-yaml vulnerability -->
             <excludeVulnerabilityIds>
-              <exclude>CVE-2022-4065</exclude>
+              <exclude>CVE-2022-1471</exclude>
             </excludeVulnerabilityIds>
             <reportFile>${project.build.directory}/audit-report.json</reportFile>
           </configuration>

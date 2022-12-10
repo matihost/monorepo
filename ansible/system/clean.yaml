@@ -1,6 +1,7 @@
 ---
 - hosts: local
   gather_facts: true
+  name: Clean current system
   tasks:
   - name: Clean systemd journal /var/log/journal logs
     ansible.builtin.shell:
@@ -9,7 +10,9 @@
     changed_when:
     - not(journal_clean.stderr is search('freed 0B'))
     - journal_clean.stdout
-  - block:
+  - name: Debian based specific cleaning
+    when: ansible_os_family == "Debian"
+    block:
     - name: Update apt cache
       ansible.builtin.apt:
         update_cache: yes
@@ -24,28 +27,23 @@
         autoclean: true
         force_apt_get: yes
     - name: Clean apt-get
-      ansible.builtin.shell:
-        apt-get clean
-      args:
-        warn: false
-      register: apt_clean_result
-      changed_when: apt_clean_result.stdout
+      ansible.builtin.apt:
+        clean: true
+        force_apt_get: yes
     - name: Remove old kernels
       ansible.builtin.include_role:
         name: remove_old_kernels
-    when: ansible_os_family == "Debian"
-  - block:
+  - name: RHEL based system specific cleaning
+    when: ansible_os_family == "RedHat"
+    block:
     - name: Remove dependencies that are no longer required from RHEL based system
       ansible.builtin.yum:
         autoremove: yes
     - name: Remove useless packages from the cache from RHEL based system
       ansible.builtin.shell:
         yum clean all
-      args:
-        warn: false
       register: yum_result
       changed_when: '"0 files removed" not in yum_result.stdout'
-    when: ansible_os_family == "RedHat"
   - name: Clean /var/log rotated logs and dist upgrade logs
     ansible.builtin.shell:
       find /var/log -type f -regex ".*\.gz$" -delete -print && \
