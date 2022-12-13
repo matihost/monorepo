@@ -46,14 +46,14 @@ ensure-cluster-shared2: ## create/update cluster shared2-dev in us-east1-b
 	cd cluster-config && $(MAKE) run CLUSTER_NAME=shared2 REGION=us-east1 ZONE_LETTER=b
 
 destroy-cluster-shared1: ## destroy cluster shared1-dev in us-central1-a
-	cd cluster-config && $(MAKE) run CLUSTER_NAME=shared1 REGION=us-central1 ZONE_LETTER=a
+	cd cluster-config && $(MAKE) run CLUSTER_NAME=shared1 REGION=us-central1 ZONE_LETTER=a MODE=destroy
 	CLUSTER_NAME=shared1 MASTER_CIDR=172.16.0.32/28 REGION=us-central1 ZONE_LETTER=a $(MAKE) run MODE=destroy
 
 
 destroy-cluster-shared2: ## destroy cluster shared2-dev in us-east1-b
 	@-terraform workspace new shared2@$(CURRENT_PROJECT) &>/dev/null
 	terraform workspace select shared2@$(CURRENT_PROJECT) && \
-	cd cluster-config && $(MAKE) run MODE=destroy REGION=us-east1 ZONE_LETTER=b
+	cd cluster-config && $(MAKE) run MODE=destroy REGION=us-east1 ZONE_LETTER=b MODE=destroy
 	$(MAKE) destroy CLUSTER_NAME=shared2 MASTER_CIDR=172.16.0.64/28 REGION=us-east1 ZONE_LETTER=b
 
 scale-down-shared1: ## scale down to 0 nodes cluster shared1-dev in us-central1-a

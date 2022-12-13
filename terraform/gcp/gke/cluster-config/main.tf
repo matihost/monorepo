@@ -44,7 +44,7 @@ provider "helm" {
 
 module "gke_auth" {
   source  = "terraform-google-modules/kubernetes-engine/google//modules/auth"
-  version = ">= 19"
+  version = ">= 24"
 
   project_id   = var.project
   cluster_name = local.gke_name

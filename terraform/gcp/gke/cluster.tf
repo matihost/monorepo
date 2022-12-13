@@ -4,7 +4,7 @@ data "google_container_engine_versions" "versions" {
   # run: gcloud container get-server-config
   # to see available versions
   location       = local.location
-  version_prefix = "1.24."
+  version_prefix = "1.25."
 
   project = var.project
 }
@@ -33,6 +33,13 @@ resource "google_container_cluster" "gke" {
   # TODO consider parametrizing
   # enable_tpu = false
 
+
+  dns_config {
+    # switch to CLOUD_DNS to use CloudDNS as internal GKE DNS system instead of kube-dns impl with node local dns cache
+    cluster_dns = "PLATFORM_DEFAULT"
+    #  when cluster_dns is CloudDNS then dns scope can be set
+    # cluster_dns_scope = "CLUSTER_SCOPE"
+  }
   addons_config {
     http_load_balancing {
       disabled = false
@@ -55,6 +62,7 @@ resource "google_container_cluster" "gke" {
     gke_backup_agent_config {
       enabled = false
     }
+
 
     dns_cache_config {
       enabled = true
@@ -169,6 +177,8 @@ resource "google_container_cluster" "gke" {
 
   node_pool_defaults {
     node_config_defaults {
+
+      logging_variant = "MAX_THROUGHPUT"
       gcfs_config {
         enabled = true
       }
@@ -211,7 +221,7 @@ resource "google_container_cluster" "gke" {
   }
 
   logging_config {
-    enable_components = ["SYSTEM_COMPONENTS", "WORKLOADS"]
+    enable_components = ["SYSTEM_COMPONENTS", "WORKLOADS", "APISERVER", "CONTROLLER_MANAGER", "SCHEDULER"]
   }
 
   release_channel {
@@ -315,12 +325,21 @@ resource "random_id" "gke_node_pool_id" {
 }
 
 resource "google_container_node_pool" "gke_nodes" {
-  name       = "compute-${random_id.gke_node_pool_id.hex}"
-  location   = local.location
-  cluster    = google_container_cluster.gke.name
+  provider = google-beta
+
+  name     = "compute-${random_id.gke_node_pool_id.hex}"
+  location = local.location
+  cluster  = google_container_cluster.gke.name
+  project  = var.project
+
   node_count = 1
 
   max_pods_per_node = 110
+
+  # Requires N2 or C2 nodes, but make sense to set it up only for Regional clusters
+  # placement_policy {
+  #   type = "COMPACT"
+  # }
 
   # Repair any issues but don't auto upgrade node versions
   management {
@@ -330,7 +349,9 @@ resource "google_container_node_pool" "gke_nodes" {
   }
 
   node_config {
-    # preemptible  = true
+
+    # use spot instances for better price
+    spot = true
     # use 4cores and 16 GB ram, e2-medium - 2 cores and 4 GB RAM is too small for all apps running on node
     # machine_type = "e2-standard-4"
     machine_type = random_id.gke_node_pool_id.keepers.machine_type
@@ -372,7 +393,8 @@ resource "google_container_node_pool" "gke_nodes" {
       // Set metadata on the VM to supply more entropy
       google-compute-enable-virtio-rng = "true"
       // Explicitly remove GCE legacy metadata API endpoint
-      disable-legacy-endpoints = "true"
+      disable-legacy-endpoints   = "true"
+      serial-port-logging-enable = "false"
     }
 
     labels = {

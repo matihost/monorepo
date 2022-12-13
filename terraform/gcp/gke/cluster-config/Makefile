@@ -41,7 +41,7 @@ endif
 	terraform workspace select $(CLUSTER_NAME)@$(CURRENT_PROJECT)
 
 
-run: ## usage make run CLUSTER_NAME=shared1 [MODE=apply/plan/destroy]
+run: pre-all ## usage make run CLUSTER_NAME=shared1 [MODE=apply/plan/destroy]
 	terraform $(MODE_STR)
 
 clean: ## clean Terraform cached plugins and data

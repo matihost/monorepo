@@ -150,6 +150,7 @@ all:
         - openssh-server
         - iftop
         - dosbox
+        - libva-x11-2 # it is steam app dependency
         - steam
         - virt-manager
         - docker.io
@@ -836,6 +837,17 @@ all:
                 select(.name | test(\"ubuntu-{{ versions.cri_dockerd_ubuntu_version }}_amd64.deb\")) | .browser_download_url" |
                   xargs curl -s -L -o "/tmp/cri-dockerd.deb"
               apt install /tmp/cri-dockerd.deb
+            }
+        - name: discord
+          become: true
+          desc: Discord app
+          command: |
+            DOWNLOAD_URL="$(curl -s -o /dev/null -w '%header{location}' https://discord.com/api/download?platform=linux)"
+            CURRENT_VERSION="$(echo $DOWNLOAD_URL | sed -E 's/.*linux\/([0..9].+)\/discord.*/\1/')"
+            INSTALLED_VERSION="$(apt list discord 2>/dev/null | grep discord |  sed -E 's/.* ([0..9].+) amd.*/\1/')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -s -L -o "/tmp/discord.deb" "${DOWNLOAD_URL}"
+              apt install /tmp/discord.deb
             }
         files_config:
         - file: /etc/gai.conf
