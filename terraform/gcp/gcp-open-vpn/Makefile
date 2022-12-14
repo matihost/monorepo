@@ -27,6 +27,7 @@ run: init-terraform prepare ## setup Open VPN usage: make run [MODE=apply]
 	@terraform validate && \
 	terraform $(MODE_STR)
 
+IP := 10.8.0.2
 # sample: make run-with-dns-forwarding ZONE=matihost IP=10.8.0.2
 run-with-dns-forwarding: init-terraform prepare ## usage: make apply-with-dns-forwarding ZONE=vpnclient.zone.com IP=onpremise_dns_server_ip;  setup Open VPN and forwards DNS to client VPN network DNS nameserver
 	@terraform validate && \

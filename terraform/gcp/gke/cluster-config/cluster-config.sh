@@ -8,6 +8,7 @@ function import_existing_object_to_helm() {
 
 function disable_default_storageclass() {
   kubectl patch storageclass standard -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+  kubectl patch storageclass standard-rwo -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
 }
 
 # Main
