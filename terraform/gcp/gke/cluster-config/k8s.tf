@@ -6,9 +6,6 @@ resource "null_resource" "cluster-config-script" {
     command = "${path.module}/cluster-config.sh ${path.module}/target/${local.gke_name}/kubeconfig"
   }
 
-  depends_on = [
-    local_file.kubeconfig
-  ]
 }
 
 # Deploy GKE K8S cluster configuration like restricted PSP, clusterroles, network policies etc.

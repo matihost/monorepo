@@ -33,12 +33,16 @@ provider "google" {
 # }
 
 provider "kubernetes" {
-  config_paths = ["${path.module}/target/${local.gke_name}/kubeconfig"]
+  cluster_ca_certificate = module.gke_auth.cluster_ca_certificate
+  host                   = module.gke_auth.host
+  token                  = module.gke_auth.token
 }
 
 provider "helm" {
   kubernetes {
-    config_paths = ["${path.module}/target/${local.gke_name}/kubeconfig"]
+    cluster_ca_certificate = module.gke_auth.cluster_ca_certificate
+    host                   = module.gke_auth.host
+    token                  = module.gke_auth.token
   }
 }
 
@@ -49,10 +53,8 @@ module "gke_auth" {
   project_id   = var.project
   cluster_name = local.gke_name
   location     = local.location
-}
-resource "local_file" "kubeconfig" {
-  content  = module.gke_auth.kubeconfig_raw
-  filename = "${path.module}/target/${local.gke_name}/kubeconfig"
+
+  use_private_endpoint = false
 }
 
 

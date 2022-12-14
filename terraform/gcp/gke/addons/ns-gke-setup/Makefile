@@ -34,9 +34,6 @@ run: pre-all ## configures Worflow Identity and Config Connector for GKE namespa
 	@terraform validate && \
 	terraform $(MODE_STR)
 
-destroy: ## removes GSA and binding making Config Connector disabled
-	terraform plan && terraform destroy -auto-approve
-
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
 	gcloud auth application-default login
@@ -50,7 +47,7 @@ endif
 	terraform workspace select $(KNS)@$(CURRENT_PROJECT)
 
 test: # configure NS default with SA default wiht workflow identity
-	$(MAKE) apply CLUSTER_NAME=shared1 KNS=default KSAS='["default"]'
+	$(MAKE) run CLUSTER_NAME=shared1 KNS=default KSAS='["default"]'
 	kubectl apply -f tests -n default
 	sleep 30
 	kubectl get storagebucket -n default

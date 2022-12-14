@@ -3,14 +3,15 @@ data "google_service_account" "configsync-sa" {
 }
 
 
-data "google_storage_bucket_object_content" "config-sync-operator-gs-content" {
-  name   = "released/latest/config-sync-operator.yaml"
+data "google_storage_bucket_object_content" "config-management-operator-gs-content" {
+  name   = "released/latest/config-management-operator.yaml"
   bucket = "config-management-release"
 }
 
+
 resource "local_file" "config-sync-operator-yaml" {
-  content  = data.google_storage_bucket_object_content.config-sync-operator-gs-content.content
-  filename = "${path.module}/target/config-sync-operator.yaml"
+  content  = data.google_storage_bucket_object_content.config-management-operator-gs-content.content
+  filename = "${path.module}/target/config-management-operator.yaml"
 }
 
 resource "local_file" "config-sync-configuration-yaml" {

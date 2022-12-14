@@ -1,6 +1,6 @@
 # Addons :: Standalone Config Sync
 
-Installs [Standalone Config Sync](https://cloud.google.com/kubernetes-engine/docs/add-on/config-sync/how-to/installing#google-service-account) on GKE
+Installs [Standalone Config Sync](https://cloud.google.com/anthos-config-management/docs/how-to/installing-kubectl) on GKE
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ Installs [Standalone Config Sync](https://cloud.google.com/kubernetes-engine/doc
 
 * Prerequisites Terraform run once per GCP project:
 
-  * `cd prerequisites && make apply` to setup GCP Git repository and necessary IAM bindings
+  * `cd prerequisites && make run` to setup GCP Git repository and necessary IAM bindings
 
 ## Usage
 

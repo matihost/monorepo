@@ -29,7 +29,7 @@ gcloud source repos clone gke-config target/gke-config --project="${PROJECT}"
 export KUBECONFIG=.terraform/kubeconfig
 
 # install Config Sync operator
-kubectl apply -f target/config-sync-operator.yaml
+kubectl apply -f target/config-management-operator.yaml
 
 # enable Config Sync configuration
 kubectl apply -f target/config-management.yaml

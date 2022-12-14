@@ -30,7 +30,7 @@ init-terraform:
 	terraform init -upgrade=true
 
 prerequisites:
-	cd prerequisites && $(MAKE) apply
+	cd prerequisites && $(MAKE) run
 
 
 help: ## show usage and tasks (default)
