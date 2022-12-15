@@ -1,6 +1,6 @@
 # OPA Gatekeeper
 
-Deployment of OPA Gatekeepeer to Minikube or GKE
+Deployment of [OPA Gatekeepeer](https://github.com/open-policy-agent/gatekeeper) to Minikube or GKE
 
 Deploys OPA Gatekeeper along with:
 

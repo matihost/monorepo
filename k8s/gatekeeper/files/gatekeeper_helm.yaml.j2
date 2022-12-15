@@ -1,5 +1,8 @@
+# when upgrading compare output of:
+# helm show values gatekeeper/gatekeeper
+# with this file
 replicas: {{  gatekeeper.chart_variables.replicas|default(3) }}
-auditInterval: 600
+auditInterval: 60
 metricsBackends: ["prometheus"]
 auditMatchKindOnly: false
 constraintViolationsLimit: 20
@@ -8,15 +11,19 @@ disableMutation: false
 disableValidatingWebhook: false
 validatingWebhookTimeoutSeconds: 3
 validatingWebhookFailurePolicy: Ignore
+validatingWebhookAnnotations: {}
 validatingWebhookExemptNamespacesLabels: {}
 validatingWebhookObjectSelector: {}
 validatingWebhookCheckIgnoreFailurePolicy: Fail
 validatingWebhookCustomRules: {}
 enableDeleteOperations: false
 enableExternalData: false
+enableGeneratorResourceExpansion: false
 enableTLSHealthcheck: false
+maxServingThreads: -1
 mutatingWebhookFailurePolicy: Ignore
 mutatingWebhookReinvocationPolicy: Never
+mutatingWebhookAnnotations: {}
 mutatingWebhookExemptNamespacesLabels: {}
 mutatingWebhookObjectSelector: {}
 mutatingWebhookTimeoutSeconds: 1
@@ -34,44 +41,60 @@ postUpgrade:
     enabled: false
     image:
       repository: openpolicyagent/gatekeeper-crds
-      tag: v3.9.0
       pullPolicy: IfNotPresent
       pullSecrets: []
     extraNamespaces: []
+    podSecurity: ["pod-security.kubernetes.io/audit=restricted",
+      "pod-security.kubernetes.io/audit-version=latest",
+      "pod-security.kubernetes.io/warn=restricted",
+      "pod-security.kubernetes.io/warn-version=latest",
+      "pod-security.kubernetes.io/enforce=restricted",
+      "pod-security.kubernetes.io/enforce-version=v1.24"]
+  affinity: {}
+  tolerations: []
+  nodeSelector: {kubernetes.io/os: linux}
+  resources: {}
   securityContext:
     allowPrivilegeEscalation: false
     capabilities:
       drop:
-      - all
+      - ALL
     readOnlyRootFilesystem: true
     runAsGroup: 999
     runAsNonRoot: true
     runAsUser: 1000
 postInstall:
   labelNamespace:
-    extraRules: []
     enabled: true
+    extraRules: []
     image:
       repository: openpolicyagent/gatekeeper-crds
-      tag: v3.9.0
       pullPolicy: IfNotPresent
       pullSecrets: []
     extraNamespaces: []
+    podSecurity: ["pod-security.kubernetes.io/audit=restricted",
+      "pod-security.kubernetes.io/audit-version=latest",
+      "pod-security.kubernetes.io/warn=restricted",
+      "pod-security.kubernetes.io/warn-version=latest",
+      "pod-security.kubernetes.io/enforce=restricted",
+      "pod-security.kubernetes.io/enforce-version=v1.24"]
   probeWebhook:
     enabled: true
     image:
       repository: curlimages/curl
-      tag: 7.83.1
       pullPolicy: IfNotPresent
       pullSecrets: []
     waitTimeout: 60
     httpTimeout: 2
     insecureHTTPS: false
+  affinity: {}
+  tolerations: []
+  nodeSelector: {kubernetes.io/os: linux}
   securityContext:
     allowPrivilegeEscalation: false
     capabilities:
       drop:
-      - all
+      - ALL
     readOnlyRootFilesystem: true
     runAsGroup: 999
     runAsNonRoot: true
@@ -82,14 +105,17 @@ preUninstall:
     enabled: false
     image:
       repository: openpolicyagent/gatekeeper-crds
-      tag: v3.9.0
       pullPolicy: IfNotPresent
       pullSecrets: []
+  affinity: {}
+  tolerations: []
+  nodeSelector: {kubernetes.io/os: linux}
+  resources: {}
   securityContext:
     allowPrivilegeEscalation: false
     capabilities:
       drop:
-      - all
+      - ALL
     readOnlyRootFilesystem: true
     runAsGroup: 999
     runAsNonRoot: true
@@ -97,12 +123,11 @@ preUninstall:
 image:
   repository: openpolicyagent/gatekeeper
   crdRepository: openpolicyagent/gatekeeper-crds
-  release: v3.9.0
   pullPolicy: IfNotPresent
   pullSecrets: []
 podAnnotations: {}
 podLabels: {}
-podCountLimit: 100
+podCountLimit: "100"
 secretAnnotations: {}
 enableRuntimeDefaultSeccompProfile: true
 controllerManager:
@@ -113,8 +138,11 @@ controllerManager:
   port: 8443
   metricsPort: 8888
   healthPort: 9090
+  readinessTimeout: 1
+  livenessTimeout: 1
   priorityClassName: system-cluster-critical
   disableCertRotation: false
+  tlsMinVersion: 1.3
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
@@ -127,6 +155,7 @@ controllerManager:
                     - webhook
             topologyKey: kubernetes.io/hostname
           weight: 100
+  topologySpreadConstraints: []
   tolerations: []
   nodeSelector: {kubernetes.io/os: linux}
   resources:
@@ -140,7 +169,7 @@ controllerManager:
     allowPrivilegeEscalation: false
     capabilities:
       drop:
-      - all
+      - ALL
     readOnlyRootFilesystem: true
     runAsGroup: 999
     runAsNonRoot: true
@@ -155,12 +184,13 @@ audit:
   dnsPolicy: ClusterFirst
   metricsPort: 8888
   healthPort: 9090
+  readinessTimeout: 1
+  livenessTimeout: 1
   priorityClassName: system-cluster-critical
   disableCertRotation: true
   affinity: {}
   tolerations: []
   nodeSelector: {kubernetes.io/os: linux}
-  writeToRAMDisk: false
   resources:
     limits:
       cpu: 1000m
@@ -172,7 +202,7 @@ audit:
     allowPrivilegeEscalation: false
     capabilities:
       drop:
-      - all
+      - ALL
     readOnlyRootFilesystem: true
     runAsGroup: 999
     runAsNonRoot: true
@@ -181,14 +211,18 @@ audit:
     fsGroup: 999
     supplementalGroups:
       - 999
+  writeToRAMDisk: false
   extraRules: []
 crds:
+  affinity: {}
+  tolerations: []
+  nodeSelector: {kubernetes.io/os: linux}
   resources: {}
   securityContext:
     allowPrivilegeEscalation: false
     capabilities:
       drop:
-      - all
+      - ALL
     readOnlyRootFilesystem: true
     runAsGroup: 65532
     runAsNonRoot: true
@@ -202,7 +236,9 @@ psp:
   enabled: {{ 'true' if lookup('pipe', 'kubectl version -o json | jq -r .serverVersion.minor') | int < 25 else 'false' }}
 upgradeCRDs:
   enabled: true
-  tolerations: []
   extraRules: []
 rbac:
   create: true
+externalCertInjection:
+  enabled: false
+  secretName: gatekeeper-webhook-server-cert
