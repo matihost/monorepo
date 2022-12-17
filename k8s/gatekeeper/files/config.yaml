@@ -25,6 +25,9 @@ spec:
         - istio-ingress
         # gatekeeper
         - gatekeeper-system
+        # my namespaces
+        - ci
+        - sample-istio
       processes: ["*"]
   sync:
     syncOnly:

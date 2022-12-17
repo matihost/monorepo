@@ -213,7 +213,8 @@ resource "google_container_cluster" "gke" {
   min_master_version = data.google_container_engine_versions.versions.release_channel_default_version["RAPID"]
 
   monitoring_config {
-    enable_components = ["SYSTEM_COMPONENTS", "APISERVER", "CONTROLLER_MANAGER", "SCHEDULER"]
+    # removed "APISERVER" from monitored components as it costs very much
+    enable_components = ["SYSTEM_COMPONENTS", "CONTROLLER_MANAGER", "SCHEDULER"]
 
     managed_prometheus {
       enabled = true
