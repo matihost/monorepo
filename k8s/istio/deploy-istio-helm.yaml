@@ -115,10 +115,9 @@
     k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/ingress_class.yaml.j2') }}"
-      # TODO uncomment when kubernetes-validate supports k8s > 1.24
-      # validate:
-      #   fail_on_error: true
-      #   strict: true
+      validate:
+        fail_on_error: true
+        strict: true
 
 
   - name: Ensure CN={{ internal_wildcard_cn }} TLS is present
@@ -150,10 +149,9 @@
     k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/internal_vs_config.yaml.j2') }}"
-      # TODO uncomment when kubernetes-validate supports k8s > 1.24
-      # validate:
-      #   fail_on_error: true
-      #   strict: true
+      validate:
+        fail_on_error: true
+        strict: true
 
   # - name: Set external wildcard  variables
   #   ansible.builtin.set_fact:
@@ -210,9 +208,19 @@
     k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/roles.yaml.j2') }}"
-      # validate:
-      #   fail_on_error: true
-      #   strict: true
+      validate:
+        fail_on_error: true
+        strict: true
+
+  - name: Ensure Prometheus PodMonitoring is setup for Istio
+    k8s:
+      state: present
+      definition: "{{ lookup('template', '{{ files }}/monitoring.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+    when:
+    - options.gke_mode|default(false)
 
   # - name: Ensure CN={{ external_wildcard_cn }} TLS is present
   #   block:

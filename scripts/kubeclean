@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# cleans current K8S from POD with Error, Completed, NodeShutdown pods
+kubectl delete pods --field-selector status.phase=Failed --all-namespaces

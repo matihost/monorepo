@@ -52,8 +52,9 @@ test: # configure NS default with SA default wiht workflow identity
 	sleep 30
 	kubectl get storagebucket -n default
 
-apply-for-istio-system:
-	$(MAKE) run CLUSTER_NAME=shared1 KNS=istio-system KSAS='["default","istio-egressgateway-service-account","istio-external-ingressgateway-service-account","istio-ingressgateway-service-account","istio-reader-service-account","istiod-service-account"]'
+apply-for-istio:
+	$(MAKE) run CLUSTER_NAME=shared1 KNS=istio-system KSAS='["default","istio-reader-service-account","istiod", "istiod-service-account"]'
+	$(MAKE) run CLUSTER_NAME=shared1 KNS=istio-ingress KSAS='["default","istio-ingressgateway"]'
 
 
 apply-for-sample-istio:

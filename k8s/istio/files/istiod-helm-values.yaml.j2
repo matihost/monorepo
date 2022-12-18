@@ -1,4 +1,8 @@
 ---
+# for update run:
+# helm show values istio/istiod > new-istiod.values.yaml
+# and compare with this file
+
 #.Values.pilot for discovery and mesh wide config
 
 ## Discovery Settings
@@ -13,6 +17,7 @@ pilot:
 
   hub: ""
   tag: ""
+  variant: ""
 
   # Can be a full hub/image:tag
   image: pilot
@@ -26,6 +31,8 @@ pilot:
     limits:
       cpu: 1
       memory: 2048Mi
+  # Set to `type: RuntimeDefault` to use the default profile if available.
+  seccompProfile: {}
 
   # full list of envs https://github.com/istio/istio/blob/master/pilot/pkg/features/pilot.go
   # https://istio.io/latest/docs/reference/commands/pilot-agent/#envvars
@@ -53,7 +60,7 @@ pilot:
   jwksResolverExtraRootCA: ""
 
   # This is used to set the source of configuration for
-  # the associated address in configSource, if nothing is specificed
+  # the associated address in configSource, if nothing is specified
   # the default MCP is assumed.
   configSource:
     subscribedResources: []
@@ -247,9 +254,11 @@ global:
   # Releases are published to docker hub under 'istio' project.
   # Dev builds from prow are on gcr.io
   hub: "{{ istio.hub|default("docker.io/istio") }}"
-
   # Default tag for Istio images.
   tag: "{{ istio.version }}"
+  # Variant of the image to use.
+  # Currently supported are: [debug, distroless]
+  variant: ""
 
   # Specify image pull policy if default behavior isn't desired.
   # Default behavior: latest images will be Always else IfNotPresent.
@@ -380,7 +389,7 @@ global:
     image: proxyv2
     resources:
       limits:
-        cpu: 2000m
+        cpu: 1
         memory: 1024Mi
       requests:
         cpu: 10m

@@ -1,6 +1,10 @@
+# for update run:
+# helm show values istio/cni > new-cni.values.yaml
+# and compare with this file
 cni:
   hub: ""
   tag: ""
+  variant: ""
   image: install-cni
   pullPolicy: ""
 
@@ -53,6 +57,9 @@ cni:
     brokenPodLabelKey: "cni.istio.io/uninitialized"
     brokenPodLabelValue: "true"
 
+  # Set to `type: RuntimeDefault` to use the default profile if available.
+  seccompProfile: {}
+
   resources:
     requests:
       cpu: 100m
@@ -80,6 +87,10 @@ global:
 
   # Default tag for Istio images.
   tag: "{{ istio.version }}"
+
+  # Variant of the image to use.
+  # Currently supported are: [debug, distroless]
+  variant: ""
 
   # Specify image pull policy if default behavior isn't desired.
   # Default behavior: latest images will be Always else IfNotPresent.

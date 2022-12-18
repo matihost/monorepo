@@ -112,17 +112,17 @@
     k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/istio_operator_control_plane.yaml.j2') }}"
-      # validate:
-      #   fail_on_error: true
-      #   strict: true
+      validate:
+        fail_on_error: true
+        strict: true
 
   - name: Ensure Istio IngressClass present
     k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/ingress_class.yaml.j2') }}"
-      # validate:
-      #   fail_on_error: true
-      #   strict: true
+      validate:
+        fail_on_error: true
+        strict: true
 
   - name: Ensure Istio ControlPlane operator reconciliating is finished
     k8s_info:
@@ -181,9 +181,9 @@
     k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/internal_vs_config.yaml.j2') }}"
-      # validate:
-      #   fail_on_error: true
-      #   strict: true
+      validate:
+        fail_on_error: true
+        strict: true
 
   - name: Set external wildcard  variables
     ansible.builtin.set_fact:
@@ -223,9 +223,9 @@
     k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/external_config.yaml.j2') }}"
-      # validate:
-      #   fail_on_error: true
-      #   strict: true
+      validate:
+        fail_on_error: true
+        strict: true
     when: ingress_external_gateway.enable|default(false)
 
   - name: Ensure VirtualServices are exposed
@@ -240,9 +240,19 @@
     k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/roles.yaml.j2') }}"
-      # validate:
-      #   fail_on_error: true
-      #   strict: true
+      validate:
+        fail_on_error: true
+        strict: true
+
+  - name: Ensure Prometheus PodMonitoring is setup for Istio
+    k8s:
+      state: present
+      definition: "{{ lookup('template', '{{ files }}/monitoring.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+    when:
+    - options.gke_mode|default(false)
 
   - name: Ensure CN={{ external_wildcard_cn }} TLS is present
     block:
