@@ -1,5 +1,6 @@
 ---
 - hosts: local
+  name: Deploy Jenkins to K8S
   collections:
   - kubernetes.core
   tasks:
@@ -30,7 +31,7 @@
     when: gke_mode | default(false)
 
   - name: Run Terraform to setup GCP prerequisites for Jenkins deployment
-    ansible.builtin.terraform:
+    community.general.terraform:
       project_path: 'files/gke'
       state: present
       workspace: "default"
@@ -40,7 +41,7 @@
     when: gke_mode | default(false)
 
   - name: Ensure Jenkins helm dependencies are in place
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/prerequisites.template.yaml') }}"
       # validate:
@@ -59,7 +60,7 @@
             cn: "{{ jenkins_ingress.host }}"
       become: true
     - name: Ensure TLS Secret {{ jenkins_ingress.secretName }} is present in namespace {{ namespace }}
-      k8s:
+      kubernetes.core.k8s:
         state: present
         definition:
           apiVersion: "v1"
@@ -84,7 +85,7 @@
       values: "{{ lookup('template', '{{ files }}/jenkins_helm.template.yaml') | from_yaml }}"
 
   - name: Ensure Jenkins StatefulSet present
-    k8s:
+    kubernetes.core.k8s:
       name: "{{ namespace }}-jenkins"
       api_version: apps/v1
       kind: StatefulSet
@@ -94,7 +95,7 @@
       wait_timeout: 300
 
   - name: Ensure Jenkins POD deployment finishes
-    k8s:
+    kubernetes.core.k8s:
       name: "{{ namespace }}-jenkins-0"
       api_version: v1
       kind: Pod
@@ -102,6 +103,16 @@
       namespace: "{{ namespace }}"
       wait: true
       wait_timeout: 600
+
+  - name: Ensure Prometheus PodMonitoring is setup for Jenkins
+    kubernetes.core.k8s:
+      state: present
+      definition: "{{ lookup('template', '{{ files }}/monitoring.template.yaml') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+    when:
+    - gke_mode | default(false)
 
   #  TODO  Minikube stops setting LoadBalancer address on Ingress objects
   #
