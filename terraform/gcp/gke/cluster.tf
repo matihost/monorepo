@@ -40,6 +40,11 @@ resource "google_container_cluster" "gke" {
     #  when cluster_dns is CloudDNS then dns scope can be set
     # cluster_dns_scope = "CLUSTER_SCOPE"
   }
+
+  gateway_api_config {
+    channel = "CHANNEL_STANDARD"
+  }
+
   addons_config {
     http_load_balancing {
       disabled = false

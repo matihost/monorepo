@@ -121,12 +121,13 @@ resource "google_compute_subnetwork" "private3" {
   }
 }
 
-
+# Subnetwork for HTTP internal load balancer proxies
+# https://cloud.google.com/load-balancing/docs/proxy-only-subnets#proxy_only_subnet_create
 resource "google_compute_subnetwork" "private-l7lb-1" {
   name          = "private-l7lb-subnetwork-${var.regions[0]}"
   ip_cidr_range = "10.13.0.0/24"
   region        = var.regions[0]
-  purpose       = "INTERNAL_HTTPS_LOAD_BALANCER"
+  purpose       = "REGIONAL_MANAGED_PROXY"
   role          = "ACTIVE"
   network       = google_compute_network.private.name
 
@@ -138,7 +139,7 @@ resource "google_compute_subnetwork" "private-l7lb-2" {
   name          = "private-l7lb-subnetwork-${var.regions[1]}"
   ip_cidr_range = "10.13.1.0/24"
   region        = var.regions[1]
-  purpose       = "INTERNAL_HTTPS_LOAD_BALANCER"
+  purpose       = "REGIONAL_MANAGED_PROXY"
   role          = "ACTIVE"
   network       = google_compute_network.private.name
 
@@ -149,7 +150,7 @@ resource "google_compute_subnetwork" "private-l7lb-3" {
   name          = "private-l7lb-subnetwork-${var.regions[2]}"
   ip_cidr_range = "10.13.2.0/24"
   region        = var.regions[2]
-  purpose       = "INTERNAL_HTTPS_LOAD_BALANCER"
+  purpose       = "REGIONAL_MANAGED_PROXY"
   role          = "ACTIVE"
   network       = google_compute_network.private.name
 

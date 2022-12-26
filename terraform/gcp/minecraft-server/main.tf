@@ -36,8 +36,8 @@ variable "project" {
 
 variable "minecraft_server_url" {
   type        = string
-  default     = "https://piston-data.mojang.com/v1/objects/f69c284232d7c7580bd89a5a4931c3581eae1378/server.jar"
-  description = "Minecraft server.jar version 1.19.2, downloadable from: https://www.minecraft.net/pl-pl/download/server"
+  default     = "https://piston-data.mojang.com/v1/objects/c9df48efed58511cdd0213c56b9013a7b5c9ac1f/server.jar"
+  description = "Minecraft server.jar version 1.19.3, downloadable from: https://www.minecraft.net/pl-pl/download/server"
 }
 
 variable "minecraft_server_name" {

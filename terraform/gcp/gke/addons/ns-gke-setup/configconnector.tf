@@ -4,11 +4,27 @@ resource "google_service_account" "identity-workflow-sa" {
   display_name = "Service Account which is used by KSA in ns ${var.kns} workflows in GKE ${local.gke_name}"
 }
 
+# Logging writing always add
+resource "google_project_iam_member" "identity-workflow-sa-logging-role" {
+  project = var.project
+
+  role   = "roles/logging.logWriter"
+  member = "serviceAccount:${google_service_account.identity-workflow-sa.email}"
+}
+
 # Metrics writing always add
 resource "google_project_iam_member" "identity-workflow-sa-metric-role" {
   project = var.project
 
   role   = "roles/monitoring.metricWriter"
+  member = "serviceAccount:${google_service_account.identity-workflow-sa.email}"
+}
+
+# Traces writing always add
+resource "google_project_iam_member" "identity-workflow-sa-trace-role" {
+  project = var.project
+
+  role   = "roles/cloudtrace.agent"
   member = "serviceAccount:${google_service_account.identity-workflow-sa.email}"
 }
 

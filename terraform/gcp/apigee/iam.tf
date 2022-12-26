@@ -35,3 +35,10 @@ resource "google_project_iam_member" "apigee-metrics-writer" {
   role   = "roles/monitoring.metricWriter"
   member = "serviceAccount:${google_service_account.apigee.email}"
 }
+
+resource "google_project_iam_member" "apigee-traces-writer" {
+  project = var.project
+
+  role   = "roles/cloudtrace.agent"
+  member = "serviceAccount:${google_service_account.apigee.email}"
+}

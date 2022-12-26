@@ -38,8 +38,6 @@ pilot:
   # https://istio.io/latest/docs/reference/commands/pilot-agent/#envvars
   env:
     PILOT_ENABLE_STATUS: true
-    # Sets the mesh-wide trace sampling percentage. Should be 0.0 - 100.0. Precision to 0.01. Default is 1.0.
-    PILOT_TRACE_SAMPLING: "100.0"
     ENABLE_STACKDRIVER_MONITORING: "{{ options.gke_mode|default("false") }}"
 
   cpu:
@@ -200,6 +198,12 @@ ownerName: ""
 # meshConfig defines runtime configuration of components, including Istiod and istio-agent behavior
 # See https://istio.io/docs/reference/config/istio.mesh.v1alpha1/ for all available options
 meshConfig:
+  enableTracing: true
+  defaultConfig:
+    tracing:
+      sampling: 50
+  accessLogFile: /dev/stdout
+  accessLogEncoding: JSON
   enablePrometheusMerge: true
   # Config for the default ProxyConfig.
   # Initially using directly the proxy metadata - can also be activated using annotations
@@ -389,7 +393,7 @@ global:
     image: proxyv2
     resources:
       limits:
-        cpu: 1
+        cpu: 1000m
         memory: 1024Mi
       requests:
         cpu: 10m

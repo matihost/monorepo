@@ -18,6 +18,15 @@ resource "google_project_iam_member" "gke-metrics-writer" {
   member = "serviceAccount:${google_service_account.gke-sa.email}"
 }
 
+
+resource "google_project_iam_member" "gke-traces-writer" {
+  project = var.project
+
+  role   = "roles/cloudtrace.agent"
+  member = "serviceAccount:${google_service_account.gke-sa.email}"
+}
+
+
 # also needed to send metrics, permits write-only access to resource metadata provide permissions needed by agents to send metadata
 resource "google_project_iam_member" "gke-metrics-metadata-writer" {
   project = var.project

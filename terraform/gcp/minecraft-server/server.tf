@@ -8,6 +8,14 @@ resource "google_compute_instance_template" "minecraft_template" {
     source_image = data.google_compute_image.ubuntu-latest.self_link
   }
 
+  # spot instance
+  scheduling {
+    automatic_restart           = false
+    provisioning_model          = "SPOT"
+    preemptible                 = true
+    instance_termination_action = "STOP"
+  }
+
   metadata = {
     enable-oslogin = "TRUE"
     startup-script = templatefile("${path.module}/init-server.tpl.sh", {
