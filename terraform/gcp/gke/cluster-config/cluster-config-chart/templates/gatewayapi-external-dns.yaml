@@ -1,0 +1,30 @@
+# yamllint disable-file
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: external-dns-for-gatewayapi
+  labels:
+    {{- include "cluster-config.labels" . | nindent 4 }}
+rules:
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get","watch","list"]
+- apiGroups: ["gateway.networking.k8s.io"]
+  resources: ["gateways","httproutes","tlsroutes","tcproutes","udproutes"]
+  verbs: ["get","watch","list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: external-dns-for-gatewayapi
+  labels:
+    {{- include "cluster-config.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: external-dns-for-gatewayapi
+subjects:
+- kind: ServiceAccount
+  name: external-dns
+  namespace: external-dns

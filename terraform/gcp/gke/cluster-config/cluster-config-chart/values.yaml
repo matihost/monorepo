@@ -1,1 +1,2 @@
-clusterName: testing
+clusterName: shared1
+env: dev

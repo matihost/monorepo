@@ -1,5 +1,24 @@
 # yamllint disable-file
 ---
+# for update run:
+# helm show values bitnami/external-dns > new-external-dns.values.yaml
+# and compare with this file
+
+# To support Gateway API
+# https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/gateway-api.md
+# To support Istio
+# https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/istio.md
+sources:
+  - gateway-httproute
+  # GKE Gateway Addon is missing TLSRoute, TCPRoute and UDPRoute CDRs
+  # - gateway-tlsroute
+  # - gateway-tcproute
+  # - gateway-udproute
+  - istio-gateway
+  - istio-virtualservice
+  - service
+  - ingress
+
 provider: google
 
 google:

@@ -1,0 +1,58 @@
+# yamllint disable-file
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gateways
+  labels:
+    istio-injection: enabled
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: external
+  namespace: gateways
+  annotations:
+    networking.gke.io/certmap: gke-{{ .Values.clusterName }}-{{ .Values.env }}-gxlb
+  labels:
+    {{- include "cluster-config.labels" . | nindent 4 }}
+spec:
+  gatewayClassName: gke-l7-global-external-managed
+  listeners:
+  - name: https
+    hostname: "*.gxlb.gke.{{ .Values.clusterName }}.{{ .Values.env }}.gcp.testing"
+    protocol: HTTPS
+    port: 443
+    allowedRoutes:
+      namespaces:
+        from: All
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: internal
+  namespace: gateways
+  # TODO internal does not support certficate map
+  # Certificate Map is supported only with global TargetHttpsProxy. Please use SSL certificates instead.
+  #
+  # annotations:
+  #   networking.gke.io/certmap: gke-{{ .Values.clusterName }}-{{ .Values.env }}-rilb
+  labels:
+    {{- include "cluster-config.labels" . | nindent 4 }}
+spec:
+  gatewayClassName: gke-l7-rilb
+  listeners:
+  - name: http
+    hostname: "*.rilb.gke.{{ .Values.clusterName }}.{{ .Values.env }}.gcp.testing"
+    protocol: HTTP
+    port: 80
+    allowedRoutes:
+      namespaces:
+        from: All
+  # - name: https
+  #   hostname: "*.rilb.gke.{{ .Values.clusterName }}.{{ .Values.env }}.gcp.testing"
+  #   protocol: HTTPS
+  #   port: 443
+  #   allowedRoutes:
+  #     namespaces:
+  #       from: All

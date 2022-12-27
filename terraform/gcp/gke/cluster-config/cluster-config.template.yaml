@@ -1,0 +1,5 @@
+# yamllint disable-file
+---
+project: '${GCP_PROJECT}'
+clusterName: '${GCP_CLUSTER_NAME}'
+env: '${GCP_ENV}'
