@@ -28,6 +28,7 @@ spec:
         # my namespaces
         - ci
         - sample-istio
+        - learning
       processes: ["*"]
   sync:
     syncOnly:

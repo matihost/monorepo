@@ -1,0 +1,26 @@
+# yamllint disable-file
+{{- $fullName := include "app.fullname" . -}}
+{{- if .Values.apigateway.enabled }}
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: {{ $fullName }}
+  namespace: {{ include "app.namespace" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+  annotations:
+    {{- with .Values.apigateway.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  parentRefs:
+  - name: {{ .Values.apigateway.gateway.name }}
+    namespace: {{ .Values.apigateway.gateway.namespace }}
+  hostnames:
+  - {{ .Values.apigateway.route.host }}
+  rules:
+  - backendRefs:
+    - name: {{ $fullName }}
+      namespace: {{ include "app.namespace" . }}
+      port: 80
+{{- end }}

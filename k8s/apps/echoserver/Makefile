@@ -4,8 +4,11 @@ deploy-minikube: ## deploys echoserver on minikube via Helm
 deploy-minikube-via-script: ## deploys echoserver on minikube via bash script (kubectl apply)
 	scripts/deploy-on-minikube-via-script.sh
 
-deploy-gke: ## deploys echoserver on gke (requires current context on some GKE cluster and access to GKE API server, if private prexix with export HTTPS_PROXY=localhost:8888)
-	scripts/deploy-on-gke.sh
+deploy-gke-ingress: ## deploys echoserver on gke with ingress (requires current context on some GKE cluster and access to GKE API server, if private prexix with export HTTPS_PROXY=localhost:8888)
+	scripts/deploy-on-gke-ingress.sh
+
+deploy-gke-httproute: ## deploys echoserver on gke with httproute (requires current context on some GKE cluster and access to GKE API server, if private prexix with export HTTPS_PROXY=localhost:8888)
+	scripts/deploy-on-gke-httproute.sh
 
 deploy-anthos: ## deploys echoserver on Anthos (requires current context on Anthos config cluster)
 	scripts/deploy-on-anthos.sh

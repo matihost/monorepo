@@ -24,9 +24,6 @@ serviceAccount:
 podAnnotations: {}
 
 # this image cannot work not as root
-# that's why clusterrolebinding.yaml is to allow sa running this pod to run such containers
-# as by default psp:restricted is used
-pspPrivilegedClusterRole: psp:privileged # in GKE use: gce:podsecuritypolicy:privileged
 podSecurityContext:
   runAsUser: 0
 
@@ -55,6 +52,14 @@ ingress:
   tls:
     key: ""
     crt: ""
+
+apigateway:
+  enabled: false
+  gateway:
+    name: external
+    namespace: gateways
+  route:
+    host: ""
 
 anthos:
   ingress:

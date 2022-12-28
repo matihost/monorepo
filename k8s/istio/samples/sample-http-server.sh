@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 # usage for gke deployment: ./sample-http-server.sh gke shared1-dev
+# usage for gke deployment with istio with xlb ingress: ./sample-http-server.sh gke-istio-xlb shared1-dev
 # usage for minikube deployment: ./sample-http-server.sh minikube
 
 case $1 in
 gke)
   MODE=gke
+  CLUSTER_NAME="${2:?CLUSTER_NAME is required}"
+  INTERNAL_DNS_SUFFIX="internal.gke.$(echo -n "${CLUSTER_NAME}" | sed 's/-/./g').gcp.testing"
+  API_GTW_DNS_SUFFIX="gxlb.gke.$(echo -n "${CLUSTER_NAME}" | sed 's/-/./g').gcp.testing"
+  ;;
+gke-istio-xlb)
+  MODE=gke-istio-xlb
   CLUSTER_NAME="${2:?CLUSTER_NAME is required}"
   INTERNAL_DNS_SUFFIX="internal.gke.$(echo -n "${CLUSTER_NAME}" | sed 's/-/./g').gcp.testing"
   EXTERNAL_DNS_SUFFIX="external.gke.$(echo -n "${CLUSTER_NAME}" | sed 's/-/./g').gcp.testing"
@@ -25,23 +32,6 @@ function deploySampleAppWithK8SIngress() {
   # we do use Istion only as k8s Ingress controller
   # so it is not necessary
   kubectl label namespace sample-istio istio-injection=enabled --overwrite
-
-  # because sample app need to be run as root
-  kubectl apply -f - <<EOF
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: sample-istio:privileged
-  namespace: sample-istio
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: $([ "${MODE}" = "gke" ] && echo "gce:podsecuritypolicy:privileged" || echo "psp:privileged")
-subjects:
-- apiGroup: rbac.authorization.k8s.io
-  kind: Group
-  name: system:serviceaccounts:sample-istio
-EOF
 
   mkdir -p /tmp/istio-certs
   CN="httpbin.${INTERNAL_DNS_SUFFIX}"
@@ -258,10 +248,39 @@ spec:
 EOF
 }
 
+function exposeSampleAppExternallyViaAPIGateway() {
+  kubectl apply -f - <<EOF
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: httpbin
+  namespace: sample-istio
+spec:
+  hostnames:
+  - "http.${API_GTW_DNS_SUFFIX}"
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: external
+    namespace: gateways
+  rules:
+  - backendRefs:
+    - group: ""
+      kind: Service
+      name: httpbin
+      namespace: sample-istio
+      port: 8000
+EOF
+}
+
 # Main
 deploySampleAppWithK8SIngress
 exposeSampleAppViaInternalIstioNatively
 
 if [ "${MODE}" = "gke" ]; then
+  exposeSampleAppExternallyViaAPIGateway
+fi
+
+if [ "${MODE}" = "gke-istio-xlb" ]; then
   exposeSampleAppExternally
 fi
