@@ -37,7 +37,9 @@ pilot:
   # full list of envs https://github.com/istio/istio/blob/master/pilot/pkg/features/pilot.go
   # https://istio.io/latest/docs/reference/commands/pilot-agent/#envvars
   env:
-    PILOT_ENABLE_STATUS: true
+  # TODO enable when https://github.com/istio/istio/issues/42612 fixed
+    PILOT_ENABLE_STATUS: false
+    PILOT_ENABLE_CONFIG_DISTRIBUTION_TRACKING: true
     ENABLE_STACKDRIVER_MONITORING: "{{ options.gke_mode|default("false") }}"
 
   cpu:
