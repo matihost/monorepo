@@ -21,8 +21,8 @@ function disable_default_storageclass() {
 }
 
 # See https://cloud.google.com/stackdriver/docs/managed-prometheus/exporters/kubelet-cadvisor
-function scrape_kubelet_metrics_once_per_minute() {
-  kubectl patch operatorconfig config -n gmp-public -p '{"collection": {"kubeletScraping": {"interval": "60s"}}}' --type merge
+function scrape_kubelet_metrics_once_per_minute_and_limit_costly_metrics() {
+  kubectl patch operatorconfig config -n gmp-public -p '{"collection": {"kubeletScraping": {"interval": "60s"}, "filter": {"matchOneOf": ["{__name__!~\"container_memory.*|container_network.*|container_blkio.*\"}"]}}}' --type merge
 }
 
 # Main
@@ -39,4 +39,4 @@ set -x
 create_self_signed_cert_for_rilb_gateway "${CN}" gxlb
 import_existing_object_to_helm nl default cluster-config cluster-config
 disable_default_storageclass
-scrape_kubelet_metrics_once_per_minute
+scrape_kubelet_metrics_once_per_minute_and_limit_costly_metrics

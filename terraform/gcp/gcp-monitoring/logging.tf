@@ -7,7 +7,7 @@ resource "google_logging_project_bucket_config" "basic" {
 
   location       = "global"
   bucket_id      = "_Default"
-  retention_days = 2
+  retention_days = 1
 }
 
 resource "google_logging_project_exclusion" "gce-ops-agent-logs-exclusion" {
@@ -34,5 +34,17 @@ resource "google_logging_project_exclusion" "gce-serial-console-logs-exclusion" 
   resource.type="gce_instance"
   log_name=~".*/logs/serialconsole.googleapis.com.*"
   severity=("DEBUG" OR "INFO")
+  EOF
+}
+
+
+resource "google_logging_project_exclusion" "gke-control-plane-logs-exclusion" {
+  project = var.project
+
+  name        = "gke-control-plane-logs-exclusion"
+  description = "Exclude GKE control plane logs"
+
+  filter = <<-EOF
+  resource.type="k8s_control_plane_component"
   EOF
 }
