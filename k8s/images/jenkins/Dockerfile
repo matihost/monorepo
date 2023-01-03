@@ -10,7 +10,7 @@ RUN jenkins-plugin-cli --verbose --latest true --plugins \
   credentials-binding:523.vd859a_4b_122e6 \
   docker-commons:1.21 \
   docker-workflow:563.vd5d2e5c4007f \
-  git:4.14.3 \
+  git:5.0.0 \
   configuration-as-code:1569.vb_72405b_80249 \
   timestamper:1.21 \
   github-branch-source:1696.v3a_7603564d04 \
