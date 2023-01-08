@@ -35,8 +35,7 @@ repos:
         .*.png
       )$
   - id: git-check
-  # TODO reenable markdownlint when https://github.com/jumanjihouse/pre-commit-hooks/issues/89 fixed
-  # - id: markdownlint
+  - id: markdownlint
   - id: require-ascii
   - id: shellcheck
   - id: shfmt

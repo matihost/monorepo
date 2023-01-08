@@ -1,0 +1,58 @@
+image:
+  file: .gitpod.Dockerfile
+
+ports:
+  - port: 8080
+    onOpen: ignore
+
+# tasks:
+#   - name: install pre-commit git hooks
+#     init: pre-commit install
+
+vscode:
+  extensions:
+    - 4ops.packer
+    - 4ops.terraform
+    - asciidoctor.asciidoctor-vscode
+    - jebbs.plantuml
+    - DavidAnson.vscode-markdownlint
+    - donjayamanne.githistory
+    - DotJoshJohnson.xml
+    - eamodio.gitlens
+    - formulahendry.code-runner
+    - foxundermoon.shell-format
+    - golang.go
+    - hashicorp.terraform
+    - joaompinto.asciidoctor-vscode
+    - ms-azuretools.vscode-docker
+    - ms-kubernetes-tools.vscode-kubernetes-tools
+    - ms-python.isort
+    - ms-python.python
+    - ms-python.vscode-pylance
+    - ms-toolsai.jupyter
+    - ms-toolsai.jupyter-keymap
+    - ms-toolsai.jupyter-renderers
+    - ms-toolsai.vscode-jupyter-cell-tags
+    - ms-toolsai.vscode-jupyter-slideshow
+    - ms-vscode.makefile-tools
+    - Pivotal.vscode-boot-dev-pack
+    - Pivotal.vscode-spring-boot
+    - redhat.fabric8-analytics
+    - redhat.java
+    - redhat.vscode-commons
+    - redhat.vscode-yaml
+    - scala-lang.scala
+    - streetsidesoftware.code-spell-checker
+    - techer.open-in-browser
+    - tomoki1207.pdf
+    - VisualStudioExptTeam.intellicode-api-usage-examples
+    - VisualStudioExptTeam.vscodeintellicode
+    - vscjava.vscode-java-debug
+    - vscjava.vscode-java-dependency
+    - vscjava.vscode-java-pack
+    - vscjava.vscode-java-test
+    - vscjava.vscode-lombok
+    - vscjava.vscode-maven
+    - vscjava.vscode-spring-boot-dashboard
+    - vscjava.vscode-spring-initializr
+    - timonwong.shellcheck

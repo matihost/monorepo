@@ -15,7 +15,7 @@ RUN jenkins-plugin-cli --verbose --latest true --plugins \
   timestamper:1.21 \
   github-branch-source:1696.v3a_7603564d04 \
   github-oauth:0.39 \
-  ldap:2.12 \
+  ldap:659.v8ca_b_a_fe79fa_d \
   google-login:1.7 \
   matrix-auth:3.1.6 \
   authorize-project:1.4.0 \
