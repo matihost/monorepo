@@ -5,9 +5,9 @@ ports:
   - port: 8080
     onOpen: ignore
 
-# tasks:
-#   - name: install pre-commit git hooks
-#     init: pre-commit install
+tasks:
+  - name: install pre-commit git hooks
+    init: pre-commit install
 
 vscode:
   extensions:
