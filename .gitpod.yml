@@ -7,7 +7,14 @@ ports:
 
 tasks:
   - name: install pre-commit git hooks
-    init: pre-commit install
+    init: pre-commit install && pre-commit run
+  - name: build java
+    init: cd java && make build
+  - name: build go
+    init: cd go/learning && make build
+  - name: run ansible
+    init: cd ansible/learning && make dictionaries.yaml
+
 
 vscode:
   extensions:

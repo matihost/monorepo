@@ -12,8 +12,7 @@ RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor > /usr/share
 
 RUN install-packages ruby shellcheck python3-dev tox ansible-lint \
         apt-transport-https ca-certificates gnupg google-cloud-cli google-cloud-sdk-gke-gcloud-auth-plugin google-cloud-cli-kpt kubectl terraform && \
-    gem install mdl && \
-    go install mvdan.cc/sh/v3/cmd/shfmt@latest
+    gem install mdl
 
 USER gitpod
 RUN go install mvdan.cc/sh/v3/cmd/shfmt@latest \
