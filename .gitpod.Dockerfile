@@ -15,6 +15,6 @@ RUN install-packages ruby shellcheck python3-dev tox ansible-lint \
     gem install mdl
 
 USER gitpod
-RUN go install mvdan.cc/sh/v3/cmd/shfmt@latest \
-    && pip3 install pre-commit ansible kubernetes-validate molecule[lint] molecule[docker] ansible-lint requests pylint pytest pipenv pipenv-setup yamllint --user
+RUN go install mvdan.cc/sh/v3/cmd/shfmt@latest
+RUN python3 -m pip install pre-commit ansible kubernetes-validate ansible-lint requests pylint pytest pipenv pipenv-setup yamllint --user
 RUN bash -c ". /home/gitpod/.sdkman/bin/sdkman-init.sh && sdk i java ${JDK_FLAVOR} && sdk d java ${JDK_FLAVOR}"

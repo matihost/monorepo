@@ -594,13 +594,16 @@ all:
               ln -s {{ playbook_dir }}/../../k8s/scripts/kubesu /usr/local/bin/kubectl-su
               echo "kubectl su enabled"
             )
-        - name: kubectl GKE GCLOUD auth plugin v1.25
+        - name: kubectl GKE GCLOUD auth plugin v1.25, and speedp IAP tunnel by installing NumPy lib as gcloud addon
           become: false
           command: |
             [ "$(grep -c 'export USE_GKE_GCLOUD_AUTH_PLUGIN=True' ~/.bashrc)" -ne 0  ] || (
               export USE_GKE_GCLOUD_AUTH_PLUGIN=True
               echo "kubectl GKE GCLOUD auth plugin v1.25 enabled"
             )
+            [ "$($(gcloud info --format='value(basic.python_location)') -m pip list |grep -c numpy)" -ne 0 ] || {
+              $(gcloud info --format='value(basic.python_location)') -m pip install numpy
+            }
         - name: shellcheck
           become: false
           command: |
