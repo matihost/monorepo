@@ -113,6 +113,9 @@ all:
         - name: envoy
           repo: "deb [arch=amd64] https://deb.dl.getenvoy.io/public/deb/ubuntu {{ ansible_distribution_release }} main"
           key_url: ["https://deb.dl.getenvoy.io/public/gpg.8115BA8E629CC074.key"]
+        - name: github
+          repo: "deb [arch=amd64] https://cli.github.com/packages stable main"
+          key_url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
         packages:
         - mc
         - lm-sensors
@@ -181,6 +184,7 @@ all:
         # - skypeforlinux
         # OpenVPN 3 is supported only on Ubuntu LTS: https://openvpn.net/cloud-docs/openvpn-3-client-for-linux/
         # - openvpn3
+        - gh
         snaps:
         - mc-installer
         - notepad-plus-plus

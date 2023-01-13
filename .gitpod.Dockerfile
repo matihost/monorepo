@@ -1,4 +1,5 @@
 # To build & test: docker build -f .gitpod.Dockerfile -t gitpod-dockerfile-test . &&  docker run -it gitpod-dockerfile-test bash
+# To force gitpod to rebuild cached image: https://gitpod.io/#imagebuild/https://github.com/matihost/monorepo
 ARG JDK_FLAVOR=17.0.5-tem
 FROM gitpod/workspace-full:latest
 
@@ -14,7 +15,8 @@ RUN install-packages ruby shellcheck python3-dev tox ansible-lint \
         apt-transport-https ca-certificates gnupg google-cloud-cli google-cloud-sdk-gke-gcloud-auth-plugin google-cloud-cli-kpt kubectl terraform && \
     gem install mdl
 
+RUN python3 -m pip install pre-commit ansible kubernetes-validate ansible-lint requests pylint pytest pipenv pipenv-setup yamllint --no-cache-dir --upgrade
+
 USER gitpod
 RUN go install mvdan.cc/sh/v3/cmd/shfmt@latest
-RUN python3 -m pip install pre-commit ansible kubernetes-validate ansible-lint requests pylint pytest pipenv pipenv-setup yamllint --user
 RUN bash -c ". /home/gitpod/.sdkman/bin/sdkman-init.sh && sdk i java ${JDK_FLAVOR} && sdk d java ${JDK_FLAVOR}"
