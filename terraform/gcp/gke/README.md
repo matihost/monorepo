@@ -12,7 +12,16 @@ It also provisions:
 
 * Create CloudDNS private `shared.dev.gke.testing` zone and deploy ExternalDNS for Ingress/Svs auto DNS record provisioning.
 
-Use  GCP resources eliglible to [GCP Free Tier](https://cloud.google.com/free/docs/gcp-free-tier#free-tier-usage-limits) __only__.
+Uses GCP resources eliglible to [GCP Free Tier](https://cloud.google.com/free/docs/gcp-free-tier#free-tier-usage-limits) __only__.
+
+Warning:
+
+Since GKE is zonal, cluster setup may fail with temporal error like:
+
+* workflow identity not present yet (this is actually a bug on GKE side)
+* after cluster creation - unable to connect to it to setup cluster-config
+
+In each case, just wait couple of minutes, and repeat cluster creation script (as it is idempotent) until scripts pass.
 
 ## Prerequisites
 

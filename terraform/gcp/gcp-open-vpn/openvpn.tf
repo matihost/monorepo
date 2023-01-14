@@ -3,6 +3,12 @@ resource "google_compute_instance" "vm" {
   machine_type = "e2-micro"
   zone         = local.zone
 
+  scheduling {
+    provisioning_model = "SPOT"
+    preemptible        = true
+    automatic_restart  = false
+  }
+
   boot_disk {
     initialize_params {
       # OpsAgents support only LTS:

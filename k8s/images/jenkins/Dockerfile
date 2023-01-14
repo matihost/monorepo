@@ -1,8 +1,8 @@
-FROM jenkins/jenkins:2.375.1
+FROM jenkins/jenkins:2.375.2
 RUN jenkins-plugin-cli --verbose --latest true --plugins \
   branch-api:2.1051.v9985666b_f6cc \
   pipeline-stage-view:2.28 \
-  kubernetes:3743.v1fa_4c724c3b_7 \
+  kubernetes:3802.vb_b_600831fcb_3 \
   workflow-job:1254.v3f64639b_11dd \
   workflow-aggregator:590.v6a_d052e5a_a_b_5 \
   cloudbees-disk-usage-simple:178.v1a_4d2f6359a_8 \
@@ -19,7 +19,7 @@ RUN jenkins-plugin-cli --verbose --latest true --plugins \
   google-login:1.7 \
   matrix-auth:3.1.6 \
   authorize-project:1.4.0 \
-  prometheus:2.0.11 \
+  prometheus:2.1.0 \
   simple-theme-plugin:136.v23a_15f86c53d \
   jdk-tool:63.v62d2fd4b_4793 \
   command-launcher:90.v669d7ccb_7c31 \
