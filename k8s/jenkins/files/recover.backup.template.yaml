@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: "{{ namespace }}-jenkins-backup-recover"
+        # to prevent injecting istio sidecar as it prevents job from completion
+        sidecar.istio.io/inject: "false"
     spec:
       restartPolicy: OnFailure
       serviceAccountName: "{{ namespace }}-jenkins"

@@ -205,6 +205,16 @@ persistence:
 {% if gke_mode is sameas true %}
 backup:
   enabled: true
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "{{ jenkins_agent_max_cpu|default('2') }}"
+      memory: "{{ jenkins_agent_max_memory|default('1Gi') }}"
+  labels:
+    # to prevent injecting istio sidecar as it prevents backup job from completion
+    sidecar.istio.io/inject: "false"
   serviceAccount:
     create: false
     name: "{{ namespace }}-jenkins"
