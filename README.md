@@ -1,8 +1,9 @@
 # Matihost's Monorepo
 
 [![License](https://img.shields.io/github/license/matihost/monorepo.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://app.travis-ci.com/matihost/monorepo.svg?branch=master)](https://app.travis-ci.com/github/matihost/monorepo)
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-908a85?logo=gitpod)](https://gitpod.io/#https://github.com/matihost/monorepo)
+[![Build Status](https://app.travis-ci.com/matihost/monorepo.svg?branch=master)](https://app.travis-ci.com/github/matihost/monorepo)
+[![CI :: Java](https://github.com/matihost/monorepo/actions/workflows/java-ci.yaml/badge.svg)](https://github.com/matihost/monorepo/actions/workflows/java-ci.yaml)
 
 Various technology deployments, tools & code:
 
