@@ -21,17 +21,36 @@ permissions:
 jobs:
   java-ci:
     runs-on: ubuntu-22.04
+    # TODO install arc in k8s mode:
+    # https://github.com/actions/actions-runner-controller/blob/master/docs/deploying-alternative-runners.md#runner-with-k8s-jobs
+    # https://github.com/actions/actions-runner-controller/issues/1730
+    # https://actions-runner-controller.github.io/actions-runner-controller/
+    #
+    # runs-on: self-hosted
+    container:
+      image: maven:3-openjdk-17
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
+      # Do not use actions/setup-java@v3 cache option as it requires downloading java again, but container image contains java already
+      # Use actions/cache to cache M2 repository manually instead
+      #
+      # - name: Set up JDK 17
+      #   uses: actions/setup-java@v3
+      #   with:
+      #     java-version: '17'
+      #     distribution: 'adopt'
+      #     cache: maven
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
         with:
-          java-version: '17'
-          distribution: 'adopt'
-          cache: maven
+          # TODO reading from MAVEN_CONFIG env did not work here
+          path: "/root/.m2/repository"
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
       - name: Build Java source code
-        run: cd java && make build
+        run: cd java && mvn -s .mvn/settings.xml --show-version clean install
       - name: Archive app jars artifacts
         uses: actions/upload-artifact@v3
         with:

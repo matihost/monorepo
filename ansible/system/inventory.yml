@@ -454,6 +454,8 @@ all:
               helm repo add jenkinsci https://charts.jenkins.io
               helm repo add cilium https://helm.cilium.io/
               helm repo add bitnami https://charts.bitnami.com/bitnami
+              helm repo add jetstack https://charts.jetstack.io
+              helm repo add actions-runner-controller https://actions-runner-controller.github.io/actions-runner-controller
               helm repo update
               [ "$(helm plugin list |grep -c diff)" -eq 1 ] || {
                 helm plugin install https://github.com/databus23/helm-diff
