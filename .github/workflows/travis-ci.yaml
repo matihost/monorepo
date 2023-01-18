@@ -1,0 +1,101 @@
+---
+# Migrated from .travis.yml via gh actions-importer extension with little changes
+#
+# Steps:
+# Obtain GitHub Personal access tokens (classic): https://github.com/settings/tokens with 'repo, workflow, write:packages' scopes
+# Obtain Travis  API authentication token: https://app.travis-ci.com/account/preferences
+# gh auth login
+# gh repo clone matihost/monorepo && cd monorepo
+#
+# Migrate .travis.yml into .github/workflows flow:
+#
+# export TRAVIS_CI_SOURCE_GITHUB_ACCESS_TOKEN=<<Travis  API authentication token>>
+# gh actions-importer dry-run travis-ci -r matihost/monorepo -o .github/workflows --travis-ci-organization '' \
+#   --github-access-token "$(gh auth token)" -t "${TRAVIS_CI_SOURCE_GITHUB_ACCESS_TOKEN}" --github-instance-url https://github.com --source-file-path .travis.yml
+#
+name: 'CI :: All :: Migration from Travis'
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #   - master
+jobs:
+  java:
+    runs-on: ubuntu-20.04
+    env:
+      CACHE: java
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+    - name: Set up cache
+      uses: actions/cache@v3
+      with:
+        path: "${{ github.workspace }}/.m2"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-java@v3
+      with:
+        distribution: adopt
+        java-version: '17'
+    - run: cd java && make build
+  project-euler:
+    runs-on: ubuntu-20.04
+    env:
+      CACHE: algorithms/project-euler
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+    - name: Set up cache
+      uses: actions/cache@v3
+      with:
+        path: "${{ github.workspace }}/.m2"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-java@v3
+      with:
+        distribution: adopt
+        java-version: '17'
+    - run: cd algorithms/project-euler && make build
+  rust:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+    - name: Set up cargo cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: "${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}"
+    - run: cd rust/guessing_game && cargo build --verbose && cargo test --verbose
+  go:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+    - name: Set up cache
+      uses: actions/cache@v3
+      with:
+        path: |-
+          ${{ github.workspace }}/.cache/go-build
+          ${{ github.workspace }}/gopath/pkg/mod
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-go@v3
+      with:
+        go-version: '1.19'
+    - run: cd go/learning && go get -d ./... && go build -mod=mod -o .  ./... && go test ./pkg/language && ./language
+  python:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+    - name: Set up pip cache
+      uses: actions/cache@v3
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    - run: cd python/apps/exchange-rate && pip3 install tox && make build && pip3 install . && exchange-rate
