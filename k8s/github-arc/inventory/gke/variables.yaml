@@ -1,0 +1,15 @@
+all:
+  hosts:
+    localhost:
+  vars:
+    options:
+      gke_mode: true
+      gke:
+        cluster_name: "shared1-dev"
+        region: "us-central1"
+        zone_letter: "a"
+    cert_manager:
+      chart_version: "v1.11.0"
+    arc:
+      replicas: 1
+      chart_version: "0.22.0"

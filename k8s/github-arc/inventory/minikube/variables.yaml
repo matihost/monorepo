@@ -1,0 +1,12 @@
+all:
+  hosts:
+    localhost:
+  vars:
+    cert_manager:
+      chart_version: "v1.11.0"
+    arc:
+      replicas: 1
+      chart_version: "0.22.0"
+    repo:
+      name: "matihost/monorepo"
+      ci_namespace: "ci"

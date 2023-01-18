@@ -1,0 +1,48 @@
+---
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: "{{ repo.name | mandatory | replace('/','-') }}"
+  namespace: "{{ repo.ci_namespace | mandatory }}"
+spec:
+  replicas: 1
+  template:
+    spec:
+      # image: summerwind/actions-runner:latest
+      # TODO fix:
+      # {"runner": "ci/matihost-monorepo-bxcz5-mj84h", "error": "serviceaccounts is forbidden: User \"system:serviceaccount:actions-runner-system:actions-runner-controller\" cannot create resource \"serviceaccounts\" in API group \"\" in the namespace \"ci\""}
+      # serviceAccountName: "gh-runner-service-account"
+      labels:
+        - self-hosted
+        - linux
+        - "{{ repo.name | mandatory }}"
+      repository: "{{ repo.name | mandatory }}"
+      containerMode: kubernetes
+      dockerdWithinRunnerContainer: false
+      dockerEnabled: false
+      workVolumeClaimTemplate:
+        storageClassName: "{{ runner.storage_class | default('standard') }}"
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ runner.storage_size | default('5Gi') }}
+      # resources:
+      #   limits:
+      #     nvidia.com/gpu: 1
+---
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: HorizontalRunnerAutoscaler
+metadata:
+  name: "{{ repo.name | mandatory | replace('/','-') }}"
+  namespace: "{{ repo.ci_namespace | mandatory }}"
+spec:
+  minReplicas: 1
+  maxReplicas: 10
+  scaleTargetRef:
+    name: "{{ repo.name | mandatory | replace('/','-') }}"
+  scaleUpTriggers:
+    - githubEvent:
+        workflowJob: {}
+      amount: 1
+      duration: "5m"

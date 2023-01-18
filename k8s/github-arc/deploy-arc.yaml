@@ -1,0 +1,45 @@
+---
+- hosts: localhost
+  become: false
+  collections:
+  - kubernetes.core
+  - community.general
+  vars:
+    files: "{{ playbook_dir }}/files"
+  tasks:
+  - name: Get current GCP project
+    shell: gcloud config get-value project
+    register: gcp_project_out
+    changed_when: false
+    when: options.gke_mode|default(false)
+
+  - name: Set GCP project fact
+    set_fact:
+      gcp_project: "{{ gcp_project_out.stdout|default('') }}"
+
+  - name: Deploy Cert Manager Helm chart with version {{ cert_manager.chart_version }}
+    helm:
+      name: "cert-manager"
+      chart_ref: "jetstack/cert-manager"
+      chart_version: "{{ cert_manager.chart_version }}"
+      release_namespace: "cert-manager"
+      create_namespace: true
+      wait: true
+      wait_timeout: "5m0s"
+      values: "{{ lookup('template', '{{ files }}/cert_manager_helm.yaml.j2') | from_yaml }}"
+
+  - name: Deploy Github Actions Runner Controller Helm chart with version {{ arc.chart_version }}
+    helm:
+      name: "actions-runner-controller"
+      chart_ref: "actions-runner-controller/actions-runner-controller"
+      chart_version: "{{ arc.chart_version }}"
+      release_namespace: "actions-runner-system"
+      create_namespace: true
+      wait: true
+      wait_timeout: "5m0s"
+      values: "{{ lookup('template', '{{ files }}/arc_helm.yaml.j2') | from_yaml }}"
+
+  - name: Ensure Github Actions Runner Controller Config present
+    k8s:
+      state: present
+      definition: "{{ lookup('template', '{{ files }}/arc_config.yaml.j2') }}"
