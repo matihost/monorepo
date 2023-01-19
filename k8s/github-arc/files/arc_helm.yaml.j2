@@ -11,7 +11,11 @@ labels: {}
 
 replicaCount: 1
 
-webhookPort: 9443
+# On GKE cluster, its control plane can only access pods on 443 or 10250 ports unless explicitely GCP firewall has port opened for such traffic
+# Either choose above ports for webhook port or open GCP firewall
+# https://github.com/actions/actions-runner-controller/blob/master/TROUBLESHOOTING.md#internalerror-when-calling-webhook-context-deadline-exceeded
+webhookPort: {{ 10250 if options.gke_mode|default(false) else 9443 }}
+
 syncPeriod: 1m
 defaultScaleDownDelay: 10m
 

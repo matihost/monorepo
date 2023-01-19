@@ -15,16 +15,11 @@ on:
 
 # https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
 permissions:
-  checks: write
-  contents: write
+  contents: read
 
 jobs:
   java-ci:
     runs-on: ubuntu-22.04
-    # TODO install arc in k8s mode:
-
-    #
-    # runs-on: self-hosted
     container:
       image: maven:3-openjdk-17
     steps:

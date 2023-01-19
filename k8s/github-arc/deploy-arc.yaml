@@ -7,16 +7,6 @@
   vars:
     files: "{{ playbook_dir }}/files"
   tasks:
-  - name: Get current GCP project
-    shell: gcloud config get-value project
-    register: gcp_project_out
-    changed_when: false
-    when: options.gke_mode|default(false)
-
-  - name: Set GCP project fact
-    set_fact:
-      gcp_project: "{{ gcp_project_out.stdout|default('') }}"
-
   - name: Deploy Cert Manager Helm chart with version {{ cert_manager.chart_version }}
     helm:
       name: "cert-manager"

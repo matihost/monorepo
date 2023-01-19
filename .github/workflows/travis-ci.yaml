@@ -2,13 +2,19 @@
 # Migrated from .travis.yml via gh actions-importer extension with little changes
 #
 # Steps:
+#
 # Obtain GitHub Personal access tokens (classic): https://github.com/settings/tokens with 'repo, workflow, write:packages' scopes
 # Obtain Travis  API authentication token: https://app.travis-ci.com/account/preferences
+#
+# Configure gh and gh-actions-importer extension:
 # gh auth login
+# gh extension install github/gh-actions-importer
+# echo `gh auth token` | gh actions-importer update --username matihost --password-stdin
+#
+# Clone the repo:
 # gh repo clone matihost/monorepo && cd monorepo
 #
 # Migrate .travis.yml into .github/workflows flow:
-#
 # export TRAVIS_CI_SOURCE_GITHUB_ACCESS_TOKEN=<<Travis  API authentication token>>
 # gh actions-importer dry-run travis-ci -r matihost/monorepo -o .github/workflows --travis-ci-organization '' \
 #   --github-access-token "$(gh auth token)" -t "${TRAVIS_CI_SOURCE_GITHUB_ACCESS_TOKEN}" --github-instance-url https://github.com --source-file-path .travis.yml
@@ -16,20 +22,11 @@
 name: 'CI :: All :: Migration from Travis'
 on:
   workflow_dispatch:
-    # Inputs are only available for workflow_dispatch - the default is not available for other type of triggers
-    # https://dev.to/mrmike/github-action-handling-input-default-value-5f2g
-    inputs:
-      runner:
-        description: 'Runner type'
-        required: true
-        default: 'ubuntu-22.04'
-        type: choice
-        options:
-        - ubuntu-22.04
-        - matihost/monorepo
+permissions:
+  contents: read
 jobs:
   java:
-    runs-on: ${{ inputs.runner }}
+    runs-on: ubuntu-22.04
     env:
       CACHE: java
     steps:
