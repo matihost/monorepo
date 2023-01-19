@@ -5,8 +5,10 @@ all:
     cert_manager:
       chart_version: "v1.11.0"
     arc:
-      replicas: 1
       chart_version: "0.22.0"
+    runner:
+      min_replicas: 1
+      storage_class: "csi-hostpath-sc"
     repo:
       name: "matihost/monorepo"
-      ci_namespace: "ci"
+      ci_namespace: "matihost-monorepo-ci"

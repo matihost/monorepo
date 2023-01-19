@@ -15,24 +15,66 @@ subjects:
   name: actions-runner-controller
   namespace: actions-runner-system
 ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: runner-role
+  namespace: "{{ repo.ci_namespace | mandatory }}"
+rules:
+- apiGroups: [ "" ]
+  resources: [ "pods" ]
+  verbs: [ "get", "list", "create", "delete" ]
+- apiGroups: [ "" ]
+  resources: [ "pods/exec" ]
+  verbs: [ "get", "create" ]
+- apiGroups: [ "" ]
+  resources: [ "pods/log" ]
+  verbs: [ "get", "list", "watch", ]
+- apiGroups: [ "batch" ]
+  resources: [ "jobs" ]
+  verbs: [ "get", "list", "create", "delete" ]
+- apiGroups: [ "" ]
+  resources: [ "secrets" ]
+  verbs: [ "get", "list", "create", "delete" ]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: runner-role-binding
+  namespace: "{{ repo.ci_namespace | mandatory }}"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: runner-role
+subjects:
+- kind: ServiceAccount
+  name: gh-runner-service-account
+  namespace: "{{ repo.ci_namespace | mandatory }}"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gh-runner-service-account
+  namespace: "{{ repo.ci_namespace | mandatory }}"
+---
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: RunnerDeployment
 metadata:
   name: "{{ repo.name | mandatory | replace('/','-') }}"
   namespace: "{{ repo.ci_namespace | mandatory }}"
 spec:
-  replicas: 1
+  replicas: {{ runner.min_replicas | default(1) }}
   template:
     metadata:
       labels:
         sidecar.istio.io/inject: "false"
     spec:
       # image: summerwind/actions-runner:latest
-      # serviceAccountName: "gh-runner-service-account"
+      serviceAccountName: "gh-runner-service-account"
       labels:
         - self-hosted
         - linux
-        - "{{ repo.name | mandatory | replace('/','-') }}"
+        - "{{ repo.name | mandatory }}"
       repository: "{{ repo.name | mandatory }}"
       containerMode: kubernetes
       dockerdWithinRunnerContainer: false
@@ -54,7 +96,7 @@ metadata:
   name: "{{ repo.name | mandatory | replace('/','-') }}"
   namespace: "{{ repo.ci_namespace | mandatory }}"
 spec:
-  minReplicas: 1
+  minReplicas: {{ runner.min_replicas | default(1) }}
   maxReplicas: 10
   scaleTargetRef:
     name: "{{ repo.name | mandatory | replace('/','-') }}"

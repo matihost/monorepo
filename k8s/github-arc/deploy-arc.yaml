@@ -39,6 +39,23 @@
       wait_timeout: "5m0s"
       values: "{{ lookup('template', '{{ files }}/arc_helm.yaml.j2') | from_yaml }}"
 
+
+  - name: Ensure {{ repo.ci_namespace | mandatory }} namespace present
+    k8s:
+      state: present
+      definition:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: "{{ repo.ci_namespace | mandatory }}"
+          labels:
+            # Ensure Istio does not inject sidecar to runner delegated jobs as they crash automatically
+            #  ##[debug]Using image 'maven:3-openjdk-17' for job image
+            #  ##[debug]Job pod created, waiting for it to come online matihost-monorepo-8blcq-87ffq-workflow
+            #  ##[debug]Job pod is ready for traffic
+            #  ##[debug]{"message":"command terminated with non-zero exit code: Error executing in Docker Container: 1","details":{"causes":[{"reason":"ExitCode","message":"1"}]}}
+            istio-injection: disabled
+
   - name: Ensure Github Actions Runner Controller Config present
     k8s:
       state: present

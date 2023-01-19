@@ -388,7 +388,9 @@ global:
     tracer: "{{ "stackdriver" if options.gke_mode|default(false) else "zipkin" }}"
 
     # Controls if sidecar is injected at the front of the container list and blocks the start of the other containers until the proxy is ready
-    holdApplicationUntilProxyStarts: false
+    # Set to true to avoid
+    # https://github.com/actions/actions-runner-controller/blob/master/TROUBLESHOOTING.md#runner-coming-up-before-network-available
+    holdApplicationUntilProxyStarts: true
 
   proxy_init:
     # Base name for the proxy_init container, used to configure iptables.

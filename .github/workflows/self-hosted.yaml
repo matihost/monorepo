@@ -2,6 +2,15 @@
 name: 'CI :: SelfHosted Test'
 on:
   workflow_dispatch:
+    inputs:
+      runner:
+        description: 'Runner type'
+        required: true
+        default: 'ubuntu-22.04'
+        type: choice
+        options:
+          - ubuntu-22.04
+          - matihost/monorepo
 
 # https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
 # permissions:
@@ -9,7 +18,7 @@ on:
 
 jobs:
   java-ci:
-    runs-on: self-hosted
+    runs-on: ${{ inputs.runner }}
     container:
       image: maven:3-openjdk-17
     steps:
@@ -17,3 +26,5 @@ jobs:
         uses: actions/checkout@v3
       - name: Test
         run: pwd && ls -la
+      - name: Build Java source code
+        run: cd java && mvn -s .mvn/settings.xml --show-version clean install
