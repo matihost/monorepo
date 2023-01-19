@@ -1,4 +1,20 @@
 ---
+# TODO limit privileges to minimum
+# this is a workaround for not working rbac.allowGrantingKubernetesContainerModePermissions Helm flag
+#
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: github-arc-rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: actions-runner-controller
+  namespace: actions-runner-system
+---
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: RunnerDeployment
 metadata:
@@ -7,15 +23,16 @@ metadata:
 spec:
   replicas: 1
   template:
+    metadata:
+      labels:
+        sidecar.istio.io/inject: "false"
     spec:
       # image: summerwind/actions-runner:latest
-      # TODO fix:
-      # {"runner": "ci/matihost-monorepo-bxcz5-mj84h", "error": "serviceaccounts is forbidden: User \"system:serviceaccount:actions-runner-system:actions-runner-controller\" cannot create resource \"serviceaccounts\" in API group \"\" in the namespace \"ci\""}
       # serviceAccountName: "gh-runner-service-account"
       labels:
         - self-hosted
         - linux
-        - "{{ repo.name | mandatory }}"
+        - "{{ repo.name | mandatory | replace('/','-') }}"
       repository: "{{ repo.name | mandatory }}"
       containerMode: kubernetes
       dockerdWithinRunnerContainer: false

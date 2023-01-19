@@ -4,18 +4,12 @@ on:
   workflow_dispatch:
 
 # https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
-permissions:
-  contents: read
+# permissions:
+#   contents: read
 
 jobs:
   java-ci:
-    runs-on: self-hosted, matihost/monorepo
-    # TODO install arc in k8s mode:
-    # https://github.com/actions/actions-runner-controller/blob/master/docs/deploying-alternative-runners.md#runner-with-k8s-jobs
-    # https://github.com/actions/actions-runner-controller/issues/1730
-    # https://actions-runner-controller.github.io/actions-runner-controller/
-    #
-    # runs-on: self-hosted
+    runs-on: self-hosted
     container:
       image: maven:3-openjdk-17
     steps:
