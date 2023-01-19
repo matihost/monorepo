@@ -16,12 +16,20 @@
 name: 'CI :: All :: Migration from Travis'
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #   - master
+    # Inputs are only available for workflow_dispatch - the default is not available for other type of triggers
+    # https://dev.to/mrmike/github-action-handling-input-default-value-5f2g
+    inputs:
+      runner:
+        description: 'Runner type'
+        required: true
+        default: 'ubuntu-22.04'
+        type: choice
+        options:
+        - ubuntu-22.04
+        - matihost/monorepo
 jobs:
   java:
-    runs-on: ubuntu-20.04
+    runs-on: ${{ inputs.runner }}
     env:
       CACHE: java
     steps:

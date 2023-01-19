@@ -163,7 +163,7 @@ MODE='docker'
 # that needs to be referenced in PVCs. The driver itself is created under the name:
 # hostpath.csi.k8s.io - to be used for e.g. snapshot class definitions.
 # ADDONS="registry dashboard volumesnapshots csi-hostpath-driver"
-ADDONS="registry dashboard nginx"
+ADDONS="registry dashboard nginx csi-hostpath-driver"
 EXTRA_PARAMS='--network-plugin=cni'
 export ADMISSION_PLUGINS="NamespaceExists"
 

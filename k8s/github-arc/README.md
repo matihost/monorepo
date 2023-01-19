@@ -1,6 +1,15 @@
 # GitHub Actions Runner Controller
 
 Deployment of [GitHub Actions Runner Controller](https://github.com/actions/actions-runner-controller) to Minikube or GKE
+It uses [Helm deployment model](https://actions-runner-controller.github.io/actions-runner-controller/).
+
+It installs GitHub Arc in [Kubernetes mode](https://github.com/actions/actions-runner-controller/blob/master/docs/deploying-alternative-runners.md#runner-with-k8s-jobs) (DiD or dockerd is disabled).
+
+Limitation:
+
+* [not full control over workflow pod definition](https://github.com/actions/actions-runner-controller/issues/1730)
+
+* inability to have Istio sidecar injection for runner or its workflow pods
 
 ## Prerequisites
 

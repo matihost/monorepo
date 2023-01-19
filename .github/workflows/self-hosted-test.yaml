@@ -1,30 +1,26 @@
 ---
-name: 'CI :: Java'
+name: 'CI :: SelfHosted Test'
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-    paths:
-      - 'java/**'
-  pull_request:
-    branches:
-      - master
-    paths:
-      - 'java/**'
+    # Inputs are only available for workflow_dispatch - the default is not available for other type of triggers
+    # https://dev.to/mrmike/github-action-handling-input-default-value-5f2g
+    inputs:
+      runner:
+        description: 'Runner type'
+        required: true
+        default: 'ubuntu-22.04'
+        type: choice
+        options:
+          - ubuntu-22.04
+          - matihost/monorepo
 
 # https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
 permissions:
-  checks: write
-  contents: write
+  contents: read
 
 jobs:
   java-ci:
-    runs-on: ubuntu-22.04
-    # TODO install arc in k8s mode:
-
-    #
-    # runs-on: self-hosted
+    runs-on: ${{ inputs.runner }}
     container:
       image: maven:3-openjdk-17
     steps:
