@@ -1,5 +1,6 @@
-image:
-  file: .gitpod.Dockerfile
+image: quay.io/matihost/gitpod/runner:latest
+  # file: k8s/images/gitpod/Dockerfile
+
 
 ports:
   - port: 8080
