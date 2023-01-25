@@ -1,3 +1,5 @@
+# Using non-dockerhub docker repository:
+# https://www.gitpod.io/docs/configure/workspaces/workspace-image#use-a-custom-dockerfile
 image: quay.io/matihost/gitpod/runner:latest
   # file: k8s/images/gitpod/Dockerfile
 

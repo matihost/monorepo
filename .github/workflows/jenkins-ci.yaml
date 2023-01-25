@@ -1,0 +1,150 @@
+---
+# Migrated from Jenkinsfile via gh actions-importer extension with little changes
+#
+# Steps:
+#
+# Obtain GitHub Personal access tokens (classic): https://github.com/settings/tokens with 'repo, workflow, write:packages' scopes
+# Obtain Travis  API authentication token: https://app.travis-ci.com/account/preferences
+# Deploy Jenkins along with job with this repo Jenkinsfile
+# Obtain Jenkins user API token
+#
+# Configure gh and gh-actions-importer extension:
+# gh auth login
+# gh extension install github/gh-actions-importer
+# echo `gh auth token` | gh actions-importer update --username matihost --password-stdin
+#
+# Clone the repo:
+# gh repo clone matihost/monorepo && cd monorepo
+#
+# Migrate Jenkinsfile into .github/workflows flow:
+#
+# gh actions-importer dry-run jenkins -o .github/workflows --source-file-path Jenkinsfile \
+#  --source-url https://jenkins.ci.internal.gke.shared1.dev.gcp.testing/job/learning/job/master/ \
+#  --jenkins-instance-url https://jenkins.ci.internal.gke.shared1.dev.gcp.testing  --github-access-token `gh auth token` -t 11dd15fbf9df40f8c64f85d965c27daeae -n admin --no-ssl-verify
+name: 'CI :: All :: Migration from Jenkins'
+on:
+  # The following PollSCM schedule was transformed and may behave differently than in Jenkins.
+  # In Actions, this workflow will run on this schedule regardless of any changes whereas in Jenkins a job will only run if there are changes.
+  # schedule:
+  # - cron: "*/10 * * * 1-5"
+  # push:
+  #   paths: "*"
+  workflow_dispatch:
+# defaults:
+#   # This item has no matching transformer
+#   kubernetes:
+#     key: inheritFrom
+#     value:
+#       isLiteral: true
+#       value: default
+permissions:
+  contents: read
+jobs:
+  Checkout_sources:
+    name: Checkout sources
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+  Build_Java:
+    name: "Build :: Java"
+    runs-on: ubuntu-latest
+    needs: Checkout_sources
+    steps:
+    - name: Set up cache
+      uses: actions/cache@v3
+      with:
+        path: "${{ github.workspace }}/.m2"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-java@v3
+      with:
+        distribution: adopt
+        java-version: '17'
+    - run: cd java && make build
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        path: "**/target/*.jar"
+        retention-days: 2
+    - name: Publish test results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        junit_files: "**/target/surefire-reports/*.xml"
+  Build_Project_Euler:
+    name: "Build :: Project Euler"
+    runs-on: ubuntu-latest
+    needs: Checkout_sources
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+#     # This item has no matching transformer
+#     - container:
+#         isLiteral: true
+#         value: maven-jdk17
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        path: "**/target/*.jar"
+  Build_Golang:
+    name: "Build :: Golang"
+    runs-on: ubuntu-latest
+    needs: Checkout_sources
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+#     # This item has no matching transformer
+#     - container:
+#         isLiteral: true
+#         value: golang
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        path: "**/language"
+  Build_Rust:
+    name: "Build :: Rust"
+    runs-on: ubuntu-latest
+    needs: Checkout_sources
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+#     # This item has no matching transformer
+#     - container:
+#         isLiteral: true
+#         value: rust
+  Build_Python:
+    name: "Build :: Python"
+    runs-on: ubuntu-latest
+    needs: Checkout_sources
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+#     # This item has no matching transformer
+#     - container:
+#         isLiteral: true
+#         value: python
+  Build_Ansible:
+    name: "Build :: Ansible"
+    runs-on: ubuntu-latest
+    needs: Checkout_sources
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+#     # This item has no matching transformer
+#     - container:
+#         isLiteral: true
+#         value: ansible
+  Build_Kubectl:
+    name: "Build :: Kubectl"
+    runs-on: ubuntu-latest
+    needs: Checkout_sources
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+#     # This item has no matching transformer
+#     - container:
+#         isLiteral: true
+#         value: kubectl
