@@ -424,12 +424,6 @@ all:
               echo "JConsole (jconsole)"
             }
             [ $(bash -ic "sdk c 2>/dev/null" |grep -cE 'groovy|maven|scala|java') -eq 4 ]
-        - name: runc-conmon-fix
-          desc: Ensure runc and conmon binaries for CRIO are on sysmte path, related to https://github.com/cri-o/cri-o/issues/1767
-          become: true
-          command: |
-            [ -e /usr/bin/runc ] || { ln -s /usr/sbin/runc /usr/bin/runc; echo "runc path fixed"; }
-            [ -e /usr/bin/conmon ] || { sudo ln -s /usr/libexec/podman/conmon /usr/bin/conmon; echo "conmon path fixed"; }
         - name: crictl
           become: true
           command: |

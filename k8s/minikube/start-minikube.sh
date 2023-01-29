@@ -10,7 +10,7 @@ function usage() {
 Starts Minikube in bare / none mode. Assumes latest Ubuntu.
 
 Minimum set of features enabled in every Minikube:
-- Container runtime selection (--with-containerd, --with-crio, --with-docker) - by default Docker cri-dockerd is selected.
+- Container runtime selection (--with-containerd, --with-crio, --with-docker) - by default containerd is selected.
 - Minikube Tunnel Loadbalancer along with Nginx Ingress
 - Nginx Ingress Class (--with-nginx) - installs Ngnix Ingress Class
 - Registry, Dashboard
@@ -24,16 +24,16 @@ Optional deprecated features:
 - OPA Gatekeeper (--with-gatekeeper) - install base Gatekeeper w/o meaningful config, go to k8s/gatekeeper dir to install OPA Gatekeeper fully
 
 Samples:
-# start default bare/none driver Minikube with docker with CNI enablement (Cilium installed via Helm)
+# start default bare/none driver Minikube with containerd with CNI enablement (Cilium installed via Helm)
 $(basename "$0")
 
-# start Minikube with containerd minimum set of features
-$(basename "$0") --with-containerd
+# start Minikube with docker
+$(basename "$0") --with-docker
 
 # start Minikube with containerd with K8S latest version (default: stable)
 $(basename "$0") --with-containerd --with-version latest
 
-# start with Crio as container engine (implies CNI aka enables NetworkPolicy)
+# start with Crio as container engine
 $(basename "$0") --with-crio
 
 # start Minikube with docker with CNI/Cilium enablement (Cilium installed via Minikube addon)
@@ -80,7 +80,7 @@ function ensureCriDockerdPresent() {
 }
 
 function ensureCrioPresent() {
-  CRIO_VERSION=1.25
+  CRIO_VERSION=1.26
 
   [ -x /usr/bin/crio ] || (
     # shellcheck disable=SC1091
@@ -103,10 +103,17 @@ function ensureCrioPresent() {
     sudo apt -y install containernetworking-plugins
   )
 
-  # ensure runc and conmon binaries for CRIO are on sysmte path
-  # related to https://github.com/cri-o/cri-o/issues/1767
-  [ -e /usr/bin/runc ] || sudo ln -s /usr/sbin/runc /usr/bin/runc
-  [ -e /usr/bin/conmon ] || sudo ln -s /usr/libexec/podman/conmon /usr/bin/conmon
+  # TODO remove when https://github.com/kubernetes/minikube/issues/15734 fixed
+  [ -e /etc/crio/crio.conf.d/02-crio.conf ] || (
+    echo '[crio.image]
+# pause_image = ""
+
+[crio.network]
+# cni_default_network = ""
+
+[crio.runtime]
+# cgroup_manager = ""' | sudo tee /etc/crio/crio.conf.d/02-crio.conf >/dev/null
+  )
 
   # minikube uses cilium as CNI provider when crio mode is enabled
   [ "$(helm repo list | grep -c cilium)" -eq 0 ] && {
@@ -153,18 +160,52 @@ function addNginxIngress() {
   }
 }
 
+function addDashboardIngress() {
+  kubectl get ingress ingress-dashboard -n kubernetes-dashboard --no-headers=false &>/dev/null || (
+    CN="dashboard.minikube"
+    FILENAME="/tmp/${CN}"
+    openssl req -x509 -sha256 -subj "/CN=${CN}" -days 365 -out "${FILENAME}.crt" -newkey rsa:2048 -nodes -keyout "${FILENAME}.key"
+    kubectl create secret tls ${CN} --key="${FILENAME}.key" --cert="${FILENAME}.crt" -n kubernetes-dashboard
+
+    echo 'apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-dashboard
+  namespace: kubernetes-dashboard
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    #this redirect to https if try to enter over http
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    #this is required when backend runs over HTTPS
+    #nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    #this requiered if want to protect site
+    #nginx.ingress.kubernetes.io/whitelist-source-range: <here your public ip>,<here server ip if want access from server>
+spec:
+  tls:
+    - hosts:
+      - dashboard.minikube
+      secretName: dashboard.minikube
+  rules:
+  - host: dashboard.minikube
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kubernetes-dashboard
+            port:
+              number: 80' | kubectl apply -f - -n kubernetes-dashboard
+    echo "Minikube Dashboard available under https://dashboard.minikube"
+  )
+}
+
 ensureMinikubePresent
 K8S_VERSION='stable'
-MODE='docker'
+MODE='containerd'
 
-# TODO csi-hostpath-driver faild with containerd
-# - VolumeSnaphots via csi-hostpath-driver.
-# The csi-hostpath-driver addon sets up a dedicated storage class called csi-hostpath-sc
-# that needs to be referenced in PVCs. The driver itself is created under the name:
-# hostpath.csi.k8s.io - to be used for e.g. snapshot class definitions.
-# ADDONS="registry dashboard volumesnapshots csi-hostpath-driver"
-ADDONS="registry dashboard nginx csi-hostpath-driver"
-EXTRA_PARAMS='--network-plugin=cni'
+ADDONS="registry dashboard nginx volumesnapshots csi-hostpath-driver"
+EXTRA_PARAMS=''
 export ADMISSION_PLUGINS="NamespaceExists"
 
 while [[ "$#" -gt 0 ]]; do
@@ -185,10 +226,9 @@ while [[ "$#" -gt 0 ]]; do
     ;;
   --with-docker | docker | d)
     MODE='docker'
-    EXTRA_PARAMS='--network-plugin=cni'
     ;;
   --with-cilium)
-    EXTRA_PARAMS='--cni=cilium'
+    EXTRA_PARAMS="${EXTRA_PARAMS} --cni=cilium"
     ;;
   --with-istio | istio)
     ADDONS="${ADDONS} istio"
@@ -215,6 +255,7 @@ containerd)
 docker)
   ensureDockerCGroupSystemD
   ensureCriDockerdPresent
+  EXTRA_PARAMS='--network-plugin=cni'
   ;;
 *)
   usage
@@ -236,6 +277,7 @@ if ! minikube status &>/dev/null; then
   sudo mkdir -p /etc/kubernetes
   sudo chmod a+rwx /etc/kubernetes
 
+  set -x
   # Default admission plugins do not need to be specified in apiserver.enable-admission-plugins:
   # https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#which-plugins-are-enabled-by-default
   #
@@ -251,7 +293,7 @@ if ! minikube status &>/dev/null; then
     --extra-config=kubelet.cgroup-driver=systemd \
     --addons=volumesnapshots \
     ${EXTRA_PARAMS}
-
+  set +x
   sudo chmod -R a+rwx /etc/kubernetes &&
     minikube update-context &>/dev/null &&
     { minikube tunnel -c &>/tmp/minikube-tunnel.log & } &&
@@ -277,6 +319,9 @@ if ! minikube status &>/dev/null; then
       minikube addons enable istio
     elif [ "${ADDON}" == 'nginx' ]; then
       addNginxIngress
+    elif [ "${ADDON}" == 'dashboard' ]; then
+      minikube addons enable dashboard
+      addDashboardIngress
     elif [ "${ADDON}" != 'gatekeeper' ]; then # skip gatekeeper as it has to be installed as the last one
       minikube addons enable "${ADDON}"
     fi
