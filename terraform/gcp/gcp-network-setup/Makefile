@@ -6,7 +6,7 @@ TF_VAR_project := $(CURRENT_PROJECT)
 
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
-	TF_LOG := DEBUG
+F_LOG := DEBUG	T
 endif
 
 MODE := apply

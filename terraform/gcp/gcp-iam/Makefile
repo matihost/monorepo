@@ -33,6 +33,8 @@ use-editor-sa: ## create new gcloud configuration with editor Google Service Acc
 	-gcloud config set compute/zone us-central1-a
 	@-rm -rf /tmp/editor.json
 
+get-editor-sa-key: ## get editor Google Service Account key
+	@-terraform output -raw sa-editor-key
 
 show-state: ## show terraform.state
 	terraform state list

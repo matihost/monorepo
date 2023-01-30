@@ -1,0 +1,72 @@
+apiVersion: v1
+baseDomain: dev.gcp.testing
+controlPlane:
+  hyperthreading: Enabled
+  name: master
+  platform:
+    gcp:
+      type: e2-standard-4
+      zones:
+      - us-central1-a
+      - us-central1-c
+      osDisk:
+        diskType: pd-ssd
+        diskSizeGB: 256
+        encryptionKey:
+          kmsKey:
+            name: os-key
+            keyRing: okd-machine-keys
+            location: global
+            projectID: "$(gcloud config get project)"
+      tags:
+      - "control-plane-${CLUSTER_NAME}"
+  replicas: 1
+compute:
+- hyperthreading: Enabled
+  name: worker
+  platform:
+    gcp:
+      type: e2-standard-4
+      zones:
+      - us-central1-a
+      - us-central1-c
+      osDisk:
+        diskType: pd-standard
+        diskSizeGB: 128
+        encryptionKey:
+          kmsKey:
+            name: os-key
+            keyRing: okd-machine-keys
+            location: global
+            projectID: "$(gcloud config get project)"
+      tags:
+      - "compute-${CLUSTER_NAME}"
+  replicas: 2
+metadata:
+  name: "${CLUSTER_NAME}"
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  # nodes network, must match VPC subnet platform.gcp.controlPlaneSubnet and platform.gcp.computeSubnet
+  machineNetwork:
+  - cidr: 10.10.0.0/16
+  networkType: OVNKubernetes
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  gcp:
+    projectID: "$(gcloud config get project)"
+    region: us-central1
+    defaultMachinePlatform:
+      tags:
+      - global-tag1
+      - global-tag2
+    network: private-vpc
+    controlPlaneSubnet: private-subnet-us-central1
+    computeSubnet: private-subnet-us-central1
+## The pull secret that provides components in the cluster access to images for OpenShift components.
+# a fake value to satisfy the installer. Images for okd need no subscription
+pullSecret: '{\"auths\":{\"fake\":{\"auth\":\"aWQ6cGFzcwo=\"}}}'
+sshKey: "$(cat ~/.ssh/id_rsa.pub)"
+publish: Internal

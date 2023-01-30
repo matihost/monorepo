@@ -1,0 +1,29 @@
+apiVersion: operator.openshift.io/v1
+kind: IngressController
+metadata:
+  creationTimestamp: null
+  name: default
+  namespace: openshift-ingress-operator
+spec:
+  clientTLS:
+    clientCA:
+      name: ""
+    clientCertificatePolicy: ""
+  endpointPublishingStrategy:
+    loadBalancer:
+      providerParameters:
+        gcp:
+          clientAccess: Global
+        type: GCP
+      scope: Internal
+    type: LoadBalancerService
+  httpCompression: {}
+  httpErrorCodePages:
+    name: ""
+  tuningOptions:
+    reloadInterval: 0s
+  unsupportedConfigOverrides: null
+status:
+  availableReplicas: 0
+  domain: ""
+  selector: ""

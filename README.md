@@ -15,7 +15,9 @@ Various technology deployments, tools & code:
   * gatekeeper - Ansible based GateKeeper deployment for Minikube or GKE
   * istio - Ansible based Istio deployment for Minikube or GKE
   * jenkins - Ansible based Jenkins deployment for Minikube or GKE
-  * okd-3 - Ansible playbooks to setup OpenShift/OKD 3 on VirtualBox VMs
+  * okd - OKD clusters deployments:
+    * okd4 - scripts to install OKD 4 on GCP
+    * okd3 - Ansible playbooks to setup OpenShift/OKD 3 on VirtualBox VMs
   * images - docker images useful in other repos
     * ansible - docker image with Ansible, available at: quay.io/matihost/ansible
     * jenkins - docker image with Jenkins and predefined plugins, available at: quay.io/matihost/jenkins:lts
