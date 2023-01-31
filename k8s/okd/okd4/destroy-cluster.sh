@@ -3,7 +3,7 @@
 function usage() {
   echo -e "Usage: $(basename "$0") -n | --name cluster-name -k|--key-file /path/to/gsa/key.json
 
-Deploys OKD in GCP.
+Destroy OKD cluster in GCP.
 
 Samples:
 $(basename "$0") -n okd -k /path/to/gsa/key.json
@@ -47,15 +47,5 @@ fi
 export GOOGLE_CREDENTIALS="${KEY_FILE}"
 
 CLUSTER_CONFIG_DIR="target/${CLUSTER_NAME}"
-mkdir -p "${CLUSTER_CONFIG_DIR}"
 
-template=$(cat files/install-config.template.yaml)
-eval "echo -e \"${template}\"" >"${CLUSTER_CONFIG_DIR}"/install-config.yaml
-
-openshift-install create manifests --dir="${CLUSTER_CONFIG_DIR}" --log-level debug
-
-# customization for ingress
-cp files/cluster-ingress-default-ingresscontroller.yaml "${CLUSTER_CONFIG_DIR}/manifests/"
-
-#
-openshift-install create cluster --dir="${CLUSTER_CONFIG_DIR}" --log-level debug
+openshift-install destroy cluster --dir="${CLUSTER_CONFIG_DIR}" --log-level debug

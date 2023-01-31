@@ -7,17 +7,18 @@ controlPlane:
     gcp:
       type: e2-standard-4
       zones:
-      - us-central1-a
-      - us-central1-c
+      - us-east1-b
+      - us-east1-c
       osDisk:
+        # can be only pd-ssd for control planes and free tier has a limit of 500 GB
         diskType: pd-ssd
-        diskSizeGB: 256
-        encryptionKey:
-          kmsKey:
-            name: os-key
-            keyRing: okd-machine-keys
-            location: global
-            projectID: "$(gcloud config get project)"
+        diskSizeGB: 128
+        # encryptionKey:
+        #   kmsKey:
+        #     name: os-key
+        #     keyRing: okd-machine-keys
+        #     location: global
+        #     projectID: "$(gcloud config get project)"
       tags:
       - "control-plane-${CLUSTER_NAME}"
   replicas: 1
@@ -28,17 +29,17 @@ compute:
     gcp:
       type: e2-standard-4
       zones:
-      - us-central1-a
-      - us-central1-c
+      - us-east1-b
+      - us-east1-c
       osDisk:
         diskType: pd-standard
         diskSizeGB: 128
-        encryptionKey:
-          kmsKey:
-            name: os-key
-            keyRing: okd-machine-keys
-            location: global
-            projectID: "$(gcloud config get project)"
+        # encryptionKey:
+        #   kmsKey:
+        #     name: os-key
+        #     keyRing: okd-machine-keys
+        #     location: global
+        #     projectID: "$(gcloud config get project)"
       tags:
       - "compute-${CLUSTER_NAME}"
   replicas: 2
@@ -50,21 +51,21 @@ networking:
     hostPrefix: 23
   # nodes network, must match VPC subnet platform.gcp.controlPlaneSubnet and platform.gcp.computeSubnet
   machineNetwork:
-  - cidr: 10.10.0.0/16
+  - cidr: 10.14.0.0/16
   networkType: OVNKubernetes
   serviceNetwork:
   - 172.30.0.0/16
 platform:
   gcp:
     projectID: "$(gcloud config get project)"
-    region: us-central1
+    region: us-east1
     defaultMachinePlatform:
       tags:
       - global-tag1
       - global-tag2
     network: private-vpc
-    controlPlaneSubnet: private-subnet-us-central1
-    computeSubnet: private-subnet-us-central1
+    controlPlaneSubnet: private-subnet-us-east1
+    computeSubnet: private-subnet-us-east1
 ## The pull secret that provides components in the cluster access to images for OpenShift components.
 # a fake value to satisfy the installer. Images for okd need no subscription
 pullSecret: '{\"auths\":{\"fake\":{\"auth\":\"aWQ6cGFzcwo=\"}}}'

@@ -28,7 +28,7 @@ resource "google_compute_firewall" "private-allow-http" {
 
   allow {
     protocol = "tcp"
-    ports    = ["80", "8080", "443", "8443"]
+    ports    = ["80", "8080", "443", "8443", "6443"]
   }
   # Ommiting target_* assumes that firewall rule is applied on all VM within network
   # target_service_accounts = [google_service_account.gke-sa.email]]
