@@ -506,14 +506,32 @@ all:
         - name: k9s
           become: false
           command: |
-            K9S_VERSION="$(curl -s "https://api.github.com/repos/derailed/k9s/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"v([^"]+)".*/\1/')"
-            [[ -x /usr/local/bin/k9s && "$(k9s version -s |grep Version)" =~ ${K9S_VERSION} ]] || (
+            CURRENT_VERSION="$(curl -s "https://api.github.com/repos/derailed/k9s/releases/latest" | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(k9s version -s 2>/dev/null |grep Version | sed -E 's/Version .*(v.*)/\1/')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || (
               cd "$(mktemp -d)" &&
-              curl -s "https://api.github.com/repos/derailed/k9s/releases/latest" |
-                jq -r ".assets[]|select(.content_type|test(\"application/gzip\"))|.browser_download_url" |
-                  grep Linux | grep x86_64 | xargs curl -sSL | tar -zxv -o k9s &&
-              sudo mv k9s /usr/local/bin
+              curl -s "https://api.github.com/repos/derailed/k9s/releases/latest" | jq -r ".assets[] | select(.browser_download_url | contains(\"k9s_Linux_amd64\")) |.browser_download_url" |
+                xargs curl -sSL | tar -zxv -o k9s &&
+                sudo mv k9s /usr/local/bin
             )
+        - name: okd
+          become: false
+          command: |
+            CURRENT_VERSION="$(curl -s https://api.github.com/repos/okd-project/okd/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(openshift-install version 2>/dev/null |grep 'openshift-install' | sed -E 's/^openshift-install (.*)/\1/')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              cd "$(mktemp -d)" &&
+              curl -s https://api.github.com/repos/okd-project/okd/releases/latest | jq -r ".assets[] | select(.browser_download_url | contains(\"openshift-install-linux\")) |.browser_download_url" |
+                xargs curl -sSL | tar -zx -o openshift-install &&
+                sudo mv openshift-install /usr/local/bin
+              curl -s https://api.github.com/repos/okd-project/okd/releases/latest | jq -r ".assets[] | select(.browser_download_url | contains(\"openshift-client-linux-4\")) |.browser_download_url" |
+                xargs curl -sSL | tar -zx -o oc &&
+                sudo mv oc /usr/local/bin &&
+              curl -s https://api.github.com/repos/okd-project/okd/releases/latest | jq -r ".assets[] | select(.browser_download_url | contains(\"ccoctl-linux\")) |.browser_download_url" |
+                xargs curl -sSL | tar -zx -o ccoctl &&
+                sudo mv ccoctl /usr/local/bin &&
+              echo "oc, openshift-install and ccoctl installed"
+            }
         - name: kubectx-ns
           become: false
           command: |

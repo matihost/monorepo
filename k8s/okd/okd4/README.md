@@ -2,19 +2,21 @@
 
 Install OKD 4.x on GCP as [private cluster on already present VPC](https://docs.okd.io/latest/installing/installing_gcp/installing-gcp-vpc.html)
 
+The script:
+
+* installs OKD tools (oc, openshift-install, ccoctl) if necessary
+
+* creates GSA along its key for actual installation
+
+* creates OKD install manifests and performs necessary customisations (aka add GlobalAccess flag to ingress ILB)
+
+* performs OKD installation in us-east1 GCP region
+
+* backups OKD installation state files in GS
+
 ## Prerequisites
 
-* GCP Service Account Key file
-
-```bash
-cd files/gcp-prerequisites
-mkdir -p target
-make run
-make use-okd-installer-sa
-make get-okd-installer-sa-key > target/key.json
-```
-
-* GCP Network with own VPC (see the repo `terraform/gcp/gcp-network-setup`)
+* GCP Network with own VPC (run `terraform/gcp/gcp-network-setup` repo)
 
   * Ensure port 6443 is open to traffic (API server)
 
@@ -29,10 +31,10 @@ make get-okd-installer-sa-key > target/key.json
 ## Cluster creation
 
 ```bash
-# deploys OKD with cluster name and path to GSA key
-./create-cluster.sh -n okd -k files/gcp-prerequisites/target/key.json
+# deploys OKD with cluster name
+./create-cluster.sh -n okd
 # or
-# ./create-cluster.sh okd files/gcp-prerequisites/target/key.
+# ./create-cluster.sh okd
 ```
 
 ### Warnings
@@ -49,10 +51,10 @@ make get-okd-installer-sa-key > target/key.json
 
 * Upon any cluster problem upon creation - do not repeat `create-cluster.sh` script invocation as openshift-install is not idempotent - especially when it comes to create GCP objects. The only way to repeat is to destroy cluster first - see below.
 
-* The whole procedure tooks around ~43 minutes to spin cluster
+* The whole procedure takes around ~43 minutes to spin cluster
 
 ## Cluster destruction
 
 ```bash
-./destroy-cluster.sh okd files/gcp-prerequisites/target/key.json
+./destroy-cluster.sh okd
 ```
