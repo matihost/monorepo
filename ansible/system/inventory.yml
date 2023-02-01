@@ -160,7 +160,7 @@ all:
         - docker.io
         - conntrack
         - fuse-overlayfs
-        - virtualbox-6.1
+        - virtualbox-7.0
         - containernetworking-plugins
         - cri-o
         - podman
