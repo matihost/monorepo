@@ -41,7 +41,7 @@
     <maven.test.skip>false</maven.test.skip>
 
     <!-- Spring Boot -->
-    <spring.boot.version>3.0.1</spring.boot.version>
+    <spring.boot.version>3.0.2</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -55,10 +55,10 @@
 
     <!-- Scala 3-->
     <scala.compat.version>3</scala.compat.version>
-    <scala.version>${scala.compat.version}.2.0</scala.version>
+    <scala.version>${scala.compat.version}.2.2</scala.version>
     <scala.spec2.version>5.2.0</scala.spec2.version>
-    <scala.test.version>3.2.14</scala.test.version>
-    <scala.test.plus.version>3.2.14.0</scala.test.plus.version>
+    <scala.test.version>3.2.15</scala.test.version>
+    <scala.test.plus.version>3.2.15.0</scala.test.plus.version>
     <!-- Scala 3 still depends on Scala 2 for backward compatibility -->
     <scala2.version>2.13.10</scala2.version>
 
@@ -285,7 +285,7 @@
         <plugin>
           <groupId>net.alchim31.maven</groupId>
           <artifactId>scala-maven-plugin</artifactId>
-          <version>4.7.1</version>
+          <version>4.8.0</version>
           <executions>
             <execution>
               <goals>
@@ -369,9 +369,15 @@
             </execution>
           </executions>
           <configuration>
-          <!-- TODO snake-yaml vulnerability -->
+            <!-- TODO snake-yaml and org.json vulnerability -->
+            <!-- org.json:json:jar:20220924
+            [CVE-2022-45688] CWE-787: Out-of-bounds Write (7.5);
+            https://ossindex.sonatype.org/component/pkg:maven/org.json/json@20220924?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+            https://ossindex.sonatype.org/vulnerability/CVE-2022-45688?component-type=maven&component-name=org.json%2Fjson&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+            -->
             <excludeVulnerabilityIds>
               <exclude>CVE-2022-1471</exclude>
+              <exclude>CVE-2022-45688</exclude>
             </excludeVulnerabilityIds>
             <reportFile>${project.build.directory}/audit-report.json</reportFile>
           </configuration>
