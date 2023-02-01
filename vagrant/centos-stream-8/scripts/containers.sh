@@ -8,6 +8,15 @@ else
   yum -y install container-tools
 fi
 
+# workaround as CentOS 8 does not trust UBI 9 images downloading
+echo '{
+    "default": [
+        {
+            "type": "insecureAcceptAnything"
+        }
+    ]
+}' >/etc/containers/policy.json
+
 # configure rootless containers
 # increase user namespaces
 echo "user.max_user_namespaces=28633" >/etc/sysctl.d/userns.conf

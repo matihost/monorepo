@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
-  config.vm.box_url = "https://cloud.centos.org/centos/8-stream/x86_64/images/CentOS-Stream-Vagrant-8-20220125.1.x86_64.vagrant-virtualbox.box"
+  config.vm.box_url = "https://cloud.centos.org/centos/8-stream/x86_64/images/CentOS-Stream-Vagrant-8-20220913.0.x86_64.vagrant-virtualbox.box"
 
   config.vm.hostname = "centos8"
 
@@ -83,6 +83,12 @@ Vagrant.configure("2") do |config|
     vb.cpus = 8
     vb.memory = 5 * 1024
     vb.default_nic_type = "virtio"
+    if "#{ENV['GUI']}" == "true"
+      vb.gui = true
+      vb.customize ["modifyvm", :id, "--accelerate3d", "off"]
+      vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
+      vb.customize ["modifyvm", :id, "--vram", "128"]
+    end
     if Vagrant.has_plugin?("vagrant-vbguest") then
       vb.customize ["modifyvm", :id, "--clipboard-mode", "bidirectional"]
       vb.customize ["modifyvm", :id, "--draganddrop", "bidirectional"]
@@ -92,7 +98,7 @@ Vagrant.configure("2") do |config|
       config.vbguest.installer_options = { allow_kernel_upgrade: true }
       # config.vbguest.installer_options = { running_kernel_modules: ["vboxguest"] }
       config.vbguest.installer_arguments = %w{--nox11 --keep}
-      VBOX_VERSION="6.1.38"
+      VBOX_VERSION="6.1.42"
       config.vbguest.installer_hooks[:before_install] = ["yum install -y epel-release policycoreutils-python-utils",
       "sed -i 's/SELINUX=.*/SELINUX=permissive/g' /etc/selinux/config",
       "setenforce Permissive",
@@ -117,13 +123,6 @@ Vagrant.configure("2") do |config|
     #   config.vbguest.installer_arguments = %w{--nox11 --keep}
     #   config.vbguest.installer_hooks[:before_install] = ["yum install -y epel-release", "sleep 1"]
     # end
-
-    if "#{ENV['GUI']}" == "true"
-      vb.gui = true
-      vb.customize ["modifyvm", :id, "--accelerate3d", "off"]
-      vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
-      vb.customize ["modifyvm", :id, "--vram", "128"]
-    end
   end
 
   # Install software once (with run: "once" as default provisioner option)

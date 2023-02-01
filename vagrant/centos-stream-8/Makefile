@@ -18,10 +18,10 @@ ssh: ## ssh to VM
 direct-ssh: ## ssh to VM directly via ssh command
 	ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa.vagrant.vm vagrant@172.30.250.3
 
-direct-run:
+direct-run: ## run exisiting VM via VBox w/o GUI
 	VBoxManage startvm centos-stream-8 --type headless
 
-direct-run-with-gui:
+direct-run-with-gui: ## run exisiting VM via VBox with GUI
 	VBoxManage startvm centos-stream-8 --type gui
 
 restart: ## restart VM with reloading Vagrantfile content w/o enforcing once provisioners
@@ -38,6 +38,9 @@ destroy: ## destroy VM
 
 update-vm: ## check for updates for vagrant box image
 	vagrant box update
+
+ensure-latest-base-vm: ## cleans base box so that if Vagrant file contains newer base box it will be downloaded
+	vagrant box remove -f centos/centos-stream-8
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
