@@ -41,7 +41,7 @@ ansible-galaxy collection install community.general
 
 ```bash
 # Deploys Istio on Minikube (assumes current kubecontext points to Minikube) and CNI is enabled
-make deploy-istio-helm-on-minikube-with-cni
+make deploy-istio-helm-on-minikube
 #  Deploys Istio on Minikube on docker w/o CNI
 make deploy-istio-helm-on-minikube-on-docker-wo-cni
 
@@ -68,7 +68,7 @@ make undeploy-istio-helm-from-gke
 
 ```bash
 # Deploys Istio on Minikube (assumes current kubecontext points to Minikube) and CNI is enabled
-make deploy-istio-operator-on-minikube-with-cni
+make deploy-istio-operator-on-minikube
 #  Deploys Istio on Minikube on docker w/o CNI
 make deploy-istio-operator-on-minikube-on-docker-wo-cni
 

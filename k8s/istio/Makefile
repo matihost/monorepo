@@ -3,7 +3,7 @@
 deploy-istio-operator-on-minikube-on-docker-wo-cni: ## deploys Istio via Operator on Minikube with Docker without CNI enabled (assumes kubecontext points to Minikube )
 	ansible-playbook -i inventory/minikube deploy-istio-operator.yaml -v -e "{\"cni\": {\"enable\": false}}"
 
-deploy-istio-operator-on-minikube-with-cni: ## deploys Istio via Operator on Minikube with CNI deployed (assumes kubecontext points to Minikube )
+deploy-istio-operator-on-minikube: ## deploys Istio via Operator on Minikube with CNI deployed (assumes kubecontext points to Minikube )
 	ansible-playbook -i inventory/minikube deploy-istio-operator.yaml -v
 
 deploy-istio-operator-on-gke: ## deploys Istio via Operator on GKE with internal ingress only(assumes kubecontext points to GKE cluster )
@@ -23,7 +23,7 @@ undeploy-istio-operator-from-gke-neg: ## undeploys Istio via Operator on GKE wit
 
 # Istio via Helm
 
-deploy-istio-helm-on-minikube-with-cni: ## deploys Istio via Helm on Minikube with CNI deployed (assumes kubecontext points to Minikube )
+deploy-istio-helm-on-minikube: ## deploys Istio via Helm on Minikube with CNI deployed (assumes kubecontext points to Minikube )
 	ansible-playbook -i inventory/minikube deploy-istio-helm.yaml -v
 
 deploy-istio-helm-on-gke: ## deploys Istio via Helm on GKE with internal ingress only(assumes kubecontext points to GKE cluster )

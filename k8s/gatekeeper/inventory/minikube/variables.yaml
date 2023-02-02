@@ -5,4 +5,4 @@ all:
     gatekeeper:
       chart_variables:
         replicas: 1
-        version: "3.10.0"
+        version: "3.11.0"

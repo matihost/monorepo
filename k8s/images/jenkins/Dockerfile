@@ -1,8 +1,8 @@
 FROM jenkins/jenkins:2.375.2
 RUN jenkins-plugin-cli --verbose --latest true --plugins \
   branch-api:2.1071.v1a_188a_562481 \
-  pipeline-stage-view:2.29 \
-  kubernetes:3834.vdc85747145e6 \
+  pipeline-stage-view:2.31 \
+  kubernetes:3845.va_9823979a_744 \
   workflow-job:1268.v6eb_e2ee1a_85a \
   workflow-aggregator:590.v6a_d052e5a_a_b_5 \
   cloudbees-disk-usage-simple:178.v1a_4d2f6359a_8 \
@@ -20,7 +20,7 @@ RUN jenkins-plugin-cli --verbose --latest true --plugins \
   matrix-auth:3.1.6 \
   authorize-project:1.4.0 \
   prometheus:2.1.1 \
-  simple-theme-plugin:136.v23a_15f86c53d \
+  simple-theme-plugin:146.v0e67db_a_9052e \
   jdk-tool:63.v62d2fd4b_4793 \
   command-launcher:90.v669d7ccb_7c31 \
   windows-slaves:1.8.1
