@@ -167,6 +167,7 @@ all:
         - buildah
         - skopeo
         - terraform
+        - packer
         - vagrant
         - sshpass
         - notepadqq
