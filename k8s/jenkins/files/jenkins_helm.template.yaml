@@ -9,7 +9,7 @@ namespaceOverride: ci
 controller:
 {% if use_prebuild_jenkins_image is sameas true %}
   image: "quay.io/matihost/jenkins"
-  tag: "2.375.2"  # has to be semver compliant
+  tag: "2.375.3"  # has to be semver compliant
   imagePullPolicy: Always
   initializeOnce: true
   installPlugins: false
