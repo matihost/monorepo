@@ -41,7 +41,7 @@
     <maven.test.skip>false</maven.test.skip>
 
     <!-- Spring Boot -->
-    <spring.boot.version>3.0.2</spring.boot.version>
+    <spring.boot.version>3.0.3</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -63,7 +63,7 @@
     <scala2.version>2.13.10</scala2.version>
 
     <!-- IBM MQ client -->
-    <mq.version>9.3.1.0</mq.version>
+    <mq.version>9.3.2.0</mq.version>
   </properties>
 
   <profiles>
@@ -369,8 +369,10 @@
             </execution>
           </executions>
           <configuration>
-            <!-- TODO snake-yaml and org.json vulnerability -->
-            <!-- org.json:json:jar:20220924
+            <!-- org.yaml:snakeyaml:jar:1.33
+             [CVE-2022-1471] CWE-502: Deserialization of Untrusted Data (9.8);
+             https://ossindex.sonatype.org/vulnerability/CVE-2022-1471?component-type=maven&component-name=org.yaml%2Fsnakeyaml&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+             https://ossindex.sonatype.org/component/pkg:maven/org.yaml/snakeyaml@1.33?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
             [CVE-2022-45688] CWE-787: Out-of-bounds Write (7.5);
             https://ossindex.sonatype.org/component/pkg:maven/org.json/json@20220924?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
             https://ossindex.sonatype.org/vulnerability/CVE-2022-45688?component-type=maven&component-name=org.json%2Fjson&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1

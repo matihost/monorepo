@@ -13,7 +13,7 @@ module org.matihost.learning.mq.client {
 
   //
   requires org.apache.commons.lang3;
-  requires com.ibm.mq.allclient;
+  requires com.ibm.mq.javax;
   requires javax.jms.api;
   requires java.naming;
 
