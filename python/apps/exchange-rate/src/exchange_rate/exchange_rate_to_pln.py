@@ -10,7 +10,7 @@ class ExchangeRateToPLN:  # pylint: disable=too-few-public-methods
     """Retrieve exchange rates from Polish NBP."""
 
     __RATE_TO_PLN_XPATH = './pozycja[kod_waluty="{0}"]/kurs_sredni'
-    __NPB_FIXING_URL = 'http://www.nbp.pl/kursy/xml/LastA.xml'
+    __NPB_FIXING_URL = 'https://static.nbp.pl/dane/kursy/xml/LastA.xml'
 
     __NBP_API_URL = "http://api.nbp.pl/api/exchangerates/rates/A/{0}/{1}/"
 
