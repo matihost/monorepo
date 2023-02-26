@@ -6,6 +6,6 @@ all:
       vars:
         files: "{{ playbook_dir }}/files"
         namespace: ci
-        chart_version: "4.3.1"
+        chart_version: "4.3.2"
         jenkins_service_type: ClusterIP
         use_prebuild_jenkins_image: true

@@ -2,7 +2,7 @@ FROM jenkins/jenkins:2.375.3
 RUN jenkins-plugin-cli --verbose --latest true --plugins \
   branch-api:2.1071.v1a_188a_562481 \
   pipeline-stage-view:2.31 \
-  kubernetes:3852.v41ea_166a_ed1b_ \
+  kubernetes:3883.v4d70a_a_a_df034 \
   workflow-job:1268.v6eb_e2ee1a_85a \
   workflow-aggregator:590.v6a_d052e5a_a_b_5 \
   cloudbees-disk-usage-simple:178.v1a_4d2f6359a_8 \
@@ -12,7 +12,7 @@ RUN jenkins-plugin-cli --verbose --latest true --plugins \
   docker-workflow:563.vd5d2e5c4007f \
   git:5.0.0 \
   configuration-as-code:1569.vb_72405b_80249 \
-  timestamper:1.21 \
+  timestamper:1.22 \
   github-branch-source:1701.v00cc8184df93 \
   github-oauth:0.39 \
   ldap:659.v8ca_b_a_fe79fa_d \
