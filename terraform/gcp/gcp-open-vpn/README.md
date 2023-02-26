@@ -27,6 +27,12 @@ TODOs/Limitations:
       forward only;
       forwarders { 10.10.0.yyy; };
   };
+  // Main zone for GCP Workstations
+  zone "cloudworkstations.dev" {
+      type forward;
+      forward only;
+      forwarders { 10.10.0.yyy; };
+  };
   ```
 
   The IP should be takend from subnetwork and region where VPN server is deployed.
