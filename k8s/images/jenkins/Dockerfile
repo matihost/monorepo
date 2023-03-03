@@ -2,8 +2,8 @@ FROM jenkins/jenkins:2.375.3
 RUN jenkins-plugin-cli --verbose --latest true --plugins \
   branch-api:2.1071.v1a_188a_562481 \
   pipeline-stage-view:2.31 \
-  kubernetes:3883.v4d70a_a_a_df034 \
-  workflow-job:1268.v6eb_e2ee1a_85a \
+  kubernetes:3893.v73d36f3b_9103 \
+  workflow-job:1282.ve6d865025906 \
   workflow-aggregator:590.v6a_d052e5a_a_b_5 \
   cloudbees-disk-usage-simple:178.v1a_4d2f6359a_8 \
   credentials:1214.v1de940103927 \

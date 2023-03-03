@@ -4,7 +4,7 @@ data "google_container_engine_versions" "versions" {
   # run: gcloud container get-server-config
   # to see available versions
   location       = local.location
-  version_prefix = "1.25."
+  version_prefix = "1.26."
 
   project = var.project
 }
@@ -215,7 +215,7 @@ resource "google_container_cluster" "gke" {
   #   type = "SYSTEM_ONLY"
   # }
 
-  min_master_version = data.google_container_engine_versions.versions.release_channel_default_version["RAPID"]
+  min_master_version = data.google_container_engine_versions.versions.release_channel_latest_version["RAPID"]
 
   monitoring_config {
     # removed "APISERVER" from monitored components as it costs very much

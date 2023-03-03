@@ -23,8 +23,8 @@
 #  --jenkins-instance-url https://jenkins.ci.internal.gke.shared1.dev.gcp.testing  --github-access-token `gh auth token` -t 11b348879dfad52c08ef0d0f8b532e72d3 -n admin --no-ssl-verify
 #
 # Audit gh actions-importer to figure out which Jenkins elements are not migrated:
-# gh actions-importer audit jenkins -o .github/workflows --config-file-path Jenkinsfile \
-#  --jenkins-instance-url https://jenkins.ci.internal.gke.shared1.dev.gcp.testing  --github-access-token `gh auth token` -t 11b348879dfad52c08ef0d0f8b532e72d3 -n admin --no-ssl-verify
+# gh actions-importer audit jenkins -o .github/workflow --jenkins-instance-url https://jenkins.ci.internal.gke.shared1.dev.gcp.testing \
+#   --github-access-token `gh auth token` -t 11b348879dfad52c08ef0d0f8b532e72d3 -n admin --no-ssl-verify
 name: 'CI :: All :: Migration from Jenkins'
 on:
   # The following PollSCM schedule was transformed and may behave differently than in Jenkins.
