@@ -36,6 +36,7 @@ Various technology deployments, tools & code:
     * gcp-kms - setup KMS keyrings, keys etc for other scripts
     * gcp-monitoring - setup logging buckets, custom dashboards, limits etc
     * gcp-workstations - setup GCP Workstations infrastructure for remote development
+    * gcp-cloudbuild - setup GCP Cloud Build infrastructure to trigger build for GitHub repository
   * aws - Terraform deployments for AWS, mainly utilizing only AWS Free Tier
     * aws-iam - setup IAM resources needed on fresh AWS account (users, roles, groups etc)
     * aws-network - minimal AWS recommended setup with private subnet

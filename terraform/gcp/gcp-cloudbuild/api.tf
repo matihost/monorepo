@@ -1,5 +1,5 @@
 locals {
-  apis = ["workstations", "servicedirectory", ]
+  apis = ["cloudbuild", "secretmanager", "artifactregistry", "clouddeploy", ]
 }
 
 resource "google_project_service" "apis" {
