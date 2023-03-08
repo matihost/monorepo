@@ -48,6 +48,20 @@ steps:
   - '-c'
   - |-
     make build
+# CloudBuild checkout sources under /workspace directory
+# And it does it as ROOT user - so that entire workspace has root:root permissions!?!
+# If builder image is non root, it cannot write any file in the workspace
+# tox is doing that so it prevent python builds from running
+# Details:
+# https://github.com/GoogleCloudPlatform/cloud-builders/issues/641#issuecomment-604599102
+- id: hack
+  name: 'ubuntu'
+  entrypoint: 'bash'
+  args:
+    [
+      '-c',
+      'chmod -R 777 /workspace',
+    ]
 - name: quay.io/matihost/ansible:latest
   waitFor: ['-']
   entrypoint: 'bash'
@@ -61,7 +75,7 @@ steps:
   - |-
     make dictionaries.yaml
 - name: quay.io/matihost/ansible:latest
-  waitFor: ['-']
+  waitFor: ['hack']
   entrypoint: 'bash'
   dir: "python/apps/exchange-rate"
   # cloud build assume workspace is home directory (/home/builder) and it is mounted as volume with sources
@@ -90,7 +104,7 @@ options:
 tags: ['matihost', 'learning']
 # timeout for entire build
 timeout: "600s"
-# saves build artifacts - only gs:// is supporte for now
+# saves build artifacts - only gs:// is supported for now
 # artifacts:
 #   objects:
 #     location: "gs://$PROJECT_ID-learning/artifacts/$REPO_NAME/$SHORT_SHA"
