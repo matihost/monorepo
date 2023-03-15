@@ -29,7 +29,6 @@ all:
           4ops.packer
           4ops.terraform
           asciidoctor.asciidoctor-vscode
-          jebbs.plantuml
           DavidAnson.vscode-markdownlint
           donjayamanne.githistory
           DotJoshJohnson.xml
@@ -38,6 +37,7 @@ all:
           foxundermoon.shell-format
           golang.go
           hashicorp.terraform
+          jebbs.plantuml
           joaompinto.asciidoctor-vscode
           ms-azuretools.vscode-docker
           ms-kubernetes-tools.vscode-kubernetes-tools
@@ -50,8 +50,6 @@ all:
           ms-toolsai.vscode-jupyter-cell-tags
           ms-toolsai.vscode-jupyter-slideshow
           ms-vscode.makefile-tools
-          Pivotal.vscode-boot-dev-pack
-          Pivotal.vscode-spring-boot
           redhat.fabric8-analytics
           redhat.java
           redhat.vscode-commons
@@ -62,6 +60,7 @@ all:
           tomoki1207.pdf
           VisualStudioExptTeam.intellicode-api-usage-examples
           VisualStudioExptTeam.vscodeintellicode
+          vmware.vscode-spring-boot
           vscjava.vscode-java-debug
           vscjava.vscode-java-dependency
           vscjava.vscode-java-pack
@@ -79,6 +78,7 @@ all:
           key_url: "https://packages.microsoft.com/keys/microsoft.asc"
         - name: teams
           repo: "deb [arch=amd64] https://packages.microsoft.com/repos/ms-teams stable main"
+          key_url: "https://packages.microsoft.com/keys/microsoft.asc"
         - name: skype-stable
           repo: "deb [arch=amd64] https://repo.skype.com/deb stable main"
           key_url: https://repo.skype.com/data/SKYPE-GPG-KEY
@@ -116,6 +116,9 @@ all:
         - name: github
           repo: "deb [arch=amd64] https://cli.github.com/packages stable main"
           key_url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+        - name: onedrive
+          repo: "deb [arch=amd64] https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_{{ ansible_distribution_version }}/ ./"
+          key_url: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_{{ ansible_distribution_version }}/Release.key
         packages:
         - mc
         - lm-sensors
@@ -171,7 +174,7 @@ all:
         - vagrant
         - sshpass
         - notepadqq
-        - teams
+          #- teams
         - google-chrome-stable
         - google-cloud-sdk
         - google-cloud-sdk-gke-gcloud-auth-plugin
@@ -603,7 +606,7 @@ all:
           command: |
             CURRENT_VERSION="$(curl -sL https://calibre-ebook.com/download_linux |grep 'The latest release of calibre is' | sed -E 's/.*The latest release of calibre is (.+)\..*/\1/')"
             INSTALLED_VERSION="$(calibre --version 2>/dev/null | sed -E 's/.*\(calibre (.*)\)/\1/')"
-            [[ "${CURRENT_VERSION}" == *"${INSTALLED_VERSION}"* ]] || {
+            [[ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ]] || {
               wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo bash
             }
         - name: kubectl plugins
@@ -847,7 +850,7 @@ all:
               curl -s https://api.github.com/repos/sindresorhus/caprine/releases/latest | jq -r ".assets[] |
                 select(.name | test(\".deb\")) | .browser_download_url" |
                   xargs curl -s -L -o "/tmp/caprine.deb"
-              apt install /tmp/caprine.deb
+              apt -y install /tmp/caprine.deb
             }
         - name: cri-dockerd
           become: true
@@ -859,7 +862,7 @@ all:
               curl -s https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest  | jq -r ".assets[] |
                 select(.name | test(\"ubuntu-{{ versions.cri_dockerd_ubuntu_version }}_amd64.deb\")) | .browser_download_url" |
                   xargs curl -s -L -o "/tmp/cri-dockerd.deb"
-              apt install /tmp/cri-dockerd.deb
+              apt -y install /tmp/cri-dockerd.deb
             }
         - name: discord
           become: true
@@ -870,7 +873,7 @@ all:
             INSTALLED_VERSION="$(apt list discord 2>/dev/null | grep discord |  sed -E 's/.* ([0..9].+) amd.*/\1/')"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl -s -L -o "/tmp/discord.deb" "${DOWNLOAD_URL}"
-              apt install /tmp/discord.deb
+              apt -y install /tmp/discord.deb
             }
         files_config:
         - file: /etc/gai.conf
