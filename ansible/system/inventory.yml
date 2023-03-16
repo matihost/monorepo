@@ -19,7 +19,7 @@ all:
           virtualbox_ubuntu_version: "jammy"
           # TODO change to {{ ansible_distribution_release }} when kinetic/22.10 is supported Ubuntu
           cri_dockerd_ubuntu_version: "jammy"
-          mq: 9.3.1.0
+          mq: 9.3.2.0
         virtual_interface_ip: 192.168.10.1
         update_cache_timeout: 30
         systemd_journal:
@@ -336,7 +336,7 @@ all:
           desc: Download KeePassRPC plugin to KeePass plugins for integration with Kee plugin to Firefox
           command: |
             [ -e /usr/lib/keepass2/Plugins/KeePassRPC.plgx ] || {
-              curl -s https://api.github.com/repos/kee-org/keepassrpc/releases/latest | jq -r ".assets[] |
+              curl -sL https://api.github.com/repos/kee-org/keepassrpc/releases/latest | jq -r ".assets[] |
                 select(.name | test(\"KeePassRPC.plgx\")) | .browser_download_url" |
                   xargs curl -s -L -o "/usr/lib/keepass2/Plugins/KeePassRPC.plgx"
               echo "KeePassRPC downloaded, you may run Firefox with Kee plugin now and KeePass app"
@@ -405,14 +405,14 @@ all:
         - name: sdkman
           become: false
           command: |
-            [ -d ~/.sdkman/bin ] || (\
+            [ -d ~/.sdkman/bin ] || (
             curl -s "https://get.sdkman.io" | bash
             bash -ic "sdk i java 11-openjdk /usr/lib/jvm/java-11-openjdk-amd64;\
             sdk i java 17-openjdk /usr/lib/jvm/java-17-openjdk-amd64;\
             sdk d java 17-openjdk;\
             sdk i maven;\
             sdk i groovy;\
-            sdk i scala")
+            sdk i scala;")
             [ -e ~/.local/share/applications/jconsole.desktop  ] || {
               mkdir -p ~/.local/share/applications
               echo "[Desktop Entry]
@@ -473,7 +473,7 @@ all:
         - name: cilium-cli
           become: false
           command: |
-            CURRENT_VERSION="$(curl -s https://api.github.com/repos/cilium/cilium-cli/releases/latest | jq -r ".tag_name")"
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/cilium/cilium-cli/releases/latest | jq -r ".tag_name")"
             INSTALLED_VERSION="$(cilium version | grep cilium-cli: | sed -E 's/^cilium.* (v[0-9\.]+).*/\1/')"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl -L --remote-name-all https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz{,.sha256sum}
@@ -510,18 +510,18 @@ all:
         - name: k9s
           become: false
           command: |
-            CURRENT_VERSION="$(curl -s "https://api.github.com/repos/derailed/k9s/releases/latest" | jq -r ".tag_name")"
+            CURRENT_VERSION="$(curl -sL "https://api.github.com/repos/derailed/k9s/releases/latest" | jq -r ".tag_name")"
             INSTALLED_VERSION="$(k9s version -s 2>/dev/null |grep Version | sed -E 's/Version .*(v.*)/\1/')"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || (
               cd "$(mktemp -d)" &&
-              curl -s "https://api.github.com/repos/derailed/k9s/releases/latest" | jq -r ".assets[] | select(.browser_download_url | contains(\"k9s_Linux_amd64\")) |.browser_download_url" |
+              curl -sL "https://api.github.com/repos/derailed/k9s/releases/latest" | jq -r ".assets[] | select(.browser_download_url | contains(\"k9s_Linux_amd64\")) |.browser_download_url" |
                 xargs curl -sSL | tar -zxv -o k9s &&
                 sudo mv k9s /usr/local/bin
             )
         - name: okd
           become: false
           command: |
-            CURRENT_VERSION="$(curl -s https://api.github.com/repos/okd-project/okd/releases/latest | jq -r ".tag_name")"
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/okd-project/okd/releases/latest | jq -r ".tag_name")"
             INSTALLED_VERSION="$(openshift-install version 2>/dev/null |grep 'openshift-install' | sed -E 's/^openshift-install (.*)/\1/')"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               cd "$(mktemp -d)" &&
@@ -553,7 +553,7 @@ all:
           command: |
             [ -d ~/bin/.jmc ] || {
               cd "$(mktemp -d)" &&
-            curl -s https://api.github.com/repos/adoptium/jmc-overrides/releases/latest | \
+            curl -sL https://api.github.com/repos/adoptium/jmc-overrides/releases/latest | \
               jq -r ".assets[] | select(.browser_download_url | contains(\"linux\")) | .browser_download_url" | \
             xargs curl -sSL | tar -zxv &&
               mv 'JDK Mission Control' ~/bin/.jmc &&
@@ -579,8 +579,8 @@ all:
           command: |
             [ -d ~/bin/.visualvm ] || {
               cd "$(mktemp -d)" &&
-              curl -s https://api.github.com/repos/oracle/visualvm/releases/latest | \
-                jq -r ".assets[]|select(.content_type|test(\"application/zip\"))|.browser_download_url" | \
+              curl -sL https://api.github.com/repos/oracle/visualvm/releases/latest | \
+                jq -r ".assets[]|select(.content_type|test(\"application/zip\"))|select(.name | test(\"visualvm\"))|.browser_download_url" | \
               xargs curl -sSLO
               unzip visualvm*.zip && rm visualvm*.zip &&
               mv visualvm* ~/bin/.visualvm &&
@@ -620,7 +620,7 @@ all:
           become: false
           command: |
             [ "$(grep -c 'export USE_GKE_GCLOUD_AUTH_PLUGIN=True' ~/.bashrc)" -ne 0  ] || (
-              export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+              echo 'export USE_GKE_GCLOUD_AUTH_PLUGIN=True' >> ~/.bashrc
               echo "kubectl GKE GCLOUD auth plugin v1.25 enabled"
             )
             [ "$($(gcloud info --format='value(basic.python_location)') -m pip list |grep -c numpy)" -ne 0 ] || {
@@ -675,11 +675,11 @@ all:
             --resources=dns,monitoring,addresses,autoscalers,regionAutoscalers,globalForwardingRules,healthChecks,globalAddresses,regionBackendServices,urlMaps,regionSslCertificates,forwardingRules,httpHealthChecks,targetTcpProxies,regionInstanceGroupManagers,targetHttpsProxies,backendServices,sslCertificates
           become: true
           command: |
-            CURRENT_VERSION="$(curl -s https://api.github.com/repos/GoogleCloudPlatform/terraformer/releases/latest | grep tag_name | cut -d '"' -f 4)"
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/GoogleCloudPlatform/terraformer/releases/latest | grep tag_name | cut -d '"' -f 4)"
             INSTALLED_VERSION=$(terraformer --version 2>/dev/null | sed -E 's/version v(.*)/\1/g')
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               export PROVIDER=all
-              curl -LO https://github.com/GoogleCloudPlatform/terraformer/releases/download/$(curl -s https://api.github.com/repos/GoogleCloudPlatform/terraformer/releases/latest | \
+              curl -LO https://github.com/GoogleCloudPlatform/terraformer/releases/download/$(curl -sL https://api.github.com/repos/GoogleCloudPlatform/terraformer/releases/latest | \
                 grep tag_name | cut -d '"' -f 4)/terraformer-${PROVIDER}-linux-amd64
               chmod +x terraformer-${PROVIDER}-linux-amd64
               sudo mv terraformer-${PROVIDER}-linux-amd64 /usr/local/bin/terraformer
@@ -689,10 +689,10 @@ all:
           become: true
           desc: Ensure latest version of Terragrnt is installed
           command: |
-            CURRENT_VERSION="$(curl -s https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r ".tag_name")"
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r ".tag_name")"
             INSTALLED_VERSION="$(terragrunt --version 2>/dev/null | sed -E 's/.* version (.*)/\1/g')"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
-              curl -s https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r ".assets[] |
+              curl -sL https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r ".assets[] |
                 select(.name | test(\"linux_amd64\")) | .browser_download_url" |
                   xargs curl -s -L -o "/usr/local/bin/terragrunt"
               chmod a+x /usr/local/bin/terragrunt
@@ -711,7 +711,7 @@ all:
           become: true
           command: |
             # TODO consider full server version
-            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/mqadv_dev931_ubuntu_x86-64.tar.gz
+            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/mqadv_dev932_ubuntu_x86-64.tar.gz
             # TODO add detect a new version
             [ -e /opt/mqm ] || {
               rm -rf /tmp/mq && mkdir -p /tmp/mq && cd /tmp/mq
@@ -719,16 +719,16 @@ all:
                 tar -zx
               export genmqpkg_inc{sdk,tls,man,adm,samp}=1
               rm -rf /opt/mqm
-              ./bin/genmqpkg.sh -b /opt/mqm
               [ "$(grep -c 'opt/mqm' ~/.bashrc)" -gt 0 ] || {
                 echo 'PATH=/opt/mqm/bin:${PATH}' >> ~/.bashrc
               }
+              ./bin/genmqpkg.sh -b /opt/mqm
               rm -rf /tmp/mq
             }
         - name: tflint
           become: false
           command: |
-            CURRENT_VERSION="$(curl -s "https://api.github.com/repos/terraform-linters/tflint/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"v([^"]+)".*/\1/')"
+            CURRENT_VERSION="$(curl -sL "https://api.github.com/repos/terraform-linters/tflint/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"v([^"]+)".*/\1/')"
             INSTALLED_VERSION="$(tflint --version 2>/dev/null | grep version |  sed -E 's/.*version ([^"]+)/\1/')"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh |bash
@@ -795,9 +795,9 @@ all:
             alias awswho="aws configure list"
             alias awswhoami="aws sts get-caller-identity"
             alias awsgettoken="aws sts get-session-token"
+            [ -e "$HOME/.aws/credentials" ] && complete -W "$(cat $HOME/.aws/credentials | grep -Eo [.*] | tr -d [])" _awsSwitchProfile
+            [ -e "$HOME/.aws/config" ] && complete -W "$(cat $HOME/.aws/config | grep -Eo [.*] | tr -d [] | cut -d " " -f 2)" _awsSetProfile'
 
-            complete -W "$(cat $HOME/.aws/credentials | grep -Eo '\[.*\]' | tr -d '[]')" _awsSwitchProfile
-            complete -W "$(cat $HOME/.aws/config | grep -Eo '\[.*\]' | tr -d '[]' | cut -d " " -f 2)" _awsSetProfile'
             [ -e ~/bin/awsp_functions.sh  ] || {
               cd ~/bin && curl -sSLO https://raw.githubusercontent.com/antonbabenko/awsp/master/awsp_functions.sh && chmod u+x awsp_functions.sh
               echo "${AWSP_BASHRC}" >> ~/.bashrc
@@ -844,10 +844,10 @@ all:
           become: true
           desc: Ensure latest version of Caprine/unofficial Messenger client for Linux is installed
           command: |
-            CURRENT_VERSION="$(curl -s https://api.github.com/repos/sindresorhus/caprine/releases/latest | jq -r ".tag_name")"
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/sindresorhus/caprine/releases/latest | jq -r ".tag_name")"
             INSTALLED_VERSION="$(dpkg -s caprine 2>/dev/null |grep Version | sed "s/Version: /v/g")"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
-              curl -s https://api.github.com/repos/sindresorhus/caprine/releases/latest | jq -r ".assets[] |
+              curl -sL https://api.github.com/repos/sindresorhus/caprine/releases/latest | jq -r ".assets[] |
                 select(.name | test(\".deb\")) | .browser_download_url" |
                   xargs curl -s -L -o "/tmp/caprine.deb"
               apt -y install /tmp/caprine.deb
@@ -856,10 +856,10 @@ all:
           become: true
           desc: Ensure latest version of cri-dockerd is installed. cri-dockerd is a requirement for Minikube to run
           command: |
-            CURRENT_VERSION="$(curl -s https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest | jq -r ".tag_name")"
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest | jq -r ".tag_name")"
             INSTALLED_VERSION="$(cri-dockerd --version 2>&1| sed -E "s/cri-dockerd (.*) .*/v\1/g")"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
-              curl -s https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest  | jq -r ".assets[] |
+              curl -sL https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest  | jq -r ".assets[] |
                 select(.name | test(\"ubuntu-{{ versions.cri_dockerd_ubuntu_version }}_amd64.deb\")) | .browser_download_url" |
                   xargs curl -s -L -o "/tmp/cri-dockerd.deb"
               apt -y install /tmp/cri-dockerd.deb
