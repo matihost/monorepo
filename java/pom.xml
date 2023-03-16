@@ -41,7 +41,7 @@
     <maven.test.skip>false</maven.test.skip>
 
     <!-- Spring Boot -->
-    <spring.boot.version>3.0.3</spring.boot.version>
+    <spring.boot.version>3.0.4</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -369,15 +369,22 @@
             </execution>
           </executions>
           <configuration>
-            <!-- org.yaml:snakeyaml:jar:1.33
-             [CVE-2022-1471] CWE-502: Deserialization of Untrusted Data (9.8);
-             https://ossindex.sonatype.org/vulnerability/CVE-2022-1471?component-type=maven&component-name=org.yaml%2Fsnakeyaml&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-             https://ossindex.sonatype.org/component/pkg:maven/org.yaml/snakeyaml@1.33?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+            <!--
+            net.minidev:json-smart:jar:2.4.8
+            [CVE-2023-1370] CWE-400: Uncontrolled Resource Consumption ('Resource Exhaustion') (7.5);
+            https://ossindex.sonatype.org/component/pkg:maven/net.minidev/json-smart@2.4.8?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+            https://ossindex.sonatype.org/vulnerability/CVE-2023-1370?component-type=maven&component-name=net.minidev%2Fjson-smart&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+            org.yaml:snakeyaml:jar:1.33
+            [CVE-2022-1471] CWE-502: Deserialization of Untrusted Data (9.8);
+            https://ossindex.sonatype.org/vulnerability/CVE-2022-1471?component-type=maven&component-name=org.yaml%2Fsnakeyaml&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+            https://ossindex.sonatype.org/component/pkg:maven/org.yaml/snakeyaml@1.33?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+            org.json:json:jar:20220924
             [CVE-2022-45688] CWE-787: Out-of-bounds Write (7.5);
             https://ossindex.sonatype.org/component/pkg:maven/org.json/json@20220924?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
             https://ossindex.sonatype.org/vulnerability/CVE-2022-45688?component-type=maven&component-name=org.json%2Fjson&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
             -->
             <excludeVulnerabilityIds>
+              <exclude>CVE-2023-1370</exclude>
               <exclude>CVE-2022-1471</exclude>
               <exclude>CVE-2022-45688</exclude>
             </excludeVulnerabilityIds>
