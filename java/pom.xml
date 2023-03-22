@@ -370,6 +370,10 @@
           </executions>
           <configuration>
             <!--
+            org.springframework:spring-expression:jar:6.0.6
+            [CVE-2023-20861] CWE-770: Allocation of Resources Without Limits or Throttling (5.3);
+            https://ossindex.sonatype.org/component/pkg:maven/org.springframework/spring-expression@6.0.6?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+            https://ossindex.sonatype.org/vulnerability/CVE-2023-20861?component-type=maven&component-name=org.springframework%2Fspring-expression&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
             net.minidev:json-smart:jar:2.4.8
             [CVE-2023-1370] CWE-400: Uncontrolled Resource Consumption ('Resource Exhaustion') (7.5);
             https://ossindex.sonatype.org/component/pkg:maven/net.minidev/json-smart@2.4.8?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
@@ -384,6 +388,7 @@
             https://ossindex.sonatype.org/vulnerability/CVE-2022-45688?component-type=maven&component-name=org.json%2Fjson&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
             -->
             <excludeVulnerabilityIds>
+              <exclude>CVE-2023-20861</exclude>
               <exclude>CVE-2023-1370</exclude>
               <exclude>CVE-2022-1471</exclude>
               <exclude>CVE-2022-45688</exclude>

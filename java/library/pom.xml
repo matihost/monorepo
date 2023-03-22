@@ -14,5 +14,6 @@
   <modules>
     <module>groovy-samples</module>
     <module>scala-samples</module>
+    <module>java-samples</module>
   </modules>
 </project>
