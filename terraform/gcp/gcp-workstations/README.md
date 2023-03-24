@@ -6,11 +6,9 @@ Workstations installation consists of:
 
 * Workstation Cluster - cluster is in private mode and exposed to private VPC via PSC.
 
-Limitations:
+* Default Workstation Configuration
 
-* Workstation Configuration - no support from Terraform GPC Provider yet
-
-* Workstations - no support from Terraform GPC Provider yet
+* Single Workstation
 
 ## Prerequisites
 

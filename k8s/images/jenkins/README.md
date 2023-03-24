@@ -23,10 +23,10 @@ make build
 make push
 
 # create additional tag for lts image
-make tag TAG=2.375.3
+make tag TAG=2.387.1
 
 # push image with tag to quay.io
-make push TAG=2.375.3
+make push TAG=2.387.1
 
 
 # run image with bash
