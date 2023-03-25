@@ -1,0 +1,132 @@
+---
+name: 'CI'
+on:
+  push:
+    branches:
+    - master
+    - feature/*
+  pull_request:
+    branches:
+    - master
+    - feature/*
+  workflow_dispatch:
+    # Inputs are only available for workflow_dispatch - the default is not available for other type of triggers
+    # https://dev.to/mrmike/github-action-handling-input-default-value-5f2g
+    inputs:
+      runner:
+        description: 'Runner type'
+        required: true
+        default: 'ubuntu-22.04'
+        type: choice
+        options:
+        - ubuntu-22.04
+        - matihost/monorepo
+  schedule:
+  - cron: '27 20 * * 0'
+# https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+
+jobs:
+  sources:
+    name: Checkout sources
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    container:
+      image: maven:3-openjdk-17
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+    - name: Cache workspace
+      uses: actions/cache/save@v3
+      with:
+        # avoid using github.workspace in caching?
+        # so how effectivelly share source code between jobs?
+        # https://github.com/actions/cache/blob/main/tips-and-workarounds.md#cross-os-cache
+        # artifacts?
+        # cleaning artifacts after workflow requires custom, non standard action:
+        # https://github.com/marketplace/actions/delete-artifact
+        path: ${{ github.workspace }}
+        key: sources-${{ github.run_id }}-${{ github.run_attempt }}
+        enableCrossOsArchive: true
+  java-ci:
+    needs: sources
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    container:
+      image: maven:3-openjdk-17
+    steps:
+    # - name: checkout
+    #   uses: actions/checkout@v3
+    - name: Download sources
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ github.workspace }}
+        key: sources-${{ github.run_id }}-${{ github.run_attempt }}
+        fail-on-cache-miss: true
+        enableCrossOsArchive: true
+    - name: Cache local Maven repository
+      uses: actions/cache@v3
+      with:
+        # TODO reading from MAVEN_CONFIG env did not work here
+        path: "/root/.m2/repository"
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    # Do not use actions/setup-java@v3 cache option as it requires downloading java again, but container image contains java already
+    # Use actions/cache to cache M2 repository manually instead
+    #
+    # - name: Set up JDK 17
+    #   uses: actions/setup-java@v3
+    #   with:
+    #     java-version: '17'
+    #     distribution: 'adopt'
+    #     cache: maven
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: java
+    - name: Build Java source code
+      run: cd java && mvn -s .mvn/settings.xml --show-version clean install
+    - name: Archive app jars artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-jars
+        path: java/apps/**/target/*.jar
+        retention-days: 2
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:java"
+  go:
+    needs: sources
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    container: golang:1.19
+    env:
+      GO_CACHE: /go
+    steps:
+    # - name: checkout
+    #   uses: actions/checkout@v3
+    - name: Download sources
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ github.workspace }}
+        key: sources-${{ github.run_id }}-${{ github.run_attempt }}
+        fail-on-cache-miss: true
+    - name: Set up cache
+      uses: actions/cache@v3
+      with:
+        path: |-
+          /go
+        key: "${{ runner.os }}-gopath"
+    # https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/running-codeql-code-scanning-in-a-container
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: go
+    - name: Build Go source code
+      run: cd go/learning && go build -buildvcs=false -mod=mod -o . ./... && go test ./pkg/language && ./language
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:go"

@@ -2,16 +2,6 @@
 name: 'CI :: Java'
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-    paths:
-      - 'java/**'
-  pull_request:
-    branches:
-      - master
-    paths:
-      - 'java/**'
 
 # https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
 permissions:
