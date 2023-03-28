@@ -1,10 +1,3 @@
-provider "google" {
-  region  = var.region
-  zone    = local.zone
-  project = var.project
-}
-
-
 // Terraform plugin for creating random ids
 resource "random_id" "instance_id" {
   byte_length = 8
@@ -12,9 +5,9 @@ resource "random_id" "instance_id" {
 
 // A single Compute Engine instance
 resource "google_compute_instance" "vm" {
-  name         = "vm-${random_id.instance_id.hex}"
+  name         = "${var.name}-${random_id.instance_id.hex}"
   machine_type = "e2-micro"
-  zone         = local.zone
+  zone         = var.zone
 
   boot_disk {
     initialize_params {
@@ -70,20 +63,24 @@ output "instance_name" {
 }
 
 
-locals {
-  zone = "${var.region}-${var.zone_letter}"
+# Own variables
+
+variable "name" {
+  type        = string
+  description = "Name prefix for VM"
 }
 
+#  Default variables
 variable "region" {
   type        = string
   default     = "us-central1"
   description = "GCP Region For Deployment"
 }
 
-variable "zone_letter" {
+variable "zone" {
   type        = string
-  default     = "a"
-  description = "GCP Region For Deployment"
+  default     = "us-central1-aaaaaa"
+  description = "GCP Zone For Deployment"
 }
 
 variable "project" {

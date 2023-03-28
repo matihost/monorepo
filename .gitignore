@@ -105,5 +105,12 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+# Terragrunt
+**/.terragrunt-cache/*
+
+
+# Terraformer
+**/generated/*
+
 # Vagrant
 .vagrant/

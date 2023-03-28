@@ -25,7 +25,7 @@ Various technology deployments, tools & code:
     * and usually each app has also Makefile task to build its docker image as well
 
 * [terraform](terraform)
-  * gcp - Terraform deployment for GCP
+  * gcp - Terraform and Terragrunt deployment for GCP
     * apigee - ApigeeX Free Tier setup with XLB, sample API proxies etc.
     * gke - GKE deployment along with optional components (Anthos, config-sync, workflow identity, etc)
     * minecraft-server - secure HA setup for Minecraft (VM, LB, hourly backups, auto-shutdown for night cloud functions etc)

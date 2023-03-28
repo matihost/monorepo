@@ -1,9 +1,5 @@
 .EXPORT_ALL_VARIABLES:
 
-CURRENT_PROJECT := $(shell gcloud config get-value project)
-
-TF_VAR_project := $(CURRENT_PROJECT)
-
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
@@ -18,26 +14,25 @@ else
 	MODE_STR := plan
 endif
 
+CURRENT_ACCOUNT_SSH_USER := $(shell gcloud config get-value account | sed -E "s/[.@]/_/g")
+
 init-terraform:
-	terraform init -upgrade=true
+	cd stage/instance && terragrunt init -upgrade=true
 
 run: init-terraform prepare ## setup free-tier eliglible Ubuntu instance, make run [MODE=apply]
-	@terraform validate && \
-	terraform $(MODE_STR)
+	cd stage/instance && terragrunt validate && terragrunt $(MODE_STR)
 
-
-CURRENT_ACCOUNT_SSH_USER := $(shell gcloud config get-value account | sed -E "s/[.@]/_/g")
 ssh: ## ssh to VM instance using ssh client via ssh key added to OS login
-	ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=accept-new $(CURRENT_ACCOUNT_SSH_USER)@$(shell terraform output public_ip)
+	PUBLIC_IP="$$(cd stage/instance && terragrunt output -raw public_ip)" && ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=accept-new $(CURRENT_ACCOUNT_SSH_USER)@$${PUBLIC_IP}
 
 check-startup: ## check VM startup script logs
-	ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=accept-new $(CURRENT_ACCOUNT_SSH_USER)@$(shell terraform output public_ip) sudo journalctl -u google-startup-scripts.service
+	PUBLIC_IP="$$(cd stage/instance && terragrunt output -raw public_ip)" && ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=accept-new $(CURRENT_ACCOUNT_SSH_USER)@$${PUBLIC_IP} sudo journalctl -u google-startup-scripts.service
 
 gssh: ## ssh to VM instance using gcloud
-	gcloud compute ssh $(shell terraform output instance_name)
+	@VM_NAME="$$(cd stage/instance && terragrunt output -raw instance_name)" && gcloud compute ssh "$${VM_NAME}"
 
 test: ## test Nginx instance
-	curl http://$(shell terraform output public_ip):80
+	@PUBLIC_IP="$$(cd stage/instance && terragrunt output -raw public_ip)" && curl "http://$${PUBLIC_IP}:80"
 
 show-state: ## show terraform.state
 	terraform state list
@@ -54,7 +49,7 @@ google-authentication: prepare ## authenticate to GCP and prepare Application De
 	gcloud compute os-login ssh-keys add --key-file ~/.ssh/id_rsa.cloud.vm.pub
 
 clean: ## clean Terraform cached plugins and data
-	rm -rf .terraform* terraform.tfstate*
+	find . -name ".terra*" -exec rm -rf {} +
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
