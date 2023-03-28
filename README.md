@@ -28,6 +28,7 @@ Various technology deployments, tools & code:
   * gcp - Terraform and Terragrunt deployment for GCP
     * apigee - ApigeeX Free Tier setup with XLB, sample API proxies etc.
     * gke - GKE deployment along with optional components (Anthos, config-sync, workflow identity, etc)
+    * ghost - Cloud Run, CloudSQL exposed over GLB deployment of Ghost software
     * minecraft-server - secure HA setup for Minecraft (VM, LB, hourly backups, auto-shutdown for night cloud functions etc)
     * gcp-open-vpn - OpenVPN setup supporting `dial-in` VPN in GCP (GCP VPN services does not support this mode), useful to work under GCP w/o need to expose services over external ip/xlb etc. It supports DNS sharing as well.
     * gcp-iam - setup IAM resources needed on fresh GCP account
