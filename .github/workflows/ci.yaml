@@ -38,6 +38,12 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    # Workaround for https://github.com/actions/runner/issues/2033
+    - name: Set ownership
+      run: |
+        chown -R $(id -u):$(id -g) $PWD
     - name: Cache workspace
       uses: actions/cache/save@v3
       with:
