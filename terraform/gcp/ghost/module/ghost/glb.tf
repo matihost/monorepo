@@ -1,4 +1,5 @@
 #TODO add TLS termination to GLB
+#TODO add Cloud Armor, add WAF(?)
 
 resource "google_compute_global_address" "ghost" {
   name         = local.name

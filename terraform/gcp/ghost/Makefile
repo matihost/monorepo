@@ -16,16 +16,28 @@ endif
 
 init-terraform:
 ifndef ENV
-	$(error Environment ENV is not defined. Usage make run ENV=dev MODE=plan [DEBUG=true])
+	$(error Environment ENV is not defined. Usage make run ENV=prod MODE=plan [DEBUG=true])
 endif
-	cd stage/$(ENV) && terragrunt init -upgrade=true
+	cd stage/$(ENV)/ghost && terragrunt init -upgrade=true
 
-run: init-terraform ## usage: Usage make run ENV=dev MODE=plan [DEBUG=true])
+run-ghost: init-terraform ## usage: Usage make run-ghost ENV=prod MODE=plan [DEBUG=true])
 ifndef ENV
 	$(error Environment ENV is not defined. Usage make run ENV=dev [MODE=apply] [DEBUG=true])
 endif
-	cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
+	cd stage/$(ENV)/ghost && terragrunt validate && terragrunt $(MODE_STR)
 
+
+run-posts-management: init-terraform ## usage: Usage make run-ghost ENV=prod MODE=plan [DEBUG=true])
+ifndef ENV
+	$(error Environment ENV is not defined. Usage make run ENV=dev [MODE=apply] [DEBUG=true])
+endif
+ifndef ADMIN_KEY
+	$(error Environment ADMIN_KEY is not defined. See https://ghost.org/docs/admin-api/javascript/#authentication how get one. Usage make run ENV=dev ADMIN_KEY=... CONTENT_KEY=... [MODE=apply] [DEBUG=true])
+endif
+ifndef CONTENT_KEY
+	$(error Environment CONTENT_KEY is not defined. See https://ghost.org/docs/admin-api/javascript/#authentication how get one. Usage make run ENV=dev ADMIN_KEY=... CONTENT_KEY=... [MODE=apply] [DEBUG=true])
+endif
+	cd stage/$(ENV)/posts-management && terragrunt validate && terragrunt $(MODE_STR)
 
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init

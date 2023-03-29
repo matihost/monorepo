@@ -3,6 +3,9 @@
 # TODO tune startup and livenes probes
 # TODO canary deployment for cloud run
 # TODO for dev env do not disable oauth
+# TODO maybe separate cloud run instance for admin purposes,
+#   for client traffic cloud run instances disable /ghost site (aka admin)
+#   do it on CloudArmor/WAF?
 
 resource "google_cloud_run_service" "ghost" {
   provider = google-beta

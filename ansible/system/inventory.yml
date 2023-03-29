@@ -189,6 +189,7 @@ all:
         # OpenVPN 3 is supported only on Ubuntu LTS: https://openvpn.net/cloud-docs/openvpn-3-client-for-linux/
         # - openvpn3
         - gh
+        - npm
         snaps:
         - mc-installer
         - notepad-plus-plus
