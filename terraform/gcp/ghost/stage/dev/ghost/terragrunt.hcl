@@ -8,12 +8,11 @@ terraform {
 }
 
 inputs = {
-  env = "prod"
-  ha = true
+  env = "dev"
+  ha = false
   name = "droneshuttles"
-  url = "http://ghost.mooo.com"
+  url = "http://ghost.dev.mooo.com"
   instances = [
     { region = "us-central1", image = "ghost:latest" },
-    { region = "us-west1", image = "ghost:latest" },
   ]
 }

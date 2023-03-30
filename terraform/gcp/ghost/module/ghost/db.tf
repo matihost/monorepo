@@ -31,7 +31,7 @@ resource "google_sql_database_instance" "ghost" {
     disk_autoresize             = "true"
     disk_autoresize_limit       = "0"
     disk_size                   = var.ha ? "100" : "20"
-    disk_type                   = var.ha ? "PD_HDD" : "PD_SSD"
+    disk_type                   = var.ha ? "PD_SSD" : "PD_HDD"
 
     ip_configuration {
       enable_private_path_for_google_cloud_services = "false"

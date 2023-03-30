@@ -84,6 +84,6 @@ resource "google_compute_backend_service" "ghost" {
   port_name        = "http"
   project          = var.project
   protocol         = "HTTPS"
-  session_affinity = "NONE"
+  session_affinity = "CLIENT_IP"
   timeout_sec      = "30"
 }
