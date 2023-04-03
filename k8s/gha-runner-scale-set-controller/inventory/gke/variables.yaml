@@ -1,0 +1,21 @@
+all:
+  hosts:
+    localhost:
+  vars:
+    options:
+      gke_mode: true
+      gke:
+        cluster_name: "shared1-dev"
+        region: "us-central1"
+        zone_letter: "a"
+    arc:
+      chart_version: "0.3.0"
+      # https://github.com/actions/runner/pkgs/container/actions-runner version
+      actions_version: "2.303.0"
+    runner:
+      name: "matihost-monorepo"
+      namespace: "matihost-monorepo-ci"
+      config_url: "https://github.com/matihost/monorepo"
+      min_replicas: 1
+      storage_class: "standard-rwo"
+      # storage_class: "csi-pd-rwo-xfs"

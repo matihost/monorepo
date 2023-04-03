@@ -20,7 +20,7 @@ on:
         type: choice
         options:
         - ubuntu-22.04
-        - matihost/monorepo
+        - matihost-monorepo
   schedule:
   - cron: '27 20 * * 0'
 # https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token

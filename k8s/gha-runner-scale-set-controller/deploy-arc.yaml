@@ -1,0 +1,47 @@
+---
+- hosts: localhost
+  become: false
+  collections:
+  - kubernetes.core
+  - community.general
+  vars:
+    files: "{{ playbook_dir }}/files"
+  tasks:
+
+  - name: Deploy Github Actions Runner Controller Helm chart with version {{ arc.chart_version }}
+    helm:
+      name: "arc"
+      chart_ref: "oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller"
+      chart_version: "{{ arc.chart_version }}"
+      release_namespace: "arc-systems"
+      create_namespace: true
+      wait: true
+      wait_timeout: "5m0s"
+      values: "{{ lookup('template', '{{ files }}/arc_helm.yaml.j2') | from_yaml }}"
+
+  - name: Ensure {{ runner.namespace | mandatory }} namespace present
+    k8s:
+      state: present
+      definition:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: "{{ runner.namespace | mandatory }}"
+          labels:
+            # Ensure Istio does not inject sidecar to runner delegated jobs as they crash automatically
+            #  ##[debug]Using image 'maven:3-openjdk-17' for job image
+            #  ##[debug]Job pod created, waiting for it to come online matihost-monorepo-8blcq-87ffq-workflow
+            #  ##[debug]Job pod is ready for traffic
+            #  ##[debug]{"message":"command terminated with non-zero exit code: Error executing in Docker Container: 1","details":{"causes":[{"reason":"ExitCode","message":"1"}]}}
+            istio-injection: disabled
+
+  - name: Deploy Runner Scale Set via Helm chart with version {{ arc.chart_version }}
+    helm:
+      name: "{{ runner.name | mandatory | replace('/','-') }}"
+      chart_ref: "oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set"
+      chart_version: "{{ arc.chart_version }}"
+      release_namespace: "{{ runner.namespace | mandatory }}"
+      create_namespace: false
+      wait: true
+      wait_timeout: "5m0s"
+      values: "{{ lookup('template', '{{ files }}/arc_config.yaml.j2') | from_yaml }}"

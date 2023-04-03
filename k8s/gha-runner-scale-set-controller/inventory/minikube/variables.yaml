@@ -1,0 +1,15 @@
+all:
+  hosts:
+    localhost:
+  vars:
+    arc:
+      chart_version: "0.3.0"
+      # https://github.com/actions/runner/pkgs/container/actions-runner version
+      # actions_version: "2.303.0"
+    runner:
+      name: "matihost-monorepo"
+      namespace: "matihost-monorepo-ci"
+      config_url: "https://github.com/matihost/monorepo"
+      min_replicas: 1
+      storage_class: standard
+      # storage_class: "csi-hostpath-sc"

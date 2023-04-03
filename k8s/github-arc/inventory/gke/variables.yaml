@@ -11,7 +11,7 @@ all:
     cert_manager:
       chart_version: "v1.11.0"
     arc:
-      chart_version: "0.22.0"
+      chart_version: "0.23.0"
     runner:
       min_replicas: 1
       storage_class: "csi-pd-rwo-xfs"

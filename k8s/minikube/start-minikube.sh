@@ -66,6 +66,11 @@ function ensureCrictlPresent() {
     sudo tar zxvf "crictl-${CRICTL_VERSION}-linux-amd64.tar.gz" -C /usr/local/bin
     rm -f "crictl-${CRICTL_VERSION}-linux-amd64.tar.gz"
   )
+
+  [ -e /etc/containerd/config.toml ] || {
+    sudo mkdir -p /etc/containerd
+    sudo touch /etc/containerd/config.toml
+  }
 }
 function ensureCriDockerdPresent() {
   [ -x /usr/bin/cri-dockerd ] || (
