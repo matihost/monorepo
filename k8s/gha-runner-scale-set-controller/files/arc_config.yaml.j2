@@ -72,25 +72,29 @@ runnerScaleSetName: "{{ runner.name | mandatory | replace('/','-')}}"
 #       key: ca.pem
 #   runnerMountPath: /usr/local/share/ca-certificates/
 
-## template is the PodSpec for each runner Pod
-template:
-  spec:
-    containers:
-    - name: runner
-      image: ghcr.io/actions/actions-runner:{{ arc.actions_version | default('latest') }}
-      command: ["/home/runner/run.sh"]
-
 containerMode:
   type: "kubernetes"  ## type can be set to dind or kubernetes
+  ## the following is required when containerMode.type=kubernetes
+  kubernetesModeWorkVolumeClaim:
+    accessModes: ["ReadWriteOnce"]
+    # For local testing, use https://github.com/openebs/dynamic-localpv-provisioner/blob/develop/docs/quickstart.md to provide dynamic provision volume with storageClassName: openebs-hostpath
+    storageClassName: "{{ runner.storage_class | default('dynamic-blob-storage') }}"
+    resources:
+      requests:
+        storage: 1Gi
+
+## template is the PodSpec for each runner Pod
+template:
+  ## template.spec will be modified if you change the container mode
   ## with containerMode.type=dind, we will populate the template.spec with following pod spec
   ## template:
   ##   spec:
   ##     initContainers:
-  ##     - name: initExternalsInternalVolume
+  ##     - name: init-dind-externals
   ##       image: ghcr.io/actions/actions-runner:latest
   ##       command: ["cp", "-r", "-v", "/home/runner/externals/.", "/home/runner/tmpDir/"]
   ##       volumeMounts:
-  ##         - name: externalsInternal
+  ##         - name: dind-externals
   ##           mountPath: /home/runner/tmpDir
   ##     containers:
   ##     - name: runner
@@ -103,9 +107,9 @@ containerMode:
   ##         - name: DOCKER_CERT_PATH
   ##           value: /certs/client
   ##       volumeMounts:
-  ##         - name: workingDirectoryInternal
+  ##         - name: work
   ##           mountPath: /home/runner/_work
-  ##         - name: dinDInternal
+  ##         - name: dind-cert
   ##           mountPath: /certs/client
   ##           readOnly: true
   ##     - name: dind
@@ -113,18 +117,18 @@ containerMode:
   ##       securityContext:
   ##         privileged: true
   ##       volumeMounts:
-  ##         - mountPath: /certs/client
-  ##           name: dinDInternal
-  ##         - mountPath: /home/runner/_work
-  ##           name: workingDirectoryInternal
-  ##         - mountPath: /home/runner/externals
-  ##           name: externalsInternal
+  ##         - name: work
+  ##           mountPath: /home/runner/_work
+  ##         - name: dind-cert
+  ##           mountPath: /certs/client
+  ##         - name: dind-externals
+  ##           mountPath: /home/runner/externals
   ##     volumes:
-  ##     - name: dinDInternal
+  ##     - name: work
   ##       emptyDir: {}
-  ##     - name: workingDirectoryInternal
+  ##     - name: dind-cert
   ##       emptyDir: {}
-  ##     - name: externalsInternal
+  ##     - name: dind-externals
   ##       emptyDir: {}
   ######################################################################################################
   ## with containerMode.type=kubernetes, we will populate the template.spec with following pod spec
@@ -155,13 +159,18 @@ containerMode:
   ##               resources:
   ##                 requests:
   ##                   storage: 1Gi
+  spec:
+    containers:
+    - name: runner
+      image: ghcr.io/actions/actions-runner:{{ arc.actions_version | default('latest') }}
+      command: ["/home/runner/run.sh"]
 
-  ## the following is required when containerMode.type=kubernetes
-  kubernetesModeWorkVolumeClaim:
-    accessModes: ["ReadWriteOnce"]
-    # For testing, use https://github.com/rancher/local-path-provisioner to provide dynamic provision volume
-    # TODO: remove before release
-    storageClassName: "{{ runner.storage_class | default('dynamic-blob-storage') }}"
-    resources:
-      requests:
-        storage: 1Gi
+## Optional controller service account that needs to have required Role and RoleBinding
+## to operate this gha-runner-scale-set installation.
+## The helm chart will try to find the controller deployment and its service account at installation time.
+## In case the helm chart can't find the right service account, you can explicitly pass in the following value
+## to help it finish RoleBinding with the right service account.
+## Note: if your controller is installed to only watch a single namespace, you have to pass these values explicitly.
+# controllerServiceAccount:
+#   namespace: arc-system
+#   name: test-arc-gha-runner-scale-set-controller
