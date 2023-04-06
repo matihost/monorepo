@@ -1,0 +1,53 @@
+---
+- hosts: localhost
+  become: false
+  collections:
+  - kubernetes.core
+  - community.general
+  vars:
+    files: "{{ playbook_dir }}/files"
+  tasks:
+
+  - name: Undeploy Runner Scale Set via Helm chart with version {{ arc.chart_version }}
+    helm:
+      name: "{{ runner.name | mandatory | replace('/','-') }}"
+      chart_ref: "oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set"
+      chart_version: "{{ arc.chart_version }}"
+      release_namespace: "{{ runner.namespace | mandatory }}"
+      release_state: absent
+      wait: true
+      wait_timeout: "5m0s"
+      values: "{{ lookup('template', '{{ files }}/arc_config.yaml.j2') | from_yaml }}"
+
+  - name: Ensure {{ runner.namespace | mandatory }} namespace absent
+    k8s:
+      state: absent
+      definition:
+        apiVersion: v1
+        wait: true
+        wait_timeout: 60
+        kind: Namespace
+        metadata:
+          name: "{{ runner.namespace | mandatory }}"
+
+  - name: Undeploy Github Actions Runner Controller Helm chart with version {{ arc.chart_version }}
+    helm:
+      name: "arc"
+      chart_ref: "oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller"
+      chart_version: "{{ arc.chart_version }}"
+      release_namespace: "arc-systems"
+      release_state: absent
+      wait: true
+      wait_timeout: "5m0s"
+      values: "{{ lookup('template', '{{ files }}/arc_helm.yaml.j2') | from_yaml }}"
+
+  - name: Ensure {{ runner.namespace | mandatory }} namespace absent
+    k8s:
+      state: absent
+      wait: true
+      wait_timeout: 60
+      definition:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: "arc-systems"

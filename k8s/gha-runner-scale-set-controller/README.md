@@ -1,4 +1,4 @@
-# GitHub Actions Runner Controller :: Autoscaling Runner Scale Sets mode
+# GitHub Actions Runner Controller v2 :: Autoscaling Runner Scale Sets mode
 
 Deployment of [GitHub Actions Runner Controller](https://github.com/actions/actions-runner-controller) to Minikube or GKE
 in [Autoscaling Runner Scale Sets](https://github.com/actions/actions-runner-controller/tree/master/docs/preview/gha-runner-scale-set-controller) mode.
@@ -35,4 +35,6 @@ make deploy-on-minikube
 # Deploys  GitHub Actions Runner Controller on GKE
 # Assumes current kubecontext points to GKE cluster and gcloud context to project where GKE cluster is deployed
 make deploy-on-gke
+
+# to undeploy
 ```

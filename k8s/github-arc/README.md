@@ -1,4 +1,4 @@
-# GitHub Actions Runner Controller
+# GitHub Actions Runner Controller V1
 
 Deployment of [GitHub Actions Runner Controller](https://github.com/actions/actions-runner-controller) to Minikube or GKE
 It uses [Helm deployment model](https://actions-runner-controller.github.io/actions-runner-controller/).
