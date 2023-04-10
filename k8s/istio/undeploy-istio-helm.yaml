@@ -1,0 +1,153 @@
+---
+- hosts: localhost
+  become: false
+  collections:
+  - kubernetes.core
+  - community.general
+  vars:
+    files: "{{ playbook_dir }}/files"
+    internal_wildcard_cn: "*.{{ ingress_gateway.default_dns_suffix }}"
+    enable_external_ingress_node_pool: "{{ ingress_external_gateway.enable|default(false) and ingress_external_gateway.enable_node_selector|default(false) }}"
+  tasks:
+  - name: Get current GCP project
+    ansible.builtin.shell: gcloud config get-value project
+    register: gcp_project_out
+    changed_when: false
+
+  - name: Set GCP project fact
+    ansible.builtin.set_fact:
+      gcp_project: "{{ gcp_project_out.stdout }}"
+
+  - name: Ensure Prometheus PodMonitoring is absent for Istio
+    k8s:
+      state: absent
+      definition: "{{ lookup('template', '{{ files }}/monitoring.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+    when:
+    - options.gke_mode|default(false)
+
+  - name: Ensure VirtualServices are absent
+    ansible.builtin.include_role:
+      name: expose_virtual_svc
+    vars:
+      wildcard_dns_suffix: "{{ ingress_gateway.default_dns_suffix }}"
+      vs: "{{ item }}"
+      desired_state: "absent"
+    loop: "{{ ingress_gateway.virtual_services | default([]) }}"
+
+  - name: Ensure Istio ClusterRoles present
+    k8s:
+      state: absent
+      definition: "{{ lookup('template', '{{ files }}/roles.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+
+  - name: Ensure Istio internal ingress wildcard Gateway are exposed
+    k8s:
+      state: absent
+      definition: "{{ lookup('template', '{{ files }}/internal_vs_config.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+
+  - name: Ensure TLS Secret internal-wildcard-gateway-tls is absent in namespace istio-ingress
+    k8s:
+      state: absent
+      definition:
+        apiVersion: "v1"
+        kind: Secret
+        metadata:
+          name: internal-wildcard-gateway-tls
+          namespace: istio-ingress
+
+
+  - name: Ensure Istio IngressClass absent
+    k8s:
+      state: absent
+      definition: "{{ lookup('template', '{{ files }}/ingress_class.yaml.j2') }}"
+
+  - name: Undeploy {{ istio.version }} version of istio/cni chart inside istio-ingress namespace
+    helm:
+      name: "istio-cni"
+      chart_ref: istio/cni
+      chart_version: "{{ istio.version }}"
+      release_namespace: "{{ 'kube-system' if options.gke_mode | default(false) else 'istio-system' }}"
+      release_state: absent
+      wait: true
+      wait_timeout: "5m0s"
+      values: "{{ lookup('template', '{{ files }}/istio-cni-helm-values.yaml.j2') | from_yaml }}"
+    when: options.gke_mode|default(cni.enable|default(true))
+
+
+  - name: Undeploy {{ istio.version }} version of istio/gateway chart inside istio-ingress namespace
+    helm:
+      name: "istio-ingressgateway"
+      chart_ref: istio/gateway
+      chart_version: "{{ istio.version }}"
+      release_namespace: "istio-ingress"
+      release_state: absent
+      wait: true
+      wait_timeout: "5m0s"
+      values: "{{ lookup('template', '{{ files }}/istio-ingress-helm-values.yaml.j2') | from_yaml }}"
+
+  - name: Ensure istio-ingress namespace absent
+    k8s:
+      name: istio-ingress
+      api_version: v1
+      kind: Namespace
+      state: absent
+
+  - name: Undeploy {{ istio.version }} version of istio/isiod chart inside istio-system namespace
+    helm:
+      name: "istiod"
+      chart_ref: istio/istiod
+      chart_version: "{{ istio.version }}"
+      release_namespace: "istio-system"
+      release_state: absent
+      wait: true
+      wait_timeout: "5m0s"
+      values: "{{ lookup('template', '{{ files }}/istiod-helm-values.yaml.j2') | from_yaml }}"
+
+  - name: Undeploy {{ istio.version }} version of istio/base chart inside istio-system namespace
+    helm:
+      name: "istio-base"
+      chart_ref: istio/base
+      chart_version: "{{ istio.version }}"
+      release_namespace: "istio-system"
+      release_state: absent
+      wait: true
+      wait_timeout: "5m0s"
+      values: "{{ lookup('template', '{{ files }}/istio-base-helm-values.yaml.j2') | from_yaml }}"
+
+  - name: Ensure istio-system namespace absent
+    k8s:
+      name: istio-system
+      api_version: v1
+      kind: Namespace
+      state: absent
+
+  - name: Ensure PodSecurityPolicy present for Istio CNI Daemon Set
+    k8s:
+      state: absent
+      definition: "{{ lookup('template', '{{ files }}/psp.yaml.j2') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+    when: lookup('pipe', 'kubectl version -o json | jq -r .serverVersion.minor') | int < 25
+
+
+  - name: Ensure GCP prerequisites for Istio deployment are missing
+    terraform:
+      project_path: 'files/gke'
+      state: absent
+      workspace: "default"
+      purge_workspace: true
+      force_init: true
+      variables: "{{ options.gke | mandatory
+        | combine({'project': gcp_project})
+        | combine({'enable_internal_ingress_node_pool': ingress_gateway.enable_node_selector | default(false) | string | lower})
+        | combine({'enable_external_ingress_node_pool': enable_external_ingress_node_pool | string | lower}) }}"
+    when: options.gke_mode | default(false)

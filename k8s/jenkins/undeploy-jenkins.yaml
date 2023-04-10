@@ -1,0 +1,83 @@
+---
+- hosts: local
+  name: Deploy Jenkins to K8S
+  collections:
+  - kubernetes.core
+  tasks:
+  - name: Check mandatory variables
+    ansible.builtin.fail:
+      msg: Variable {{ item }} was not provided
+    when: vars[item] is undefined
+    loop:
+    - env
+
+  - name: Load {{ env }} variables files
+    ansible.builtin.include_vars:
+      dir: "{{ inventory_dir }}/{{ env }}"
+      depth: 1
+      extensions:
+      - yaml
+      - yml
+
+  - name: Get current GCP project
+    ansible.builtin.shell: gcloud config get-value project
+    register: gcp_project_out
+    changed_when: false
+    when: gke_mode is sameas true
+
+  - name: Set GCP project fact
+    ansible.builtin.set_fact:
+      gcp_project: "{{ gcp_project_out.stdout }}"
+    when: gke_mode | default(false)
+
+  - name: Ensure Prometheus PodMonitoring is absent for Jenkins
+    kubernetes.core.k8s:
+      state: present
+      definition: "{{ lookup('template', '{{ files }}/monitoring.template.yaml') }}"
+      validate:
+        fail_on_error: true
+        strict: true
+    when:
+    - gke_mode | default(false)
+
+
+  - name: Undeploy {{ chart_version }} version of Jenkins chart inside {{ namespace }} namespace
+    helm:
+      name: "{{ namespace }}"
+      chart_ref: jenkinsci/jenkins
+      chart_version: "{{ chart_version }}"
+      release_namespace: "{{ namespace }}"
+      release_state: absent
+      wait: true
+      wait_timeout: "5m0s"
+      values: "{{ lookup('template', '{{ files }}/jenkins_helm.template.yaml') | from_yaml }}"
+
+
+  - name: Ensure TLS Secret {{ jenkins_ingress.secretName }} is absent in namespace {{ namespace }}
+    kubernetes.core.k8s:
+      state: absent
+      definition:
+        apiVersion: "v1"
+        kind: Secret
+        metadata:
+          name: "{{ jenkins_ingress.secretName }}"
+          namespace: "{{ namespace }}"
+    when: jenkins_ingress.class != "istio" # assuming using existing secret present in istio-ingress namespace
+
+
+  - name: Ensure Jenkins helm dependencies are absent
+    kubernetes.core.k8s:
+      state: absent
+      definition: "{{ lookup('template', '{{ files }}/prerequisites.template.yaml') }}"
+
+
+  - name: Run Terraform to setup GCP prerequisites for Jenkins deployment
+    community.general.terraform:
+      project_path: 'files/gke'
+      workspace: "default"
+      state: absent
+      purge_workspace: true
+      force_init: true
+      variables: "{{ gke | mandatory
+        | combine({'project': gcp_project}) }}"
+    when: gke_mode | default(false)

@@ -68,7 +68,7 @@ resource "google_workstations_workstation_config" "default" {
       machine_type                = "n2d-standard-4"
       boot_disk_size_gb           = 35
       disable_public_ip_addresses = true
-      pool_size                   = 0
+      pool_size                   = 1
       shielded_instance_config {
         enable_secure_boot          = true
         enable_vtpm                 = true
@@ -80,10 +80,10 @@ resource "google_workstations_workstation_config" "default" {
     }
   }
 
-  container {
-    # https://cloud.google.com/workstations/docs/preconfigured-base-images
-    image = "code-oss"
-  }
+  # container {
+  #   # https://cloud.google.com/workstations/docs/preconfigured-base-images
+  #   image = "code-oss"
+  # }
 }
 
 

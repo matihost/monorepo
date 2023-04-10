@@ -1,8 +1,6 @@
 ---
 - hosts: local
   name: Deploy Jenkins to K8S
-  collections:
-  - kubernetes.core
   tasks:
   - name: Check mandatory variables
     ansible.builtin.fail:
@@ -49,6 +47,8 @@
       #   strict: true
 
   - name: Ensure Jenkins CN={{ jenkins_ingress.host }} Secret is present
+    when: jenkins_ingress.class != "istio" # assuming using existing secret present in istio-ingress namespace
+    become: true
     block:
     - name: "Ensure Jenkins CN={{ jenkins_ingress.host }} is present"
       block:
@@ -58,7 +58,6 @@
         vars:
           certificate_def:
             cn: "{{ jenkins_ingress.host }}"
-      become: true
     - name: Ensure TLS Secret {{ jenkins_ingress.secretName }} is present in namespace {{ namespace }}
       kubernetes.core.k8s:
         state: present
@@ -73,15 +72,15 @@
             tls.key: "{{ tls.key }}"
           type: kubernetes.io/tls
       no_log: true
-    when: jenkins_ingress.class != "istio" # assuming using existing secret present in istio-ingress namespace
-
 
   - name: Deploy {{ chart_version }} version of Jenkins chart inside {{ namespace }} namespace
-    helm:
+    kubernetes.core.helm:
       name: "{{ namespace }}"
       chart_ref: jenkinsci/jenkins
       chart_version: "{{ chart_version }}"
       release_namespace: "{{ namespace }}"
+      wait: true
+      wait_timeout: "5m0s"
       values: "{{ lookup('template', '{{ files }}/jenkins_helm.template.yaml') | from_yaml }}"
 
   - name: Ensure Jenkins StatefulSet present

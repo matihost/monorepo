@@ -4,9 +4,9 @@
     msg: No vs or wildcard_dns_suffix are not provided properly
   when: vs is not defined or vs.name is not defined or vs.svc is not defined or vs.svc.port is not defined or vs.svc.fqdn is not defined or wildcard_dns_suffix is not defined
 
-- name: Ensure Istio VirtualService {{ vs.name }} is present in {{ vs.namespace }} namespace
-  k8s:
-    state: present
+- name: Ensure Istio VirtualService {{ vs.name }} is "{{ desired_state | default('present') }}" in {{ vs.namespace }} namespace
+  kubernetes.core.k8s:
+    state: "{{ desired_state | default('present') }}"
     definition: "{{ lookup('template', role_path + '/files/virtual_svc.yaml.j2') }}"
     # validate:
     #   fail_on_error: true

@@ -45,6 +45,8 @@ google-authentication: prepare ## authenticate to GCP and prepare Application De
 
 clean: ## clean Terraform cached plugins and data
 	find . -name ".terra*" -exec rm -rf {} +
+	find . -name "target" -exec rm -rf {} +
+	find . -name "node_modules" -exec rm -rf {} +
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
