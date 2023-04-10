@@ -16,7 +16,7 @@ In particular:
 make google-authentication
 
 # to create IAM objects, in particular SA with editor role
-make run
+make run MODE=apply
 
 # switch current gcloud configuration to use editor SA
 make use-editor-sa

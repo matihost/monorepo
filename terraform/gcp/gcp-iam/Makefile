@@ -1,9 +1,5 @@
 .EXPORT_ALL_VARIABLES:
 
-CURRENT_PROJECT := $(shell gcloud config get-value project)
-
-TF_VAR_project := $(CURRENT_PROJECT)
-
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
@@ -18,14 +14,16 @@ else
 	MODE_STR := plan
 endif
 
-run: init-terraform prepare ## setup user IAM roles and binding
-	export TF_VAR_project=$(CURRENT_PROJECT) && \
-	terraform init -upgrade=true && \
-	terraform validate && \
-	terraform $(MODE_STR)
 
+init-terraform: prepare
+	cd stage/current && terragrunt init -upgrade=true
+
+run: init-terraform ## usage: Usage make run MODE=plan [DEBUG=true])
+	cd stage/current && terragrunt validate && terragrunt $(MODE_STR)
+
+CURRENT_PROJECT := $(shell gcloud config get-value project)
 use-editor-sa: ## create new gcloud configuration with editor Google Service Account
-	@-terraform output -raw sa-editor-key > /tmp/editor.json
+	@-cd stage/current && terragrunt output -raw sa-editor-key > /tmp/editor.json
 	@-gcloud config configurations create $(CURRENT_PROJECT)-editor-sa 2>/dev/null
 	-gcloud config configurations activate $(CURRENT_PROJECT)-editor-sa
 	-gcloud auth activate-service-account editor@$(CURRENT_PROJECT).iam.gserviceaccount.com --key-file=/tmp/editor.json --project=$(CURRENT_PROJECT)
@@ -34,15 +32,10 @@ use-editor-sa: ## create new gcloud configuration with editor Google Service Acc
 	@-rm -rf /tmp/editor.json
 
 get-editor-sa-key: ## get editor Google Service Account key
-	@-terraform output -raw sa-editor-key
+	@-cd stage/current && terragrunt output -raw sa-editor-key
 
 show-state: ## show terraform.state
-	terraform state list
-	terraform show
-
-
-init-terraform:
-	terraform init -upgrade=true
+	cd stage/current && terragrunt state list && terragrunt show
 
 prepare:
 	@[ -e "$(HOME)/.ssh/id_rsa.cloud.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.cloud.vm; }
@@ -53,7 +46,8 @@ google-authentication: prepare ## authenticate to GCP and prepare Application De
 	gcloud auth application-default login
 
 clean: ## clean Terraform cached plugins and data
-	rm -rf .terraform* terraform.tfstate*
+	find . -name ".terra*" -exec rm -rf {} +
+	find . -name "target" -exec rm -rf {} +
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
