@@ -1,12 +1,8 @@
 .EXPORT_ALL_VARIABLES:
 
-CURRENT_PROJECT := $(shell gcloud config get-value project)
-
-TF_VAR_project := $(CURRENT_PROJECT)
-
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
-F_LOG := DEBUG	T
+	TF_LOG := DEBUG
 endif
 
 MODE := apply
@@ -19,25 +15,20 @@ else
 endif
 
 init-terraform:
-	terraform init -upgrade=true
+	cd stage/dev &&  terragrunt init -upgrade=true
 
 run: init-terraform ## setup VPC: make run [MODE=apply]
-	@terraform validate && \
-	terraform $(MODE_STR)
+	@cd stage/dev && terragrunt validate && terragrunt $(MODE_STR)
 
 ssh: ## ssh to VPC bastion host
-	eval $(shell terraform output bastion_instance_ssh_cmd)
+	eval $(shell cd stage/dev && terragrunt output bastion_instance_ssh_cmd)
 
 
 list-dns-resolvers: # list inbound CloudDNS resolvers
 	gcloud compute addresses list --filter='purpose = "DNS_RESOLVER"' --format='csv(address, region, subnetwork)'
 
 show-state: ## show terraform.state
-	terraform state list
-	terraform show
-
-destroy: ## destroy resources
-	terraform destroy -auto-approve
+	cd stage/dev && terraform state list && terraform show
 
 google-authentication: ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
@@ -45,7 +36,8 @@ google-authentication: ## authenticate to GCP and prepare Application Default Cr
 
 
 clean: ## clean Terraform cached plugins and data
-	rm -rf .terraform* terraform.tfstate*
+	find . -name ".terra*" -exec rm -rf {} +
+	find . -name "target" -exec rm -rf {} +
 
 upgrade-terraform-provider-version: init-terraform
 
