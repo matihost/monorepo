@@ -81,7 +81,7 @@ containerMode:
     storageClassName: "{{ runner.storage_class | default('dynamic-blob-storage') }}"
     resources:
       requests:
-        storage: 1Gi
+        storage: 10Gi
 
 ## template is the PodSpec for each runner Pod
 template:
@@ -164,13 +164,13 @@ template:
     - name: runner
       image: ghcr.io/actions/actions-runner:{{ arc.actions_version | default('latest') }}
       command: ["/home/runner/run.sh"]
-      # resources:
-      #   limits:
-      #     cpu: 50m
-      #     memory: 50Mi
-      #   requests:
-      #     cpu: 10m
-      #     memory: 50Mi
+      resources:
+        limits:
+          cpu: 1
+          memory: 1Gi
+        requests:
+          cpu: 100m
+          memory: 512Mi
     # Required for PVC to have write access to the volume as non-root user
     securityContext:
       fsGroup: 1000
