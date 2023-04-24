@@ -35,6 +35,12 @@ ansible-galaxy collection install community.general
 
 * Helm
 
+* Helm istio charts repository imported
+
+```bash
+helm repo add istio https://istio-release.storage.googleapis.com/charts
+```
+
 * For GKE: gcloud cli, terraform and GKE itself
 
 ## Running deployment with Helm charts

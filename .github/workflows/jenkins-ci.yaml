@@ -11,7 +11,7 @@
 # Configure gh and gh-actions-importer extension:
 # gh auth login
 # gh extension install github/gh-actions-importer
-# echo `gh auth token` | gh actions-importer update --username matihost --password-stdin
+# gh actions-importer update
 #
 # Clone the repo:
 # gh repo clone matihost/monorepo && cd monorepo
