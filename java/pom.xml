@@ -41,7 +41,7 @@
     <maven.test.skip>false</maven.test.skip>
 
     <!-- Spring Boot -->
-    <spring.boot.version>3.0.5</spring.boot.version>
+    <spring.boot.version>3.0.6</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
