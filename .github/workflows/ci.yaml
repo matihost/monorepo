@@ -44,6 +44,9 @@ jobs:
     - name: Set ownership
       run: |
         chown -R $(id -u):$(id -g) $PWD
+    - name: Obtain git version
+      run: |
+        echo "GIT_COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_ENV
     - name: Cache workspace
       uses: actions/cache/save@v3
       with:
@@ -93,7 +96,8 @@ jobs:
       with:
         languages: java
     - name: Build Java source code
-      run: cd java && mvn -s .mvn/settings.xml --show-version clean install
+      working-directory: java
+      run: mvn -s .mvn/settings.xml --show-version clean install
     - name: Archive app jars artifacts
       uses: actions/upload-artifact@v3
       with:
@@ -131,7 +135,8 @@ jobs:
       with:
         languages: go
     - name: Build Go source code
-      run: cd go/learning && go build -buildvcs=false -mod=mod -o . ./... && go test ./pkg/language && ./language
+      working-directory: go/learning
+      run: go build -buildvcs=false -mod=mod -o . ./... && go test ./pkg/language && ./language
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
       with:

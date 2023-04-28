@@ -168,9 +168,14 @@ template:
         limits:
           cpu: 1
           memory: 1Gi
+          ephemeral-storage: 2Gi
         requests:
           cpu: 100m
           memory: 512Mi
+          ephemeral-storage: 2Gi
+      env:
+        - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
+          value: "false"
     # Required for PVC to have write access to the volume as non-root user
     securityContext:
       fsGroup: 1000
