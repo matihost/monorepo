@@ -7,19 +7,21 @@ all:
       vars:
         versions:
           # represents path to local gems, for example:  ~/.local/share/gem/ruby/3.0.0/bin
-          ruby: 3.0.0
-          crio: 1.26
+          ruby: 3.1.0
+          crio: 1.27
           # libcontainers && cri-o :: https://github.com/cri-o/cri-o/blob/master/install.md#apt-based-operating-systems
           # use {{ ansible_distribution_version }} instead of current Ubuntu version is supported, otherwise hardcode version (aka: 22.04)
-          # TODO change to {{ ansible_distribution_version }} when kinetic/22.10 is supported Ubuntu
+          # TODO change to {{ ansible_distribution_version }} when lunar/23.04 is supported Ubuntu
           libcontainers_repo_ubuntu_version: "22.04"
           libcontainers_crio_repo_ubuntu_version: "22.04"
-          # TODO change to {{ ansible_distribution_release }} when kinetic/22.10 is supported Ubuntu
+          # TODO change to {{ ansible_distribution_release }} when lunar/23.04 is supported Ubuntu
           terraform_ubuntu_version: "jammy"
           virtualbox_ubuntu_version: "jammy"
-          # TODO change to {{ ansible_distribution_release }} when kinetic/22.10 is supported Ubuntu
+          # TODO change to {{ ansible_distribution_release }} when lunar/23.04 is supported Ubuntu
           cri_dockerd_ubuntu_version: "jammy"
           mq: 9.3.2.0
+          # TODO change to {{ ansible_distribution_version }} when lunar/23.04 is supported Ubuntu
+          onedrive_ubuntu_version: "22.10"
         virtual_interface_ip: 192.168.10.1
         update_cache_timeout: 30
         systemd_journal:
@@ -49,6 +51,7 @@ all:
           ms-toolsai.jupyter-renderers
           ms-toolsai.vscode-jupyter-cell-tags
           ms-toolsai.vscode-jupyter-slideshow
+          ms-vscode-remote.remote-containers
           ms-vscode.makefile-tools
           redhat.fabric8-analytics
           redhat.java
@@ -117,8 +120,8 @@ all:
           repo: "deb [arch=amd64] https://cli.github.com/packages stable main"
           key_url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
         - name: onedrive
-          repo: "deb [arch=amd64] https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_{{ ansible_distribution_version }}/ ./"
-          key_url: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_{{ ansible_distribution_version }}/Release.key
+          repo: "deb [arch=amd64] https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_{{ versions.onedrive_ubuntu_version }}/ ./"
+          key_url: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_{{ versions.onedrive_ubuntu_version }}/Release.key
         packages:
         - mc
         - lm-sensors
@@ -190,6 +193,21 @@ all:
         # - openvpn3
         - gh
         - npm
+        - tox
+        - python3-ansible-runner
+        - python3-pip
+        - python3-flake8
+        - python3-flake8-docstrings
+        - python3-flake8-2020
+        - python3-openshift
+        - ansible-lint
+        - python3-requests
+        - pre-commit
+        - pylint
+        - python3-pytest
+        - pipenv
+        - yamllint
+        - youtubedl-gui
         snaps:
         - mc-installer
         - notepad-plus-plus
@@ -197,28 +215,12 @@ all:
         # classic_snaps:
         # - google-cloud-sdk
         # - kubectl
+        # use only to install python libraries which are not available as python3-xyz ubuntu packages
+        # Ubuntu 23.04 forces PEP668, the following libs are installed as --user --break-system-packages
         pips:
-        - pip
-        - tox
-        - flake8
-        - flake8-docstrings
-        - flake8-2020
-        - openshift
-        # do not update kubernetes itself to latest as it is not compatible with openhishift / k8s module
-        # - kubernetes
         - kubernetes-validate
         - "molecule[lint]"
         - "molecule[docker]"
-        - ansible
-        - ansible-lint
-        - requests
-        - pre-commit
-        - pylint
-        - pytest
-        - pipenv
-        - pipenv-setup
-        - yamllint
-        - youtube-dl
         clis:
         - name: virtual-network-interface
           desc: To ensure there is a virtual interface with stable IP
@@ -255,6 +257,7 @@ all:
           command: |
             [ "$(vagrant plugin list |grep -c vagrant-vbguest)" -ne 0 ] || {
               vagrant plugin install vagrant-vbguest
+              vagrant plugin update
             }
         - name: git-prompt
           become: false
@@ -385,8 +388,8 @@ all:
           desc: Ensure ruby local gems are  on path. W/o it it is not possible to install asciidoctor below
           become: false
           command: |
-            [ "$(grep -c '.local/share/gem/ruby' ~/.bashrc)" -gt 0 ] || {
-              echo 'PATH=${HOME}/.local/share/gem/ruby/{{ versions.ruby }}/bin:${PATH}' >> ~/.bashrc
+            [ "$(grep -c './gem/ruby' ~/.bashrc)" -gt 0 ] || {
+              echo 'PATH=${HOME}/.gem/ruby/{{ versions.ruby }}/bin:${PATH}' >> ~/.bashrc
             }
         - name: asciidoctor
           become: false
@@ -608,7 +611,7 @@ all:
           command: |
             CURRENT_VERSION="$(curl -sL https://calibre-ebook.com/download_linux |grep 'The latest release of calibre is' | sed -E 's/.*The latest release of calibre is (.+)\..*/\1/')"
             INSTALLED_VERSION="$(calibre --version 2>/dev/null | sed -E 's/.*\(calibre (.*)\)/\1/')"
-            [[ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ]] || {
+            [[ "${CURRENT_VERSION}" == "${INSTALLED_VERSION}"* ]] || {
               wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo bash
             }
         - name: kubectl plugins

@@ -3,7 +3,8 @@
   gather_facts: true
   name: Updates system software versions
   tasks:
-  - block:
+  - when: ansible_os_family == "Debian"
+    block:
     - name: Update packages for Debian based distribution
       ansible.builtin.apt:
         name: "*"
@@ -23,9 +24,10 @@
       ansible.builtin.apt:
         autoclean: yes
         force_apt_get: yes
-    when: ansible_os_family == "Debian"
 
-  - block:
+
+  - when: ansible_os_family == "RedHat"
+    block:
     - name: Update packages for RHEL based distribution
       ansible.builtin.yum:
         name: "*"
@@ -39,7 +41,6 @@
         yum clean all
       register: yum_result
       changed_when: '"0 files removed" not in yum_result.stdout'
-    when: ansible_os_family == "RedHat"
 
   - name: Check whether snap is present on the machine
     ansible.builtin.shell: which snap
@@ -53,16 +54,17 @@
     changed_when: not (snap_result.stderr is search('All snaps up to date.'))
     when: snap_presence.rc == 0
 
-  - block:
+  - become: false
+    block:
     - name: Update SDKMan and its installations
       ansible.builtin.shell: "bash -ic 'sdk selfupdate && sdk update && sdk ug'"
       register: sdk_result
       ignore_errors: true
       changed_when:
       - sdk_result.stdout is regex('Installing')
-    become: false
 
-  - block:
+  - become: false
+    block:
     - name: Check whether helm is present on the machine
       ansible.builtin.shell: which helm
       ignore_errors: true
@@ -70,5 +72,17 @@
       register: helm_presence
     - name: Update helm repositories
       ansible.builtin.shell: helm repo update
+      changed_when: true
       when: helm_presence.rc == 0
-    become: false
+
+  - become: false
+    block:
+    - name: Check whether vagrant is present on the machine
+      ansible.builtin.shell: which vagrant
+      ignore_errors: true
+      changed_when: false
+      register: vagrant_presence
+    - name: Update vagrant plugins
+      ansible.builtin.shell: vagrant plugin update
+      changed_when: true
+      when: vagrant_presence.rc == 0

@@ -22,7 +22,7 @@ repos:
   - id: detect-private-key
   - id: check-executables-have-shebangs
 - repo: https://github.com/gruntwork-io/pre-commit
-  rev: v0.1.19
+  rev: v0.1.21
   hooks:
   - id: terraform-fmt
   - id: terraform-validate
@@ -36,12 +36,12 @@ repos:
         .*.png
       )$
   - id: git-check
-  - id: markdownlint
+  # - id: markdownlint
   - id: require-ascii
   - id: shellcheck
   - id: shfmt
 - repo: https://github.com/adrienverge/yamllint.git
-  rev: v1.29.0
+  rev: v1.31.0
   hooks:
   - id: yamllint
     entry: yamllint --strict

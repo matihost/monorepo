@@ -2,7 +2,7 @@
 
 Various playbooks for Ubuntu machine management.
 
-Supported Ubuntu distribution: **22.10 (kinetic)**
+Supported Ubuntu distribution: **23.04 (lunar)**
 
 ## Prerequisites
 
@@ -30,8 +30,11 @@ Supported Ubuntu distribution: **22.10 (kinetic)**
   # install Python3
   sudo apt install -y build-essential libssl-dev libffi-dev python3-dev python3-pip
 
-  # make sure Ansible is installed from pip3
-  pip3 install ansible --user
+  # make sure Ansible is installed
+  sudo apt install -y python3-ansible-runner
+
+  # you cannot install it from pip3 anymore in user space
+  # pip3 install ansible --user
 
   # ensure user Python apps can be run
   echo 'PATH="$HOME/.local/bin:$HOME/bin:$PATH"' >> ~/.bashrc

@@ -4,10 +4,11 @@
   name: Setup Ubuntu based Desktop system
   tasks:
   - name: Ensure ~/bin is present
+    become: false
     ansible.builtin.file:
       path: "{{ lookup('env', 'HOME') }}/bin"
+      mode: "0775"
       state: directory
-    become: false
   - name: Ensure package repositories
     ansible.builtin.include_role:
       name: apt
@@ -46,11 +47,12 @@
     ignore_errors: true
     loop: "{{ clis | selectattr('become', 'equalto', true) | list }}"
 
-  - block:
+  - become: false
+    block:
     - name: Install required Python modules in user directory
       ansible.builtin.pip:
         name: "{{ item }}"
-        extra_args: --user
+        extra_args: --user --break-system-packages
         state: latest
       loop: "{{ pips }}"
     - name: Install user level CLIs
@@ -61,7 +63,6 @@
         executable: /bin/bash
       ignore_errors: true
       loop: "{{ clis | selectattr('become', 'equalto', false) | list }}"
-    become: false
 
   - name: Ensure files config is desired
     ansible.builtin.include_role:
