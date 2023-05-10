@@ -6,7 +6,7 @@ and dependencies ensured via pipenv-setup sync tooling.
 import sys
 
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 from os import path
 
 
@@ -33,20 +33,20 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Build Tools",
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
     keywords="exchange rate nbp",  # Optional
     # When your source code is in a subdirectory under the project root, e.g.
     # `src/`, it is necessary to specify the `package_dir` argument.
     package_dir={"": "src"},  # Optional
-    packages=find_packages(where="src"),  # Required
+    packages=find_namespace_packages(where="src"),  # Required
     # Ensures that non .py files are included in package
     setup_requires=["setuptools_scm"],
     include_package_data=True,
-    python_requires=">=3.10, <4",
+    python_requires=">=3.11, <4",
     install_requires=[
         "jinja2>=3.1.2",
-        "markupsafe>=2.1.1; python_version >= '2.7' and python_version >= '3.10'",
+        "markupsafe>=2.1.1; python_version >= '2.7' and python_version >= '3.11'",
     ],
     dependency_links=[],
     entry_points={

@@ -32,7 +32,7 @@ spec:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
   - name: golang
-    image: golang:1.19
+    image: golang:1.20
     command:
     - sleep
     args:

@@ -3,8 +3,8 @@ RUN apk add git
 RUN pip3 install --no-cache-dir --upgrade pip && \
   adduser --uid 1000 --disabled-password --ingroup root default
 USER default
-ENV PATH=${PATH}:/home/default/.local/bin
+ENV PATH=${PATH}:/home/default/.venv/user/bin
 COPY --chown=1000 . /app
 WORKDIR /app
-RUN pip3 install --user --force-reinstall .
+RUN python3 -m venv /home/default/.venv/user && /home/default/.venv/user/bin/pip3 install --force-reinstall .
 ENTRYPOINT [ "exchange-rate-web" ]

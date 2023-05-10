@@ -5,7 +5,7 @@ and dependencies ensured via pipenv-setup sync tooling.
 """
 import sys
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 from os import path
 import site
 
@@ -34,18 +34,18 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Build Tools",
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
     keywords="exchange rate nbp",  # Optional
     # When your source code is in a subdirectory under the project root, e.g.
     # `src/`, it is necessary to specify the `package_dir` argument.
     package_dir={"": "src"},  # Optional
-    packages=find_packages(where="src"),  # Required
-    python_requires=">=3.10, <4",
+    packages=find_namespace_packages(where="src"),  # Required
+    python_requires=">=3.11, <4",
     install_requires=[
-        "requests>=2.28.1, <3",
-        "flask>=2.1.2, <3",
-        "waitress>=2.1.1, <3",
+        "requests>=2.30.0, <3",
+        "flask>=2.3.2, <3",
+        "waitress>=2.1.2, <3",
     ],  # Optional
     dependency_links=[],
     entry_points={

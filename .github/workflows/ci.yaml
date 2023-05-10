@@ -111,7 +111,7 @@ jobs:
   go:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
-    container: golang:1.19
+    container: golang:1.20
     env:
       GO_CACHE: /go
     steps:

@@ -87,7 +87,7 @@ jobs:
         key: "${{ runner.os }}-path"
     - uses: actions/setup-go@v3
       with:
-        go-version: '1.19'
+        go-version: '1.20'
     - run: cd go/learning && go get -d ./... && go build -mod=mod -o .  ./... && go test ./pkg/language && ./language
   python:
     runs-on: ubuntu-20.04
@@ -102,5 +102,5 @@ jobs:
         restore-keys: "${{ runner.os }}-pip-"
     - uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: '3.11'
     - run: cd python/apps/exchange-rate && pip3 install tox && make build && pip3 install . && exchange-rate

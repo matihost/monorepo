@@ -138,7 +138,7 @@ all:
         - hplip
         - hplip-gui
         - ddclient
-        - golang-1.19-go
+        - golang-1.20-go
         - golang-golang-x-tools
         - python3-pip
         - graphviz
@@ -194,6 +194,8 @@ all:
         - gh
         - npm
         - tox
+        # Python libraries should be installed via Ubuntu distro manager if possible as Ubuntu 23.04+ forces PEP668
+        - python3-venv
         - python3-ansible-runner
         - python3-pip
         - python3-flake8
@@ -241,6 +243,20 @@ all:
           become: false
           command: |
             [ "$(groups |grep -c vboxusers)" -ne 0 ] || sudo usermod -aG vboxusers ${USER}
+        - name: python3-user-venv
+          desc: |
+            From Ubuntu 23.04 user site packages are forbidden in favor of custom venv
+            Hence it is required to create at least one venv and ensure its bin directory is last item on PATH
+            So that Ubuntu distributioon python3, pip3 etc. are taken from /usr/bin/
+            while all installed Python libs on virtual env are possible to be run
+          become: false
+          command: |
+            [ -d ~/.venv/user ] || {
+              /usr/bin/python3 -m venv ~/.venv/user
+              [ "$(grep -c '.venv/usr/bin' ~/.bashrc)" -gt 0 ] || {
+                echo 'PATH=${PATH}:${HOME}/.venv/user/bin' >> ~/.bashrc
+              }
+            }
         - name: vbox-settings
           desc: To ensure VirtualBox can create any host network
           become: true
