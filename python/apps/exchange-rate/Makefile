@@ -54,7 +54,8 @@ run-container-bash: ## run image with bash
 
 ensure-custom-user-venv:
 ifeq ($(wildcard $(HOME)/.venv/user),)
-	/usr/bin/python3 -m venv $(HOME)/.venv/user
+	python3 -m venv $(HOME)/.venv/user
+	[ "$$(grep -c '.venv/user/bin' ~/.bashrc)" -gt 0 ] || echo 'PATH=$${PATH}:$${HOME}/.venv/user/bin' >> $(HOME)/.bashrc
 endif
 
 help: ## show usage and tasks (default)

@@ -252,7 +252,7 @@ all:
           become: false
           command: |
             [ -d ~/.venv/user ] || {
-              /usr/bin/python3 -m venv ~/.venv/user
+              python3 -m venv ~/.venv/user
               [ "$(grep -c '.venv/usr/bin' ~/.bashrc)" -gt 0 ] || {
                 echo 'PATH=${PATH}:${HOME}/.venv/user/bin' >> ~/.bashrc
               }
@@ -404,7 +404,7 @@ all:
           desc: Ensure ruby local gems are  on path. W/o it it is not possible to install asciidoctor below
           become: false
           command: |
-            [ "$(grep -c './gem/ruby' ~/.bashrc)" -gt 0 ] || {
+            [ "$(grep -c './gem/ruby' ~/.bashrc)" -eq 0 ] || {
               echo 'PATH=${HOME}/.gem/ruby/{{ versions.ruby }}/bin:${PATH}' >> ~/.bashrc
             }
         - name: asciidoctor

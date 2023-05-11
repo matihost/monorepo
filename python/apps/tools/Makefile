@@ -52,7 +52,7 @@ init: ## ensure virtualenv contains all dependencies and app is installed in edi
 
 ensure-custom-user-venv:
 ifeq ($(wildcard $(HOME)/.venv/user),)
-	/usr/bin/python3 -m venv $(HOME)/.venv/user
+	python3 -m venv $(HOME)/.venv/user
 endif
 
 help: ## show usage and tasks (default)
