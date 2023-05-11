@@ -9,6 +9,12 @@ undeploy-from-minikube: ## deploys GitHub Actions Runner Controller on Minikube 
 deploy-on-gke: ## deploys GitHub Actions Runner Controller on GKE (assumes kubecontext points to GKE cluster )
 	@ansible-playbook -i inventory/gke deploy-arc.yaml -e github_token="$(GITHUB_PAT)" -v
 
+deploy-on-gke-with-gh-app: ## deploys GitHub Actions Runner Controller on GKE (assumes kubecontext points to GKE cluster )
+ifeq ($(wildcard inventory/gke/.gh-app.yaml),)
+
+endif
+	@ansible-playbook -i inventory/gke deploy-arc.yaml -e "@inventory/gke/.gh-app.yaml" -v
+
 undeploy-from-gke: ## deploys GitHub Actions Runner Controller on GKE (assumes kubecontext points to GKE cluster )
 	@ansible-playbook -i inventory/gke undeploy-arc.yaml -e github_token="$(GITHUB_PAT)" -v
 

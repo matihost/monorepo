@@ -95,6 +95,7 @@ jobs:
       uses: github/codeql-action/init@v2
       with:
         languages: java
+        queries: security-extended,security-and-quality
     - name: Build Java source code
       working-directory: java
       run: mvn -s .mvn/settings.xml --show-version clean install
@@ -134,6 +135,7 @@ jobs:
       uses: github/codeql-action/init@v2
       with:
         languages: go
+        queries: security-extended,security-and-quality
     - name: Build Go source code
       working-directory: go/learning
       run: go build -buildvcs=false -mod=mod -o . ./... && go test ./pkg/language && ./language
