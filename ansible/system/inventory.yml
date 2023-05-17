@@ -37,6 +37,7 @@ all:
           eamodio.gitlens
           formulahendry.code-runner
           foxundermoon.shell-format
+          github.vscode-github-actions
           golang.go
           hashicorp.terraform
           jebbs.plantuml
@@ -248,7 +249,7 @@ all:
             From Ubuntu 23.04 user site packages are forbidden in favor of custom venv
             Hence it is required to create at least one venv and ensure its bin directory is last item on PATH
             So that Ubuntu distributioon python3, pip3 etc. are taken from /usr/bin/
-            while all installed Python libs on virtual env are possible to be run
+            while all installed Python libs on virtual env are possible to be run by installing them via ~/.venv/user/pip3
           become: false
           command: |
             [ -d ~/.venv/user ] || {
@@ -316,6 +317,8 @@ all:
             [ "$(git config --global pull.rebase)" == "true" ] || {
               git config --global pull.rebase true
               git config --global credential.helper store
+              git config --global fetch.prune true
+              git config --global alias.lol "log --oneline --graph --decorate --all"
             }
             ([ -n "$(git config --global user.name)" ] && [ -n "$(git config --global user.email)" ]) || {
               echo "Git user.name and user.email MUST be set"

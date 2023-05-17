@@ -28,7 +28,9 @@ permissions:
   actions: read
   contents: read
   security-events: write
-
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   sources:
     name: Checkout sources
@@ -143,3 +145,63 @@ jobs:
       uses: github/codeql-action/analyze@v2
       with:
         category: "/language:go"
+  python:
+    needs: sources
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    container:
+      image: quay.io/matihost/ansible:root
+    steps:
+    - name: Download sources
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ github.workspace }}
+        key: sources-${{ github.run_id }}-${{ github.run_attempt }}
+        fail-on-cache-miss: true
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: python
+        queries: security-extended,security-and-quality
+    - name: Build Python exchange-rate app
+      run: |-
+        make build
+        # make install
+        # TODO github overrides HOME with /home/github - so if venv is stored in oryginal HOME dir it has to be defined explicitely
+        /root/.venv/user/bin/pip3 install --force-reinstall .
+        exchange-rate
+      working-directory: python/apps/exchange-rate
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:python"
+  ansible:
+    needs: sources
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    container:
+      image: quay.io/matihost/ansible:root
+    steps:
+    - name: Download sources
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ github.workspace }}
+        key: sources-${{ github.run_id }}-${{ github.run_attempt }}
+        fail-on-cache-miss: true
+    - name: Run Ansible dictionaries playbook
+      run: |-
+        make dictionaries.yaml
+      working-directory: ansible/learning
+  rust:
+    needs: sources
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    container:
+      image: rust
+    steps:
+    - name: Download sources
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ github.workspace }}
+        key: sources-${{ github.run_id }}-${{ github.run_attempt }}
+        fail-on-cache-miss: true
+    - name: Build rust
+      run: make build
+      working-directory: rust/guessing_game

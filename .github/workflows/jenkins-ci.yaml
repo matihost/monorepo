@@ -11,7 +11,10 @@
 # Configure gh and gh-actions-importer extension:
 # gh auth login
 # gh extension install github/gh-actions-importer
+#
+# Update extension regularly:
 # gh actions-importer update
+# gh extension upgrade github/gh-actions-importer
 #
 # Clone the repo:
 # gh repo clone matihost/monorepo && cd monorepo
@@ -20,10 +23,10 @@
 # export JENKINS_URL='https://jenkins.dev.mooo.com'
 # gh actions-importer dry-run jenkins -o .github/workflows --source-file-path Jenkinsfile \
 #  --source-url ${JENKINS_URL}/job/learning/ \
-#  --jenkins-instance-url ${JENKINS_URL}  --github-access-token `gh auth token` -t 11e02bc0a4a96069e26638ee2b15ca5490 -n admin --no-ssl-verify
+#  --jenkins-instance-url ${JENKINS_URL}  --github-access-token `gh auth token` -t REDACTED -n admin --no-ssl-verify
 #
 # Audit gh actions-importer to figure out which Jenkins elements are not migrated:
-# gh actions-importer audit jenkins -o .github/workflows --jenkins-instance-url "${JENKINS_URL}" --github-access-token "$(gh auth token)" -t 11e02bc0a4a96069e26638ee2b15ca5490 -n admin --no-ssl-verify
+# gh actions-importer audit jenkins -o .github/workflows --jenkins-instance-url "${JENKINS_URL}" --github-access-token "$(gh auth token)" -t REDACTED -n admin --no-ssl-verify
 name: 'CI :: All :: Migration from Jenkins'
 on:
   # The following PollSCM schedule was transformed and may behave differently than in Jenkins.
