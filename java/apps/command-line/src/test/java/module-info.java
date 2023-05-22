@@ -19,5 +19,7 @@ open module org.matihost.learning.apps.commandline.test {
   requires transitive org.assertj.core;
   // to mitigate https://github.com/mockito/mockito/issues/2282
   requires transitive net.bytebuddy;
+  requires transitive net.bytebuddy.agent;
+
 
 }

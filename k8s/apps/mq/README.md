@@ -30,8 +30,8 @@ Prerequisites:
 # deploy MQ manager on Minikube;usage: make deploy [K8S=minikube] [MQ_NAME=dev1] [APP_PASS=app] [TLS=true] [PERSISTENCE=false] [DEBUG=false]
 make deploy
 
-# deploy MQ manager on GKE;usage: make deploy K8S=gke [MQ_NAME=dev1] [APP_PASS=app] [TLS=true] [PERSISTENCE=false] [DEBUG=false]
-make deploy K8S=gke
+# deploy MQ manager on GKE with TLS;usage: make deploy K8S=gke [MQ_NAME=dev1] [APP_PASS=app] [TLS=true] [PERSISTENCE=false] [DEBUG=false]
+make deploy K8S=gke TLS=true
 
 # deploy MQ with custom TLS certificate
 make deploy TLS=true

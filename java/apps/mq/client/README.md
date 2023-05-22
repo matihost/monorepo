@@ -14,7 +14,7 @@ Prerequisites:
 
   * Warning: Ensure `app-config.mqsc` in `k8s\apps\mq` contains correct Linux user of your workspace (currently it is `mati` user) mapped to `app` user on MQ server side.
 
-  * MQ_TLS=true required that MQ servier is deployed with TLS=true option
+  * MQ_TLS=true required that MQ server is deployed with TLS=true option
 
 * Sample executions running from container (`make *-container`) uses user `app` for authentication.
 

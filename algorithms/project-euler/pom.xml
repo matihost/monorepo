@@ -59,7 +59,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>3.3.0</version>
           <executions>
             <execution>
               <id>enforce-maven</id>
@@ -113,24 +113,25 @@
         <!-- Versions can be taken from  mvn -T1 versions:display-plugin-updates -->
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.10.1</version>
+          <version>3.11.0</version>
           <configuration>
             <!-- The -release option ensures that the code is compiled following the rules of the programming language of the specified release,
             and that generated classes target the release as well as the public API of that release.
             This means that, unlike the -source and -target options,
             the compiler will detect and generate an error when using APIs that don't exist in previous releases of Java SE. -->
             <release>${java.version}</release>
+            <parameters>true</parameters>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.0.0-M7</version>
+          <version>3.1.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>3.0.0-M7</version>
+          <version>3.1.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
@@ -138,23 +139,30 @@
         </plugin>
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>3.2.0</version>
+          <version>3.3.1</version>
         </plugin>
         <plugin>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>3.0.0-M2</version>
+          <version>3.1.1</version>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
-          <version>3.0.0-M1</version>
+          <version>3.1.1</version>
         </plugin>
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.2.2</version>
+          <version>3.3.0</version>
+          <configuration>
+            <archive>
+              <manifest>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+            </archive>
+          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
-          <version>4.0.0-M1</version>
+          <version>4.0.0-M8</version>
         </plugin>
       </plugins>
     </pluginManagement>

@@ -1,6 +1,6 @@
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
-	DEBUG_FLAG := --debug
+	DEBUG_FLAG := --debug -Dmaven.plugin.validation=VERBOSE
 endif
 
 show-plugins-updates: ## show which plugins versions are not set or outdated
@@ -41,7 +41,7 @@ build-submodule: ## build submodule; usage make build-submodule MODULE=mavenModu
 	mvn -s .mvn/settings.xml --show-version -am $(DEBUG_FLAG) -pl :$(MODULE) clean install -Pnative
 
 clean: ## builds the project
-	mvn -s .mvn/settings.xml --show-version clean
+	mvn -s .mvn/settings.xml --show-version $(DEBUG_FLAG) clean
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
