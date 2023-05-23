@@ -61,7 +61,7 @@ jobs:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
         enableCrossOsArchive: true
-  java-ci:
+  java:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
     container:

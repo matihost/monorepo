@@ -1,0 +1,103 @@
+---
+name: 'CI :: Images'
+on:
+  push:
+    # paths: "k8s/images/*"
+    branches:
+    - master
+    - feature/*
+  pull_request:
+    # paths: "k8s/images/*"
+    branches:
+    - master
+    - feature/*
+  workflow_dispatch:
+  # Inputs are only available for workflow_dispatch - the default is not available for other type of triggers
+  # https://dev.to/mrmike/github-action-handling-input-default-value-5f2g
+    inputs:
+      runner:
+        description: 'Runner type'
+        required: true
+        default: 'ubuntu-22.04'
+        type: choice
+        options:
+        - ubuntu-22.04
+        - matihost
+# https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+concurrency:
+  group: images-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  # sources:
+  #   name: Checkout sources
+  #   runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+  #   container:
+  #     image: maven:3-openjdk-17
+  #   steps:
+  #   - name: checkout
+  #     uses: actions/checkout@v3
+  #     with:
+  #       fetch-depth: 0
+  #   # Workaround for https://github.com/actions/runner/issues/2033
+  #   - name: Set ownership
+  #     run: |
+  #       chown -R $(id -u):$(id -g) $PWD
+  #   - name: Obtain git version
+  #     run: |
+  #       echo "GIT_COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_ENV
+  #   - name: Cache workspace
+  #     uses: actions/cache/save@v3
+  #     with:
+  #       # avoid using github.workspace in caching?
+  #       # so how effectivelly share source code between jobs?
+  #       # https://github.com/actions/cache/blob/main/tips-and-workarounds.md#cross-os-cache
+  #       # artifacts?
+  #       # cleaning artifacts after workflow requires custom, non standard action:
+  #       # https://github.com/marketplace/actions/delete-artifact
+  #       path: ${{ github.workspace }}
+  #       key: sources-${{ github.run_id }}-${{ github.run_attempt }}
+  #       enableCrossOsArchive: true
+  ansible-image:
+    # needs: sources
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    container:
+      # image: gcr.io/kaniko-project/executor:debug
+      image: quay.io/matihost/gh-kaniko
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    # - name: Download sources
+    #   uses: actions/cache/restore@v3
+    #   with:
+    #     path: ${{ github.workspace }}
+    #     key: sources-${{ github.run_id }}-${{ github.run_attempt }}
+    #     fail-on-cache-miss: true
+    #     enableCrossOsArchive: true
+    - name: Build Ansible image in GKE hosted runner
+      if: ${{ (inputs.runner || 'ubuntu-22.04') != 'ubuntu-22.04' }}
+      working-directory: k8s/images/ansible
+      env:
+        container: "kube"
+        GCP_PROJECT: "${{ vars.GCP_PROJECT }}"
+      shell: /busybox/sh
+      run: |
+        /kaniko/executor -f ${pwd()}/Dockerfile -c ${pwd()} --insecure --skip-tls-verify --cache=true --destination=gcr.io/${{ env.GCP_PROJECT }}/ansible:latest
+    - name: Build Ansible image on GH hosted runner
+      if: ${{ (inputs.runner || 'ubuntu-22.04') == 'ubuntu-22.04' }}
+      working-directory: k8s/images/ansible
+      env:
+        container: "docker"
+        REGISTRY: "${{ vars.REGISTRY || 'quay.io' }}"
+        REGISTRY_USER: "${{ secrets.REGISTRY_USER }}"
+        REGISTRY_PASSWORD: "${{ secrets.REGISTRY_PASSWORD }}"
+      shell: /busybox/sh
+      run: |
+        mkdir -p /kaniko/.docker
+        echo "{\"auths\":{\"${{ env.REGISTRY }}\":{\"username\":\"${{ env.REGISTRY_USER }}\",\"password\":\"${{ env.REGISTRY_PASSWORD }}\"}}}" > /kaniko/.docker/config.json
+        /kaniko/executor -f ${pwd()}/Dockerfile -c ${pwd()} --insecure --skip-tls-verify --cache=true --destination=${{ env.REGISTRY }}/matihost/ansible:latest

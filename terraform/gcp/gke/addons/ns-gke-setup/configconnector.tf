@@ -1,6 +1,6 @@
 # GSA for Worflow Identity and Config Connector purposes
 resource "google_service_account" "identity-workflow-sa" {
-  account_id   = "${local.gke_name}-${var.kns}-wsa"
+  account_id   = "${local.gke_name}-${substr(var.kns, 0, 10)}-wsa"
   display_name = "Service Account which is used by KSA in ns ${var.kns} workflows in GKE ${local.gke_name}"
 }
 

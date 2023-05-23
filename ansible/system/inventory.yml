@@ -316,6 +316,7 @@ all:
           command: |
             [ "$(git config --global pull.rebase)" == "true" ] || {
               git config --global pull.rebase true
+              git config --global push.autoSetupRemote true
               git config --global credential.helper store
               git config --global fetch.prune true
               git config --global alias.lol "log --oneline --graph --decorate --all"

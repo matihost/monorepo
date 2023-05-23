@@ -44,6 +44,14 @@ In case  you use GitHub App, you need to create a file in the inventory/\<select
     -----END RS A PRIVATE KEY-----
     ```
 
+* Workload identity configured for namespaces where runners are running.
+As of now all worker runners are running as `default` KSA.
+
+  ```bash
+  cd ../../../gcp/gke/addons/ns-gke-setup && \
+    make run MODE=apply CLUSTER_NAME=shared1 KNS=matihost-monorepo-ci KSAS='["default"]' ROLES='["roles/storage.admin"]'
+  ```
+
 ## Running
 
 ```bash

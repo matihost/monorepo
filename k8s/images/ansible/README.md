@@ -45,6 +45,6 @@ Requirements:
 * Workload identity configured for Jenkins `ci` namespaces Kubernetes Service Accounts (KSAs)
 
   ```bash
-  cd ../../../gcp/gke/addons/ng-gke-setup && \
-    make apply CLUSTER_NAME=shared1 KNS=ci KSAS='["default","ci", "ci-jenkins"]' ROLES='["roles/storage.admin"]'
+  cd ../../../gcp/gke/addons/ns-gke-setup && \
+    make run MODE=apply CLUSTER_NAME=shared1 KNS=ci KSAS='["default","ci", "ci-jenkins"]' ROLES='["roles/storage.admin"]'
   ```
