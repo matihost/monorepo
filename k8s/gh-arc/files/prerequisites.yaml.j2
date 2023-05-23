@@ -1,0 +1,25 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: "{{ runner.namespace | mandatory }}"
+  labels:
+    # Ensure Istio does not inject sidecar to runner delegated jobs as they crash automatically
+    #  ##[debug]Using image 'maven:3-openjdk-17' for job image
+    #  ##[debug]Job pod created, waiting for it to come online matihost-monorepo-8blcq-87ffq-workflow
+    #  ##[debug]Job pod is ready for traffic
+    #  ##[debug]{"message":"command terminated with non-zero exit code: Error executing in Docker Container: 1","details":{"causes":[{"reason":"ExitCode","message":"1"}]}}
+    istio-injection: disabled
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: "{{ runner.namespace | mandatory }}-limitrange"
+  namespace: "{{ runner.namespace | mandatory }}"
+spec:
+  limits:
+  - defaultRequest:
+      cpu: 250m
+      ephemeral-storage: 256Mi
+      memory: 256Mi
+    type: Container
