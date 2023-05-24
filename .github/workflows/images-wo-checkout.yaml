@@ -1,0 +1,105 @@
+---
+name: 'CI :: Images w/o source checkout'
+on:
+  push:
+    # paths: "k8s/images/*"
+    branches:
+    - master
+    - feature/*
+  pull_request:
+    # paths: "k8s/images/*"
+    branches:
+    - master
+    - feature/*
+  workflow_dispatch:
+  # Inputs are only available for workflow_dispatch - the default is not available for other type of triggers
+  # https://dev.to/mrmike/github-action-handling-input-default-value-5f2g
+    inputs:
+      runner:
+        description: 'Runner type'
+        required: true
+        default: 'ubuntu-22.04'
+        type: choice
+        options:
+        - ubuntu-22.04
+        - matihost
+# https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
+permissions:
+  contents: read
+  packages: write
+concurrency:
+  group: images-wo-checkout-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  IMAGE_TAG: "${{ github.ref == 'refs/heads/master' && 'latest' || github.sha }}"
+jobs:
+  image-build-on-gcp-artifact-registry:
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    if: ${{ (inputs.runner || 'ubuntu-22.04') != 'ubuntu-22.04' }}
+    container:
+      image: gcr.io/kaniko-project/executor:debug
+    steps:
+    - name: Build Ansible image in GKE hosted runner
+      if: ${{ (inputs.runner || 'ubuntu-22.04') != 'ubuntu-22.04' }}
+      env:
+        container: "kube"
+        GCP_PROJECT: "${{ vars.GCP_PROJECT }}"
+      run: |
+        export GIT_USERNAME="oauth2"
+        export GIT_PASSWORD="${{ secrets.GITHUB_TOKEN }}"
+
+        echo "Building image: ${{ github.repositoryUrl }}#${{ github.ref }}#${{ github.sha }}/k8s/images/ansible/Dockerfile"
+        /kaniko/executor -c "${{ github.repositoryUrl }}#${{ github.ref }}#${{ github.sha }}" \
+          -f ./k8s/images/ansible/Dockerfile \
+          --destination="gcr.io/${{ env.GCP_PROJECT }}/ansible:${{ env.IMAGE_TAG }}" \
+          --insecure --skip-tls-verify --cache=true \
+          --push-retry 2 --image-name-with-digest-file /workspace/image-digest.txt
+
+  image-build-generic-registry:
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    if: ${{ (inputs.runner || 'ubuntu-22.04') == 'ubuntu-22.04' }}
+    container:
+      image: gcr.io/kaniko-project/executor:debug
+    steps:
+    - name: Build Ansible image on GH hosted runner with deployment to generic image registry
+      if: ${{ vars.REGISTRY }}
+      env:
+        container: "docker"
+        REGISTRY: "${{ vars.REGISTRY || 'quay.io' }}"
+        REGISTRY_USER: "${{ secrets.REGISTRY_USER }}"
+        REGISTRY_PASSWORD: "${{ secrets.REGISTRY_PASSWORD }}"
+      run: |
+        export GIT_USERNAME="oauth2"
+        export GIT_PASSWORD="${{ secrets.GITHUB_TOKEN }}"
+        mkdir -p /kaniko/.docker
+        echo "{\"auths\":{\"${{ env.REGISTRY }}\":{\"username\":\"${{ env.REGISTRY_USER }}\",\"password\":\"${{ env.REGISTRY_PASSWORD }}\"}}}" > /kaniko/.docker/config.json
+        /kaniko/executor -c "${{ github.repositoryUrl }}#${{ github.ref }}#${{ github.sha }}" \
+          -f ./k8s/images/ansible/Dockerfile \
+          --destination="${{ env.REGISTRY }}/matihost/ansible:${{ env.IMAGE_TAG }}" \
+          --insecure --skip-tls-verify --cache=true \
+          --push-retry 2 --image-name-with-digest-file /workspace/image-digest.txt
+
+  # kaniko does not allow to build second image - hence it has to run as separated job
+  # https://github.com/GoogleContainerTools/kaniko/issues/1118
+  image-build-ghcr:
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    if: ${{ (inputs.runner || 'ubuntu-22.04') == 'ubuntu-22.04' }}
+    container:
+      image: gcr.io/kaniko-project/executor:debug
+    steps:
+    - name: Build Ansible image on GH hosted runner with deployment to GH Packages
+      env:
+        container: "docker"
+      run: |
+        export GIT_USERNAME="oauth2"
+        export GIT_PASSWORD="${{ secrets.GITHUB_TOKEN }}"
+
+        mkdir -p /kaniko/.docker
+        AUTH=$(echo -n ${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} | base64)
+        echo "{\"auths\": {\"ghcr.io\": {\"auth\": \"${AUTH}\"}}}" > /kaniko/.docker/config.json
+
+        /kaniko/executor -c "${{ github.repositoryUrl }}#${{ github.ref }}#${{ github.sha }}" \
+          -f ./k8s/images/ansible/Dockerfile \
+          --destination="ghcr.io/${{ github.repository }}/ansible:${{ env.IMAGE_TAG }}" \
+          --insecure --skip-tls-verify --cache=true \
+          --push-retry 2 --image-name-with-digest-file /workspace/image-digest.txt

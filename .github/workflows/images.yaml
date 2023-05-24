@@ -31,6 +31,8 @@ permissions:
 concurrency:
   group: images-${{ github.ref }}
   cancel-in-progress: true
+env:
+  IMAGE_TAG: "${{ github.ref == 'refs/heads/master' && 'latest' || github.sha }}"
 jobs:
   # sources:
   #   name: Checkout sources
@@ -85,9 +87,9 @@ jobs:
       env:
         container: "kube"
         GCP_PROJECT: "${{ vars.GCP_PROJECT }}"
-      shell: /busybox/sh
       run: |
-        /kaniko/executor -f ${pwd()}/Dockerfile -c ${pwd()} --insecure --skip-tls-verify --cache=true --destination=gcr.io/${{ env.GCP_PROJECT }}/ansible:latest
+        /kaniko/executor -f ${pwd()}/Dockerfile -c ${pwd()} --insecure --skip-tls-verify --cache=true \
+          --destination=gcr.io/${{ env.GCP_PROJECT }}/ansible:${{ env.IMAGE_TAG }}
     - name: Build Ansible image on GH hosted runner
       if: ${{ (inputs.runner || 'ubuntu-22.04') == 'ubuntu-22.04' }}
       working-directory: k8s/images/ansible
@@ -96,8 +98,8 @@ jobs:
         REGISTRY: "${{ vars.REGISTRY || 'quay.io' }}"
         REGISTRY_USER: "${{ secrets.REGISTRY_USER }}"
         REGISTRY_PASSWORD: "${{ secrets.REGISTRY_PASSWORD }}"
-      shell: /busybox/sh
       run: |
         mkdir -p /kaniko/.docker
         echo "{\"auths\":{\"${{ env.REGISTRY }}\":{\"username\":\"${{ env.REGISTRY_USER }}\",\"password\":\"${{ env.REGISTRY_PASSWORD }}\"}}}" > /kaniko/.docker/config.json
-        /kaniko/executor -f ${pwd()}/Dockerfile -c ${pwd()} --insecure --skip-tls-verify --cache=true --destination=${{ env.REGISTRY }}/matihost/ansible:latest
+        /kaniko/executor -f ${pwd()}/Dockerfile -c ${pwd()} --insecure --skip-tls-verify --cache=true \
+          --destination=${{ env.REGISTRY }}/matihost/ansible:${{ env.IMAGE_TAG }}

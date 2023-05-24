@@ -31,6 +31,9 @@ permissions:
 concurrency:
   group: kaniko-${{ github.ref }}
   cancel-in-progress: true
+env:
+  IMAGE_TAG: "${{ github.ref == 'refs/heads/master' && 'latest' || github.sha }}"
+  ROOT_IMAGE_TAG: "${{ github.ref == 'refs/heads/master' && 'root' || format('root-{0}', github.sha) }}"
 jobs:
   # sources:
   #   name: Checkout sources
@@ -79,7 +82,7 @@ jobs:
       uses: aevea/action-kaniko@master
       with:
         image: gcr.io/${{ env.GCP_PROJECT }}/ansible
-        tag: latest
+        tag: "${{ env.IMAGE_TAG }}"
         path: k8s/images/ansible
         build_file: Dockerfile
         cache: true
@@ -90,7 +93,7 @@ jobs:
       uses: aevea/action-kaniko@master
       with:
         image: gcr.io/${{ env.GCP_PROJECT }}/ansible
-        tag: root
+        tag: "${{ env.ROOT_IMAGE_TAG }}"
         path: k8s/images/ansible
         build_file: Dockerfile.root
         cache: true
@@ -100,7 +103,7 @@ jobs:
       with:
         registry: ${{ vars.REGISTRY }}
         image: matihost/ansible
-        tag: latest
+        tag: "${{ env.IMAGE_TAG }}"
         username: "${{ secrets.REGISTRY_USER }}"
         password: "${{ secrets.REGISTRY_PASSWORD }}"
         path: k8s/images/ansible
@@ -113,7 +116,7 @@ jobs:
       with:
         registry: ${{ vars.REGISTRY }}
         image: matihost/ansible
-        tag: root
+        tag: "${{ env.ROOT_IMAGE_TAG }}"
         username: "${{ secrets.REGISTRY_USER }}"
         password: "${{ secrets.REGISTRY_PASSWORD }}"
         path: k8s/images/ansible
