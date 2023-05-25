@@ -2,7 +2,7 @@
 # file - FileStore - required by Filestore CSI driver (aka google_container_cluster.addons.gcp_filestore_csi_driver_config )
 # certificatemanager - required by Gateway API Addon to GKE to keep TLS certificates
 locals {
-  gke-apis = ["container", "containerfilesystem", "file", "containersecurity", "certificatemanager"]
+  gke-apis = ["container", "containerfilesystem", "file", "containersecurity", "certificatemanager", "artifactregistry"]
 }
 
 resource "google_project_service" "gke-apis" {

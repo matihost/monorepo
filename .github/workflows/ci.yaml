@@ -27,18 +27,23 @@ on:
 permissions:
   actions: read
   contents: read
+  packages: write
   security-events: write
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
+env:
+  IMAGE_TAG: "${{ github.ref == 'refs/heads/master' && 'latest' || github.sha }}"
 jobs:
   sources:
     name: Checkout sources
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
     container:
       image: maven:3-openjdk-17
+    outputs:
+      GIT_COMMIT_HASH: ${{ steps.git_hash.outputs.GIT_COMMIT_HASH }}
     steps:
-    - name: checkout
+    - name: Checkout sources
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
@@ -47,8 +52,9 @@ jobs:
       run: |
         chown -R $(id -u):$(id -g) $PWD
     - name: Obtain git version
+      id: git_hash
       run: |
-        echo "GIT_COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_ENV
+        echo "GIT_COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
     - name: Cache workspace
       uses: actions/cache/save@v3
       with:
@@ -67,8 +73,6 @@ jobs:
     container:
       image: maven:3-openjdk-17
     steps:
-    # - name: checkout
-    #   uses: actions/checkout@v3
     - name: Download sources
       uses: actions/cache/restore@v3
       with:
@@ -93,11 +97,6 @@ jobs:
     #     java-version: '17'
     #     distribution: 'adopt'
     #     cache: maven
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
-      with:
-        languages: java
-        queries: security-extended,security-and-quality
     - name: Build Java source code
       working-directory: java
       run: mvn -s .mvn/settings.xml --show-version clean install
@@ -107,19 +106,46 @@ jobs:
         name: app-jars
         path: java/apps/**/target/*.jar
         retention-days: 2
+        enableCrossOsArchive: true
+  codeql-java:
+    needs: sources
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    container:
+      image: maven:3-openjdk-17
+    steps:
+    - name: Download sources
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ github.workspace }}
+        key: sources-${{ github.run_id }}-${{ github.run_attempt }}
+        fail-on-cache-miss: true
+        enableCrossOsArchive: true
+    - name: Cache local Maven repository
+      uses: actions/cache@v3
+      with:
+        path: "/root/.m2/repository"
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: java
+        queries: security-extended,security-and-quality
+    - name: Build Java source code
+      working-directory: java
+      run: mvn -s .mvn/settings.xml --show-version clean install
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
       with:
         category: "/language:java"
-  go:
+  codeql-go:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
     container: golang:1.20
     env:
       GO_CACHE: /go
     steps:
-    # - name: checkout
-    #   uses: actions/checkout@v3
     - name: Download sources
       uses: actions/cache/restore@v3
       with:
@@ -145,7 +171,7 @@ jobs:
       uses: github/codeql-action/analyze@v2
       with:
         category: "/language:go"
-  python:
+  codeql-python:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
     container:
@@ -205,3 +231,79 @@ jobs:
     - name: Build rust
       run: make build
       working-directory: rust/guessing_game
+  image-build-on-gcp-artifact-registry:
+    needs: sources
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    if: ((inputs.runner || 'ubuntu-22.04') != 'ubuntu-22.04') && vars.GCP_PROJECT
+    container:
+      image: quay.io/matihost/gh-kaniko
+    steps:
+    - name: Download sources
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ github.workspace }}
+        key: sources-${{ github.run_id }}-${{ github.run_attempt }}
+        fail-on-cache-miss: true
+        enableCrossOsArchive: true
+    - name: Build Ansible image in GKE hosted runner
+      working-directory: k8s/images/ansible
+      env:
+        container: "kube"
+        GCP_PROJECT: "${{ vars.GCP_PROJECT }}"
+        GIT_COMMIT_HASH: "${{ needs.sources.outputs.GIT_COMMIT_HASH }}"
+      run: |
+        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure --skip-tls-verify --cache=true \
+          --destination="gcr.io/${{ env.GCP_PROJECT }}/ansible:${{ env.GIT_COMMIT_HASH }}"
+  image-build-generic-registry:
+    needs: sources
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    if: vars.REGISTRY
+    container:
+      image: quay.io/matihost/gh-kaniko
+    steps:
+    - name: Download sources
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ github.workspace }}
+        key: sources-${{ github.run_id }}-${{ github.run_attempt }}
+        fail-on-cache-miss: true
+        enableCrossOsArchive: true
+    - name: Build Ansible image on GH hosted runner with deployment to generic image registry
+      working-directory: k8s/images/ansible
+      env:
+        container: "docker"
+        REGISTRY: "${{ vars.REGISTRY || 'quay.io' }}"
+        REGISTRY_USER: "${{ secrets.REGISTRY_USER }}"
+        REGISTRY_PASSWORD: "${{ secrets.REGISTRY_PASSWORD }}"
+      run: |
+        mkdir -p /kaniko/.docker
+        echo "{\"auths\":{\"${{ env.REGISTRY }}\":{\"username\":\"${{ env.REGISTRY_USER }}\",\"password\":\"${{ env.REGISTRY_PASSWORD }}\"}}}" > /kaniko/.docker/config.json
+        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure  --push-retry 2 - --skip-tls-verify --cache=true \
+          --destination="${{ env.REGISTRY }}/matihost/ansible:${{ env.IMAGE_TAG }}"
+  image-build-ghcr:
+    needs: sources
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    container:
+      image: quay.io/matihost/gh-kaniko
+    steps:
+    - name: Download sources
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ github.workspace }}
+        key: sources-${{ github.run_id }}-${{ github.run_attempt }}
+        fail-on-cache-miss: true
+        enableCrossOsArchive: true
+    - name: Build Ansible image on GH hosted runner with deployment to GH Packages
+      working-directory: k8s/images/ansible
+      env:
+        container: "${{ inputs.runner == 'ubuntu-22.04' && 'docker' || 'kube' }}"
+      run: |
+        mkdir -p /kaniko/.docker
+        AUTH=$(echo -n ${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} | base64)
+        echo "{\"auths\": {\"ghcr.io\": {\"auth\": \"${AUTH}\"}}}" > /kaniko/.docker/config.json
+
+        /kaniko/executor -c "$(pwd)" \
+          -f ./Dockerfile \
+          --destination="ghcr.io/${{ github.repository }}/ansible:${{ env.IMAGE_TAG }}" \
+          --insecure --skip-tls-verify --cache=true \
+          --push-retry 2

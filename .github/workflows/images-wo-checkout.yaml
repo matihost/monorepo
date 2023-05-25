@@ -1,16 +1,16 @@
 ---
 name: 'CI :: Images w/o source checkout'
 on:
-  push:
-    # paths: "k8s/images/*"
-    branches:
-    - master
-    - feature/*
-  pull_request:
-    # paths: "k8s/images/*"
-    branches:
-    - master
-    - feature/*
+  # push:
+  #   # paths: "k8s/images/*"
+  #   branches:
+  #   - master
+  #   - feature/*
+  # pull_request:
+  #   # paths: "k8s/images/*"
+  #   branches:
+  #   - master
+  #   - feature/*
   workflow_dispatch:
   # Inputs are only available for workflow_dispatch - the default is not available for other type of triggers
   # https://dev.to/mrmike/github-action-handling-input-default-value-5f2g
@@ -40,7 +40,6 @@ jobs:
       image: gcr.io/kaniko-project/executor:debug
     steps:
     - name: Build Ansible image in GKE hosted runner
-      if: ${{ (inputs.runner || 'ubuntu-22.04') != 'ubuntu-22.04' }}
       env:
         container: "kube"
         GCP_PROJECT: "${{ vars.GCP_PROJECT }}"
