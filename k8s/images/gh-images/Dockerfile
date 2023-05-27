@@ -1,5 +1,6 @@
+ARG JAVA_VERSION=17
 FROM gcr.io/kaniko-project/executor:debug as kaniko
-FROM ubuntu:22.04
+FROM maven:3-openjdk-${JAVA_VERSION}
 COPY --from=kaniko /kaniko /kaniko
 ENV PATH="/kaniko:${PATH}"
 ENV DOCKER_CONFIG=/kaniko/.docker/

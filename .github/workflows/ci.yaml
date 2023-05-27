@@ -38,6 +38,7 @@ jobs:
   sources:
     name: Checkout sources
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    timeout-minutes: 5
     container:
       image: maven:3-openjdk-17
     outputs:
@@ -70,6 +71,7 @@ jobs:
   java:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    timeout-minutes: 30
     container:
       image: maven:3-openjdk-17
     steps:
@@ -107,9 +109,71 @@ jobs:
         path: java/apps/**/target/*.jar
         retention-days: 2
         enableCrossOsArchive: true
+    - name: Cache java build sources
+      uses: actions/cache/save@v3
+      with:
+        path: ${{ github.workspace }}/java
+        key: java-${{ github.run_id }}-${{ github.run_attempt }}
+        enableCrossOsArchive: true
+  java-image-mq-app:
+    needs: java
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    timeout-minutes: 30
+    container:
+      image: quay.io/matihost/gh-java-kaniko
+    steps:
+    - name: Download java build sources
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ github.workspace }}/java
+        key: java-${{ github.run_id }}-${{ github.run_attempt }}
+        fail-on-cache-miss: true
+        enableCrossOsArchive: true
+    - name: Build Java mq client image
+      working-directory: java/apps/mq/client
+      env:
+        container: "${{ inputs.runner == 'ubuntu-22.04' && 'docker' || 'kube' }}"
+        REGISTRY: "${{ vars.REGISTRY || 'quay.io' }}"
+        REGISTRY_USER: "${{ secrets.REGISTRY_USER }}"
+        REGISTRY_PASSWORD: "${{ secrets.REGISTRY_PASSWORD }}"
+      run: |
+        mkdir -p /kaniko/.docker
+        echo "{\"auths\":{\"${{ env.REGISTRY }}\":{\"username\":\"${{ env.REGISTRY_USER }}\",\"password\":\"${{ env.REGISTRY_PASSWORD }}\"}}}" > /kaniko/.docker/config.json
+        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure  --push-retry 2 - --skip-tls-verify --cache=false \
+          --build-arg JAR_FILE=target/*.jar \
+          --destination="${{ env.REGISTRY }}/matihost/mq/basic-client:${{ env.IMAGE_TAG }}"
+  java-image-cmdline:
+    needs: java
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    timeout-minutes: 30
+    container:
+      image: quay.io/matihost/gh-java-kaniko
+    steps:
+    - name: Download java build sources
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ github.workspace }}/java
+        key: java-${{ github.run_id }}-${{ github.run_attempt }}
+        fail-on-cache-miss: true
+        enableCrossOsArchive: true
+    - name: Build Java command-line image
+      working-directory: java/apps/command-line
+      env:
+        container: "${{ inputs.runner == 'ubuntu-22.04' && 'docker' || 'kube' }}"
+        REGISTRY: "${{ vars.REGISTRY || 'quay.io' }}"
+        REGISTRY_USER: "${{ secrets.REGISTRY_USER }}"
+        REGISTRY_PASSWORD: "${{ secrets.REGISTRY_PASSWORD }}"
+      run: |
+        mkdir -p /kaniko/.docker
+        echo "{\"auths\":{\"${{ env.REGISTRY }}\":{\"username\":\"${{ env.REGISTRY_USER }}\",\"password\":\"${{ env.REGISTRY_PASSWORD }}\"}}}" > /kaniko/.docker/config.json
+        echo "Building Java commandline image"
+        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure  --push-retry 2 - --skip-tls-verify --cache=false \
+          --build-arg JAR_FILE=target/*.jar \
+          --destination="${{ env.REGISTRY }}/matihost/commandline:${{ env.IMAGE_TAG }}"
   codeql-java:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    timeout-minutes: 30
     container:
       image: maven:3-openjdk-17
     steps:
@@ -142,6 +206,7 @@ jobs:
   codeql-go:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    timeout-minutes: 30
     container: golang:1.20
     env:
       GO_CACHE: /go
@@ -174,6 +239,7 @@ jobs:
   codeql-python:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    timeout-minutes: 30
     container:
       image: quay.io/matihost/ansible:root
     steps:
@@ -203,6 +269,7 @@ jobs:
   ansible:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    timeout-minutes: 30
     container:
       image: quay.io/matihost/ansible:root
     steps:
@@ -219,6 +286,7 @@ jobs:
   rust:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    timeout-minutes: 30
     container:
       image: rust
     steps:
@@ -235,8 +303,9 @@ jobs:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
     if: ((inputs.runner || 'ubuntu-22.04') != 'ubuntu-22.04') && vars.GCP_PROJECT
+    timeout-minutes: 30
     container:
-      image: quay.io/matihost/gh-kaniko
+      image: quay.io/matihost/gh-java-kaniko
     steps:
     - name: Download sources
       uses: actions/cache/restore@v3
@@ -258,8 +327,9 @@ jobs:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
     if: vars.REGISTRY
+    timeout-minutes: 30
     container:
-      image: quay.io/matihost/gh-kaniko
+      image: quay.io/matihost/gh-java-kaniko
     steps:
     - name: Download sources
       uses: actions/cache/restore@v3
@@ -283,8 +353,9 @@ jobs:
   image-build-ghcr:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    timeout-minutes: 30
     container:
-      image: quay.io/matihost/gh-kaniko
+      image: quay.io/matihost/gh-java-kaniko
     steps:
     - name: Download sources
       uses: actions/cache/restore@v3
