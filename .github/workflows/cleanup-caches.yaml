@@ -2,13 +2,16 @@
 #
 # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#force-deleting-cache-entries
 # https://github.com/actions/cache/blob/main/tips-and-workarounds.md#force-deletion-of-caches-overriding-default-cache-eviction-policy
-name: Cleanup GitHub caches by a branch
+name: Cleanup GitHub caches
 on:
   pull_request:
     types:
       - closed
   workflow_dispatch:
-
+  schedule:
+    - cron: '27 20 * * *'
+env:
+  GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 jobs:
   cleanup:
     runs-on: ubuntu-latest
@@ -20,11 +23,32 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
-
-      - name: Cleanup
+      - name: Install prerequisites
         run: |
           gh extension install actions/gh-actions-cache
+      - name: Cleanup cache from non default branch
+        if: contains(fromJSON('["schedule", "workflow_dispatch"]'), github.event_name)
+        run: |
+          REPO=${{ github.repository }}
+          # Cannot use github.event.repository.default_branch variable
+          # as it does not work when when running schedule events via cron.
+          # when github.event_name == "schedule" the only element in github.event is schedule (the cron string that triggered the run).
 
+          DEFAULT_BRANCH="$(gh repo view --json defaultBranchRef --jq .defaultBranchRef.name)"
+
+          CACHES_TO_REMOVE="$(gh actions-cache list -R "${REPO}" --order asc -L 100 |grep -v "${DEFAULT_BRANCH}" | cut -f 1)"
+
+          ## Setting this to not fail the workflow while deleting cache keys.
+          set +e
+          echo "Deleting caches..."
+          for cacheKey in ${CACHES_TO_REMOVE}
+          do
+              gh actions-cache delete "${cacheKey}" -R "${REPO}" --confirm
+          done
+          echo "Done"
+      - name: Cleanup cache from closed pull request
+        if: github.event_name == 'pull_request'
+        run: |
           REPO=${{ github.repository }}
           BRANCH=refs/pull/${{ github.event.pull_request.number }}/merge
 
@@ -39,5 +63,3 @@ jobs:
               gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
           done
           echo "Done"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
