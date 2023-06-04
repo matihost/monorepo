@@ -1,14 +1,14 @@
 ---
 name: 'GCP'
 on:
-  push:
-    branches:
-    - master
-    - feature/*
-  pull_request:
-    branches:
-    - master
-    - feature/*
+  # push:
+  #   branches:
+  #   - master
+  #   - feature/*
+  # pull_request:
+  #   branches:
+  #   - master
+  #   - feature/*
   workflow_dispatch:
     inputs:
       runner:
