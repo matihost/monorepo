@@ -246,3 +246,7 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+
+# Ignore generated credentials from google-github-actions/auth
+gha-creds-*.json

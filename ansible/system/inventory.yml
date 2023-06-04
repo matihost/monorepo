@@ -690,7 +690,7 @@ all:
             [ "$(grep -c 'complete -C /usr/bin/terraform terraform' ~/.bashrc)" -ne 0 ] || terraform -install-autocomplete
             [ "$(grep -c 'plugin_cache_dir' ~/.terraformrc 2>/dev/null || echo 0)" -ne 0 ] || {
               mkdir -p ~/.terraform.d/plugins
-              echo 'plugin_cache_dir = "$HOME/.terraform.d/plugins"' >> ~/.terraformrc
+              echo -e 'plugin_cache_dir = "$HOME/.terraform.d/plugins"\nplugin_cache_may_break_dependency_lock_file = true' > ~/.terraformrc
             }
         - name: terraformer
           desc: |

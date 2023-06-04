@@ -120,7 +120,7 @@ jobs:
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
     timeout-minutes: 30
     container:
-      image: quay.io/matihost/gh-java-kaniko
+      image: quay.io/matihost/gh-gcp-java-kaniko
     steps:
     - name: Download java build sources
       uses: actions/cache/restore@v3
@@ -147,7 +147,7 @@ jobs:
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
     timeout-minutes: 30
     container:
-      image: quay.io/matihost/gh-java-kaniko
+      image: quay.io/matihost/gh-gcp-java-kaniko
     steps:
     - name: Download java build sources
       uses: actions/cache/restore@v3
@@ -305,7 +305,7 @@ jobs:
     if: ((inputs.runner || 'ubuntu-22.04') != 'ubuntu-22.04') && vars.GCP_PROJECT
     timeout-minutes: 30
     container:
-      image: quay.io/matihost/gh-java-kaniko
+      image: quay.io/matihost/gh-gcp-java-kaniko
     steps:
     - name: Download sources
       uses: actions/cache/restore@v3
@@ -329,7 +329,7 @@ jobs:
     if: vars.REGISTRY
     timeout-minutes: 30
     container:
-      image: quay.io/matihost/gh-java-kaniko
+      image: quay.io/matihost/gh-gcp-java-kaniko
     steps:
     - name: Download sources
       uses: actions/cache/restore@v3
@@ -355,7 +355,7 @@ jobs:
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
     timeout-minutes: 30
     container:
-      image: quay.io/matihost/gh-java-kaniko
+      image: quay.io/matihost/gh-gcp-java-kaniko
     steps:
     - name: Download sources
       uses: actions/cache/restore@v3

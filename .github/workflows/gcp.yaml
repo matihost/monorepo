@@ -1,0 +1,110 @@
+---
+name: 'GCP'
+on:
+  push:
+    branches:
+    - master
+    - feature/*
+  pull_request:
+    branches:
+    - master
+    - feature/*
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: 'Runner type'
+        required: true
+        default: 'ubuntu-22.04'
+        type: choice
+        options:
+        - ubuntu-22.04
+        - matihost
+      env:
+        description: 'Target environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+        - dev
+        - prod
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: gcp-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  IMAGE_TAG: "${{ github.ref == 'refs/heads/master' && 'latest' || github.sha }}"
+jobs:
+  gcp:
+    name: Run GCP related tasks
+    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    environment: ${{ inputs.env || 'dev' }}
+    timeout-minutes: 30
+    container:
+      image: quay.io/matihost/gh-gcp-java-kaniko
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    env:
+      GCP_PROJECT: "${{ vars.GCP_PROJECT }}"
+      # Artifact Registry docker repository
+      GAR_REPOSITORY: "${{ vars.GAR_REPOSITORY }}"
+      # Region of the Artifact Registry
+      GAR_LOCATION: "${{ vars.GAR_LOCATION }}"
+      GKE_CLUSTER: "${{ vars.GKE_CLUSTER }}"
+      GKE_LOCATION: "${{ vars.GKE_LOCATION }}"
+    steps:
+    # The credentials file is exported into $GITHUB_WORKSPACE, which makes it available to all future steps and filesystems (including Docker-based GitHub Actions).
+    # The file is automatically removed at the end of the job via a post action.
+    # In order to use exported credentials, the actions/checkout step has be present before calling auth.
+    # This is due to how GitHub Actions creates $GITHUB_WORKSPACE.
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Configure Workload Identity Federation and generate an access token.
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        token_format: 'access_token'
+        # Format: 'projects/137505059283/locations/global/workloadIdentityPools/gh-pool/providers/gh-pool-provider'
+        workload_identity_provider: "${{ secrets.GH_WORKLOAD_IDENTITY_PROVIDER}}"
+        # Format: 'gha-matihost-monorepo@matihack6.iam.gserviceaccount.com'
+        service_account: "${{ secrets.GH_GSA}}"
+
+    # Alternative option - authentication via credentials json
+    # - id: 'auth'
+    #   uses: 'google-github-actions/auth@v1'
+    #   with:
+    #     credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+    - name: Run gcloud command
+      run: |-
+        gcloud storage buckets list --format="json(name)"
+    - name: Docker configuration
+      env:
+        REGISTRY_ADDRESS: "${{ vars.GAR_LOCATION }}-docker.pkg.dev"
+        REGISTRY_USER: 'oauth2accesstoken'
+        REGISTRY_PASSWORD: "${{ steps.auth.outputs.access_token }}"
+      run: |-
+        mkdir -p /kaniko/.docker
+        echo "{\"auths\":{\"${{ env.REGISTRY_ADDRESS }}\":{\"username\":\"${{ env.REGISTRY_USER }}\",\"password\":\"${{ env.REGISTRY_PASSWORD }}\"}}}" > /kaniko/.docker/config.json
+    - name: Build
+      working-directory: k8s/images/ansible
+      run: |-
+        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure  --push-retry 2 - --skip-tls-verify --cache=true \
+          --destination="${GAR_LOCATION}-docker.pkg.dev/${GCP_PROJECT}/${GAR_REPOSITORY}/ansible:${{ env.IMAGE_TAG }}"
+    - name: Set up GKE credentials
+      uses: google-github-actions/get-gke-credentials@v1
+      if: ((inputs.runner || 'ubuntu-22.04') != 'ubuntu-22.04')
+      with:
+        cluster_name: ${{ env.GKE_CLUSTER }}
+        location: ${{ env.GKE_LOCATION }}
+        use_internal_ip: true
+    - name: Run kubectl
+      # when run on self-hosted runner within GCP network, otherwise cluster is not accessible from internet
+      # TODO consider add https://api.github.com/meta actions servers to authz GKE networks...
+      if: ((inputs.runner || 'ubuntu-22.04') != 'ubuntu-22.04')
+      run: |-
+        kubectl get svc -A

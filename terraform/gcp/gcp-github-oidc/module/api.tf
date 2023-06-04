@@ -1,5 +1,5 @@
 locals {
-  apis = ["secretmanager", "compute", "servicenetworking", "sts", ]
+  apis = ["iam", "cloudresourcemanager", "iamcredentials", "sts", ]
 }
 
 resource "google_project_service" "apis" {

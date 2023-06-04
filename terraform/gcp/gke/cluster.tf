@@ -4,7 +4,7 @@ data "google_container_engine_versions" "versions" {
   # run: gcloud container get-server-config
   # to see available versions
   location       = local.location
-  version_prefix = "1.26."
+  version_prefix = "1.27."
 
   project = var.project
 }
@@ -39,6 +39,7 @@ resource "google_container_cluster" "gke" {
     cluster_dns = "PLATFORM_DEFAULT"
     #  when cluster_dns is CloudDNS then dns scope can be set
     # cluster_dns_scope = "CLUSTER_SCOPE"
+    cluster_dns_scope = "DNS_SCOPE_UNSPECIFIED"
   }
 
   gateway_api_config {
@@ -162,6 +163,7 @@ resource "google_container_cluster" "gke" {
   }
 
   master_authorized_networks_config {
+    gcp_public_cidrs_access_enabled = false
     cidr_blocks {
       cidr_block   = data.google_compute_subnetwork.private-gke.ip_cidr_range
       display_name = "from GKE nodes subnetwork"
@@ -338,7 +340,7 @@ resource "google_container_node_pool" "gke_nodes" {
   cluster  = google_container_cluster.gke.name
   project  = var.project
 
-  node_count = 1
+  node_count = 2
 
   max_pods_per_node = 110
 
