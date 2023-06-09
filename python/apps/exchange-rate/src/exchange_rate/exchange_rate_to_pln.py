@@ -4,6 +4,7 @@ import json
 
 import xml.etree.ElementTree as ET
 import requests
+from exchange_rate.helpers.currency import validate_currency_code
 
 
 class ExchangeRateToPLN:  # pylint: disable=too-few-public-methods
@@ -23,11 +24,13 @@ class ExchangeRateToPLN:  # pylint: disable=too-few-public-methods
 
     def __get_rate_for_today(self, currency):
         """Get conversion rate for currency for today."""
+        currency = validate_currency_code(currency)
         rate = self.__nbp_rates_xml.find(self.__RATE_TO_PLN_XPATH.format(currency))
         return None if rate is None else rate.text
 
     def __get_rate_for_date(self, currency: str, convert_date: date):
         # TODO handle errors
+        currency = validate_currency_code(currency)
         response = requests.get(self.__NBP_API_URL.format(currency, convert_date.isoformat()),
                                 headers={'Accept': 'application/json'}, timeout=10).text
         response_json = json.loads(response)

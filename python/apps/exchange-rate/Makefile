@@ -6,7 +6,10 @@ dist: ## create distribution
 build: ## build
 	tox
 
-install: ensure-custom-user-venv ## install locally in editable mode
+develop: ensure-custom-user-venv ## install locally in editable mode, so that it can be debug locally
+	$(HOME)/.venv/user/bin/pip3 install -e .
+
+install: ensure-custom-user-venv ## install locally
 	$(HOME)/.venv/user/bin/pip3 install --force-reinstall .
 
 uninstall: ensure-custom-user-venv ## uninstall locally

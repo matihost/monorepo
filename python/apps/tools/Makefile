@@ -13,6 +13,9 @@ setup.py: init ## ensure setup.py exists and deps are locked with Pipfile.lock
 build: ## create distribution
 	python3 setup.py build
 
+develop: ensure-custom-user-venv ## install locally in editable mode, so that it can be debug locally
+	$(HOME)/.venv/user/bin/pip3 install -e .
+
 test: init ## run tests
 	@pipenv run pytest tests
 

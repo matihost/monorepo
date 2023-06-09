@@ -10,6 +10,7 @@ from waitress import serve
 from flask import Flask, jsonify, make_response
 
 from exchange_rate.helpers.version import package_version
+from exchange_rate.helpers.currency import validate_currency_code
 from exchange_rate.exchange_rate_to_pln import ExchangeRateToPLN
 
 
@@ -24,7 +25,8 @@ Central Bank (NBP) fixing exchange rate."
 @app.route("/exchanges/<currency>/<convert_date>")
 def exchanges(currency, convert_date):
     """Expose /exchanges GET endpoint."""
-    rate_to_pln = ExchangeRateToPLN().get_exchange_rate_to_pln(currency, date.fromisoformat(convert_date))
+    rate_to_pln = ExchangeRateToPLN().get_exchange_rate_to_pln(
+        validate_currency_code(currency), date.fromisoformat(convert_date))
     return jsonify({"currency": currency, "rate_to_pln": rate_to_pln, "date": convert_date})
 
 

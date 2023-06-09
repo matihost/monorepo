@@ -46,6 +46,7 @@ setup(
         "requests>=2.30.0, <3",
         "flask>=2.3.2, <3",
         "waitress>=2.1.2, <3",
+        "Babel>=2.12.1,<3",
     ],  # Optional
     dependency_links=[],
     entry_points={
