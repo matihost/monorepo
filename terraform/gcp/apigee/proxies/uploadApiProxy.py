@@ -140,23 +140,20 @@ body = None
 if Directory is not None:
     # Construct a ZIPped copy of the bundle in memory
     tf = io.BytesIO()
-    zipout = zipfile.ZipFile(tf, 'w')
-
-    dirList = os.walk(Directory)
-    for dirEntry in dirList:
-        if not pathContainsDot(dirEntry[0]):
-            for fileEntry in dirEntry[2]:
-                if not fileEntry.endswith('~'):
-                    fn = os.path.join(dirEntry[0], fileEntry)
-                    en = os.path.join(os.path.relpath(dirEntry[0], Directory), fileEntry)
-                    zipout.write(fn, en)
-
-    zipout.close()
+    with zipfile.ZipFile(tf, 'w') as zipout:
+        dirList = os.walk(Directory)
+        for dirEntry in dirList:
+            if not pathContainsDot(dirEntry[0]):
+                for fileEntry in dirEntry[2]:
+                    if not fileEntry.endswith('~'):
+                        fn = os.path.join(dirEntry[0], fileEntry)
+                        en = os.path.join(os.path.relpath(dirEntry[0], Directory), fileEntry)
+                        zipout.write(fn, en)
     body = tf.getvalue()
 elif ZipFile is not None:
-    f = open(ZipFile, 'r')
-    body = f.read()
-    f.close()
+    with open(ZipFile, 'r') as f:
+        body = f.read()
+
 
 # Upload the bundle to the API
 hdrs = {'Content-Type': 'application/octet-stream',

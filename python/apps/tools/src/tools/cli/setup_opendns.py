@@ -66,7 +66,7 @@ def ensure_ddclient_installed():
 
 def ensure_ddclient_config_setup(opendns_network_label, user, password):
     """Ensure ddclient configuration is present in the system."""
-    template = Template(read_file(relative_path(__file__, '..', 'files', 'ddclient.conf.j2')))
+    template = Template(read_file(relative_path(__file__, '..', 'files', 'ddclient.conf.j2')), autoescape=True)
     desired_config = template.render(opendns_network_label=opendns_network_label,
                                      user_email=user, password=password)
 

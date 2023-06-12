@@ -24,20 +24,20 @@ class ExchangeRateToPLN:  # pylint: disable=too-few-public-methods
 
     def __get_rate_for_today(self, currency):
         """Get conversion rate for currency for today."""
-        currency = validate_currency_code(currency)
         rate = self.__nbp_rates_xml.find(self.__RATE_TO_PLN_XPATH.format(currency))
         return None if rate is None else rate.text
 
     def __get_rate_for_date(self, currency: str, convert_date: date):
         # TODO handle errors
-        currency = validate_currency_code(currency)
-        response = requests.get(self.__NBP_API_URL.format(currency, convert_date.isoformat()),
+        iso_date = convert_date.isoformat()
+        response = requests.get(self.__NBP_API_URL.format(currency, iso_date),
                                 headers={'Accept': 'application/json'}, timeout=10).text
         response_json = json.loads(response)
         return str(response_json['rates'][0]['mid'])
 
     def get_exchange_rate_to_pln(self, currency='USD', convert_date: date = None):
         """Get convertion rate for currency."""
+        validated_currency = validate_currency_code(currency)
         if convert_date is None:
-            return self.__get_rate_for_today(currency)
-        return self.__get_rate_for_date(currency, convert_date)
+            return self.__get_rate_for_today(validated_currency)
+        return self.__get_rate_for_date(validated_currency, convert_date)

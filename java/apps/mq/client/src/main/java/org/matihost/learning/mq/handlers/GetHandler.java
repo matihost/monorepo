@@ -33,7 +33,7 @@ public class GetHandler implements Consumer<ApplicationArguments> {
       try {
         logger.info("Message {} has been received from: {}", message.getBody(String.class), connection.getQueueName());
       } catch (JMSException e) {
-        logger.error(String.format("Unable to convert message body to String from queue: %s"), e);
+        logger.error(String.format("Unable to convert message body to String from queue: %s", this.queue), e);
       }
     });
     // block application from shutdown

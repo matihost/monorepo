@@ -65,9 +65,9 @@ func main() {
 		}
 		conn, err = grpc.Dial(*address, grpc.WithTransportCredentials(credentials.NewTLS(config)))
 	}	else {
-		tc, err := credentials.NewClientTLSFromFile(*cert, "")
-		if err != nil {
-			log.Fatalf("Failed to generate credentials %v", err)
+		tc, tcErr := credentials.NewClientTLSFromFile(*cert, "")
+		if tcErr != nil {
+			log.Fatalf("Failed to generate credentials %v", tcErr)
 		}
 		conn, err = grpc.Dial(*address, grpc.WithTransportCredentials(tc))
 	}
