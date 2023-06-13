@@ -4,33 +4,35 @@ Various script to manage Minikube with "none" mode on Ubuntu.
 
 Tested environment:
 
-* Ubuntu 22.10
+* Ubuntu 23.04
 
-* CNI: Cilium v1.12.6
+* CNI: Cilium v1.13.3
 
-* Minikube 1.29.0 (and K8S 1.26.1)
+* Minikube 1.30.1 (and K8S 1.26.3)
 
 And CRI:
 
-* Docker 20.10.16 + cri-dockerd 0.3.1
+* Docker 20.10.21 + cri-dockerd 0.3.1
 
 Or
 
-* Containerd 1.6.4-0ubuntu1.1
+* Containerd 1.6.12-0ubuntu3
 
 Or
 
-* CRIO 1.26.1~0
+* CRIO 1.27.0
 
 Tested working configurations:
 
-* `./start-minikube.sh`  - starts Minikube wiht containerd with none driver
+* `./start-minikube.sh`  - starts Minikube with Docker with Cilium CNI driver
 
-* `./start-minikube.sh --with-containerd`
+* `./start-minikube.sh --with-docker --with-cillium`
 
-* `./start-minikube.sh --with-docker`
+Untested/not-working configurations:
 
-* `./start-minikube.sh --with-crio`
+* `./start-minikube.sh --with-containerd` - does not work
+
+* `./start-minikube.sh --with-crio` - not tested
 
 Samples:
 

@@ -34,8 +34,9 @@
       state: present
       workspace: "default"
       force_init: true
-      variables: "{{ gke | mandatory
-        | combine({'project': gcp_project}) }}"
+      init_reconfigure: true
+      provider_upgrade: true
+      variables: "{{ gke | combine({'project': gcp_project}) }}"
     when: gke_mode | default(false)
 
   - name: Ensure Jenkins helm dependencies are in place

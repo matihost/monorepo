@@ -34,9 +34,9 @@
     kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/monitoring.template.yaml') }}"
-      validate:
-        fail_on_error: true
-        strict: true
+      # validate:
+      #   fail_on_error: true
+      #   strict: true
     when:
     - gke_mode | default(false)
 
@@ -71,13 +71,14 @@
       definition: "{{ lookup('template', '{{ files }}/prerequisites.template.yaml') }}"
 
 
-  - name: Run Terraform to setup GCP prerequisites for Jenkins deployment
+  - name: Ensure Terraform GCP prerequisites for Jenkins are absent
     community.general.terraform:
       project_path: 'files/gke'
       workspace: "default"
       state: absent
       purge_workspace: true
       force_init: true
+      init_reconfigure: true
       variables: "{{ gke | mandatory
         | combine({'project': gcp_project}) }}"
     when: gke_mode | default(false)

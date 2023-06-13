@@ -9,6 +9,7 @@ constraintViolationsLimit: 20
 auditFromCache: true
 disableMutation: false
 disableValidatingWebhook: false
+validatingWebhookName: gatekeeper-validating-webhook-configuration
 validatingWebhookTimeoutSeconds: 3
 validatingWebhookFailurePolicy: Ignore
 validatingWebhookAnnotations: {}
@@ -21,6 +22,7 @@ enableExternalData: true
 enableGeneratorResourceExpansion: false
 enableTLSHealthcheck: false
 maxServingThreads: -1
+mutatingWebhookName: gatekeeper-mutating-webhook-configuration
 mutatingWebhookFailurePolicy: Ignore
 mutatingWebhookReinvocationPolicy: Never
 mutatingWebhookAnnotations: {}
@@ -35,7 +37,18 @@ logDenies: true
 logMutations: true
 emitAdmissionEvents: false
 emitAuditEvents: false
+admissionEventsInvolvedNamespace: false
+auditEventsInvolvedNamespace: false
 resourceQuota: true
+image:
+  repository: openpolicyagent/gatekeeper
+  crdRepository: openpolicyagent/gatekeeper-crds
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+preInstall:
+  crdRepository:
+    image:
+      repository: null
 postUpgrade:
   labelNamespace:
     enabled: false
@@ -50,6 +63,7 @@ postUpgrade:
       "pod-security.kubernetes.io/warn-version=latest",
       "pod-security.kubernetes.io/enforce=restricted",
       "pod-security.kubernetes.io/enforce-version=v1.24"]
+    extraAnnotations: {}
   affinity: {}
   tolerations: []
   nodeSelector: {kubernetes.io/os: linux}
@@ -78,6 +92,7 @@ postInstall:
       "pod-security.kubernetes.io/warn-version=latest",
       "pod-security.kubernetes.io/enforce=restricted",
       "pod-security.kubernetes.io/enforce-version=v1.24"]
+    extraAnnotations: {}
   probeWebhook:
     enabled: true
     image:
@@ -120,11 +135,6 @@ preUninstall:
     runAsGroup: 999
     runAsNonRoot: true
     runAsUser: 1000
-image:
-  repository: openpolicyagent/gatekeeper
-  crdRepository: openpolicyagent/gatekeeper-crds
-  pullPolicy: IfNotPresent
-  pullSecrets: []
 podAnnotations: {}
 podLabels: {}
 podCountLimit: "100"
@@ -180,6 +190,12 @@ controllerManager:
     supplementalGroups:
       - 999
   extraRules: []
+  networkPolicy:
+    enabled: false
+    ingress: { }
+      # - from:
+      #   - ipBlock:
+      #       cidr: 0.0.0.0/0
 audit:
   hostNetwork: false
   dnsPolicy: ClusterFirst

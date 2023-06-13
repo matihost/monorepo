@@ -4,7 +4,7 @@ all:
   vars:
     istio:
       hub: "gcr.io/istio-release"
-      version: "1.17.2"
+      version: "1.18.0"
       istiod:
         minReplicas: 1
         maxReplicas: 1

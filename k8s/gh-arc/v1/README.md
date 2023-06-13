@@ -26,6 +26,11 @@ ansible-galaxy collection install community.general
 
 * Helm
 
+```bash
+helm repo add actions-runner-controller https://actions-runner-controller.github.io/actions-runner-controller
+helm repo update
+```
+
 * For GKE: gcloud cli, terraform and GKE itself
 
 ## Running

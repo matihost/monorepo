@@ -10,7 +10,7 @@ function usage() {
 Starts Minikube in bare / none mode. Assumes latest Ubuntu.
 
 Minimum set of features enabled in every Minikube:
-- Container runtime selection (--with-containerd, --with-crio, --with-docker) - by default containerd is selected.
+- Container runtime selection (--with-containerd, --with-crio, --with-docker) - by default docker is selected along with --with-cilium.
 - Minikube Tunnel Loadbalancer along with Nginx Ingress
 - Nginx Ingress Class (--with-nginx) - installs Ngnix Ingress Class
 - Registry, Dashboard
@@ -27,6 +27,9 @@ Samples:
 # start default bare/none driver Minikube with containerd with CNI enablement (Cilium installed via Helm)
 $(basename "$0")
 
+# start Minikube with docker with CNI/Cilium enablement (Cilium installed via Minikube addon)
+$(basename "$0") --with-docker --with-cilium
+
 # start Minikube with docker
 $(basename "$0") --with-docker
 
@@ -35,9 +38,6 @@ $(basename "$0") --with-containerd --with-version latest
 
 # start with Crio as container engine
 $(basename "$0") --with-crio
-
-# start Minikube with docker with CNI/Cilium enablement (Cilium installed via Minikube addon)
-$(basename "$0") --with-docker --with-cilium
 
 # start with Crio as container engine with Istio
 $(basename "$0") --with-crio --with-gatekeeper
@@ -210,7 +210,7 @@ K8S_VERSION='stable'
 MODE='containerd'
 
 ADDONS="registry dashboard nginx volumesnapshots csi-hostpath-driver"
-EXTRA_PARAMS=''
+EXTRA_PARAMS='--cni=cilium'
 export ADMISSION_PLUGINS="NamespaceExists"
 
 while [[ "$#" -gt 0 ]]; do

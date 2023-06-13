@@ -1,3 +1,6 @@
+data "google_project" "current" {
+}
+
 resource "google_bigquery_dataset" "dataset" {
   dataset_id                  = "${replace(var.region, "-", "_")}_dataset"
   friendly_name               = "BigQuery dataset for ${var.region} analizys"

@@ -23,6 +23,8 @@
       state: present
       workspace: "default"
       force_init: true
+      init_reconfigure: true
+      provider_upgrade: true
       variables: "{{ options.gke|mandatory
         |combine({'project': gcp_project}) }}"
     when: options.gke_mode|default(false)

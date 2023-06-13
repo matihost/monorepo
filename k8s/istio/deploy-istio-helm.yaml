@@ -1,9 +1,7 @@
 ---
 - hosts: localhost
   become: false
-  collections:
-  - kubernetes.core
-  - community.general
+  name: Deploys Istio via Helm
   vars:
     files: "{{ playbook_dir }}/files"
     internal_wildcard_cn: "*.{{ ingress_gateway.default_dns_suffix }}"
@@ -20,14 +18,14 @@
 
 
   - name: Ensure istio-system namespace present
-    k8s:
+    kubernetes.core.k8s:
       name: istio-system
       api_version: v1
       kind: Namespace
       state: present
 
   - name: Ensure PodSecurityPolicy present for Istio CNI Daemon Set
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/psp.yaml.j2') }}"
       validate:
@@ -37,7 +35,7 @@
 
   - name: Ensure tcp:15017 is open on GKE nodes
     ansible.builtin.shell: |
-      FIREWALL_NAME=$(gcloud compute firewall-rules list --filter="name~'{{ options.gke.cluster_name | mandatory }}-.*-master'" --format="value(name)")
+      FIREWALL_NAME=$(gcloud compute firewall-rules list --filter="name~'{{ options.gke.cluster_name }}-.*-master'" --format="value(name)")
       [ -z "${FIREWALL_NAME}" ] && {
         echo "Missing cluster {{ options.gke.cluster_name }} master firewall rule"
         echo "Unable to open Istio CNI port to be accessed by masters"
@@ -46,21 +44,23 @@
       }
       gcloud compute firewall-rules update "${FIREWALL_NAME}" --allow tcp:10250,tcp:443,tcp:15017
     when: options.gke_mode | default(false)
+    changed_when: true
 
   - name: Run Terraform to setup GCP prerequisites for Istio deployment
-    terraform:
+    community.general.terraform:
       project_path: 'files/gke'
       state: present
       workspace: "default"
       force_init: true
-      variables: "{{ options.gke | mandatory
-        | combine({'project': gcp_project})
+      init_reconfigure: true
+      provider_upgrade: true
+      variables: "{{ options.gke | combine({'project': gcp_project})
         | combine({'enable_internal_ingress_node_pool': ingress_gateway.enable_node_selector | default(false) | string | lower})
         | combine({'enable_external_ingress_node_pool': enable_external_ingress_node_pool | string | lower}) }}"
     when: options.gke_mode | default(false)
 
   - name: Deploy {{ istio.version }} version of istio/base chart inside istio-system namespace
-    helm:
+    kubernetes.core.helm:
       name: "istio-base"
       chart_ref: istio/base
       chart_version: "{{ istio.version }}"
@@ -70,7 +70,7 @@
       values: "{{ lookup('template', '{{ files }}/istio-base-helm-values.yaml.j2') | from_yaml }}"
 
   - name: Deploy {{ istio.version }} version of istio/isiod chart inside istio-system namespace
-    helm:
+    kubernetes.core.helm:
       name: "istiod"
       chart_ref: istio/istiod
       chart_version: "{{ istio.version }}"
@@ -80,7 +80,7 @@
       values: "{{ lookup('template', '{{ files }}/istiod-helm-values.yaml.j2') | from_yaml }}"
 
   - name: Ensure istio-ingress namespace with istio-injection present
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition:
         apiVersion: v1
@@ -91,7 +91,7 @@
             istio-injection: enabled
 
   - name: Deploy {{ istio.version }} version of istio/gateway chart inside istio-ingress namespace
-    helm:
+    kubernetes.core.helm:
       name: "istio-ingressgateway"
       chart_ref: istio/gateway
       chart_version: "{{ istio.version }}"
@@ -101,7 +101,7 @@
       values: "{{ lookup('template', '{{ files }}/istio-ingress-helm-values.yaml.j2') | from_yaml }}"
 
   - name: Deploy {{ istio.version }} version of istio/cni chart inside istio-ingress namespace
-    helm:
+    kubernetes.core.helm:
       name: "istio-cni"
       chart_ref: istio/cni
       chart_version: "{{ istio.version }}"
@@ -109,10 +109,10 @@
       wait: true
       wait_timeout: "5m0s"
       values: "{{ lookup('template', '{{ files }}/istio-cni-helm-values.yaml.j2') | from_yaml }}"
-    when: options.gke_mode|default(cni.enable|default(true))
+    when: options.gke_mode | default(cni.enable | default(true))
 
   - name: Ensure Istio IngressClass present
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/ingress_class.yaml.j2') }}"
       validate:
@@ -121,6 +121,7 @@
 
 
   - name: Ensure CN={{ internal_wildcard_cn }} TLS is present
+    become: true
     block:
     - name: Ensure CN={{ internal_wildcard_cn }} TLS is present
       ansible.builtin.include_role:
@@ -129,9 +130,9 @@
         certificate_def:
           cn: "{{ internal_wildcard_cn }}"
           tls_name: wildcard.{{ ingress_gateway.default_dns_suffix }}
-    become: true
+
   - name: Ensure TLS Secret internal-wildcard-gateway-tls is present in namespace istio-ingress
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition:
         apiVersion: "v1"
@@ -146,7 +147,7 @@
     no_log: true
 
   - name: Ensure Istio internal ingress wildcard Gateway are exposed
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/internal_vs_config.yaml.j2') }}"
       validate:
@@ -172,7 +173,7 @@
   #   when: ingress_external_gateway.enable|default(false)
 
   # - name: Ensure TLS Secret for external global wildcard gateway is present in namespace istio-system
-  #   k8s:
+  #   kubernetes.core.k8s:
   #     state: present
   #     definition:
   #       apiVersion: "v1"
@@ -188,7 +189,7 @@
   #   when: ingress_external_gateway.enable|default(false)
 
   # - name: Ensure Istio external ingress wildcard Gateway are exposed
-  #   k8s:
+  #   kubernetes.core.k8s:
   #     state: present
   #     definition: "{{ lookup('template', '{{ files }}/external_config.yaml.j2') }}"
   #     validate:
@@ -205,7 +206,7 @@
     loop: "{{ ingress_gateway.virtual_services | default([]) }}"
 
   - name: Ensure Istio ClusterRoles present
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/roles.yaml.j2') }}"
       validate:
@@ -213,7 +214,7 @@
         strict: true
 
   - name: Ensure Prometheus PodMonitoring is setup for Istio
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/monitoring.yaml.j2') }}"
       validate:

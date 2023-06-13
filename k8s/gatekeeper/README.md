@@ -23,6 +23,11 @@ ansible-galaxy collection install community.general
 
 * Helm
 
+```bash
+helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
+helm repo update
+```
+
 * For GKE: gcloud cli, terraform and GKE itself
 
 ## Running

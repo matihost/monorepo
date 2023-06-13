@@ -22,9 +22,7 @@
     k8s:
       state: absent
       definition: "{{ lookup('template', '{{ files }}/monitoring.yaml.j2') }}"
-      validate:
-        fail_on_error: true
-        strict: true
+
     when:
     - options.gke_mode|default(false)
 
@@ -41,17 +39,11 @@
     k8s:
       state: absent
       definition: "{{ lookup('template', '{{ files }}/roles.yaml.j2') }}"
-      validate:
-        fail_on_error: true
-        strict: true
 
   - name: Ensure Istio internal ingress wildcard Gateway are exposed
     k8s:
       state: absent
       definition: "{{ lookup('template', '{{ files }}/internal_vs_config.yaml.j2') }}"
-      validate:
-        fail_on_error: true
-        strict: true
 
   - name: Ensure TLS Secret internal-wildcard-gateway-tls is absent in namespace istio-ingress
     k8s:
@@ -133,9 +125,6 @@
     k8s:
       state: absent
       definition: "{{ lookup('template', '{{ files }}/psp.yaml.j2') }}"
-      validate:
-        fail_on_error: true
-        strict: true
     when: lookup('pipe', 'kubectl version -o json | jq -r .serverVersion.minor') | int < 25
 
 
@@ -146,6 +135,8 @@
       workspace: "default"
       purge_workspace: true
       force_init: true
+      init_reconfigure: true
+      provider_upgrade: true
       variables: "{{ options.gke | mandatory
         | combine({'project': gcp_project})
         | combine({'enable_internal_ingress_node_pool': ingress_gateway.enable_node_selector | default(false) | string | lower})

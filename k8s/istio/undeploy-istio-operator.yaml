@@ -38,6 +38,10 @@
       project_path: 'files/gke/external-lb'
       state: absent
       workspace: "default"
+      purge_workspace: true
+      force_init: true
+      init_reconfigure: true
+      provider_upgrade: true
       variables: "{{ options.gke|mandatory
         |combine({'project': gcp_project})
         |combine({'enable_external_ingress_node_pool': enable_external_ingress_node_pool|string|lower})
@@ -86,6 +90,9 @@
       state: absent
       workspace: "default"
       purge_workspace: true
+      force_init: true
+      init_reconfigure: true
+      provider_upgrade: true
       variables: "{{ options.gke|mandatory
         |combine({'project': gcp_project})
         |combine({'enable_internal_ingress_node_pool': ingress_gateway.enable_node_selector|default(false)|string|lower})

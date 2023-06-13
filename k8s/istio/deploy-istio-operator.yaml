@@ -1,9 +1,7 @@
 ---
 - hosts: localhost
   become: false
-  collections:
-  - kubernetes.core
-  - community.general
+  name: Deploys Istio via Istio operator
   vars:
     files: "{{ playbook_dir }}/files"
     internal_wildcard_cn: "*.{{ ingress_gateway.default_dns_suffix }}"
@@ -23,6 +21,7 @@
     ansible.builtin.file:
       path: "{{ lookup('env', 'HOME') }}/.istio"
       state: directory
+      mode: "0775"
 
   - name: Check .istio/current exists
     ansible.builtin.stat:
@@ -36,23 +35,24 @@
       cd istio-*
       ln -s "$(pwd)" ../current
     when: not istio_installed.stat.exists
+    changed_when: true
 
   - name: Ensure istio-system namespace present
-    k8s:
+    kubernetes.core.k8s:
       name: istio-system
       api_version: v1
       kind: Namespace
       state: present
 
   - name: Ensure istio-egress namespace present
-    k8s:
+    kubernetes.core.k8s:
       name: istio-egress
       api_version: v1
       kind: Namespace
       state: present
 
   - name: Ensure istio-ingress namespace with istio-injection present
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition:
         apiVersion: v1
@@ -63,17 +63,17 @@
             istio-injection: enabled
 
   - name: Ensure PodSecurityPolicy present for Istio CNI Daemon Set
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/psp.yaml.j2') }}"
       validate:
         fail_on_error: true
         strict: true
-    when: lookup('pipe', 'kubectl version -o json | jq -r .serverVersion.minor')|int < 25
+    when: lookup('pipe', 'kubectl version -o json | jq -r .serverVersion.minor') | int < 25
 
   - name: Ensure tcp:15017 is open on GKE nodes
     ansible.builtin.shell: |
-      FIREWALL_NAME=$(gcloud compute firewall-rules list --filter="name~'{{ options.gke.cluster_name | mandatory }}-.*-master'" --format="value(name)")
+      FIREWALL_NAME=$(gcloud compute firewall-rules list --filter="name~'{{ options.gke.cluster_name }}-.*-master'" --format="value(name)")
       [ -z "${FIREWALL_NAME}" ] && {
         echo "Missing cluster {{ options.gke.cluster_name }} master firewall rule"
         echo "Unable to open Istio CNI port to be accessed by masters"
@@ -81,22 +81,25 @@
         exit 1
       }
       gcloud compute firewall-rules update "${FIREWALL_NAME}" --allow tcp:10250,tcp:443,tcp:15017
-    when: options.gke_mode|default(false)
+    when: options.gke_mode | default(false)
+    changed_when: true
+
 
   - name: Run Terraform to setup GCP prerequisites for Istio deployment
-    terraform:
+    community.general.terraform:
       project_path: 'files/gke'
       state: present
       workspace: "default"
       force_init: true
-      variables: "{{ options.gke | mandatory
-        | combine({'project': gcp_project})
+      init_reconfigure: true
+      provider_upgrade: true
+      variables: "{{ options.gke | combine({'project': gcp_project})
         | combine({'enable_internal_ingress_node_pool': ingress_gateway.enable_node_selector | default(false) | string | lower})
         | combine({'enable_external_ingress_node_pool': enable_external_ingress_node_pool | string | lower}) }}"
-    when: options.gke_mode|default(false)
+    when: options.gke_mode | default(false)
 
   - name: Deploy Istio Operator Helm chart
-    helm:
+    kubernetes.core.helm:
       name: "istio-operator"
       chart_ref: "{{ lookup('env', 'HOME') }}/.istio/current/manifests/charts/istio-operator"
       release_namespace: "istio-system"
@@ -109,7 +112,7 @@
 
 
   - name: Ensure Istio ControlPlane operator configured
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/istio_operator_control_plane.yaml.j2') }}"
       validate:
@@ -117,7 +120,7 @@
         strict: true
 
   - name: Ensure Istio IngressClass present
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/ingress_class.yaml.j2') }}"
       validate:
@@ -125,7 +128,7 @@
         strict: true
 
   - name: Ensure Istio ControlPlane operator reconciliating is finished
-    k8s_info:
+    kubernetes.core.k8s_info:
       api_version: install.istio.io/v1alpha1
       kind: IstioOperator
       name: istiocontrolplane
@@ -138,7 +141,7 @@
 
 
   - name: Get final ControlPlane operator status
-    k8s_info:
+    kubernetes.core.k8s_info:
       api_version: install.istio.io/v1alpha1
       kind: IstioOperator
       name: istiocontrolplane
@@ -153,6 +156,7 @@
     when: operator_status.resources[0].status.status != "HEALTHY"
 
   - name: Ensure CN={{ internal_wildcard_cn }} TLS is present
+    become: true
     block:
     - name: Ensure CN={{ internal_wildcard_cn }} TLS is present
       ansible.builtin.include_role:
@@ -161,9 +165,9 @@
         certificate_def:
           cn: "{{ internal_wildcard_cn }}"
           tls_name: wildcard.{{ ingress_gateway.default_dns_suffix }}
-    become: true
+
   - name: Ensure TLS Secret internal-wildcard-gateway-tls is present in namespace istio-ingress
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition:
         apiVersion: "v1"
@@ -178,7 +182,7 @@
     no_log: true
 
   - name: Ensure Istio internal ingress wildcard Gateway are exposed
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/internal_vs_config.yaml.j2') }}"
       validate:
@@ -192,6 +196,8 @@
     when: ingress_external_gateway.enable | default(false)
 
   - name: Ensure CN=* TLS is present
+    become: true
+    when: ingress_external_gateway.enable | default(false)
     block:
     - name: Ensure CN=* TLS is present
       ansible.builtin.include_role:
@@ -200,11 +206,9 @@
         certificate_def:
           cn: "*"
           tls_name: wildcard.global
-    become: true
-    when: ingress_external_gateway.enable|default(false)
 
   - name: Ensure TLS Secret for external global wildcard gateway is present in namespace istio-ingress
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition:
         apiVersion: "v1"
@@ -217,16 +221,16 @@
           tls.key: "{{ tls.key }}"
         type: kubernetes.io/tls
     no_log: true
-    when: ingress_external_gateway.enable|default(false)
+    when: ingress_external_gateway.enable | default(false)
 
   - name: Ensure Istio external ingress wildcard Gateway are exposed
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/external_config.yaml.j2') }}"
       validate:
         fail_on_error: true
         strict: true
-    when: ingress_external_gateway.enable|default(false)
+    when: ingress_external_gateway.enable | default(false)
 
   - name: Ensure VirtualServices are exposed
     ansible.builtin.include_role:
@@ -237,7 +241,7 @@
     loop: "{{ ingress_gateway.virtual_services | default([]) }}"
 
   - name: Ensure Istio ClusterRoles present
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/roles.yaml.j2') }}"
       validate:
@@ -245,7 +249,7 @@
         strict: true
 
   - name: Ensure Prometheus PodMonitoring is setup for Istio
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', '{{ files }}/monitoring.yaml.j2') }}"
       validate:
@@ -255,6 +259,8 @@
     - options.gke_mode|default(false)
 
   - name: Ensure CN={{ external_wildcard_cn }} TLS is present
+    become: true
+    when: ingress_external_gateway.enable | default(false)
     block:
     - name: Ensure CN={{ external_wildcard_cn }} TLS is present
       ansible.builtin.include_role:
@@ -263,17 +269,16 @@
         certificate_def:
           cn: "{{ external_wildcard_cn }}"
           tls_name: "{{ external_wildcard_name }}"
-    become: true
-    when: ingress_external_gateway.enable|default(false)
 
   - name: Run Terraform to setup External HTTPS LB for external Istio ingress gateway
-    terraform:
+    community.general.terraform:
       project_path: 'files/gke/external-lb'
       state: present
       workspace: "default"
       force_init: true
-      variables: "{{ options.gke | mandatory
-        | combine({'project': gcp_project})
+      init_reconfigure: true
+      provider_upgrade: true
+      variables: "{{ options.gke | combine({'project': gcp_project})
         | combine({'enable_external_ingress_node_pool': enable_external_ingress_node_pool | string | lower})
         | combine({'external_wildcard_cn': external_wildcard_cn | default(\"\")})
         | combine({'external_wildcard_name': external_wildcard_name | default(\"\")})

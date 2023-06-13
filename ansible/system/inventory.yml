@@ -478,7 +478,7 @@ all:
               helm repo add bitnami https://charts.bitnami.com/bitnami
               helm repo add jetstack https://charts.jetstack.io
               helm repo add istio https://istio-release.storage.googleapis.com/charts
-              helm repo add actions-runner-controller https://actions-runner-controller.github.io/actions-runner-controller
+              helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
               helm repo update
               [ "$(helm plugin list |grep -c diff)" -eq 1 ] || {
                 helm plugin install https://github.com/databus23/helm-diff
