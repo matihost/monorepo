@@ -207,7 +207,7 @@ spec:
 
 ensureMinikubePresent
 K8S_VERSION='stable'
-MODE='containerd'
+MODE='docker'
 
 ADDONS="registry dashboard nginx volumesnapshots csi-hostpath-driver"
 EXTRA_PARAMS='--cni=cilium'

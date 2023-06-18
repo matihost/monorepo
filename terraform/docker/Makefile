@@ -1,17 +1,36 @@
-apply: ## run Ngnix on host port 8000
-	terraform init -upgrade=true && \
-	terraform validate && \
-	terraform plan && \
-	terraform apply -auto-approve
+.EXPORT_ALL_VARIABLES:
 
-test: ## checl whether Nginx is working
+DEBUG := false
+ifeq ($(strip $(DEBUG)),true)
+	TF_LOG := DEBUG
+endif
+
+MODE := apply
+ifeq ($(strip $(MODE)),apply)
+	MODE_STR := apply -auto-approve
+else ifeq ($(strip $(MODE)),destroy)
+	MODE_STR := destroy -auto-approve
+else
+	MODE_STR := plan
+endif
+
+init-terraform:
+	terraform init -upgrade=true
+
+
+*.tfvars: init-terraform ## usage: make nginx.tfvars [MODE=apply] [DEBUG=false]
+	terraform $(MODE_STR) -state=state/$(subst .tfvars,,$@).tfstate \
+	-var-file=$@
+
+test: ## check whether Nginx is working
 	@[ "$(shell curl -s http://localhost:8000 | grep -c nginx)" -gt 0 ] && echo OK || echo FAILED
 
-destroy: ## destroy Docker instance
-	terraform plan && terraform destroy -auto-approve
+clean: ## clean Terraform cached plugins and data
+	rm -rf .terraform* *.tfstate* state
+
 
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help apply destroy
+.PHONY: help init-terraform *.tfvars
