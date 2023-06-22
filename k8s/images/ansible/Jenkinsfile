@@ -86,7 +86,7 @@ spec:
               dir("k8s/images/ansible"){
                 echo "Building ${pwd()}..."
                 sh """
-                /kaniko/executor -f ${pwd()}/Dockerfile -c ${pwd()} --insecure --skip-tls-verify --cache=true --destination=gcr.io/${env.GCP_PROJECT}/ansible:latest
+                /kaniko/executor -f ${pwd()}/Dockerfile -c ${pwd()} --insecure --skip-tls-verify --cache=true --ignore-path=/var/mail --ignore-path=/var/spool/mail --destination=gcr.io/${env.GCP_PROJECT}/ansible:latest
                 """
               }
             }

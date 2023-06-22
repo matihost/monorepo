@@ -290,9 +290,9 @@ all:
           become: false
           command: |
             [ "$(grep -c HISTTIMEFORMAT ~/.bashrc)" -gt 0 ] || {
-              sed -E "s/^HISTCONTROL=.+$/HISTCONTROL=ignoreboth:erasedups/" ~/.bashrc
-              sed -E "s/^HISTSIZE=.+$/HISTSIZE=-1/" ~/.bashrc
-              sed -E "s/^HISTFILESIZE=.+$/HISTFILESIZE=-1/" ~/.bashrc
+              sed -i -E "s/^HISTCONTROL=.+$/HISTCONTROL=ignoreboth:erasedups/" ~/.bashrc
+              sed -i -E "s/^HISTSIZE=.+$/HISTSIZE=-1/" ~/.bashrc
+              sed -i -E "s/^HISTFILESIZE=.+$/HISTFILESIZE=-1/" ~/.bashrc
               echo 'HISTTIMEFORMAT="[%F %T] "' >> ~/.bashrc
               echo "Bash history configured"
             }

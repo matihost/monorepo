@@ -1,3 +1,5 @@
+FROM alpine as certs
+RUN apk --update add ca-certificates
 FROM gcr.io/kaniko-project/executor:debug as kaniko
 FROM ubuntu:22.04
 ARG JAVA_VERSION=17
@@ -9,6 +11,7 @@ RUN apt -y update && apt -y install curl wget lsb-release gnupg apt-transport-ht
   && apt -y update && apt -y install terraform google-cloud-cli kubectl google-cloud-cli-kubectl-oidc google-cloud-cli-gke-gcloud-auth-plugin \
   && rm -rf /var/lib/apt/lists/*
 COPY --from=kaniko /kaniko /kaniko
+COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 ENV PATH="/kaniko:${PATH}"
 ENV DOCKER_CONFIG=/kaniko/.docker/
 ENV DOCKER_CREDENTIAL_GCR_CONFIG=/kaniko/.config/gcloud/docker_credential_gcr_config.json

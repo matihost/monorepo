@@ -321,7 +321,8 @@ jobs:
         GCP_PROJECT: "${{ vars.GCP_PROJECT }}"
         GIT_COMMIT_HASH: "${{ needs.sources.outputs.GIT_COMMIT_HASH }}"
       run: |
-        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure --skip-tls-verify --cache=true \
+        # remove ignore-path when fixed https://github.com/GoogleContainerTools/kaniko/issues/2214
+        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure --skip-tls-verify --cache=true --ignore-path=/var/mail --ignore-path=/var/spool/mail \
           --destination="gcr.io/${{ env.GCP_PROJECT }}/ansible:${{ env.GIT_COMMIT_HASH }}"
   image-build-generic-registry:
     needs: sources
@@ -348,7 +349,7 @@ jobs:
       run: |
         mkdir -p /kaniko/.docker
         echo "{\"auths\":{\"${{ env.REGISTRY }}\":{\"username\":\"${{ env.REGISTRY_USER }}\",\"password\":\"${{ env.REGISTRY_PASSWORD }}\"}}}" > /kaniko/.docker/config.json
-        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure  --push-retry 2 - --skip-tls-verify --cache=true \
+        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure  --push-retry 2 - --skip-tls-verify --cache=true --ignore-path=/var/mail --ignore-path=/var/spool/mail \
           --destination="${{ env.REGISTRY }}/matihost/ansible:${{ env.IMAGE_TAG }}"
   image-build-ghcr:
     needs: sources
@@ -376,5 +377,5 @@ jobs:
         /kaniko/executor -c "$(pwd)" \
           -f ./Dockerfile \
           --destination="ghcr.io/${{ github.repository }}/ansible:${{ env.IMAGE_TAG }}" \
-          --insecure --skip-tls-verify --cache=true \
+          --insecure --skip-tls-verify --cache=true --ignore-path=/var/mail --ignore-path=/var/spool/mail \
           --push-retry 2
