@@ -19,7 +19,7 @@ all:
           virtualbox_ubuntu_version: "jammy"
           # TODO change to {{ ansible_distribution_release }} when lunar/23.04 is supported Ubuntu
           cri_dockerd_ubuntu_version: "jammy"
-          mq: 9.3.2.0
+          mq: 9.3.3.0
           # TODO change to {{ ansible_distribution_version }} when lunar/23.04 is supported Ubuntu
           onedrive_ubuntu_version: "22.10"
         virtual_interface_ip: 192.168.10.1
@@ -712,7 +712,7 @@ all:
             }
         - name: terragrunt
           become: true
-          desc: Ensure latest version of Terragrnt is installed
+          desc: Ensure latest version of Terragrunt is installed
           command: |
             CURRENT_VERSION="$(curl -sL https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r ".tag_name")"
             INSTALLED_VERSION="$(terragrunt --version 2>/dev/null | sed -E 's/.* version (.*)/\1/g')"
@@ -721,7 +721,7 @@ all:
                 select(.name | test(\"linux_amd64\")) | .browser_download_url" |
                   xargs curl -s -L -o "/usr/local/bin/terragrunt"
               chmod a+x /usr/local/bin/terragrunt
-              echo "Terragrun has been installed"
+              echo "Terragrunt has been installed"
             }
         - name: ibm-mq-client
           desc: |
@@ -736,6 +736,7 @@ all:
           become: true
           command: |
             # TODO consider full server version
+            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/9.3.3.0-IBM-MQ-Advanced-for-Developers-UbuntuLinuxX64.tar.gz
             # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/mqadv_dev932_ubuntu_x86-64.tar.gz
             # TODO add detect a new version
             [ -e /opt/mqm ] || {

@@ -13,7 +13,6 @@ open module org.matihost.learning.apps.commandline.test {
   requires transitive org.junit.jupiter.api;
   requires transitive org.junit.jupiter.params;
 
-  requires org.mockito;
   requires org.mockito.junit.jupiter;
 
   requires transitive org.assertj.core;

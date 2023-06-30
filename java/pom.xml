@@ -41,7 +41,7 @@
     <maven.test.skip>false</maven.test.skip>
 
     <!-- Spring Boot -->
-    <spring.boot.version>3.1.0</spring.boot.version>
+    <spring.boot.version>3.1.1</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -55,15 +55,15 @@
 
     <!-- Scala 3-->
     <scala.compat.version>3</scala.compat.version>
-    <scala.version>${scala.compat.version}.2.2</scala.version>
+    <scala.version>${scala.compat.version}.3.0</scala.version>
     <scala.spec2.version>5.2.0</scala.spec2.version>
-    <scala.test.version>3.2.15</scala.test.version>
-    <scala.test.plus.version>3.2.15.0</scala.test.plus.version>
+    <scala.test.version>3.2.16</scala.test.version>
+    <scala.test.plus.version>3.2.16.0</scala.test.plus.version>
     <!-- Scala 3 still depends on Scala 2 for backward compatibility -->
-    <scala2.version>2.13.10</scala2.version>
+    <scala2.version>2.13.11</scala2.version>
 
     <!-- IBM MQ client -->
-    <mq.version>9.3.2.1</mq.version>
+    <mq.version>9.3.3.0</mq.version>
   </properties>
 
   <profiles>
@@ -264,7 +264,7 @@
         <plugin>
           <groupId>org.codehaus.gmavenplus</groupId>
           <artifactId>gmavenplus-plugin</artifactId>
-          <version>2.1.0</version>
+          <version>3.0.0</version>
           <executions>
             <execution>
               <goals>
@@ -369,14 +369,20 @@
             </execution>
           </executions>
           <configuration>
-            <!--
-            org.yaml:snakeyaml:jar:1.33
-            [CVE-2022-1471] CWE-502: Deserialization of Untrusted Data (9.8);
-            https://ossindex.sonatype.org/vulnerability/CVE-2022-1471?component-type=maven&component-name=org.yaml%2Fsnakeyaml&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-            https://ossindex.sonatype.org/component/pkg:maven/org.yaml/snakeyaml@1.33?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-            -->
             <excludeVulnerabilityIds>
+              <!--
+              org.yaml:snakeyaml:jar:1.33
+              [CVE-2022-1471] CWE-502: Deserialization of Untrusted Data (9.8);
+              https://ossindex.sonatype.org/vulnerability/CVE-2022-1471?component-type=maven&component-name=org.yaml%2Fsnakeyaml&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+              https://ossindex.sonatype.org/component/pkg:maven/org.yaml/snakeyaml@1.33?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+              -->
               <exclude>CVE-2022-1471</exclude>
+              <!--
+              org.bouncycastle:bcprov-jdk15to18:jar:1.72:compile;
+              https://ossindex.sonatype.org/component/pkg:maven/org.bouncycastle/bcprov-jdk15to18@1.72?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+              [CVE-2023-33201] CWE-200: Information Exposure (6.5); https://ossindex.sonatype.org/vulnerability/CVE-2023-33201?component-type=maven&component-name=org.bouncycastle%2Fbcprov-jdk15to18&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+              -->
+              <exclude>CVE-2023-33201</exclude>
             </excludeVulnerabilityIds>
             <reportFile>${project.build.directory}/audit-report.json</reportFile>
           </configuration>

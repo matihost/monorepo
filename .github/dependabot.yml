@@ -4,7 +4,7 @@ updates:
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
   - package-ecosystem: "github-actions"
     # To scan workflow files stored in the
     # default location of `.github/workflows` provider directory: /
@@ -14,12 +14,12 @@ updates:
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
