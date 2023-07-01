@@ -108,7 +108,6 @@ jobs:
         name: app-jars
         path: java/apps/**/target/*.jar
         retention-days: 2
-        enableCrossOsArchive: true
     - name: Cache java build sources
       uses: actions/cache/save@v3
       with:

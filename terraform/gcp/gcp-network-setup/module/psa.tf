@@ -11,12 +11,12 @@
 # If this allocation exists, Google services use the existing one instead of creating another one.
 
 resource "google_compute_global_address" "psa-peering-range" {
-  name          = "google-managed-services-${google_compute_network.private.name}"
+  name          = "google-managed-services-${google_compute_network.vpc.name}"
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
-  prefix_length = 16
-  network       = google_compute_network.private.id
-  address       = "10.9.0.0"
+  prefix_length = substr(var.psa_peering_cidr_range, length(var.psa_peering_cidr_range) - 2, 2)
+  network       = google_compute_network.vpc.id
+  address       = substr(var.psa_peering_cidr_range, 0, length(var.psa_peering_cidr_range) - 3)
 }
 
 
@@ -32,7 +32,7 @@ resource "google_compute_global_address" "psa-peering-range" {
 # TODO enable exporting custom routes update on servicenetworking-googleapis-com perring
 # to achieve https://cloud.google.com/vpc/docs/configure-private-services-access#on-prem
 resource "google_service_networking_connection" "servicenetworking-vpc-connection" {
-  network                 = google_compute_network.private.id
+  network                 = google_compute_network.vpc.id
   service                 = "servicenetworking.googleapis.com"
   reserved_peering_ranges = [google_compute_global_address.psa-peering-range.name]
 

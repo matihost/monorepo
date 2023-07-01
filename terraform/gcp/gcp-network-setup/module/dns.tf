@@ -5,16 +5,16 @@ resource "google_dns_managed_zone" "main-zone" {
   force_destroy = true
 
   name        = var.env
-  dns_name    = "${var.env}.gcp.testing."
+  dns_name    = "${var.env}.${var.dns_suffix}"
   description = "Main private DNS zone"
   labels = {
-    owner = "private-vpc"
+    owner = google_compute_network.vpc.name
   }
 
   visibility = "private"
   private_visibility_config {
     networks {
-      network_url = google_compute_network.private.id
+      network_url = google_compute_network.vpc.id
     }
     networks {
       network_url = data.google_compute_network.default.id
@@ -26,7 +26,7 @@ resource "google_dns_managed_zone" "main-zone" {
 # so that peered networks forward DNS queries of dns_suffix to this network Cloud DNS
 resource "google_service_networking_peered_dns_domain" "name" {
   name       = var.env
-  network    = google_compute_network.private.name
+  network    = google_compute_network.vpc.name
   dns_suffix = google_dns_managed_zone.main-zone.dns_name
   service    = "servicenetworking.googleapis.com"
 }
@@ -49,7 +49,7 @@ resource "google_dns_policy" "allow-inbound-query-forwarding" {
   enable_logging = false
 
   networks {
-    network_url = google_compute_network.private.id
+    network_url = google_compute_network.vpc.id
   }
   networks {
     network_url = data.google_compute_network.default.id

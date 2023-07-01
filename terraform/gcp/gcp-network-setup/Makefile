@@ -14,11 +14,15 @@ else
 	MODE_STR := plan
 endif
 
-init-terraform:
-	cd stage/dev &&  terragrunt init -upgrade=true
 
-run: init-terraform ## setup VPC: make run [MODE=apply]
-	@cd stage/dev && terragrunt validate && terragrunt $(MODE_STR)
+ENV := dev
+
+init-terraform:
+	cd stage/$(ENV) && terragrunt init -upgrade=true
+
+
+run: init-terraform ## setup VPC: make run [ENV=dev] [MODE=apply]
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
 
 ssh: ## ssh to VPC bastion host
 	eval $(shell cd stage/dev && terragrunt output bastion_instance_ssh_cmd)
@@ -28,7 +32,7 @@ list-dns-resolvers: # list inbound CloudDNS resolvers
 	gcloud compute addresses list --filter='purpose = "DNS_RESOLVER"' --format='csv(address, region, subnetwork)'
 
 show-state: ## show terraform.state
-	cd stage/dev && terraform state list && terraform show
+	cd stage/$(ENV) && terragrunt state list && terragrunt show
 
 google-authentication: ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init

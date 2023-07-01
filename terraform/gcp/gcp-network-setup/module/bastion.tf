@@ -1,19 +1,7 @@
-// Allow access to the Bastion Host via SSH
-
-locals {
-  vpc-apis = ["compute", "dns"]
-}
-
-resource "google_project_service" "vpc-apis" {
-  count              = length(local.vpc-apis)
-  service            = "${local.vpc-apis[count.index]}.googleapis.com"
-  disable_on_destroy = false
-}
-
 # allows to SSH to bastion via IAP
 resource "google_compute_firewall" "bastion-ssh" {
-  name      = "${google_compute_network.private.name}-bastion-ssh"
-  network   = google_compute_network.private.name
+  name      = "${google_compute_network.vpc.name}-bastion-ssh"
+  network   = google_compute_network.vpc.name
   direction = "INGRESS"
   project   = var.project
   # represents adresses used for IAP
@@ -29,9 +17,9 @@ resource "google_compute_firewall" "bastion-ssh" {
 
 // A single Compute Engine instance
 resource "google_compute_instance" "bastion" {
-  name         = "${google_compute_network.private.name}-bastion"
+  name         = "${google_compute_network.vpc.name}-bastion"
   machine_type = "e2-micro"
-  zone         = local.zones[0]
+  zone         = var.zone
 
   boot_disk {
     initialize_params {
@@ -60,7 +48,7 @@ resource "google_compute_instance" "bastion" {
   }
 
   network_interface {
-    subnetwork = google_compute_subnetwork.private1.name
+    subnetwork = google_compute_subnetwork.subnet[var.region].name
 
     # Do not add public IP, connect only via gcloud compute ssh --tunnel-through-iap
     # access_config {
@@ -85,7 +73,7 @@ resource "google_compute_instance" "bastion" {
 
 // Dedicated service account for the Bastion instance
 resource "google_service_account" "bastion" {
-  account_id   = "${google_compute_network.private.name}-bastion-sa"
+  account_id   = "${google_compute_network.vpc.name}-bastion-sa"
   display_name = "Service account for bastion instance"
 }
 
