@@ -15,6 +15,8 @@ Setup minimal IAM resources:
 
 * Group : _IamAdmin_ - group allowing IAM modification, user and policies management, access to account billing information and tools.
 
+* Group : _User_ - group with basic user privileges and allowing to assume any roles
+
 * Roles and Instance Profiles:
 
 ** _s3all_ and _s3readers_ - to access S3 from EC2
@@ -26,27 +28,42 @@ Users management is not part of this setup.
 
 ** _ami-builder_ - role used to create AMI by Packer. LimitedAdmin group is able to assume this role.
 
+** _Admin_ and _ReadOnly_ roles - so that IAM users can assume these roles
+
 ## Prerequisites
 
 * Latest Terraform installed
 * [AWS CLI v2](https://github.com/aws/aws-cli/tree/v2)
-* Recommended [awsp](https://github.com/antonbabenko/awsp) to easily switch aws profiles.
+* Recommended [awsp](https://github.com/antonbabenko/awsp) or [awsume](https://awsu.me/) to easily switch aws profiles.
 
 * AWS Account. AWS FreeTier Account is ok.
 
 * Logged to AWS Account allowing to modify IAM.
 
-  On fresh AWS root acccount it is recommeded to first create: IAM user and attach directly AdministratorAccess policy.
+  * On fresh AWS root account it is recommended to first create: IAM user (for example `admin`), attach directly AdministratorAccess policy, create secrets keys and configure AWS:
 
-  Then run this terraform script.
+  ```bash
+  aws configure --profile admin@my-free-tier
+  awsume -l
+  awsume admin@my-free-tier
+  ```
+
+  * Then run this terraform script:
+
+  ```bash
+  make run MODE=plan
+  # agree on bucket creation
+  # if Terraform plan looks ok, run:
+  make run MODE=apply
+  ```
 
   After running this terraform - remove the user and its AdministratorAccess attachment and:
 
-  * create IAM User and assign it to LimitedAdmin group and relogin to it with `aws configure`.
-  * create AWS profile assuming particular role, for example run `./configure-assume-role.sh ami-builder` to
-  create AWS CLI profile assuming `ami-builder`
+  * create IAM User and assign it to `User` group and relogin to it with `aws configure --profile myuser@myfreetier`.
+  * create AWS profile assuming particular role, for example run `./configure-assume-role.sh ReadOnly` to
+  create AWS CLI profile assuming `ReadOnly`
 
-  * create another IAM User and assign it to IamAdmin group create AWS CLI profile with it `aws configure --profile iam`. Next run of this terraform script can run on user belonging to IAMAdmin group (aka do `awsp iam` to switch to this user before running `make apply`)
+  * create another IAM User and assign it to IamAdmin group create AWS CLI profile with it `aws configure --profile iam`. Next run of this terraform script can run on user belonging to IAMAdmin group (aka do `awsp iam` to switch to this user before running `make run`)
 
   * (Optionally) The root AWS account has to follow [this procedure](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_billing.html?icmpid=docs_iam_console#tutorial-billing-step1) to enable billing access to IAM users.
 
@@ -57,18 +74,13 @@ Users management is not part of this setup.
 aws configure --profile iam
 
 # or to switch to in case you already login
-awsp iam
+awsume iam
 awswhoami
 
 # creates AWS CLI profile which assume role
 ./configure-assume-role.sh ami-builder
-awsp ami-builder
+awsume ami-builder
 
 # setup IAM resources
-make apply
-
-# show Terraform state along with current EC2 instance user_date startup script
-make show-state
-
-# make destroy task is commented out for safety
+make run MODE=apply
 ```

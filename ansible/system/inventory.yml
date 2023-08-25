@@ -224,6 +224,7 @@ all:
         - kubernetes-validate
         - "molecule[lint]"
         - "molecule[docker]"
+        - awsume
         clis:
         - name: virtual-network-interface
           desc: To ensure there is a virtual interface with stable IP
@@ -797,9 +798,9 @@ all:
           become: true
           desc: To install awscli2
           command: |
-            # TODO compare current vesion with latest tag from github
-            CURRENT_VERSION="$(git ls-remote -t https://github.com/aws/aws-cli.git | grep -v '{}'|cut -d'/' -f3 |sort -n |tail -n 1)"
-            [ -e /usr/local/bin/aws ] || {
+            CURRENT_VERSION="$(git ls-remote -t https://github.com/aws/aws-cli.git | grep -v '{}'|cut -d'/' -f3 | sort -t. -k1,1n -k2,2n -k3,3n |tail -n 1)"
+            INSTALLED_VERSION="$(aws --version  |cut -d'/' -f2 |cut -d' ' -f1)"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               rm -rf /tmp/awscli-installer && mkdir -p /tmp/awscli-installer && cd /tmp/awscli-installer
               curl -sSLO "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
               unzip awscli-exe-linux-x86_64.zip
@@ -828,6 +829,15 @@ all:
               cd ~/bin && curl -sSLO https://raw.githubusercontent.com/antonbabenko/awsp/master/awsp_functions.sh && chmod u+x awsp_functions.sh
               echo "${AWSP_BASHRC}" >> ~/.bashrc
               echo "AWSP Installed"
+            }
+        - name: awsume
+          desc: |
+            Ensure AWS config is present: https://awsu.me/general/aws-file-configuration.html
+          become: false
+          command: |
+            AWSSUME_BASHRC='alias awsume=". awsume"'
+            [ "$(grep -c 'awsume' ~/.bashrc)" -gt 0 ] || {
+              echo "${AWSSUME_BASHRC}" >> ~/.bashrc
             }
         - name: chrome unsafe link
           become: false
