@@ -78,7 +78,7 @@ data "aws_ami" "image" {
 
 resource "aws_instance" "vm" {
   ami                    = data.aws_ami.image.id
-  instance_type          = "t2.micro"
+  instance_type          = "t4g.small"
   key_name               = aws_key_pair.vm_key.key_name
   vpc_security_group_ids = [aws_security_group.private_access.id]
   iam_instance_profile   = var.instance_profile

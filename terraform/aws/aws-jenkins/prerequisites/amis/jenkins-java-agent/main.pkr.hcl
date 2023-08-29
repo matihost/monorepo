@@ -15,7 +15,7 @@ locals {
 
 source "amazon-ebs" "main" {
   ami_name      = "${local.ami_name}"
-  instance_type = "t2.micro"
+  instance_type = "t4g.small"
   region        = "${var.region}"
   source_ami_filter {
     filters = {

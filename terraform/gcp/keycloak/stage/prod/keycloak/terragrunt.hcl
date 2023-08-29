@@ -2,7 +2,7 @@ locals {
   project = "${run_cmd("--terragrunt-quiet", "gcloud", "config", "get-value", "project")}"
   cn = "id.matihost.mooo.com"
   tls_crt = "${run_cmd("--terragrunt-quiet", find_in_parent_folders("create-selfsigned-tls.sh") , local.cn )}"
-  tls_key = file(find_in_parent_folders("target/tls.key"))
+  tls_key = file(find_in_parent_folders("target/${local.cn}.key"))
 }
 
 # include does not import locals...

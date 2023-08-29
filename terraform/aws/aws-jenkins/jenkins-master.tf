@@ -127,7 +127,7 @@ resource "aws_launch_template" "jenkins" {
 
   image_id = data.aws_ami.master.id
 
-  instance_type = "t2.micro"
+  instance_type = "t4g.small"
 
   key_name = aws_key_pair.jenkins_key.key_name
 
