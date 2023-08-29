@@ -35,6 +35,11 @@ variable "url" {
   description = "Full URL under which site is visible"
 }
 
+variable "welcome_page" {
+  type        = string
+  description = "Redirect to this page instead of showing typical KeyCloak welcome page, usually a page to admin own user account in realm"
+}
+
 variable "tls_key" {
   type        = string
   description = "TLS Key for url site"

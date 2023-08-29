@@ -2,7 +2,7 @@ locals {
   project = "${run_cmd("--terragrunt-quiet", "gcloud", "config", "get-value", "project")}"
   cn = "id.matihost.dev.mooo.com"
   tls_crt = "${run_cmd("--terragrunt-quiet", find_in_parent_folders("create-selfsigned-tls.sh") , local.cn )}"
-  tls_key = file(find_in_parent_folders("target/tls.key"))
+  tls_key = file(find_in_parent_folders("target/${local.cn}.key"))
 }
 
 # include does not import locals...
@@ -20,6 +20,7 @@ inputs = {
   ha = false
   name = "idp"
   url = "https://${local.cn}"
+  welcome_page = "/realms/id/account/#/"
   tls_key = local.tls_key
   tls_crt = local.tls_crt
   instances = [

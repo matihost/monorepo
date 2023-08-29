@@ -39,8 +39,30 @@ resource "google_compute_ssl_certificate" "keycloak" {
 
 resource "google_compute_url_map" "keycloak" {
   default_service = google_compute_backend_service.keycloak.self_link
-  name            = local.name
-  project         = var.project
+
+  host_rule {
+    hosts        = ["*"]
+    path_matcher = "path-matcher-1"
+  }
+
+  path_matcher {
+    name            = "path-matcher-1"
+    default_service = google_compute_backend_service.keycloak.self_link
+    route_rules {
+      match_rules {
+        full_path_match = "/"
+      }
+      priority = 1
+      url_redirect {
+        path_redirect          = var.welcome_page
+        redirect_response_code = "MOVED_PERMANENTLY_DEFAULT"
+        strip_query            = true
+      }
+    }
+  }
+
+  name    = local.name
+  project = var.project
 }
 
 

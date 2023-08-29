@@ -20,6 +20,7 @@ inputs = {
   ha = false
   name = "idp"
   url = "https://${local.cn}"
+  welcome_page = "/realms/id/account/#/"
   tls_key = local.tls_key
   tls_crt = local.tls_crt
   instances = [
