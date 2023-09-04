@@ -45,7 +45,7 @@ jobs:
       GIT_COMMIT_HASH: ${{ steps.git_hash.outputs.GIT_COMMIT_HASH }}
     steps:
     - name: Checkout sources
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     # Workaround for https://github.com/actions/runner/issues/2033
