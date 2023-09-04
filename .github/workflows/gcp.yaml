@@ -60,7 +60,7 @@ jobs:
     # In order to use exported credentials, the actions/checkout step has be present before calling auth.
     # This is due to how GitHub Actions creates $GITHUB_WORKSPACE.
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     # Configure Workload Identity Federation and generate an access token.
     - id: 'auth'
