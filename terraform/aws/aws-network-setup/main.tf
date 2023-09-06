@@ -12,7 +12,7 @@ data "aws_ami" "ubuntu" {
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
   }
 
   filter {
@@ -26,11 +26,13 @@ data "aws_ami" "ubuntu" {
 
 variable "zone" {
   default     = "us-east-1a"
+  type        = string
   description = "Preffered AWS AZ where resources need to placed, has to be compatible with region variable"
 }
 
 variable "region" {
   default     = "us-east-1"
+  type        = string
   description = "Preffered AWS region where resource need to be placed"
 }
 

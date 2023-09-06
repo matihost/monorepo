@@ -4,6 +4,14 @@ resource "aws_organizations_organization" "org" {
 }
 
 
+resource "aws_organizations_organizational_unit" "shared" {
+  name      = "shared"
+  parent_id = aws_organizations_organization.org.roots[0].id
+  tags = {
+    "env" : "shared"
+  }
+}
+
 resource "aws_organizations_organizational_unit" "dev" {
   name      = "dev"
   parent_id = aws_organizations_organization.org.roots[0].id

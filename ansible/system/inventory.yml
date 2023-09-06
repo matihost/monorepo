@@ -77,6 +77,9 @@ all:
         repositories:
         - name: universe
         - name: multiverse
+        - name: pgadmin
+          repo: "deb [arch=amd64] https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/{{ ansible_distribution_release }} pgadmin4 main"
+          key_url: "https://www.pgadmin.org/static/packages_pgadmin_org.pub"
         - name: vscode
           repo: "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main"
           key_url: "https://packages.microsoft.com/keys/microsoft.asc"
@@ -195,6 +198,7 @@ all:
         - gh
         - npm
         - tox
+        - pgadmin4-desktop
         # Python libraries should be installed via Ubuntu distro manager if possible as Ubuntu 23.04+ forces PEP668
         - python3-venv
         - python3-ansible-runner

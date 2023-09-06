@@ -30,6 +30,12 @@ Users management is not part of this setup.
 
 ** _Admin_ and _ReadOnly_ roles - so that IAM users can assume these roles
 
+** AWS Organization along with _shared_, _dev_ and _prod_ Organization Units. Current account is management account and it belongs directly to root of the organization. You need to create Account yourself and attach them to Organization Units yourself.
+After that you can switch to _OrganizationAccountAccessRole_ from any user/role in Management Account.
+
+** Service Control Policy applied on organization root level to ensure only Free Tier EC2 instance type are used.
+(Current Account is management account - and SCP are not preventing anything on managed account.)
+
 ## Prerequisites
 
 * Latest Terraform installed
@@ -59,27 +65,53 @@ Users management is not part of this setup.
 
   After running this terraform - remove the user and its AdministratorAccess attachment and:
 
-  * create IAM User and assign it to `User` group and relogin to it with `aws configure --profile myuser@myfreetier`.
-  * create AWS profile assuming particular role, for example run `./configure-assume-role.sh ReadOnly` to
-  create AWS CLI profile assuming `ReadOnly`
+  * create IAM User and assign it to `User` group and relogin to it with `aws configure --profile username@accountalias`.
+  Edit profile and add `mfa_serial` entry.
+  * create AWS profile assuming particular role, for example run `/configure-assume-role.sh -p Admin@accountalias -s username@accountalias Admin` to
+  create AWS CLI profile assuming `Admin` role from `username@accountalias` and name resulting profile with `Admin@accountalias`.
 
-  * create another IAM User and assign it to IamAdmin group create AWS CLI profile with it `aws configure --profile iam`. Next run of this terraform script can run on user belonging to IAMAdmin group (aka do `awsp iam` to switch to this user before running `make run`)
+  * (Optionally) create auxiliary account in AWS Organization panel and attach them to Organization Units. When new Account is created and attached to AWS Organization you may create another entry in `~/.aws/config` to assume to `OrganizationAccountAccessRole` role in that Account.
+
+  The resulting `~/.aws/configure` may look like this:
+
+  ```txt
+  [profile username@accountalias]
+  region = us-east-1
+  mfa_serial=arn:aws:iam::ACCOUNT_ID:mfa/username@matihosthack@mfa-device-name
+  [profile Admin@accountalias]
+  role_arn = arn:aws:iam::ACCOUNT_ID:role/Admin
+  region = us-east-1
+  [profile OrganizationAccountAccessRole@accountalias-dev]
+  role_arn = arn:aws:iam::ANOTHER_ACCOUNT_ID:role/OrganizationAccountAccessRole
+  source_profile = username@accountalias
+  region = us-east-1
+  ```
 
   * (Optionally) The root AWS account has to follow [this procedure](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_billing.html?icmpid=docs_iam_console#tutorial-billing-step1) to enable billing access to IAM users.
 
 ## Usage
 
 ```bash
-# login to AWS Account allowing to modify IAM.
-aws configure --profile iam
+# list available AWS CLI profiles
+awsume -l
 
-# or to switch to in case you already login
-awsume iam
+# configure profile with credentials for user
+# after that you need to edit ~/.aws/config to provide mfa_serial for 2FA
+aws configure --profile username@accountalias
+
+# activate particular AWS CLI profile
+awsume username@accountalias
+
+# convention that role profiles are capital letter
+awsume Admin@accountalias
+
+# example of assuming role in child account
+awsume OrganizationAccountAccessRole@accountalias-dev
+
+# check current profile identity
 awswhoami
 
-# creates AWS CLI profile which assume role
-./configure-assume-role.sh ami-builder
-awsume ami-builder
+
 
 # setup IAM resources
 make run MODE=apply

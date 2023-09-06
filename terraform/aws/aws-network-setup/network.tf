@@ -100,8 +100,9 @@ resource "aws_route_table" "natted" {
 
   # default route, mapping the VPC's CIDR block to "local", is created implicitly and cannot be specified.
   route {
-    cidr_block  = "0.0.0.0/0"
-    instance_id = aws_instance.nat.id
+    cidr_block           = "0.0.0.0/0"
+    network_interface_id = aws_instance.nat.primary_network_interface_id
+
   }
 
   tags = {

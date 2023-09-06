@@ -7,7 +7,7 @@ data "aws_ami" "ubuntu" {
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
   }
 
   filter {
@@ -59,15 +59,18 @@ data "aws_security_group" "http_from_single_computer" {
 
 variable "zone" {
   default     = "us-east-1a"
+  type        = string
   description = "Preffered AWS AZ where resources need to placed, has to be compatible with region variable"
 }
 
 variable "region" {
   default     = "us-east-1"
+  type        = string
   description = "Preffered AWS region where resource need to be placed"
 }
 
 
+# tflint-ignore: terraform_unused_declarations
 variable "external_access_ip" {
   type        = string
   description = "The public IP which is allowed to access instance"
