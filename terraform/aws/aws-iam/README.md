@@ -34,7 +34,7 @@ Users management is not part of this setup.
 After that you can switch to _OrganizationAccountAccessRole_ from any user/role in Management Account.
 
 ** Service Control Policy applied on organization root level to ensure only Free Tier EC2 instance type are used.
-(Current Account is management account - and SCP are not preventing anything on managed account.)
+(Current Account is management account - and SCPs are not preventing anything on managed account.)
 
 ## Prerequisites
 
@@ -77,7 +77,7 @@ After that you can switch to _OrganizationAccountAccessRole_ from any user/role 
   ```txt
   [profile username@accountalias]
   region = us-east-1
-  mfa_serial=arn:aws:iam::ACCOUNT_ID:mfa/username@matihosthack@mfa-device-name
+  mfa_serial=arn:aws:iam::ACCOUNT_ID:mfa/username@accountalias@mfa-device-name
   [profile Admin@accountalias]
   role_arn = arn:aws:iam::ACCOUNT_ID:role/Admin
   region = us-east-1
@@ -116,3 +116,58 @@ awswhoami
 # setup IAM resources
 make run MODE=apply
 ```
+
+
+## AWS Identity Center With Keycloak as IdP
+
+### Setup SSO
+
+* Login to AWS console with IAM user of management account capable to access AWS Identity Center (for example `Admin@accountalias` account above)
+* Go to AWS Identity Center. Optionally switch to region which should be a host region for Identity Center service (default: us-east-1)
+* Enable Identity Center. Select _Choose your identity source_ , select _External identity provider_
+* Under Service provider metadata click _Download metadata file_
+
+* Spin Keycloak deployment available over internet. For example deploy: [../../gcp/keycloak/](../../gcp/keycloak/).
+* Create a Realm in Keycloak
+* It is recommended Realm/Login/Email as username is enabled.
+* Under your Realm options in Keycloak, click Clients, and click _Import a client_. Pass a metadata file download from AWS console. Click Save.
+* Go to new Client settings, and change _IDP-Initiated SSO URL name_ to: `amazon-aws`. Optionally change _Login theme_ to keycloak (it is good looking...). Save.
+* Go to _Realm settings_ and download: _SAML 2.0 Identity Provider Metadata_
+
+* Come back to AWS console. Under _Identity provider metadata_ upload your Realm Keycloak SAML 2.0 metadata downloaded in previous step.
+
+* Proceed and your basic setup is completed.
+
+* (Optionally) Change alias to _AWS access portal URL_.
+Idp users login to AWS not as usual IAM users. They use _AWS access portal URL_ which redirect them do Idp page. Upon successful login AWS access portal shows Accounts where use can login.
+The url looks like: https://b-2323443.awsapps.com/start. However the prefix can be change to more human friendly name.
+Go to AWS Identity Center dashboard, Go to setting button, Actions and change the prefix for desired one.
+
+### Configure federated user mapping to privileges in AWS
+
+By default there is no automatic mapping for IdP user and Users on AWS side.
+For basic setup - SSO and IdP is only to authenticate user. The assumption is that the same user is present in AWS Identity Center Users tab. If you successfully log into: https://youralias.awsapps.com/start - but they user is not present in AWS Identity Center/Users tab - the authentication fails.
+
+You need to ensure that user in Keycloak exists in AWS Identity Center/Users with the same user name [manually](https://docs.aws.amazon.com/singlesignon/latest/userguide/provision-manually.html).
+There is a way to [automatically](https://docs.aws.amazon.com/singlesignon/latest/userguide/provision-automatically.html) map user in Idp to user in AWS Identity center via SCIM protocol - however Keycloak does not support it and [SCIM Keycloak plugin](https://github.com/Captain-P-Goldfish/scim-for-keycloak) is no more open source.
+
+#### Manual mapping user in Keycloak with User in AWS Identity Center
+
+In order to login to AWS:
+
+* Ensure you have at least one user in configured Realm in Keycloak. You can do it in Keycloak Realm/Users configuration or by allowing to create user account upon first login (Realm/Login/User registration enabled, Email as username also enabled)
+
+* Create the same user in AWS Identity Center / Users. The username must match with the username in Keycloak.
+
+* Create a AWS Identity Center / Group and Assign user to it.
+
+* Create AWS Identity Center /Permission sets. For example: create `Admin` Group and assing it to `AdministratorAccess` permission set associated with `AdministratorAccess` policy.
+
+* In IAM Identity Center / AWS accounts page select AWS account and click _Assign users or groups_. Select group and choose permission sets.
+
+* Now you can login to AWS with https://youralias.awsapps.com/start now.
+
+#### Automatic mapping user in Keycloak with User in AWS Identity Center
+
+There is a way to [automatically](https://docs.aws.amazon.com/singlesignon/latest/userguide/provision-automatically.html) map user in Idp to user in AWS Identity center via SCIM protocol.However Keycloak does not support it and [SCIM Keycloak plugin](https://github.com/Captain-P-Goldfish/scim-for-keycloak) is no more open source.
+TODO check with Okta Free Trial
