@@ -149,7 +149,7 @@ By default there is no automatic mapping for IdP user and Users on AWS side.
 For basic setup - SSO and IdP is only to authenticate user. The assumption is that the same user is present in AWS Identity Center Users tab. If you successfully log into: https://youralias.awsapps.com/start - but they user is not present in AWS Identity Center/Users tab - the authentication fails.
 
 You need to ensure that user in Keycloak exists in AWS Identity Center/Users with the same user name [manually](https://docs.aws.amazon.com/singlesignon/latest/userguide/provision-manually.html).
-There is a way to [automatically](https://docs.aws.amazon.com/singlesignon/latest/userguide/provision-automatically.html) map user in Idp to user in AWS Identity center via SCIM protocol - however Keycloak does not support it and [SCIM Keycloak plugin](https://github.com/Captain-P-Goldfish/scim-for-keycloak) is no more open source.
+There is a way to [automatically](https://docs.aws.amazon.com/singlesignon/latest/userguide/provision-automatically.html) map user in Idp to user in AWS Identity center via SCIM protocol - however Keycloak does not support it. See [SCIM support #13484 ](https://github.com/keycloak/keycloak/issues/13484). Also [SCIM Keycloak plugin](https://github.com/Captain-P-Goldfish/scim-for-keycloak) is no more open source and [Libre SCIM](https://lab.libreho.st/libre.sh/scim/keycloak-scim) no more works with latest Keycloak
 
 #### Manual mapping user in Keycloak with User in AWS Identity Center
 

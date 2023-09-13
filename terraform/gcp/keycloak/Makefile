@@ -49,9 +49,12 @@ image: ## builds keycloak image with support to PostreSQL GC ClouSQL
 	mkdir -p target
 	curl -sL https://storage.googleapis.com/cloud-sql-connectors-java/v$(POSTGRESQL_JDBC_VERSION)/postgres-socket-factory-$(POSTGRESQL_JDBC_VERSION)-jar-with-dependencies.jar -o target/postgres-socket-factory-jar-with-dependencies.jar
 	curl -sL https://github.com/aerogear/keycloak-metrics-spi/releases/download/$(KEYCLOAK_METRICS_SPI_VERSION)/keycloak-metrics-spi-$(KEYCLOAK_METRICS_SPI_VERSION).jar -o target/keycloak-metrics-spi.jar
-	DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build -t quay.io/matihost/keycloak-postgres-cloudsql:$(TAG) .
+	# TODO remove when https://bugs.launchpad.net/ubuntu/+source/docker.io/+bug/2034485 fixed Buildx is missing in Ubuntu
+	# DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain
+	docker build -t quay.io/matihost/keycloak-postgres-cloudsql:$(TAG) .
 	docker push quay.io/matihost/keycloak-postgres-cloudsql:$(TAG)
 	docker tag quay.io/matihost/keycloak-postgres-cloudsql:$(TAG) us-central1-docker.pkg.dev/$(CURRENT_PROJECT)/docker/keycloak-postgres-cloudsql:$(TAG)
+	docker push us-central1-docker.pkg.dev/$(CURRENT_PROJECT)/docker/keycloak-postgres-cloudsql:$(TAG)
 
 run-bash: ## run image with bash
 	docker run -it --entrypoint bash --rm quay.io/matihost/keycloak-postgres-cloudsql:$(TAG)

@@ -5,7 +5,6 @@ Exposed via GLB.
 
 ## Prerequisites
 
-
 * [Compute Engine API enabled](https://console.cloud.google.com/apis/library/compute.googleapis.com) - needed to configure gcloud command fully, deployment does not use VM at all
 
 * terragrunt, terraform, make, zip, gcloud - present on your machine, tested on Ubuntu 22.10
@@ -16,6 +15,8 @@ Exposed via GLB.
 
 * Ensure you have DNS domain for [stage/dev/keycloak/terragrunt.hcl#input.url](stage/dev/keycloak/terragrunt.hcl). Change input.url parameter to meet DNS domain you wish site will be accessible from internet. I use free DNS subdomains from [https://freedns.afraid.org/](https://freedns.afraid.org/)
 
+* Ensure Google Cloud Docker registry is configured. Run [../gcp-repository/](../gcp-repository/) terraform.
+
 * Authenticate to GCP:
 
   ```bash
@@ -23,6 +24,15 @@ Exposed via GLB.
   gcloud config configuration create dev-keycloak
   # init your gcloud command, select us-central1-a as zone for example
   make google-authentication
+  ```
+
+* Build Docker image of Keycloak with additional plugins
+
+  ```bash
+  # run once to configure docker cli to be able to push docker image to Google Cloud Docker registry
+  make configure-docker-registry
+  # to build image and push to quay and GC docker repository
+  make image
   ```
 
 * Deploy Keycloak
