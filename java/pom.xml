@@ -41,7 +41,7 @@
     <maven.test.skip>false</maven.test.skip>
 
     <!-- Spring Boot -->
-    <spring.boot.version>3.1.2</spring.boot.version>
+    <spring.boot.version>3.1.4</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -55,15 +55,15 @@
 
     <!-- Scala 3-->
     <scala.compat.version>3</scala.compat.version>
-    <scala.version>${scala.compat.version}.3.0</scala.version>
+    <scala.version>${scala.compat.version}.3.1</scala.version>
     <scala.spec2.version>5.3.2</scala.spec2.version>
-    <scala.test.version>3.2.16</scala.test.version>
-    <scala.test.plus.version>3.2.16.0</scala.test.plus.version>
+    <scala.test.version>3.2.17</scala.test.version>
+    <scala.test.plus.version>3.2.17.0</scala.test.plus.version>
     <!-- Scala 3 still depends on Scala 2 for backward compatibility -->
-    <scala2.version>2.13.11</scala2.version>
+    <scala2.version>2.13.12</scala2.version>
 
     <!-- IBM MQ client -->
-    <mq.version>9.3.3.0</mq.version>
+    <mq.version>9.3.3.1</mq.version>
   </properties>
 
   <profiles>
@@ -264,7 +264,7 @@
         <plugin>
           <groupId>org.codehaus.gmavenplus</groupId>
           <artifactId>gmavenplus-plugin</artifactId>
-          <version>3.0.0</version>
+          <version>3.0.2</version>
           <executions>
             <execution>
               <goals>

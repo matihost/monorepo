@@ -147,10 +147,10 @@ all:
         - python3-pip
         - graphviz
         - ruby
-        - openjdk-11-jdk
-        - openjdk-11-source
         - openjdk-17-jdk
         - openjdk-17-source
+        - openjdk-21-jdk
+        - openjdk-21-source
         - dos2unix
         - guake
         - mono-complete
@@ -436,9 +436,9 @@ all:
           command: |
             [ -d ~/.sdkman/bin ] || (
             curl -s "https://get.sdkman.io" | bash
-            bash -ic "sdk i java 11-openjdk /usr/lib/jvm/java-11-openjdk-amd64;\
-            sdk i java 17-openjdk /usr/lib/jvm/java-17-openjdk-amd64;\
-            sdk d java 17-openjdk;\
+            bash -ic "sdk i java 17-openjdk /usr/lib/jvm/java-17-openjdk-amd64;\
+            sdk i java 21-openjdk /usr/lib/jvm/java-21-openjdk-amd64;\
+            sdk d java 21-openjdk;\
             sdk i maven;\
             sdk i groovy;\
             sdk i scala;")
