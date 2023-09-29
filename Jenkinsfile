@@ -22,8 +22,8 @@ spec:
     runAsUser: 1000
     fsGroup: 1000
   containers:
-  - name: maven-jdk17
-    image: maven:3-openjdk-17
+  - name: maven-jdk21
+    image: maven:3-amazoncorretto-21-debian
     command:
     - sleep
     args:
@@ -108,7 +108,7 @@ spec:
       parallel {
         stage('Build :: Java') {
           steps {
-              container("maven-jdk17"){
+              container("maven-jdk21"){
                 dir("java"){
                   echo "Building ${pwd()}..."
                   sh """
@@ -128,7 +128,7 @@ spec:
         }
         stage('Build :: Project Euler') {
           steps {
-            container("maven-jdk17"){
+            container("maven-jdk21"){
               dir("algorithms/project-euler"){
                 echo "Building ${pwd()}..."
                 sh """

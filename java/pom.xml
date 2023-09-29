@@ -34,7 +34,11 @@
   </modules>
 
   <properties>
-    <java.version>17</java.version>
+    <!-- Latest Travis CI dist:jammmy aka Ubuntu 22.03 has only openjdk17
+    https://docs.travis-ci.com/user/reference/jammy/#jvm-clojure-groovy-java-scala-support
+    For Travis CI, Maven build has to support passing -Djava.version=17 as well
+    -->
+    <java.version>21</java.version>
     <maven.compiler.release>${java.version}</maven.compiler.release>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -47,7 +51,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <!-- Travis CI openjdk17 image has build in Maven 3.6.3 -->
+    <!-- Latest Travis CI dist:jammmy aka Ubuntu 22.03 has only Maven 3.6.3
+    https://docs.travis-ci.com/user/reference/jammy/#jvm-clojure-groovy-java-scala-support
+    -->
     <enforce.maven.version>3.6</enforce.maven.version>
 
     <!-- Spock -->

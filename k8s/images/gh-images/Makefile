@@ -1,5 +1,5 @@
 TAG := latest
-JAVA_VERSION := 17
+JAVA_VERSION := 21
 build: ## builds docker image
 	DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build --build-arg=JAVA_VERSION=$(JAVA_VERSION) -t quay.io/matihost/gh-gcp-java-kaniko:$(TAG) .
 

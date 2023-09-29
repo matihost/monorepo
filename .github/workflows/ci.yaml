@@ -40,7 +40,7 @@ jobs:
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
     timeout-minutes: 5
     container:
-      image: maven:3-openjdk-17
+      image: maven:3-amazoncorretto-21-debian
     outputs:
       GIT_COMMIT_HASH: ${{ steps.git_hash.outputs.GIT_COMMIT_HASH }}
     steps:
@@ -73,7 +73,7 @@ jobs:
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
     timeout-minutes: 30
     container:
-      image: maven:3-openjdk-17
+      image: maven:3-amazoncorretto-21-debian
     steps:
     - name: Download sources
       uses: actions/cache/restore@v3
@@ -93,10 +93,10 @@ jobs:
     # Do not use actions/setup-java@v3 cache option as it requires downloading java again, but container image contains java already
     # Use actions/cache to cache M2 repository manually instead
     #
-    # - name: Set up JDK 17
+    # - name: Set up JDK 21
     #   uses: actions/setup-java@v3
     #   with:
-    #     java-version: '17'
+    #     java-version: '21'
     #     distribution: 'adopt'
     #     cache: maven
     - name: Build Java source code
@@ -174,7 +174,7 @@ jobs:
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
     timeout-minutes: 30
     container:
-      image: maven:3-openjdk-17
+      image: maven:3-amazoncorretto-21-debian
     steps:
     - name: Download sources
       uses: actions/cache/restore@v3

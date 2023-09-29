@@ -35,7 +35,7 @@ jobs:
   images:
     runs-on: 'ubuntu-22.04'
     container:
-      image: maven:3-openjdk-17
+      image: maven:3-amazoncorretto-21-debian
     steps:
     - name: checkout
       uses: actions/checkout@v4

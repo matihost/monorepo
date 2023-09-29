@@ -65,7 +65,7 @@ jobs:
     - uses: actions/setup-java@v3
       with:
         distribution: adopt
-        java-version: '17'
+        java-version: '21'
     - run: cd java && make build
     - name: Upload Artifacts
       uses: actions/upload-artifact@v3
@@ -88,7 +88,7 @@ jobs:
 #     # This item has no matching transformer
 #     - container:
 #         isLiteral: true
-#         value: maven-jdk17
+#         value: maven-jdk21
     - name: Upload Artifacts
       uses: actions/upload-artifact@v3
       if: always()

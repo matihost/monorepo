@@ -1,15 +1,19 @@
 ---
+# Travis supports natively the following software on the Ubuntu 22.04
+# https://docs.travis-ci.com/user/reference/jammy/#jvm-clojure-groovy-java-scala-support
 dist: jammy
-branches:
-  only:
-  - master
+# branches:
+#   only:
+#   - master
 jobs:
   include:
   - stage: build
     language: java
     jdk: openjdk17
     before_script: cd java
-    script: make build
+    # TODO bring back running via make when travis supports jdk21
+    # script: make build
+    script: mvn -Djava.version=17 -s .mvn/settings.xml --show-version clean install
     cache:
       directories:
       - $HOME/.m2
@@ -18,7 +22,9 @@ jobs:
   - language: java
     jdk: openjdk17
     before_script: cd algorithms/project-euler
-    script: make build
+    # TODO bring back running via make when travis supports jdk21
+    # script: make build
+    script: mvn -Djava.version=17 -s .mvn/settings.xml --show-version clean install
     cache:
       directories:
       - $HOME/.m2

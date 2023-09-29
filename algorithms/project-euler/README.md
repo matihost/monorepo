@@ -5,8 +5,8 @@ Project Euler algorithms [description](algorithms.md).
 ## Prerequisites
 
 ```bash
-# JDK 17
-sudo apt install openjdk-17-jdk openjdk-17-source
+# JDK 21
+sudo apt install openjdk-21-jdk openjdk-21-source
 
 # maven (via sdkman)
 curl -s "https://get.sdkman.io" | bash

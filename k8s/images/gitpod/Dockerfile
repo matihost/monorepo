@@ -1,6 +1,6 @@
 # To build & test: docker build -f .gitpod.Dockerfile -t gitpod-dockerfile-test . &&  docker run -it gitpod-dockerfile-test bash
 # To force gitpod to rebuild cached image: https://gitpod.io/#imagebuild/https://github.com/matihost/monorepo
-ARG JDK_FLAVOR=17.0.7-tem
+ARG JDK_FLAVOR=21-open
 FROM gitpod/workspace-full:latest
 
 
