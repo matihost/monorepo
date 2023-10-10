@@ -168,6 +168,7 @@ all:
         - steam
         - virt-manager
         - docker.io
+        - docker-buildx
         - conntrack
         - fuse-overlayfs
         - virtualbox-7.0
