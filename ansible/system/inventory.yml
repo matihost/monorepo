@@ -177,7 +177,8 @@ all:
         - podman
         - buildah
         - skopeo
-        - terraform
+        # switch to OpenTofu
+        # - terraform
         - packer
         - vagrant
         - sshpass
@@ -715,6 +716,18 @@ all:
               chmod +x terraformer-${PROVIDER}-linux-amd64
               sudo mv terraformer-${PROVIDER}-linux-amd64 /usr/local/bin/terraformer
               echo "Terraformer has been installed"
+            }
+        - name: tofu
+          become: true
+          desc: Ensure latest version OpenTofu installed
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/opentofu/opentofu/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(tofu version 2>/dev/null |grep OpenTofu | sed "s/OpenTofu //g")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/opentofu/opentofu/releases/latest | jq -r ".assets[] |
+                select(.name | test(\"amd64.deb\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/tofu.deb"
+              apt -y install /tmp/tofu.deb
             }
         - name: terragrunt
           become: true
