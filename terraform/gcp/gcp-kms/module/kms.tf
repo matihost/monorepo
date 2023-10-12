@@ -1,11 +1,5 @@
 locals {
-  regions = toset([
-    "us-central1",
-    "us-east1",
-    "europe-central2"
-  ])
-
-  keyring_locations = toset(concat(tolist(local.regions), ["us"]))
+  keyring_locations = toset(concat(tolist(var.regions), ["us"]))
 }
 
 # KMS for cluster encryption
@@ -37,7 +31,7 @@ resource "google_kms_key_ring" "keyring" {
 
 # etcd encryption key, GKE does not support global location for keyring, GKE supports regional keyrings for ETCD
 resource "google_kms_crypto_key" "gke-etcd-enc-key" {
-  for_each = local.regions
+  for_each = var.regions
 
   name            = "gke-${each.key}-etcd-enc-key"
   key_ring        = google_kms_key_ring.keyring[each.key].id
@@ -71,7 +65,7 @@ resource "google_kms_crypto_key" "apigee-us-db-enc-key" {
 
 # Apigee instance dick encription keys
 resource "google_kms_crypto_key" "apigee-disk-enc-key" {
-  for_each = local.regions
+  for_each = var.regions
 
   name            = "apigee-${each.key}-disk-enc-key"
   key_ring        = google_kms_key_ring.keyring[each.key].id

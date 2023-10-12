@@ -14,13 +14,13 @@ else
 	MODE_STR := plan
 endif
 
-init-terraform:
+init:
 ifndef ENV
 	$(error Environment ENV is not defined. Usage make run ENV=prod MODE=plan [DEBUG=true])
 endif
 	cd stage/$(ENV)/keycloak && terragrunt init -upgrade=true
 
-run-keycloak: init-terraform ## usage: Usage make run-keycloak ENV=prod MODE=plan [DEBUG=true])
+run-keycloak: init ## usage: Usage make run-keycloak ENV=prod MODE=plan [DEBUG=true])
 ifndef ENV
 	$(error Environment ENV is not defined. Usage make run ENV=dev [MODE=apply] [DEBUG=true])
 endif

@@ -42,7 +42,7 @@ resource "google_secret_manager_secret" "editor-secret" {
   secret_id = "sa-editor-key"
 
   replication {
-    automatic = true
+    auto {}
   }
 
   depends_on = [

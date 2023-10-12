@@ -73,6 +73,7 @@
 
   - name: Ensure Terraform GCP prerequisites for Jenkins are absent
     community.general.terraform:
+      binary_path: "/usr/bin/tofu"
       project_path: 'files/gke'
       workspace: "default"
       state: absent

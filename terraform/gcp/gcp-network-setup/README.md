@@ -1,6 +1,6 @@
-# Terraform :: Minimal GCP recommended network setup with private subnet
+# Minimal GCP recommended network setup with private subnet
 
-Terraform scripts creating:
+The following scripts creates:
 
 * private VPC with subnets spanning in regions. Subnets can be used as base for GKE deploy as they contains additional ip ranges for pods and svc addresses.
 
@@ -21,7 +21,7 @@ Terraform scripts creating:
 * (Optionally, but recommended) Enable required GCP APIs. Deployments ensure that particular API is enabled first, but Google often claims that API is enabled, but later on deployment claims it is not yet, and several minutes waiting is really required that API is truly enabled on GCP side.
   The list of required APIs: [Compute](https://console.cloud.google.com/apis/library/compute.googleapis.com), [Service Networkking](https://console.cloud.google.com/apis/library/servicenetworking.googleapis.com), [Dns](https://console.cloud.google.com/apis/library/dns.googleapis.com)
 
-* Latest Terraform installed
+* Latest OpenTofu and Terragrunt installed
 
 ## Usage
 
@@ -32,7 +32,7 @@ make run [ENV=dev] [MODE=apply]
 # connect to Bastion via Cloud IAP
 make ssh
 
-# show Terraform state
+# show state
 make show-state
 
 # terminates all GCP resources created with apply task

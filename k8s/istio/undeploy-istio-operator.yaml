@@ -35,6 +35,7 @@
 
   - name: Run Terraform to remove External HTTPS LB for external Istio ingress gateway
     terraform:
+      binary_path: "/usr/bin/tofu"
       project_path: 'files/gke/external-lb'
       state: absent
       workspace: "default"
@@ -86,6 +87,7 @@
 
   - name: Run Terraform to remove GCP prerequisites for Istio deployment
     terraform:
+      binary_path: "/usr/bin/tofu"
       project_path: 'files/gke'
       state: absent
       workspace: "default"

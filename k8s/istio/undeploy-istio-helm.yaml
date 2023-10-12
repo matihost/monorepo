@@ -130,6 +130,7 @@
 
   - name: Ensure GCP prerequisites for Istio deployment are missing
     terraform:
+      binary_path: "/usr/bin/tofu"
       project_path: 'files/gke'
       state: absent
       workspace: "default"

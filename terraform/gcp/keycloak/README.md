@@ -7,7 +7,7 @@ Exposed via GLB.
 
 * [Compute Engine API enabled](https://console.cloud.google.com/apis/library/compute.googleapis.com) - needed to configure gcloud command fully, deployment does not use VM at all
 
-* terragrunt, terraform, make, zip, gcloud - present on your machine, tested on Ubuntu 22.10
+* terragrunt, open tofu, make, zip, gcloud - present on your machine, tested on Ubuntu 22.10
 
 * (Optionally, but recommended) Enable remaining required GCP APIs. Deployments ensure that particular API is enabled first, but Google often claims that API is enabled, but later on deployment claims it is not yet, and several minutes waiting is really required that API is truly enabled on GCP side.
 
@@ -15,7 +15,7 @@ Exposed via GLB.
 
 * Ensure you have DNS domain for [stage/dev/keycloak/terragrunt.hcl#input.url](stage/dev/keycloak/terragrunt.hcl). Change input.url parameter to meet DNS domain you wish site will be accessible from internet. I use free DNS subdomains from [https://freedns.afraid.org/](https://freedns.afraid.org/)
 
-* Ensure Google Cloud Docker registry is configured. Run [../gcp-repository/](../gcp-repository/) terraform.
+* Ensure Google Cloud Docker registry is configured. Run [../gcp-repository/](../gcp-repository/) deployment.
 
 * Authenticate to GCP:
 
@@ -49,6 +49,13 @@ Exposed via GLB.
   # for stage/dev/keycloak/terragrunt.hcl#input.url DNS domain
   # with IP returned from the deployment output of: keycloak_glb_public_ip
   # in your DNS domain provider
+
+  # when you change dns
+  # ensure global DNS resolves obtained new DNS A record value
+  nslookup id.keycloack.my.dns 1.1.1.1
+
+  # when DNS is resolved correctly, ensure local DNS caches are cleared
+  sudo resolvectl flush-caches
   ```
 
 ## Post installation steps

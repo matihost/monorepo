@@ -209,7 +209,8 @@ all:
         - python3-flake8-docstrings
         - python3-flake8-2020
         - python3-openshift
-        - ansible-lint
+        # Ansiblie-lint from ubuntu package stopped working
+        # - ansible-lint
         - python3-requests
         - pre-commit
         - pylint
@@ -231,6 +232,7 @@ all:
         - "molecule[lint]"
         - "molecule[docker]"
         - awsume
+        - ansible-lint
         clis:
         - name: virtual-network-interface
           desc: To ensure there is a virtual interface with stable IP

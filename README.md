@@ -25,8 +25,8 @@ Various technology deployments, tools & code:
     * buildah - experiments with buildah
     * and usually each app has also Makefile task to build its docker image as well
 
-* [terraform](terraform)
-  * gcp - Terraform and Terragrunt deployment for GCP
+* [terraform/tofu](terraform/tofu)
+  * gcp - Open Tofu (open source version of Terraform) and Terragrunt deployment for GCP
     * apigee - ApigeeX Free Tier setup with XLB, sample API proxies etc.
     * gke - GKE deployment along with optional components (Anthos, config-sync, workflow identity, etc)
     * keycloak - Cloud Run, CloudSQL exposed over GLB deployment of Keycloak IAM/IDP software
@@ -40,7 +40,7 @@ Various technology deployments, tools & code:
     * gcp-monitoring - setup logging buckets, custom dashboards, limits etc
     * gcp-workstations - setup GCP Workstations infrastructure for remote development
     * gcp-cloudbuild - setup GCP Cloud Build infrastructure to trigger build for GitHub repository
-  * aws - Terraform deployments for AWS, mainly utilizing only AWS Free Tier
+  * aws - OpenTofu deployments for AWS, mainly utilizing only AWS Free Tier
     * aws-iam - setup IAM resources needed on fresh AWS account (users, roles, groups etc)
     * aws-network - minimal AWS recommended setup with private subnet
     * aws-instance - minimal VM setup

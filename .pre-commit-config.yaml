@@ -24,8 +24,9 @@ repos:
 - repo: https://github.com/gruntwork-io/pre-commit
   rev: v0.1.22
   hooks:
-  - id: terraform-fmt
-  - id: terraform-validate
+  # TODO enabled when tofu is supported
+  # - id: terraform-fmt
+  # - id: terraform-validate
   - id: tflint
 - repo: https://github.com/jumanjihouse/pre-commit-hooks
   rev: 3.0.0

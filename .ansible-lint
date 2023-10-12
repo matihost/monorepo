@@ -6,3 +6,4 @@ skip_list:
 - package-latest
 - name[template]
 - name[missing]
+- var-naming[no-role-prefix]

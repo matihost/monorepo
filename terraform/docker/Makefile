@@ -14,12 +14,12 @@ else
 	MODE_STR := plan
 endif
 
-init-terraform:
-	terraform init -upgrade=true
+init-tofu:
+	tofu init -upgrade=true
 
 
-*.tfvars: init-terraform ## usage: make nginx.tfvars [MODE=apply] [DEBUG=false]
-	terraform $(MODE_STR) -state=state/$(subst .tfvars,,$@).tfstate \
+*.tfvars: init-tofu ## usage: make nginx.tfvars [MODE=apply] [DEBUG=false]
+	tofu $(MODE_STR) -state=state/$(subst .tfvars,,$@).tfstate \
 	-var-file=$@
 
 test: ## check whether Nginx is working
@@ -33,4 +33,4 @@ clean: ## clean Terraform cached plugins and data
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help init-terraform *.tfvars
+.PHONY: help init-tofu *.tfvars

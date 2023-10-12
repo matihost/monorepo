@@ -15,13 +15,13 @@ else
 endif
 
 
-init-terraform:
+init:
 	cd stage/current && terragrunt init -upgrade=true
 
-run: init-terraform ## usage: Usage make run MODE=plan [DEBUG=true])
+run: init ## usage: Usage make run MODE=plan [DEBUG=true])
 	cd stage/current && terragrunt validate && terragrunt $(MODE_STR)
 
-show-state: ## show terraform.state
+show-state: ## show state
 	cd stage/current && terragrunt state list && terragrunt show
 
 

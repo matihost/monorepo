@@ -16,7 +16,7 @@ terraform {
 # some inputs duplication due to https://github.com/gruntwork-io/terragrunt/issues/1566
 inputs = {
   env = "dev"
-  name = "droneshuttles"
+  name = "matihost"
   ghost_admin_key = local.admin_key
   ghost_content_key = local.content_key
 }

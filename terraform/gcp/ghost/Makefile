@@ -14,20 +14,20 @@ else
 	MODE_STR := plan
 endif
 
-init-terraform:
+init:
 ifndef ENV
-	$(error Environment ENV is not defined. Usage make run ENV=prod MODE=plan [DEBUG=true])
+	$(error Environment ENV is not defined. Usage make init ENV=prod [DEBUG=true])
 endif
 	cd stage/$(ENV)/ghost && terragrunt init -upgrade=true
 
-run-ghost: init-terraform ## usage: Usage make run-ghost ENV=prod MODE=plan [DEBUG=true])
+run-ghost: init ## usage: Usage make run-ghost ENV=prod MODE=plan [DEBUG=true])
 ifndef ENV
 	$(error Environment ENV is not defined. Usage make run ENV=dev [MODE=apply] [DEBUG=true])
 endif
 	cd stage/$(ENV)/ghost && terragrunt validate && terragrunt $(MODE_STR)
 
 
-run-posts-management: init-terraform ## usage: Usage make run-ghost ENV=prod MODE=plan [DEBUG=true])
+run-posts-management: init ## usage: Usage make run-ghost ENV=prod MODE=plan [DEBUG=true])
 ifndef ENV
 	$(error Environment ENV is not defined. Usage make run ENV=dev [MODE=apply] [DEBUG=true])
 endif

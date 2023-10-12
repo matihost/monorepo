@@ -16,10 +16,10 @@ else
 	MODE_STR := plan
 endif
 
-init-terraform:
+init:
 	cd stage/$(ENV) && terragrunt init -upgrade=true
 
-run: init-terraform ## usage: make run [ENV=current] [MODE=apply] [DEBUG=false])
+run: init ## usage: make run [ENV=current] [MODE=apply] [DEBUG=false])
 	cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
 
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage

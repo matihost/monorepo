@@ -15,10 +15,10 @@ else
 endif
 
 
-init-terraform: prepare
+init: prepare
 	cd stage/current && terragrunt init -upgrade=true
 
-run: init-terraform ## usage: Usage make run MODE=plan [DEBUG=true])
+run: init ## usage: Usage make run MODE=plan [DEBUG=true])
 	cd stage/current && terragrunt validate && terragrunt $(MODE_STR)
 
 CURRENT_PROJECT := $(shell gcloud config get-value project)

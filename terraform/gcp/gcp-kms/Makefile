@@ -1,8 +1,6 @@
 .EXPORT_ALL_VARIABLES:
 
-CURRENT_PROJECT := $(shell gcloud config get-value project)
-
-TF_VAR_project := $(CURRENT_PROJECT)
+ENV := current
 
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
@@ -18,31 +16,28 @@ else
 	MODE_STR := plan
 endif
 
-run: init-terraform ## setup KMS
-	@terraform validate && \
-	terraform ${MODE_STR}
+init:
+	cd stage/$(ENV) && terragrunt init -upgrade=true
 
-show-state: ## show terraform.state
-	terraform state list
-	terraform show
+run: init ## usage: make run [ENV=current] [MODE=apply] [DEBUG=false])
+	cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
 
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
 	gcloud auth application-default login
 
+clean: ## clean cached plugins and data
+	find . -name ".terra*" -exec rm -rf {} +
+	find . -name "target" -exec rm -rf {} +
+	find . -name "node_modules" -exec rm -rf {} +
+
 # pre-apply: ## import undeletable KMS related state
-# 	-@terraform import google_kms_key_ring.us-central1-keyring projects/${CURRENT_PROJECT}/locations/us-central1/keyRings/us-central1-keyring
-# 	-@terraform import google_kms_crypto_key.gke-etcd-enc-key projects/${CURRENT_PROJECT}/locations/us-central1/keyRings/us-central1-keyring/cryptoKeys/gke-etcd-enc-key
+# 	-@terragrunt import google_kms_key_ring.us-central1-keyring projects/${CURRENT_PROJECT}/locations/us-central1/keyRings/us-central1-keyring
+# 	-@terragrunt import google_kms_crypto_key.gke-etcd-enc-key projects/${CURRENT_PROJECT}/locations/us-central1/keyRings/us-central1-keyring/cryptoKeys/gke-etcd-enc-key
 
 # pre-destroy: ## remove no removable KMS related data from state before actually destroying cluster
-# 	-@terraform state rm google_kms_key_ring.us-central1-keyring
-# 	-@terraform state rm google_kms_crypto_key.gke-etcd-enc-key
-
-clean: ## clean Terraform cached plugins and data
-	rm -rf .terraform* terraform.tfstate*
-
-init-terraform:
-	terraform init -upgrade=true
+# 	-@terragrunt state rm google_kms_key_ring.us-central1-keyring
+# 	-@terragrunt state rm google_kms_crypto_key.gke-etcd-enc-key
 
 
 help: ## show usage and tasks (default)

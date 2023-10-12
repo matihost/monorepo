@@ -30,6 +30,7 @@
 
   - name: Run Terraform to setup GCP prerequisites for Jenkins deployment
     community.general.terraform:
+      binary_path: "/usr/bin/tofu"
       project_path: 'files/gke'
       state: present
       workspace: "default"

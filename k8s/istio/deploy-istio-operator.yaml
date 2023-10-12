@@ -87,6 +87,7 @@
 
   - name: Run Terraform to setup GCP prerequisites for Istio deployment
     community.general.terraform:
+      binary_path: "/usr/bin/tofu"
       project_path: 'files/gke'
       state: present
       workspace: "default"
@@ -272,6 +273,7 @@
 
   - name: Run Terraform to setup External HTTPS LB for external Istio ingress gateway
     community.general.terraform:
+      binary_path: "/usr/bin/tofu"
       project_path: 'files/gke/external-lb'
       state: present
       workspace: "default"
