@@ -385,10 +385,11 @@
               <exclude>CVE-2022-1471</exclude>
               <!--
               org.bouncycastle:bcprov-jdk15to18:jar:1.72:compile;
-              https://ossindex.sonatype.org/component/pkg:maven/org.bouncycastle/bcprov-jdk15to18@1.72?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-              [CVE-2023-33201] CWE-200: Information Exposure (6.5); https://ossindex.sonatype.org/vulnerability/CVE-2023-33201?component-type=maven&component-name=org.bouncycastle%2Fbcprov-jdk15to18&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+              [CVE-2023-5072] CWE-770: Allocation of Resources Without Limits or Throttling (7.5);
+              https://ossindex.sonatype.org/vulnerability/CVE-2023-5072?component-type=maven&component-name=org.json%2Fjson&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+
               -->
-              <exclude>CVE-2023-33201</exclude>
+              <exclude>CVE-2023-5072</exclude>
             </excludeVulnerabilityIds>
             <reportFile>${project.build.directory}/audit-report.json</reportFile>
           </configuration>
