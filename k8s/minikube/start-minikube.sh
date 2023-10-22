@@ -85,7 +85,7 @@ function ensureCriDockerdPresent() {
 }
 
 function ensureCrioPresent() {
-  CRIO_VERSION=1.26
+  CRIO_VERSION=1.28
 
   [ -x /usr/bin/crio ] || (
     # shellcheck disable=SC1091

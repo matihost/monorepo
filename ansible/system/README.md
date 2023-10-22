@@ -2,7 +2,7 @@
 
 Various playbooks for Ubuntu machine management.
 
-Supported Ubuntu distribution: **23.04 (lunar)**
+Supported Ubuntu distribution: **23.10 (mantic)**
 
 ## Prerequisites
 
