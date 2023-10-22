@@ -20,7 +20,7 @@ jobs:
     env:
     - CACHE=java
   - language: java
-    jdk: openjdk17
+    jdk: openjdk17 # Travis does not support java 21 yet'
     before_script: cd algorithms/project-euler
     # TODO bring back running via make when travis supports jdk21
     # script: make build
@@ -34,7 +34,7 @@ jobs:
     before_script: cd rust/guessing_game
     cache: cargo
   - language: go
-    go: "1.20"
+    go: "1.20" # Travis does not support go 1.21 yet'
     before_install: cd go/learning
     script:
     - go build -mod=mod -o .  ./...

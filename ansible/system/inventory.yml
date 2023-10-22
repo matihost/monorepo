@@ -153,7 +153,7 @@ all:
         - hplip
         - hplip-gui
         - ddclient
-        - golang-1.20-go
+        - golang-1.21-go
         - golang-golang-x-tools
         - python3-pip
         - graphviz

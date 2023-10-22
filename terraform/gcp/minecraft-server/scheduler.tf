@@ -81,7 +81,9 @@ resource "google_storage_bucket_object" "minecraft-code" {
 resource "google_cloudfunctions_function" "minecraft-lifecycle-executor" {
   name        = "${var.minecraft_server_name}-minecraft-lifecycle-executor"
   description = "Minecraft server ${var.minecraft_server_name} lifecycle executor"
-  runtime     = "go119"
+  # supported runtimes versions:
+  # https://cloud.google.com/functions/docs/concepts/execution-environment#runtimes
+  runtime     = "go121"
 
   available_memory_mb   = 128
   source_archive_bucket = google_storage_bucket.minecraft-data.name
