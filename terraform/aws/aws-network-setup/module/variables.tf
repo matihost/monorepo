@@ -12,6 +12,11 @@ variable "ssh_pub_key" {
   description = "The pem encoded SSH pub key for accessing VMs"
 }
 
+variable "ssh_key" {
+  type        = string
+  description = "The pem encoded SSH priv key to place on bastion"
+}
+
 variable "external_access_ip" {
   type        = string
   description = "The public IP which is allowed to access instance"
@@ -22,6 +27,18 @@ variable "create_sample_instance" {
   type        = bool
   default     = false
   description = "Whether to span single instance in private subnet"
+}
+
+variable "ec2_instance_type" {
+  type        = string
+  description = "Instance type for EC2 deployments"
+  default = "t3.micro"
+}
+
+variable "ec2_architecture" {
+  type        = string
+  description = "Instance type for EC2 deployments"
+  default = "x86_64"
 }
 
 variable "zone" {

@@ -25,24 +25,26 @@ run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
 	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
 
 ssh: ## ssh to VPC bastion host
-	cd stage/$(ENV) && eval $(shell terragrunt output bastion_ssh)
+	eval $(shell cd stage/$(ENV) && terragrunt output bastion_ssh)
 
 nat-ssh: ## ssh to NAT instance
-	cd stage/$(ENV) && eval "$(shell terragrunt output nat_ssh)"
+	eval "$(shell cd stage/$(ENV) && terragrunt output nat_ssh)"
 
 expose_bastion_proxy_locally: ## expose bastion's HTTP proxy locally
-	@[ "$(shell sudo ss -antl |grep -c 8888)" -ne 0 ] || { cd stage/$(ENV) && eval "$(shell terragrunt output expose_bastion_proxy_locally)"; }
+	@[ "$(shell sudo ss -antl |grep -c 8888)" -ne 0 ] || eval "$(shell cd stage/$(ENV) && terragrunt output expose_bastion_proxy_locally)"
 
 shutdown_local_bastion_proxy: ## shutdown tunneled bastion's HTTP proxy
 	@[ "$(shell sudo ss -antl |grep -c 8888)" -eq 0 ] || sudo kill -9 $(shell sudo lsof -t -i:8888)
 
 test: expose_bastion_proxy_locally ## test private  webeserver
-	cd stage/$(ENV) && eval "$(shell terragrunt output connect_via_bastion_proxy)"
+	eval "$(shell cd stage/$(ENV) && terragrunt output connect_via_bastion_proxy)"
 
 
 show-state: ## show state
-	cd stage/$(ENV) && terragrunt state list && terragrunt show &&
-		aws ec2 describe-instance-attribute --instance-id $(shell terragrunt output bastion_id) --attribute userData --output text --query "UserData.Value"
+	cd stage/$(ENV) && terragrunt state list && terragrunt show
+
+show-bastion-user-data: ## show bastion user data value
+	aws ec2 describe-instance-attribute --instance-id $(shell cd stage/$(ENV) && terragrunt output bastion_id) --attribute userData --output text --query "UserData.Value" | base64 -d
 
 
 clean: ## clean cached plugins and data

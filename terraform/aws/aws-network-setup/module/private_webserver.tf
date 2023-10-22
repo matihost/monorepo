@@ -39,7 +39,7 @@ resource "aws_security_group" "internal_access" {
 resource "aws_instance" "webserver" {
   count         = var.create_sample_instance ? 1 : 0
   ami           = data.aws_ami.ubuntu.id
-  instance_type = "t4g.small"
+  instance_type = var.ec2_instance_type
   subnet_id     = aws_subnet.private_a.id
   # Terraform ignores associate_public_ip_address = false when subnet_id is not provided
   # and chosen subnet assigns Public Ips (aka map_public_ip_on_launch = true on aws_subnet)
