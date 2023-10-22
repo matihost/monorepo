@@ -1,48 +1,63 @@
-WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
+.EXPORT_ALL_VARIABLES:
 
-
-ifeq ($(WITH_SAMPLE_INSTANCE),true)
-ENABLE_SAMPLE_INSTANCE :=-var 'create_sample_instance=true'
+DEBUG := false
+ifeq ($(strip $(DEBUG)),true)
+	TF_LOG := DEBUG
 endif
 
-apply: prepare shutdown_local_bastion_proxy ## setup minimal AWS setup, bastion, nas, private network and webservr in private network
-	export TF_VAR_external_access_ip=$(WHOAMI) && \
-	terraform init -upgrade=true && \
-	terraform validate && \
-	terraform plan $(ENABLE_SAMPLE_INSTANCE) && \
-	terraform apply $(ENABLE_SAMPLE_INSTANCE) -auto-approve
+MODE := apply
+ifeq ($(strip $(MODE)),apply)
+	MODE_STR := apply -auto-approve
+else ifeq ($(strip $(MODE)),destroy)
+	MODE_STR := destroy -auto-approve
+else
+	MODE_STR := plan
+endif
 
-show-state: ## show terraform.state
-	terraform state list
-	terraform show
-	aws ec2 describe-instance-attribute --instance-id $(shell terraform output bastion_id) --attribute userData --output text --query "UserData.Value"
 
-bastion-ssh: ## ssh to bastion EC2 instance
-	eval "$(shell terraform output bastion_ssh)"
+ENV := dev
+
+init: prepare
+	cd stage/$(ENV) && terragrunt init -upgrade=true
+
+
+run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
+
+ssh: ## ssh to VPC bastion host
+	cd stage/$(ENV) && eval $(shell terragrunt output bastion_ssh)
 
 nat-ssh: ## ssh to NAT instance
-	eval "$(shell terraform output nat_ssh)"
+	cd stage/$(ENV) && eval "$(shell terragrunt output nat_ssh)"
 
 expose_bastion_proxy_locally: ## expose bastion's HTTP proxy locally
-	@[ "$(shell sudo ss -antl |grep -c 8888)" -ne 0 ] || eval "$(shell terraform output expose_bastion_proxy_locally)"
+	@[ "$(shell sudo ss -antl |grep -c 8888)" -ne 0 ] || { cd stage/$(ENV) && eval "$(shell terragrunt output expose_bastion_proxy_locally)"; }
 
 shutdown_local_bastion_proxy: ## shutdown tunneled bastion's HTTP proxy
 	@[ "$(shell sudo ss -antl |grep -c 8888)" -eq 0 ] || sudo kill -9 $(shell sudo lsof -t -i:8888)
 
 test: expose_bastion_proxy_locally ## test private  webeserver
-	eval "$(shell terraform output connect_via_bastion_proxy)"
+	cd stage/$(ENV) && eval "$(shell terragrunt output connect_via_bastion_proxy)"
 
-destroy: shutdown_local_bastion_proxy ## destroy applied setup
-	export TF_VAR_external_access_ip=$(WHOAMI) && \
-	terraform plan && terraform destroy -auto-approve
 
-clean: ## clean Terraform cached plugins and data
-	rm -rf .terraform* terraform.tfstate*
+show-state: ## show state
+	cd stage/$(ENV) && terragrunt state list && terragrunt show &&
+		aws ec2 describe-instance-attribute --instance-id $(shell terragrunt output bastion_id) --attribute userData --output text --query "UserData.Value"
 
-prepare:
-	@[ -e "$(HOME)/.ssh/id_rsa.aws.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.aws.vm; }
+
+clean: ## clean cached plugins and data
+	find . -name ".terra*" -exec rm -rf {} +
+	find . -name "target" -exec rm -rf {} +
+
+upgrade-providers-version: init
+
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help apply destroy
+.PHONY: help run clean
+
+
+
+prepare:
+	@[ -e "$(HOME)/.ssh/id_rsa.aws.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.aws.vm; }

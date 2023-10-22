@@ -11,7 +11,7 @@ data "aws_subnet" "default" {
 
 resource "aws_security_group" "nat_access" {
   name        = "nat_access"
-  description = "Allow SSH access only from single computer and HTTP traffic to the internt"
+  description = "Allow SSH access only from single computer and HTTP traffic to the Internt"
 
   tags = {
     Name = "nat_access"
@@ -72,7 +72,7 @@ resource "aws_instance" "nat" {
   # NAT instance has to have source / dest adress check disabled
   source_dest_check = false
 
-  user_data = templatefile("nat.init.tpl.sh", {
+  user_data = templatefile("${path.module}/nat.init.tpl.sh", {
     private_cidr = aws_subnet.private_a.cidr_block,
     }
   )

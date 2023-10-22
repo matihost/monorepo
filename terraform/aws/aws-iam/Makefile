@@ -21,6 +21,9 @@ init-terraform:
 run: init-terraform ## usage: Usage make run MODE=plan [DEBUG=true])
 	cd stage/current && terragrunt validate && terragrunt $(MODE_STR)
 
+show-state: ## show state
+	cd stage/current && terragrunt state list && terragrunt show
+
 # destroy task likely not needed
 # removal of IAM resource will effectively make users unable to do nothing
 # and root accout login would be required to fix issues.

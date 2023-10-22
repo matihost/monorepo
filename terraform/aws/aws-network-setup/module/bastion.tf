@@ -1,3 +1,24 @@
+resource "aws_key_pair" "vm_key" {
+  key_name   = "vm"
+  public_key = var.ssh_pub_key
+  # public_key = file("~/.ssh/id_rsa.aws.vm.pub")
+}
+
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"] # Canonical
+}
 
 resource "aws_security_group" "bastion_access" {
   name        = "bastion_access"
@@ -32,7 +53,7 @@ resource "aws_instance" "bastion_vm" {
   subnet_id              = data.aws_subnet.default.id
   key_name               = aws_key_pair.vm_key.key_name
   vpc_security_group_ids = [aws_security_group.bastion_access.id]
-  user_data = templatefile("bastion.cloud-init.tpl", {
+  user_data = templatefile("${path.module}/bastion.cloud-init.tpl", {
     ssh_key = filebase64("~/.ssh/id_rsa.aws.vm"),
     ssh_pub = filebase64("~/.ssh/id_rsa.aws.vm.pub"),
     }

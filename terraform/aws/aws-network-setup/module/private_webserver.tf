@@ -46,7 +46,7 @@ resource "aws_instance" "webserver" {
   associate_public_ip_address = false
   key_name                    = aws_key_pair.vm_key.key_name
   vpc_security_group_ids      = [aws_security_group.internal_access.id]
-  user_data                   = file("private_webserver.cloud-init.yaml")
+  user_data                   = file("${path.module}/private_webserver.cloud-init.yaml")
   tags = {
     Name = "webserver-${random_id.webserver_instance_id.hex}"
   }

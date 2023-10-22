@@ -1,4 +1,4 @@
-# Terraform :: Minimal AWS recommended setup with private subnet
+#  Minimal AWS recommended setup with private subnet
 
 Terraform scripts creating:
 
@@ -7,7 +7,7 @@ Terraform scripts creating:
 - bastion in public subnet
 
 - NAT instance in public subnet to allow private subnet access internet.
-  In production NAT Gateway should be used. NAT instance is AWS free-tier eliglibe version of NAT Gateway.
+  In production NAT Gateway should be used. NAT instance is AWS free-tier eligible version of NAT Gateway.
 
 - (Optionally) plus sample webserver instance in private subnet.
 
