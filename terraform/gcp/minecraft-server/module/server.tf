@@ -1,6 +1,15 @@
+data "google_compute_network" "vpc" {
+  name = var.vpc
+}
+
+data "google_compute_subnetwork" "subnet" {
+  name   = var.vpc_subnet
+  region = var.region
+}
+
 resource "google_compute_instance_template" "minecraft_template" {
   name_prefix  = "${var.minecraft_server_name}-minecraft-server-"
-  machine_type = "e2-medium"
+  machine_type = var.machine_type
   region       = var.region
 
   // boot disk
@@ -28,7 +37,7 @@ resource "google_compute_instance_template" "minecraft_template" {
   can_ip_forward = false
 
   network_interface {
-    subnetwork = data.google_compute_subnetwork.private1.name
+    subnetwork = data.google_compute_subnetwork.subnet.name
   }
 
   service_account {
@@ -53,7 +62,7 @@ resource "google_compute_instance_group_manager" "minecraft_group_manager" {
   }
   base_instance_name = "${var.minecraft_server_name}-minecraft-server"
 
-  zone        = local.zone
+  zone        = var.zone
   target_size = "1"
 
   named_port {
@@ -143,7 +152,7 @@ resource "google_project_iam_member" "minecraft-server-metrics-writer" {
 # let connect via to minecraft server only within GCP VPC or via IAP tunnel
 resource "google_compute_firewall" "minecraft-server-ssh" {
   name          = "${var.minecraft_server_name}-minecraft-server-ssh"
-  network       = data.google_compute_network.private.name
+  network       = data.google_compute_network.vpc.name
   direction     = "INGRESS"
   project       = var.project
   source_ranges = ["10.0.0.0/8", "35.235.240.0/20"]
@@ -164,7 +173,7 @@ resource "google_compute_firewall" "minecraft-server-ssh" {
 # it could be simplified - but leave as it is for clarity why
 resource "google_compute_firewall" "minecraft-server-minecraft-ports" {
   name          = "${var.minecraft_server_name}-minecraft-server"
-  network       = data.google_compute_network.private.name
+  network       = data.google_compute_network.vpc.name
   direction     = "INGRESS"
   project       = var.project
   source_ranges = ["10.0.0.0/8", "130.211.0.0/22", "35.191.0.0/16", "209.85.152.0/22", "209.85.204.0/22", "0.0.0.0/0"]

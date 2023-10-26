@@ -30,14 +30,14 @@ resource "google_storage_bucket" "minecraft-data" {
 resource "null_resource" "minecraft-config-template" {
   triggers = {
     always_run = timestamp()
-    dest_file  = "target/minecraft-config-template.tar.xz"
+    dest_file  = "${path.module}/target/minecraft-config-template.tar.xz"
   }
   provisioner "local-exec" {
     command = <<-EOT
-    pwd && mkdir -p target/minecraft-server &&
-      cp -r config/* target/minecraft-server &&
-      curl -sSL ${var.minecraft_server_url} -o  target/minecraft-server/server/server.jar &&
-      cd target/ &&
+    pwd && mkdir -p ${path.module}/target/minecraft-server &&
+      cp -r config/* ${path.module}/target/minecraft-server &&
+      curl -sSL ${var.minecraft_server_url} -o  ${path.module}/target/minecraft-server/server/server.jar &&
+      cd ${path.module}/target/ &&
       curl -L ${var.minecraft_rcon_url} -o - |tar -zxv mcrcon &&
       mv mcrcon minecraft-server/server/ &&
       sed -i 's/MINECRAFT_PASS/${var.server_rcon_pass}/g' minecraft-server/server/server.properties minecraft-server/server/*.sh minecraft-server/minecraft.service &&

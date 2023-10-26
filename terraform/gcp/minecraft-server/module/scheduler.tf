@@ -62,8 +62,8 @@ resource "null_resource" "scheduler-code" {
   }
   provisioner "local-exec" {
     command = <<-EOT
-    mkdir -p target &&
-      cp -r scheduler target/ && cd target/scheduler &&
+    mkdir -p ${path.module}/target &&
+      cp -r scheduler ${path.module}/target/ && cd ${path.module}/target/scheduler &&
       zip -r scheduler.zip * && mv scheduler.zip ..
     EOT
   }
@@ -71,7 +71,7 @@ resource "null_resource" "scheduler-code" {
 
 resource "google_storage_bucket_object" "minecraft-code" {
   name   = "${var.minecraft_server_name}/scheduler.zip"
-  source = "target/scheduler.zip"
+  source = "${path.module}/target/scheduler.zip"
   bucket = google_storage_bucket.minecraft-data.name
 
   depends_on = [null_resource.scheduler-code]
@@ -104,7 +104,7 @@ resource "google_cloudfunctions_function" "minecraft-lifecycle-executor" {
 
   environment_variables = {
     MINECRAFT_SERVER_NAME = google_compute_instance_group_manager.minecraft_group_manager.name
-    GCP_ZONE              = local.zone
+    GCP_ZONE              = var.zone
     GCP_PROJECT_ID        = var.project
   }
 

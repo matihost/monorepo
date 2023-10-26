@@ -1,19 +1,11 @@
 .EXPORT_ALL_VARIABLES:
 
-CURRENT_PROJECT := $(shell gcloud config get-value project)
-WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
+DEBUG := false
+ifeq ($(strip $(DEBUG)),true)
+	TF_LOG := DEBUG
+endif
 
-REGION := europe-central2
-SERVER_NAME := prod-01
-
-TF_VAR_minecraft_server_name := $(SERVER_NAME)
-TF_VAR_project := $(CURRENT_PROJECT)
-TF_VAR_region := $(REGION)
-
-# uncomment to run terraform in debug mode
-# TF_LOG := DEBUG
-
-MODE := plan
+MODE := apply
 ifeq ($(strip $(MODE)),apply)
 	MODE_STR := apply -auto-approve
 else ifeq ($(strip $(MODE)),destroy)
@@ -22,44 +14,56 @@ else
 	MODE_STR := plan
 endif
 
-run: init-terraform prepare ## setup Minecraft Server VM, usage make run [MODE=plan/apply/destroy] PASS=pass_for_minecraft_rcon OP_USER=minecraftusername
+
+ENV := prod-01
+
+init:
+	cd stage/$(ENV) && terragrunt init -upgrade=true
+
+
+run: init prepare ## setup Minecraft Server VM, usage make run [MODE=plan/apply/destroy] [ENV=prod-01] PASS=pass_for_minecraft_rcon OP_USER=minecraftusername
+ifndef ENV
+	$(error Environment ENV is not defined. Usage make run ENV=prod MODE=plan [DEBUG=true])
+endif
 ifndef PASS
 	$(error Env PASS is not defined. Provider password for Minecraft rcon is required. Usage make apply PASS=pass_for_minecraft_rcon OP_USER=minecraftusername)
 endif
 ifndef OP_USER
 	$(error Env OP_USER is not defined. Minecraft operator/admin user is required. Usage make apply PASS=pass_for_minecraft_rcon OP_USER=minecraftusername)
 endif
-	@terraform validate && \
-	terraform $(MODE_STR) -var='server_rcon_pass=$(PASS)' -var='server_op_user=$(OP_USER)'
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) -var='server_rcon_pass=$(PASS)' -var='server_op_user=$(OP_USER)'
+
 
 ssh: ## ssh to Minecraft Server instance
-	gcloud compute ssh --strict-host-key-checking=no `gcloud compute instances list --filter="name~'.*$(SERVER_NAME)-minecraft-server-.*$$'" --format=json | jq -rc .[0].name`
+ifndef ENV
+	$(error Environment ENV is not defined. Usage make run ENV=prod MODE=plan [DEBUG=true])
+endif
+	gcloud compute ssh --strict-host-key-checking=no --zone europe-central2-a `gcloud compute instances list --filter="name~'.*$(ENV)-minecraft-server-.*$$'" --format=json | jq -rc .[0].name`
 
-show-state: ## show terraform.state
-	terraform state list
-	terraform show
+show-state: ## show terragrunt.state
+	cd stage/$(ENV) && terragrunt state list && terragrunt show
 
 
-google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
+google-authentication: ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
 	gcloud auth application-default login
 
-clean: ## clean Terraform cached plugins and data
-	rm -rf target .terraform* terraform.tfstate*
 
-init-terraform:
-	terraform init -upgrade=true
+clean: ## clean Terraform cached plugins and data
+	find . -name ".terra*" -exec rm -rf {} +
+	find . -name "target" -exec rm -rf {} +
+
+upgrade-providers-version: init
+
 
 shutdown: ## resize instance group to zero
-	gcloud compute instance-groups managed resize $(SERVER_NAME)-minecraft-server --zone=europe-central2-a --size=0
+	gcloud compute instance-groups managed resize $(ENV)-minecraft-server --zone=europe-central2-a --size=0
 
 bring-up: ## resize instance group to one
-	gcloud compute instance-groups managed resize $(SERVER_NAME)-minecraft-server --zone=europe-central2-a --size=1
+	gcloud compute instance-groups managed resize $(ENV)-minecraft-server --zone=europe-central2-a --size=1
 
 prepare:
 	@[ -e "$(HOME)/.ssh/id_rsa.cloud.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.cloud.vm; }
-	rm -rf target
-
 
 docs: prepare ## generate html/pdf from *.ad in target directory
 	asciidoctor -r asciidoctor-diagram -b html -D target docs/*.ad

@@ -37,11 +37,11 @@ TODO include png in base64 for when GitHup md renderer supports it
 ## Usage
 
 ```bash
-# setup or destroy Minecraft Server resources, default is show Terraform plan
-make run [MODE=plan/apply/destroy] PASS=pass_for_minecraft_rcon OP_USER=minecraftusername [REGION=europe-central2] [SERVER_NAME=prod-01]
+# setup (plan or apply) or destroy Minecraft Server VM
+make run [MODE=plan/apply/destroy] [ENV=prod-01] PASS=pass_for_minecraft_rcon OP_USER=minecraftusername
 
 # ssh to Minecraft Server instance
-make ssh [SERVER_NAME=prod-01]
+make ssh [ENV=prod-01]
 
 # show terraform.state
 make show-state

@@ -40,7 +40,7 @@ function init_op_user() {
 function run_minecraft_server() {
   /usr/bin/java -XX:+UnlockExperimentalVMOptions \
     -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.rmi.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false \
-    -Xms2880M -Xmx2880M -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 \
+    -Xms6168M -Xmx6168M -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 \
     -XshowSettings:* -XX:+PrintFlagsFinal -XX:NativeMemoryTracking=summary -Xlog:async -Xlog:gc*=debug,gc+ergo*=trace,gc+age*=trace,safepoint*:file=/tmp/minecraft.gc.log:level,tags,utctime,uptime,pid:filecount=5,filesize=100m \
     -XX:OnOutOfMemoryError='kill -9 %p' -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp \
     -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:+UseNUMA -XX:+PreserveFramePointer \
