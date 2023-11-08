@@ -36,7 +36,7 @@ endif
 
 ssh: ## ssh to Minecraft Server instance
 ifndef ENV
-	$(error Environment ENV is not defined. Usage make run ENV=prod MODE=plan [DEBUG=true])
+	$(error Environment ENV is not defined. Usage make ssh ENV=prod-02
 endif
 	gcloud compute ssh --strict-host-key-checking=no --zone europe-central2-a `gcloud compute instances list --filter="name~'.*$(ENV)-minecraft-server-.*$$'" --format=json | jq -rc .[0].name`
 
