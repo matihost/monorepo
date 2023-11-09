@@ -30,22 +30,20 @@ aws configure
 ## Usage
 
 ```bash
-
-# deploy resources, w/o sample webserver in private subnetwork, only networking resources
-make apply
-
-# deploy resources along with sample webserver in private subnetwork
-make apply WITH_SAMPLE_INSTANCE=true
+# setup VPC
+make run ENV=dev MODE=apply
 
 # ssh to bastion EC2 instance
-make bastion-ssh
+make ssh
 
 # test private webserver, it creates tunnel to Bastion's Proxy and connects via it to private webserver intance
 make test
 
-# ssh to bastion EC2 instance
+# ssh to NAT EC2 instance
 make nat-ssh
 
+# ssh to webserver instance over SSM
+make webserver-ssm-ssh
 
 # show Terraform state
 make show-state

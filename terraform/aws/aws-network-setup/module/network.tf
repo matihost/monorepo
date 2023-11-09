@@ -89,11 +89,22 @@ resource "aws_subnet" "private_a" {
   availability_zone       = var.zone
   map_public_ip_on_launch = false
   tags = {
-    Name = "private for ${var.zone}"
+    Name = "${local.prefix}-private-${var.zone}"
     Tier = "private"
   }
 }
 
+# TODO make it dynamic
+resource "aws_subnet" "private_b" {
+  vpc_id                  = data.aws_vpc.default.id
+  cidr_block              = "172.31.112.0/20"
+  availability_zone       = "us-east-1b"
+  map_public_ip_on_launch = false
+  tags = {
+    Name = "${local.prefix}-private-us-east-1b"
+    Tier = "private"
+  }
+}
 
 resource "aws_route_table" "natted" {
   vpc_id = data.aws_vpc.default.id
@@ -106,7 +117,7 @@ resource "aws_route_table" "natted" {
   }
 
   tags = {
-    Name = "natted"
+    Name = "${local.prefix}-natted"
   }
 }
 

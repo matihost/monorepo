@@ -10,7 +10,7 @@ In particular it creates:
 
 - targetgroup for ALB usage - it is being populated via autoscalling group automatically (aka changes to instances count is reflected in target group)
 
-- Application Load Balancer (ALB)  with single listener forwarding all trafic to above targetgroup
+- Application Load Balancer (ALB)  with single listener forwarding all traffic to above target group
 
 This setup use AWS resources eliglible to AWS Free Tier __only__.
 
@@ -31,7 +31,7 @@ aws configure
 ```bash
 
 # deploy webservers ALB
-make apply
+make run ENV=dev MODE=apply
 
 # test webservers via ALB
 make test

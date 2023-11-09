@@ -30,6 +30,9 @@ ssh: ## ssh to VPC bastion host
 nat-ssh: ## ssh to NAT instance
 	eval "$(shell cd stage/$(ENV) && terragrunt output nat_ssh)"
 
+webserver-ssm-ssh: ## ssh to webserver instance over SSM
+	aws ssm start-session --target "$(shell cd stage/$(ENV) && terragrunt output webserver_id)"
+
 expose_bastion_proxy_locally: ## expose bastion's HTTP proxy locally
 	@[ "$(shell sudo ss -antl |grep -c 8888)" -ne 0 ] || eval "$(shell cd stage/$(ENV) && terragrunt output expose_bastion_proxy_locally)"
 

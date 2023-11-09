@@ -1,5 +1,5 @@
 resource "aws_key_pair" "vm_key" {
-  key_name   = "vm"
+  key_name   = "${local.prefix}-bastion-ssh"
   public_key = var.ssh_pub_key
 }
 
@@ -27,7 +27,7 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_security_group" "bastion_access" {
-  name        = "bastion_access"
+  name        = "${local.prefix}-bastion-access"
   description = "Allow SSH access only from single computer"
 
   tags = {
@@ -52,20 +52,53 @@ resource "aws_security_group" "bastion_access" {
   }
 }
 
+resource "aws_security_group" "internal_access" {
+  name        = "${local.prefix}-internal_access"
+  description = "Allow HTTP & SSH access from internal VPC only"
+
+  tags = {
+    Name = "internal_access"
+  }
+
+  ingress {
+    description = "HTTP from default VPC"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.default.cidr_block]
+  }
+  ingress {
+    description = "SSH from default VPC"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.default.cidr_block]
+  }
+
+  # Terraform removed default egress ALLOW_ALL rule
+  # It has to be explicitely added
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 
 resource "aws_instance" "bastion_vm" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.ec2_instance_type
   subnet_id              = data.aws_subnet.default.id
   key_name               = aws_key_pair.vm_key.key_name
-  vpc_security_group_ids = [aws_security_group.bastion_access.id]
+  vpc_security_group_ids = [aws_security_group.bastion_access.id, aws_security_group.internal_access.id]
   user_data = templatefile("${path.module}/bastion.cloud-init.tpl", {
     ssh_key = base64encode(var.ssh_key),
     ssh_pub = base64encode(var.ssh_pub_key),
     }
   )
   tags = {
-    Name = "bastion"
+    Name = "${local.prefix}-bastion"
   }
 }
 

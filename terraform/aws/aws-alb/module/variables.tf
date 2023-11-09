@@ -1,3 +1,4 @@
+
 data "aws_caller_identity" "current" {}
 
 locals {
@@ -12,27 +13,12 @@ variable "env" {
   description = "Environment name"
 }
 
-variable "ssh_pub_key" {
-  type        = string
-  description = "The pem encoded SSH pub key for accessing VMs"
-}
-
-variable "ssh_key" {
-  type        = string
-  description = "The pem encoded SSH priv key to place on bastion"
-}
-
+# tflint-ignore: terraform_unused_declarations
 variable "external_access_ip" {
   type        = string
   description = "The public IP which is allowed to access instance"
 }
 
-
-variable "create_sample_instance" {
-  type        = bool
-  default     = false
-  description = "Whether to span single instance in private subnet"
-}
 
 variable "ec2_instance_type" {
   type        = string
@@ -57,4 +43,11 @@ variable "region" {
   default     = "us-east-1"
   type        = string
   description = "Preffered AWS region where resource need to be placed"
+}
+
+
+variable "instance_profile" {
+  default     = ""
+  type        = string
+  description = "The name of instance_profile (dynamically provisioning access to role)"
 }

@@ -2,39 +2,6 @@ resource "random_id" "webserver_instance_id" {
   byte_length = 8
 }
 
-resource "aws_security_group" "internal_access" {
-  name        = "internal_access"
-  description = "Allow HTTP & SSH access from internal VPC only"
-
-  tags = {
-    Name = "internal_access"
-  }
-
-  ingress {
-    description = "HTTP from default VPC"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.default.cidr_block]
-  }
-  ingress {
-    description = "SSH from default VPC"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.default.cidr_block]
-  }
-
-  # Terraform removed default egress ALLOW_ALL rule
-  # It has to be explicitely added
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 
 resource "aws_instance" "webserver" {
   count         = var.create_sample_instance ? 1 : 0
@@ -46,12 +13,16 @@ resource "aws_instance" "webserver" {
   associate_public_ip_address = false
   key_name                    = aws_key_pair.vm_key.key_name
   vpc_security_group_ids      = [aws_security_group.internal_access.id]
+  iam_instance_profile = aws_iam_instance_profile.ssm-ec2.name
   user_data                   = file("${path.module}/private_webserver.cloud-init.yaml")
   tags = {
     Name = "webserver-${random_id.webserver_instance_id.hex}"
   }
 }
 
+output "webserver_id" {
+  value = var.create_sample_instance ? aws_instance.webserver[0].id : "N/A"
+}
 
 output "webserver_ip" {
   value = var.create_sample_instance ? aws_instance.webserver[0].private_ip : "N/A"

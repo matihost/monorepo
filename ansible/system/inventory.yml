@@ -715,9 +715,13 @@ all:
         - name: terraformer
           desc: |
             Reverse terraform
-            Sample:
+            Sample for GC:
             terraformer import google --connect=true --regions=`gcloud config get-value compute/region` --projects=`gcloud config get-value project` \
             --resources=dns,monitoring,addresses,autoscalers,regionAutoscalers,globalForwardingRules,healthChecks,globalAddresses,regionBackendServices,urlMaps,regionSslCertificates,forwardingRules,httpHealthChecks,targetTcpProxies,regionInstanceGroupManagers,targetHttpsProxies,backendServices,sslCertificates
+            Sample for AWS
+            awsume rolename@accounr
+            # TODO https://github.com/GoogleCloudPlatform/terraformer/issues/1743
+            terraformer import aws --resources=api_gateway,alb --regions=us-east-1 --profile=""
           become: true
           command: |
             CURRENT_VERSION="$(curl -sL https://api.github.com/repos/GoogleCloudPlatform/terraformer/releases/latest | grep tag_name | cut -d '"' -f 4)"
@@ -838,6 +842,9 @@ all:
               sudo aws/install --update
               rm -rf /tmp/awscli-installer
               echo "AWC CLI Installed"
+              curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "/tmp/session-manager-plugin.deb"
+              dpkg -i /tmp/session-manager-plugin.deb
+              echo "AWC Session Manager Plugin Installed"
             }
             [ -e /etc/bash_completion.d/aws_bash_completer ] || {
               echo 'complete -C aws_completer aws' > /etc/bash_completion.d/aws_bash_completer

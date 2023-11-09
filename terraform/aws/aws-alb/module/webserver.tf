@@ -1,5 +1,74 @@
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  # possible filter ids from sample image:
+  # aws ec2 describe-images --region us-east-1 --image-ids ami-0fc5d935ebf8bc3bc
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-*-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = [var.ec2_architecture]
+  }
+
+  owners = ["099720109477"] # Canonical
+}
+
+data "aws_vpc" "default" {
+  default = true
+}
+
+data "aws_subnet" "private_subnet" {
+  vpc_id            = data.aws_vpc.default.id
+  availability_zone = var.zone
+  tags = {
+    Tier = "private"
+  }
+}
+
+data "aws_subnet" "private_subnet2" {
+  vpc_id            = data.aws_vpc.default.id
+  availability_zone = "us-east-1b"
+  tags = {
+    Tier = "private"
+  }
+}
+
+
+data "aws_subnet" "public_subnet_1" {
+  vpc_id            = data.aws_vpc.default.id
+  availability_zone = var.zone
+  default_for_az    = true
+}
+
+data "aws_subnet" "public_subnet_2" {
+  vpc_id            = data.aws_vpc.default.id
+  availability_zone = "us-east-1b"
+  default_for_az    = true
+}
+
+data "aws_security_group" "internal_access" {
+  tags = {
+    Name = "internal_access"
+  }
+}
+
+data "aws_security_group" "http_from_single_computer" {
+  tags = {
+    Name = "http_from_single_computer"
+  }
+}
+
+
 resource "aws_launch_template" "webserver" {
-  name                   = "webserver"
+  name                   = "${local.prefix}-webserver"
   update_default_version = true
 
   iam_instance_profile {
@@ -8,9 +77,9 @@ resource "aws_launch_template" "webserver" {
 
   image_id = data.aws_ami.ubuntu.id
 
-  instance_type = "t4g.small"
+  instance_type = var.ec2_instance_type
 
-  key_name = "vm"
+  key_name = "${local.prefix}-bastion-ssh"
 
   vpc_security_group_ids = [data.aws_security_group.internal_access.id]
 
@@ -22,7 +91,7 @@ resource "aws_launch_template" "webserver" {
     }
   }
 
-  user_data = filebase64("webserver.cloud-init.yaml")
+  user_data = filebase64("${path.module}/webserver.cloud-init.yaml")
 }
 
 resource "aws_lb_target_group" "webserver" {
@@ -40,7 +109,7 @@ resource "aws_autoscaling_group" "webserver" {
     version = "$Latest"
   }
   # Subnets where to place instances
-  vpc_zone_identifier = [data.aws_subnet.private_subnet.id]
+  vpc_zone_identifier = [data.aws_subnet.private_subnet.id, data.aws_subnet.private_subnet2.id]
 
   # ALBs Target Groups to place instances
   target_group_arns     = [aws_lb_target_group.webserver.arn]
@@ -50,7 +119,7 @@ resource "aws_autoscaling_group" "webserver" {
 
   health_check_type = "ELB"
   # The amount of time until EC2 Auto Scaling performs the first health check on new instances after they are put into service.
-  health_check_grace_period = 300
+  health_check_grace_period = 120
 
   # maximum time for Terraform to wait for ASG reach
   wait_for_capacity_timeout = "10m"
@@ -77,6 +146,8 @@ resource "aws_lb" "webserver" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [data.aws_security_group.http_from_single_computer.id]
+
+  # TODO replace with subnet mapping to reserver EIP
   subnets            = [data.aws_subnet.public_subnet_1.id, data.aws_subnet.public_subnet_2.id]
 }
 

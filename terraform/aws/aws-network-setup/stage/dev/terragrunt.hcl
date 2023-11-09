@@ -15,10 +15,12 @@ terraform {
 
 
 inputs = {
+  env                    = "dev"
   ssh_pub_key            = local.pub_ssh
   ssh_key                = local.ssh_key
   external_access_ip     = local.current_ip
   create_sample_instance = true
   ec2_instance_type      = "t4g.small" # or t3.micro
   ec2_architecture       = "arm64"     # or x86_64
+  aws_tags               = { Env = "dev" }
 }
