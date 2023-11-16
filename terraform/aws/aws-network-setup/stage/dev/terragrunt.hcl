@@ -23,4 +23,15 @@ inputs = {
   ec2_instance_type      = "t4g.small" # or t3.micro
   ec2_architecture       = "arm64"     # or x86_64
   aws_tags               = { Env = "dev" }
+  zones = {
+    "us-east-1a" = {
+      ip_cidr_range = "172.31.96.0/20"
+    },
+    "us-east-1b" = {
+      ip_cidr_range = "172.31.112.0/20"
+    },
+    "us-east-1c" = {
+      ip_cidr_range = "172.31.128.0/20"
+    },
+  },
 }

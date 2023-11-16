@@ -1,7 +1,7 @@
 locals {
   bucket  = "${local.account}-terraform-state"
   account = "${run_cmd("--terragrunt-quiet", "aws", "sts", "get-caller-identity", "--query", "\"Account\"", "--output", "text")}"
-  region  = "${get_env("AWS_REGION", "us-east-1")}"
+  region  = "us-east-1"
   zone    = "us-east-1a"
 }
 

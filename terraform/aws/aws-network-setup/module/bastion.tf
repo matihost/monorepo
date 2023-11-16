@@ -1,5 +1,5 @@
 resource "aws_key_pair" "vm_key" {
-  key_name   = "${local.prefix}-bastion-ssh"
+  key_name   = "${local.prefix}-${var.region}-bastion-ssh"
   public_key = var.ssh_pub_key
 }
 
@@ -89,7 +89,7 @@ resource "aws_security_group" "internal_access" {
 resource "aws_instance" "bastion_vm" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.ec2_instance_type
-  subnet_id              = data.aws_subnet.default.id
+  subnet_id              = data.aws_subnet.default[var.zone].id
   key_name               = aws_key_pair.vm_key.key_name
   vpc_security_group_ids = [aws_security_group.bastion_access.id, aws_security_group.internal_access.id]
   user_data = templatefile("${path.module}/bastion.cloud-init.tpl", {
@@ -98,7 +98,7 @@ resource "aws_instance" "bastion_vm" {
     }
   )
   tags = {
-    Name = "${local.prefix}-bastion"
+    Name = "${local.prefix}-${var.region}-bastion"
   }
 }
 

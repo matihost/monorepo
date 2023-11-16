@@ -3,7 +3,8 @@ data "aws_vpc" "default" {
 }
 
 data "aws_subnet" "default" {
-  availability_zone = var.zone
+  for_each = var.zones
+  availability_zone = each.key
   vpc_id            = data.aws_vpc.default.id
   default_for_az    = true
 }
@@ -32,18 +33,18 @@ resource "aws_security_group" "nat_access" {
     cidr_blocks = [data.aws_vpc.default.cidr_block]
   }
   ingress {
-    description = "HTTP from private subnetwork"
+    description = "HTTP from VPC"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [aws_subnet.private_a.cidr_block]
+    cidr_blocks = [data.aws_vpc.default.cidr_block]
   }
   ingress {
-    description = "HTTPS from private subnetwork"
+    description = "HTTPS from VPC"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [aws_subnet.private_a.cidr_block]
+    cidr_blocks = [data.aws_vpc.default.cidr_block]
   }
 
   # Terraform removed default egress ALLOW_ALL rule
@@ -66,14 +67,14 @@ resource "aws_security_group" "nat_access" {
 resource "aws_instance" "nat" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.ec2_instance_type
-  subnet_id              = data.aws_subnet.default.id
+  subnet_id              = data.aws_subnet.default[var.zone].id
   key_name               = aws_key_pair.vm_key.key_name
   vpc_security_group_ids = [aws_security_group.nat_access.id]
   # NAT instance has to have source / dest adress check disabled
   source_dest_check = false
 
   user_data = templatefile("${path.module}/nat.init.tpl.sh", {
-    private_cidr = aws_subnet.private_a.cidr_block,
+    private_cidr = data.aws_vpc.default.cidr_block,
     }
   )
 
@@ -83,27 +84,22 @@ resource "aws_instance" "nat" {
 }
 
 
-resource "aws_subnet" "private_a" {
+resource "aws_subnet" "private" {
+  for_each = var.zones
   vpc_id                  = data.aws_vpc.default.id
-  cidr_block              = "172.31.96.0/20"
-  availability_zone       = var.zone
+  cidr_block              = each.value.ip_cidr_range
+  availability_zone       = each.key
   map_public_ip_on_launch = false
   tags = {
-    Name = "${local.prefix}-private-${var.zone}"
+    Name = "${local.prefix}-${var.region}-private-${each.key}"
     Tier = "private"
   }
 }
 
-# TODO make it dynamic
-resource "aws_subnet" "private_b" {
-  vpc_id                  = data.aws_vpc.default.id
-  cidr_block              = "172.31.112.0/20"
-  availability_zone       = "us-east-1b"
-  map_public_ip_on_launch = false
-  tags = {
-    Name = "${local.prefix}-private-us-east-1b"
-    Tier = "private"
-  }
+resource "aws_route_table_association" "private" {
+  for_each = var.zones
+  subnet_id      = aws_subnet.private[each.key].id
+  route_table_id = aws_route_table.natted.id
 }
 
 resource "aws_route_table" "natted" {
@@ -117,13 +113,8 @@ resource "aws_route_table" "natted" {
   }
 
   tags = {
-    Name = "${local.prefix}-natted"
+    Name = "${local.prefix}-${var.region}-natted"
   }
-}
-
-resource "aws_route_table_association" "private_a" {
-  subnet_id      = aws_subnet.private_a.id
-  route_table_id = aws_route_table.natted.id
 }
 
 

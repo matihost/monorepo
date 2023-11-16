@@ -58,3 +58,11 @@ variable "region" {
   type        = string
   description = "Preffered AWS region where resource need to be placed"
 }
+
+
+variable "zones" {
+  type = map(object({
+      ip_cidr_range = string
+  }))
+  description = "AWS zones for VPC Subnetworks Deployment"
+}

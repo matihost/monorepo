@@ -83,13 +83,17 @@ resource "aws_security_group" "ssm" {
 }
 
 
+locals{
+  subnet_ids =  [for subnet in aws_subnet.private: subnet.id]
+}
+
 # VPC endpoint for the Systems Manager service
 # - https://aws.amazon.com/premiumsupport/knowledge-center/ec2-systems-manager-vpc-endpoints/
 resource "aws_vpc_endpoint" "ssm_endpoint" {
   vpc_id              = data.aws_vpc.default.id
   service_name        = "com.amazonaws.${var.region}.ssm"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+  subnet_ids          = local.subnet_ids
   security_group_ids  = [aws_security_group.ssm.id]
   private_dns_enabled = true
 
@@ -103,7 +107,7 @@ resource "aws_vpc_endpoint" "ec2_messages_endpoint" {
   vpc_id              = data.aws_vpc.default.id
   service_name        = "com.amazonaws.${var.region}.ec2messages"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+  subnet_ids          = local.subnet_ids
   security_group_ids  = [aws_security_group.ssm.id]
   private_dns_enabled = true
 
@@ -117,7 +121,7 @@ resource "aws_vpc_endpoint" "ssm_messages_endpoint" {
   vpc_id              = data.aws_vpc.default.id
   service_name        = "com.amazonaws.${var.region}.ssmmessages"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+  subnet_ids          = local.subnet_ids
   security_group_ids  = [aws_security_group.ssm.id]
   private_dns_enabled = true
 
@@ -140,7 +144,7 @@ resource "aws_vpc_endpoint" "ec2_endpoint" {
   vpc_id              = data.aws_vpc.default.id
   service_name        = "com.amazonaws.${var.region}.ec2"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+  subnet_ids          = local.subnet_ids
   security_group_ids  = [aws_security_group.ssm.id]
   private_dns_enabled = true
 
@@ -154,7 +158,7 @@ resource "aws_vpc_endpoint" "kms_endpoint" {
   vpc_id              = data.aws_vpc.default.id
   service_name        = "com.amazonaws.${var.region}.kms"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+  subnet_ids          = local.subnet_ids
   security_group_ids  = [aws_security_group.ssm.id]
   private_dns_enabled = true
 
@@ -168,7 +172,7 @@ resource "aws_vpc_endpoint" "logs_endpoint" {
   vpc_id              = data.aws_vpc.default.id
   service_name        = "com.amazonaws.${var.region}.logs"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+  subnet_ids          = local.subnet_ids
   security_group_ids  = [aws_security_group.ssm.id]
   private_dns_enabled = true
 

@@ -26,7 +26,7 @@ run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
 
 
 test: ## test ALB Nginx instance
-	curl http://$(shell cd stage/$(ENV) && terragrunt output alb_dns):80
+	curl http://$(shell cd stage/$(ENV) && terragrunt output public_alb_dns):80
 
 show-auto-scalling-group-state: ## show AutoScalingGroup state(see DesiredCapacity for current amount of instances)
 	aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name webserver

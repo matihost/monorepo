@@ -1,18 +1,18 @@
 # Terraform :: Application Load Balancer usage example
 
-Terraform scripts deploy sample webserver app in autoscalling mode in private subnet and expose public facing loadbalancer to it.
+Terraform scripts deploy sample webserver app in autoscalling mode in private subnets and expose public facing loadbalancer to it.
 
 In particular it creates:
 
 - launch template for webserver (ubuntu with nginx acting as webserver)
 
-- autoscalling group, plus simple autoscalling policy
+- autoscaling group, plus simple autoscaling policy
 
-- targetgroup for ALB usage - it is being populated via autoscalling group automatically (aka changes to instances count is reflected in target group)
+- targetgroup for ALB usage - it is being populated via autoscaling group automatically (aka changes to instances count is reflected in target group)
 
 - Application Load Balancer (ALB)  with single listener forwarding all traffic to above target group
 
-This setup use AWS resources eliglible to AWS Free Tier __only__.
+This setup use AWS resources eligible to AWS Free Tier __only__.
 
 ## Prerequisites
 
