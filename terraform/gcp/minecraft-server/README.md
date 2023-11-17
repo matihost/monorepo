@@ -12,6 +12,8 @@ Features:
 
 * Minecraft server world and configuration is automatically backup each hour to Cloud Storage. When server crashes - after 200 seconds of inactivity - the instance is recreated. Upon startup , the last backup is downloaded, otherwise it creates a new fresh world. Upon ordinary reboot, the backup is not downloaded.
 
+* Attempt to logging and logout from the server are kept in separate log bucket sing for 30 days.
+
 * Minecraft server is automatically shutdown (instanceGroup is scaled to 0) at 10:05 PM and automatically started at 10:05 AM every day.
 
 Limitations:
