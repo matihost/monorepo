@@ -60,9 +60,15 @@ variable "region" {
 }
 
 
+variable "vpc_ip_cidr_range" {
+  type        = string
+  description = "Regional VPC range"
+}
+
 variable "zones" {
   type = map(object({
-      ip_cidr_range = string
+      public_ip_cidr_range = string
+      private_ip_cidr_range = string
   }))
   description = "AWS zones for VPC Subnetworks Deployment"
 }

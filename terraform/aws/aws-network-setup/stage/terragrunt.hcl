@@ -1,8 +1,6 @@
 locals {
   bucket  = "${local.account}-terraform-state"
   account = "${run_cmd("--terragrunt-quiet", "aws", "sts", "get-caller-identity", "--query", "\"Account\"", "--output", "text")}"
-  region  = "us-east-1"
-  zone    = "us-east-1a"
 }
 
 remote_state {
@@ -14,7 +12,7 @@ remote_state {
   config = {
     bucket = local.bucket
     key    = "${basename(abspath("${get_parent_terragrunt_dir()}/.."))}/${basename(get_parent_terragrunt_dir())}/${path_relative_to_include()}/terraform.tfstate"
-    region = local.region
+    region = "us-east-1"
     # TODO play with it... maybe not in free tier
     # encrypt        = true
     # dynamodb_table = "my-lock-table"
@@ -51,6 +49,4 @@ terraform {
 
 inputs = {
   account = local.account
-  region  = local.region
-  zone    = local.zone
 }

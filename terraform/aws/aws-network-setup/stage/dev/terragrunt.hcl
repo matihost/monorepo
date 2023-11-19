@@ -16,22 +16,31 @@ terraform {
 
 inputs = {
   env                    = "dev"
+  region                 = "us-east-1"
+  zone                   = "us-east-1a"
   ssh_pub_key            = local.pub_ssh
   ssh_key                = local.ssh_key
   external_access_ip     = local.current_ip
-  create_sample_instance = true
+  create_sample_instance = false
   ec2_instance_type      = "t4g.small" # or t3.micro
   ec2_architecture       = "arm64"     # or x86_64
-  aws_tags               = { Env = "dev" }
+  aws_tags = {
+    Env    = "dev"
+    Region = "us-east-1"
+  }
+  vpc_ip_cidr_range = "10.0.0.0/16"
   zones = {
     "us-east-1a" = {
-      ip_cidr_range = "172.31.96.0/20"
+      public_ip_cidr_range  = "10.0.0.0/22"
+      private_ip_cidr_range = "10.0.32.0/19"
     },
     "us-east-1b" = {
-      ip_cidr_range = "172.31.112.0/20"
+      public_ip_cidr_range  = "10.0.4.0/22"
+      private_ip_cidr_range = "10.0.64.0/19"
     },
     "us-east-1c" = {
-      ip_cidr_range = "172.31.128.0/20"
+      public_ip_cidr_range  = "10.0.8.0/22"
+      private_ip_cidr_range = "10.0.96.0/19"
     },
   },
 }

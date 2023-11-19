@@ -65,16 +65,16 @@ resource "aws_iam_role_policy_attachment" "ssm-ec2" {
 }
 
 resource "aws_security_group" "ssm" {
-  name        = "${var.env}-ssm"
+  name        = "${local.prefix}-ssm"
   description = "Allow TLS inbound traffic for SSM/EC2 endpoints"
-  vpc_id      = data.aws_vpc.default.id
+  vpc_id      = aws_vpc.main.id
 
   ingress {
     description = "TLS from VPC"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.default.cidr_block]
+    cidr_blocks = [aws_vpc.main.cidr_block]
 
   }
   tags = {
@@ -90,7 +90,7 @@ locals{
 # VPC endpoint for the Systems Manager service
 # - https://aws.amazon.com/premiumsupport/knowledge-center/ec2-systems-manager-vpc-endpoints/
 resource "aws_vpc_endpoint" "ssm_endpoint" {
-  vpc_id              = data.aws_vpc.default.id
+  vpc_id              = aws_vpc.main.id
   service_name        = "com.amazonaws.${var.region}.ssm"
   vpc_endpoint_type   = "Interface"
   subnet_ids          = local.subnet_ids
@@ -98,13 +98,13 @@ resource "aws_vpc_endpoint" "ssm_endpoint" {
   private_dns_enabled = true
 
   tags = {
-    Name = "${try(data.aws_vpc.default.tags.Name, data.aws_vpc.default.id)}-ssm"
+    Name = "${try(aws_vpc.main.tags.Name, aws_vpc.main.id)}-ssm"
   }
 }
 
 # VPC endpoint for SSM Agent to make calls to the Systems Manager service
 resource "aws_vpc_endpoint" "ec2_messages_endpoint" {
-  vpc_id              = data.aws_vpc.default.id
+  vpc_id              = aws_vpc.main.id
   service_name        = "com.amazonaws.${var.region}.ec2messages"
   vpc_endpoint_type   = "Interface"
   subnet_ids          = local.subnet_ids
@@ -112,13 +112,13 @@ resource "aws_vpc_endpoint" "ec2_messages_endpoint" {
   private_dns_enabled = true
 
   tags = {
-    Name = "${try(data.aws_vpc.default.tags.Name, data.aws_vpc.default.id)}-ec2messages"
+    Name = "${try(aws_vpc.main.tags.Name, aws_vpc.main.id)}-ec2messages"
   }
 }
 
 # VPC endpoint for connecting to EC2 instances through a secure data channel using Session Manager
 resource "aws_vpc_endpoint" "ssm_messages_endpoint" {
-  vpc_id              = data.aws_vpc.default.id
+  vpc_id              = aws_vpc.main.id
   service_name        = "com.amazonaws.${var.region}.ssmmessages"
   vpc_endpoint_type   = "Interface"
   subnet_ids          = local.subnet_ids
@@ -126,7 +126,7 @@ resource "aws_vpc_endpoint" "ssm_messages_endpoint" {
   private_dns_enabled = true
 
   tags = {
-    Name = "${try(data.aws_vpc.default.tags.Name, data.aws_vpc.default.id)}-ssmmessages"
+    Name = "${try(aws_vpc.main.tags.Name, aws_vpc.main.id)}-ssmmessages"
   }
 }
 
@@ -141,7 +141,7 @@ resource "aws_vpc_endpoint" "ssm_messages_endpoint" {
 
 # VPC endpoint for Systems Manager to create VSS-enabled snapshots
 resource "aws_vpc_endpoint" "ec2_endpoint" {
-  vpc_id              = data.aws_vpc.default.id
+  vpc_id              = aws_vpc.main.id
   service_name        = "com.amazonaws.${var.region}.ec2"
   vpc_endpoint_type   = "Interface"
   subnet_ids          = local.subnet_ids
@@ -149,13 +149,13 @@ resource "aws_vpc_endpoint" "ec2_endpoint" {
   private_dns_enabled = true
 
   tags = {
-    Name = "${try(data.aws_vpc.default.tags.Name, data.aws_vpc.default.id)}-ec2"
+    Name = "${try(aws_vpc.main.tags.Name, aws_vpc.main.id)}-ec2"
   }
 }
 
 # VPC endpoint for AWS Key Management Service (AWS KMS) encryption for Session Manager or Parameter Store parameters
 resource "aws_vpc_endpoint" "kms_endpoint" {
-  vpc_id              = data.aws_vpc.default.id
+  vpc_id              = aws_vpc.main.id
   service_name        = "com.amazonaws.${var.region}.kms"
   vpc_endpoint_type   = "Interface"
   subnet_ids          = local.subnet_ids
@@ -163,13 +163,13 @@ resource "aws_vpc_endpoint" "kms_endpoint" {
   private_dns_enabled = true
 
   tags = {
-    Name = "${try(data.aws_vpc.default.tags.Name, data.aws_vpc.default.id)}-kms"
+    Name = "${try(aws_vpc.main.tags.Name, aws_vpc.main.id)}-kms"
   }
 }
 
 # VPC endpoint for Amazon CloudWatch Logs (CloudWatch Logs) for Session Manager, Run Command, or SSM Agent logs
 resource "aws_vpc_endpoint" "logs_endpoint" {
-  vpc_id              = data.aws_vpc.default.id
+  vpc_id              = aws_vpc.main.id
   service_name        = "com.amazonaws.${var.region}.logs"
   vpc_endpoint_type   = "Interface"
   subnet_ids          = local.subnet_ids
@@ -177,6 +177,6 @@ resource "aws_vpc_endpoint" "logs_endpoint" {
   private_dns_enabled = true
 
   tags = {
-    Name = "${try(data.aws_vpc.default.tags.Name, data.aws_vpc.default.id)}-logs"
+    Name = "${try(aws_vpc.main.tags.Name, aws_vpc.main.id)}-logs"
   }
 }

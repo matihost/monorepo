@@ -26,7 +26,9 @@ data "aws_ami" "ubuntu" {
 }
 
 data "aws_vpc" "default" {
-  default = true
+  tags = {
+    Name = var.vpc_name
+  }
 }
 
 data "aws_subnet" "private" {
@@ -43,11 +45,14 @@ data "aws_subnet" "public" {
   for_each = var.zones
   vpc_id            = data.aws_vpc.default.id
   availability_zone = each.key
-  default_for_az    = true
+  tags = {
+    Tier = "public"
+  }
 }
 
 
 data "aws_security_group" "webserver" {
+  vpc_id = data.aws_vpc.default.id
   tags = {
     Name = var.ec2_security_group_name
   }
@@ -112,6 +117,15 @@ resource "aws_autoscaling_group" "webserver" {
 
   # maximum time for Terraform to wait for ASG reach
   wait_for_capacity_timeout = "10m"
+
+  dynamic "tag" {
+    for_each = try(var.aws_tags, map())
+    content {
+      key                 = tag.key
+      propagate_at_launch = true
+      value               = tag.value
+    }
+  }
 }
 
 resource "aws_autoscaling_policy" "webserver" {

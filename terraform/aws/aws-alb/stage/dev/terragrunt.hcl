@@ -14,13 +14,19 @@ terraform {
 
 inputs = {
   env                           = "dev"
+  region                        = "us-east-1"
+  zone                          = "us-east-1a"
   external_access_ip            = local.current_ip
   instance_profile              = "SSM-EC2"
   ec2_instance_type             = "t4g.small" # or t3.micro
   ec2_architecture              = "arm64"     # or x86_64
   ssh_key_id                    = "dev-us-east-1-bastion-ssh"
-  ec2_security_group_name       = "internal_access"
-  public_lb_security_group_name = "http_from_single_computer"
-  aws_tags                      = { Env = "dev" }
-  zones                         = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  ec2_security_group_name       = "dev-ssh-http-from-vpc"
+  public_lb_security_group_name = "dev-http-from-single-external-ip-only"
+  vpc_name                      = "dev-us-east-1"
+  aws_tags = {
+    Env    = "dev"
+    Region = "us-east1"
+  }
+  zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }

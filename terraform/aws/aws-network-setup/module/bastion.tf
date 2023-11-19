@@ -27,11 +27,13 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_security_group" "bastion_access" {
-  name        = "${local.prefix}-bastion-access"
+  name        = "${local.prefix}-ssh-from-single-external-ip-only"
   description = "Allow SSH access only from single computer"
 
+  vpc_id = aws_vpc.main.id
+
   tags = {
-    Name = "bastion_access"
+    Name = "${local.prefix}-ssh-from-single-external-ip-only"
   }
 
   ingress {
@@ -53,11 +55,13 @@ resource "aws_security_group" "bastion_access" {
 }
 
 resource "aws_security_group" "internal_access" {
-  name        = "${local.prefix}-internal_access"
-  description = "Allow HTTP & SSH access from internal VPC only"
+  name        = "${local.prefix}-ssh-http-from-vpc"
+  description = "Allow HTTP(s) & SSH access from internal VPC only"
+
+  vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "internal_access"
+    Name = "${local.prefix}-ssh-http-from-vpc"
   }
 
   ingress {
@@ -65,14 +69,21 @@ resource "aws_security_group" "internal_access" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.default.cidr_block]
+    cidr_blocks = [aws_vpc.main.cidr_block]
+  }
+  ingress {
+    description = "HTTPS from default VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.main.cidr_block]
   }
   ingress {
     description = "SSH from default VPC"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.default.cidr_block]
+    cidr_blocks = [aws_vpc.main.cidr_block]
   }
 
   # Terraform removed default egress ALLOW_ALL rule
@@ -89,7 +100,7 @@ resource "aws_security_group" "internal_access" {
 resource "aws_instance" "bastion_vm" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.ec2_instance_type
-  subnet_id              = data.aws_subnet.default[var.zone].id
+  subnet_id              = aws_subnet.public[var.zone].id
   key_name               = aws_key_pair.vm_key.key_name
   vpc_security_group_ids = [aws_security_group.bastion_access.id, aws_security_group.internal_access.id]
   user_data = templatefile("${path.module}/bastion.cloud-init.tpl", {
@@ -100,6 +111,8 @@ resource "aws_instance" "bastion_vm" {
   tags = {
     Name = "${local.prefix}-${var.region}-bastion"
   }
+
+  depends_on = [ aws_default_route_table.main ]
 }
 
 output "bastion_id" {

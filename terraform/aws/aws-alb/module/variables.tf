@@ -46,11 +46,22 @@ variable "region" {
   description = "Preffered AWS region where resource need to be placed"
 }
 
+variable "aws_tags" {
+  type = map(string)
+  description = "AWS tags"
+}
 
 variable "ec2_instance_profile" {
   default     = ""
   type        = string
   description = "The name of instance_profile (dynamically provisioning access to role)"
+}
+
+
+variable "vpc_name" {
+  default     = "dev-us-east-1"
+  type        = string
+  description = "VPC Name to place EC2 instances"
 }
 
 
