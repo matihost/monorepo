@@ -88,13 +88,6 @@ resource "aws_launch_template" "webserver" {
   user_data = filebase64("${path.module}/webserver.cloud-init.yaml")
 }
 
-resource "aws_lb_target_group" "webserver" {
-  name = local.prefix
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = data.aws_vpc.default.id
-}
-
 
 resource "aws_autoscaling_group" "webserver" {
   name = local.prefix
@@ -106,8 +99,8 @@ resource "aws_autoscaling_group" "webserver" {
   vpc_zone_identifier = local.private_subnet_ids
 
   # ALBs Target Groups to place instances
-  target_group_arns     = [aws_lb_target_group.webserver.arn]
-  max_size              = 2
+  target_group_arns     = [aws_lb_target_group.webserver.arn, aws_lb_target_group.tcp-webserver.arn]
+  max_size              = 5
   min_size              = 1
   wait_for_elb_capacity = 1
 

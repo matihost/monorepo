@@ -29,13 +29,13 @@ test: ## test ALB Nginx instance
 	curl http://$(shell cd stage/$(ENV) && terragrunt output public_alb_dns):80
 
 show-auto-scalling-group-state: ## show AutoScalingGroup state(see DesiredCapacity for current amount of instances)
-	aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name webserver
+	aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name $(ENV)-webserver
 
 scale-up-manually: ## scale Auto Scaling Group up by single instance
-	aws autoscaling set-desired-capacity --auto-scaling-group-name webserver --desired-capacity $$(( `aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name webserver | jq  '..|.DesiredCapacity?'|grep -v null` + 1 ))
+	aws autoscaling set-desired-capacity --auto-scaling-group-name $(ENV)-webserver --desired-capacity $$(( `aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name $(ENV)-webserver | jq  '..|.DesiredCapacity?'|grep -v null` + 1 ))
 
 scale-down-manually: ## scale Auto Scaling Group down by single instance
-	aws autoscaling set-desired-capacity --auto-scaling-group-name webserver --desired-capacity $$(( `aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name webserver | jq  '..|.DesiredCapacity?'|grep -v null` - 1 ))
+	aws autoscaling set-desired-capacity --auto-scaling-group-name $(ENV)-webserver --desired-capacity $$(( `aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name $(ENV)-webserver | jq  '..|.DesiredCapacity?'|grep -v null` - 1 ))
 
 
 show-state: ## show state
