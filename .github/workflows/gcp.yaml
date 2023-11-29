@@ -65,7 +65,7 @@ jobs:
     # Configure Workload Identity Federation and generate an access token.
     - id: 'auth'
       name: 'Authenticate to Google Cloud'
-      uses: 'google-github-actions/auth@v1'
+      uses: 'google-github-actions/auth@v2'
       with:
         token_format: 'access_token'
         # Format: 'projects/137505059283/locations/global/workloadIdentityPools/gh-pool/providers/gh-pool-provider'
@@ -75,7 +75,7 @@ jobs:
 
     # Alternative option - authentication via credentials json
     # - id: 'auth'
-    #   uses: 'google-github-actions/auth@v1'
+    #   uses: 'google-github-actions/auth@v2'
     #   with:
     #     credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 
