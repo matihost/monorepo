@@ -98,6 +98,9 @@ resource "aws_autoscaling_group" "webserver" {
   # Subnets where to place instances
   vpc_zone_identifier = local.private_subnet_ids
 
+  # how to spread between zones
+  placement_group = aws_placement_group.webserver.id
+
   # ALBs Target Groups to place instances
   target_group_arns     = [aws_lb_target_group.webserver.arn, aws_lb_target_group.tcp-webserver.arn]
   max_size              = 5
@@ -127,4 +130,11 @@ resource "aws_autoscaling_policy" "webserver" {
   adjustment_type        = "ChangeInCapacity"
   cooldown               = 20
   autoscaling_group_name = aws_autoscaling_group.webserver.name
+}
+
+
+resource "aws_placement_group" "webserver" {
+  name     = local.prefix
+  strategy = "partition"
+  partition_count = 3
 }
