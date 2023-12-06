@@ -108,11 +108,12 @@ resource "aws_ecs_service" "app" {
   deployment_maximum_percent         = "200"
   deployment_minimum_healthy_percent = "50"
 
-  # load_balancer {
-  #   target_group_arn = "${var.alb_target_group_arn}"
-  #   container_name   = "${var.container_name}"
-  #   container_port   = "${var.container_port}"
-  # }
+  load_balancer {
+    target_group_arn = aws_lb_target_group.app[each.key].arn
+    container_name   = each.key
+    container_port   = each.value.port
+  }
+
   lifecycle {
     ignore_changes = [desired_count]
   }

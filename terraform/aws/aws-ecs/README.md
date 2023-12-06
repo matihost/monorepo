@@ -8,13 +8,13 @@ In particular it creates:
 
 - for each application it creates
 
-  - private ECR repository (ECR repository is represents single image)
+  - private ECR repository (ECR repository represents single image)
 
   - move image to ECR repository (TODO)
 
   - ECS service (with Fargate)
 
-  - ALB (TODO)
+  - internal ALB exposing ECS service
 
 This setup use AWS resources eligible to AWS Free Tier __only__ when possible.
 
