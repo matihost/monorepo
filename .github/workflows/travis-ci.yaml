@@ -85,7 +85,7 @@ jobs:
           ${{ github.workspace }}/.cache/go-build
           ${{ github.workspace }}/gopath/pkg/mod
         key: "${{ runner.os }}-path"
-    - uses: actions/setup-go@v4
+    - uses: actions/setup-go@v5
       with:
         go-version: '1.21'
     - run: cd go/learning && go get -d ./... && go build -mod=mod -o .  ./... && go test ./pkg/language && ./language
