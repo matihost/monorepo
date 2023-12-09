@@ -64,6 +64,7 @@ resource "aws_rds_cluster" "db" {
   port                                = "5432"
   preferred_backup_window             = "06:43-07:13"
   preferred_maintenance_window        = "mon:10:25-mon:10:55"
+  skip_final_snapshot = true
 
   serverlessv2_scaling_configuration {
     max_capacity = "16"
