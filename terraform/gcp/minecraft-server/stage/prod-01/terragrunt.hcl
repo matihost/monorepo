@@ -1,3 +1,4 @@
+
 locals {
   bucket  = "${local.project}-terraform-state"
   project = "${run_cmd("--terragrunt-quiet", "gcloud", "config", "get-value", "project")}"

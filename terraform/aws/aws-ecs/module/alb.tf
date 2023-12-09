@@ -1,5 +1,12 @@
+locals {
+  apps_with_lb =  {
+    for k, v in var.apps : k => v
+    if v.port != 0
+  }
+
+}
 resource "aws_lb" "app" {
-  for_each = var.apps
+  for_each = local.apps_with_lb
 
   name = "${local.prefix}-${each.key}"
   internal           = true
@@ -12,7 +19,7 @@ resource "aws_lb" "app" {
 }
 
 resource "aws_lb_listener" "app" {
-  for_each = var.apps
+  for_each = local.apps_with_lb
 
   load_balancer_arn = aws_lb.app[each.key].arn
   port              = "80"
@@ -31,7 +38,7 @@ resource "aws_lb_listener" "app" {
 }
 
 resource "aws_lb_target_group" "app" {
-  for_each = var.apps
+  for_each = local.apps_with_lb
 
   name = "${local.prefix}-${each.key}"
   port     = each.value.port

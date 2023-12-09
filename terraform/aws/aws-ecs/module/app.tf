@@ -60,14 +60,16 @@ resource "aws_ecs_task_definition" "app" {
         memory    = each.value.memory
         cpu       = each.value.cpu
         essential = true,
-        portMappings = [
+        portMappings = each.value.port !=0 ? [
           {
             # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#container_definition_portmappings
             containerPort = each.value.port
             appProtocol = try(each.value.protocol, "http")
           }
-        ]
-        # environment = each.value.env_vars
+        ] : []
+        environment = each.value.env_vars
+
+        dockerLabels = each.value.docker_labels
 
         logConfiguration = {
           logDriver = "awslogs"
@@ -77,6 +79,8 @@ resource "aws_ecs_task_definition" "app" {
             awslogs-stream-prefix : each.key
           }
         }
+
+
       }
   ])
 }
@@ -108,11 +112,16 @@ resource "aws_ecs_service" "app" {
   deployment_maximum_percent         = "200"
   deployment_minimum_healthy_percent = "50"
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.app[each.key].arn
-    container_name   = each.key
-    container_port   = each.value.port
+
+  dynamic "load_balancer" {
+    for_each = each.value.port != 0 ? [1] : []
+    content {
+      target_group_arn = aws_lb_target_group.app[each.key].arn
+      container_name   = each.key
+      container_port   = each.value.port
+    }
   }
+
 
   lifecycle {
     ignore_changes = [desired_count]

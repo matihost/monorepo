@@ -32,6 +32,8 @@ variable "apps" {
     protocol = string
     desired_instances = number
     security_group_name = string
+    env_vars = list(map(string))
+    docker_labels = map(string)
   }))
   description = "Map of apps to deploy as ECS tasks,"
 }
