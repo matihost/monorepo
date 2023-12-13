@@ -96,8 +96,7 @@ resource "random_password" "postgres" {
   for_each = var.dbs
 
   length           = 10
-  special          = true
-  override_special = "_%@"
+  special          = false
 }
 
 
