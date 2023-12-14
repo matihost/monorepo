@@ -193,7 +193,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: java
         queries: security-extended,security-and-quality
@@ -201,7 +201,7 @@ jobs:
       working-directory: java
       run: mvn -s .mvn/settings.xml --show-version clean install
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3
       with:
         category: "/language:java"
   codeql-go:
@@ -226,7 +226,7 @@ jobs:
         key: "${{ runner.os }}-gopath"
     # https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/running-codeql-code-scanning-in-a-container
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: go
         queries: security-extended,security-and-quality
@@ -234,7 +234,7 @@ jobs:
       working-directory: go/learning
       run: go build -buildvcs=false -mod=mod -o . ./... && go test ./pkg/language && ./language
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3
       with:
         category: "/language:go"
   codeql-python:
@@ -251,7 +251,7 @@ jobs:
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
         fail-on-cache-miss: true
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: python
         queries: security-extended,security-and-quality
@@ -264,7 +264,7 @@ jobs:
         exchange-rate
       working-directory: python/apps/exchange-rate
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3
       with:
         category: "/language:python"
   ansible:
