@@ -103,7 +103,7 @@ jobs:
       working-directory: java
       run: mvn -s .mvn/settings.xml --show-version clean install
     - name: Archive app jars artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: app-jars
         path: java/apps/**/target/*.jar
