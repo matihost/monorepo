@@ -311,10 +311,13 @@ if ! minikube status &>/dev/null; then
   # do no use --cni=cilium as it breaks network connectivity
   # it is more robust to setup network-plugin to cni and install CNI driver itself
   if [[ "${EXTRA_PARAMS}" == *'network-plugin'* ]]; then
-    # Set cilium/cilium help config: operator.numReplicas=1
+    # Set cilium/cilium helm config: operator.numReplicas=1
     # because there is antiAffinity rule so that minikube cannot run 2 instances on single node
+    # Set cilium/cilium helm config: cni.exclusive=false
+    # because there is conflict with Istio https://github.com/istio/istio/issues/46764
+    # making Istio CNI unable to spin istio-cni-node
     # shellcheck disable=SC2046
-    helm install cilium cilium/cilium --namespace kube-system --set operator.replicas=1 --set containerRuntime.integration=auto
+    helm install cilium cilium/cilium --namespace kube-system --set operator.replicas=1 --set containerRuntime.integration=auto --set cni.exclusive=false
   fi
 
   for ADDON in ${ADDONS}; do

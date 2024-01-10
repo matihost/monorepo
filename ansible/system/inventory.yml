@@ -122,9 +122,9 @@ all:
         - name: google-cloud-sdk
           repo: "deb [arch=amd64] https://packages.cloud.google.com/apt cloud-sdk main"
           key_url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-        - name: openvpn
-          repo: "deb [arch=amd64] https://swupdate.openvpn.net/community/openvpn3/repos {{ versions.openvpn_repo_ubuntu_version }} main"
-          key_url: https://swupdate.openvpn.net/repos/openvpn-repo-pkg-key.pub
+        # - name: openvpn
+        #   repo: "deb [arch=amd64] https://swupdate.openvpn.net/community/openvpn3/repos {{ versions.openvpn_repo_ubuntu_version }} main"
+        #   key_url: https://swupdate.openvpn.net/repos/openvpn-repo-pkg-key.pub
         - name: terraform
           repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ versions.terraform_ubuntu_version }} main"
           key_url: https://apt.releases.hashicorp.com/gpg
@@ -138,6 +138,7 @@ all:
           repo: "deb [arch=amd64] https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_{{ versions.onedrive_ubuntu_version }}/ ./"
           key_url: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_{{ versions.onedrive_ubuntu_version }}/Release.key
         packages:
+        - neofetch
         - mc
         - lm-sensors
         - psensor
@@ -559,9 +560,10 @@ all:
             INSTALLED_VERSION="$(k9s version -s 2>/dev/null |grep Version | sed -E 's/Version .*(v.*)/\1/')"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || (
               cd "$(mktemp -d)" &&
-              curl -sL "https://api.github.com/repos/derailed/k9s/releases/latest" | jq -r ".assets[] | select(.browser_download_url | contains(\"k9s_Linux_amd64\")) |.browser_download_url" |
+              curl -sL "https://api.github.com/repos/derailed/k9s/releases/latest" | jq -r ".assets[] | select(.browser_download_url | endswith(\"k9s_Linux_amd64.tar.gz\")) |.browser_download_url" |
                 xargs curl -sSL | tar -zxv -o k9s &&
-                sudo mv k9s /usr/local/bin
+                sudo mv k9s /usr/local/bin &&
+                echo "k9s has been installed"
             )
         - name: okd
           become: false

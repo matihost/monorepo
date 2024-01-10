@@ -45,7 +45,7 @@
     <maven.test.skip>false</maven.test.skip>
 
     <!-- Spring Boot -->
-    <spring.boot.version>3.2.0</spring.boot.version>
+    <spring.boot.version>3.2.1</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -62,14 +62,14 @@
     <!-- Scala 3-->
     <scala.compat.version>3</scala.compat.version>
     <scala.version>${scala.compat.version}.3.1</scala.version>
-    <scala.spec2.version>5.4.1</scala.spec2.version>
+    <scala.spec2.version>5.4.2</scala.spec2.version>
     <scala.test.version>3.2.17</scala.test.version>
     <scala.test.plus.version>3.2.17.0</scala.test.plus.version>
     <!-- Scala 3 still depends on Scala 2 for backward compatibility -->
     <scala2.version>2.13.12</scala2.version>
 
     <!-- IBM MQ client -->
-    <mq.version>9.3.4.0</mq.version>
+    <mq.version>9.3.4.1</mq.version>
   </properties>
 
   <profiles>
@@ -377,25 +377,12 @@
           <configuration>
           <excludeVulnerabilityIds>
               <!--
-              ch.qos.logback:logback-core:jar:1.4.11:compile;
-              [CVE-2023-6378] CWE-502: Deserialization of Untrusted Data (7.1);
-              https://ossindex.sonatype.org/vulnerability/CVE-2023-6378?component-type=maven&component-name=ch.qos.logback%2Flogback-core&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-              https://ossindex.sonatype.org/component/pkg:maven/ch.qos.logback/logback-core@1.4.11?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+              com.jayway.jsonpath:json-path:jar:2.8.0:test;
+              [CVE-2023-51074] CWE-787: Out-of-bounds Write (7.5);
+              https://ossindex.sonatype.org/vulnerability/CVE-2023-51074?component-type=maven&component-name=com.jayway.jsonpath%2Fjson-path&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+              https://ossindex.sonatype.org/component/pkg:maven/com.jayway.jsonpath/json-path@2.8.0?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
               -->
-              <!--
-              ch.qos.logback:logback-classic:jar:1.4.11:compile;
-              [CVE-2023-6378] CWE-502: Deserialization of Untrusted Data (7.1);
-              https://ossindex.sonatype.org/vulnerability/CVE-2023-6378?component-type=maven&component-name=ch.qos.logback%2Flogback-classic&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-              https://ossindex.sonatype.org/component/pkg:maven/ch.qos.logback/logback-classic@1.4.11?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-              -->
-              <exclude>CVE-2023-6378</exclude>
-              <!--
-              org.json:json:jar:20230618:compile;
-              [CVE-2023-5072] CWE-770: Allocation of Resources Without Limits or Throttling (7.5);
-              https://ossindex.sonatype.org/vulnerability/CVE-2023-5072?component-type=maven&component-name=org.json%2Fjson&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-              https://ossindex.sonatype.org/component/pkg:maven/org.json/json@20230618?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-              -->
-              <exclude>CVE-2023-5072</exclude>
+              <exclude>CVE-2023-51074</exclude>
             </excludeVulnerabilityIds>
             <reportFile>${project.build.directory}/audit-report.json</reportFile>
           </configuration>
