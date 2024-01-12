@@ -244,6 +244,7 @@ all:
         - "molecule[lint]"
         - "molecule[docker]"
         - awsume
+        - aws-sso-util
         - ansible-lint
         clis:
         - name: virtual-network-interface

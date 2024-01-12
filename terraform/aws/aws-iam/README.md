@@ -99,6 +99,12 @@ awsume -l
 # after that you need to edit ~/.aws/config to provide mfa_serial for 2FA
 aws configure --profile username@accountalias
 
+# setup SSO profile via aws-sso-util
+# pip3 install --user --break-system-packages aws-sso-util
+aws-sso-util configure profile --sso-start-url "https://SSO_NAME.awsapps.com/start#/" --sso-region "eu-west-1" SSORoleName@accountalias
+# in order to awsume to SSO profile, it requires to be logged first to the profile SSO config
+aws-sso-util login --profile Admin@mati-dev
+
 # activate particular AWS CLI profile
 awsume username@accountalias
 
