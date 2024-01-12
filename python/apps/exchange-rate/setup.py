@@ -43,10 +43,10 @@ setup(
     packages=find_namespace_packages(where="src"),  # Required
     python_requires=">=3.11, <4",
     install_requires=[
-        "requests>=2.30.0, <3",
-        "flask>=2.3.2, <3",
+        "requests>=2.31.0, <3",
+        "flask>=3.0.0, <4",
         "waitress>=2.1.2, <3",
-        "Babel>=2.12.1,<3",
+        "Babel>=2.14.0,<3",
     ],  # Optional
     dependency_links=[],
     entry_points={

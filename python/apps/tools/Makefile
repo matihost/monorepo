@@ -8,7 +8,9 @@ lint: init ## linter source code
 	@pipenv run pylint src/ tests/
 
 setup.py: init ## ensure setup.py exists and deps are locked with Pipfile.lock
-	@pipenv-setup sync
+	#@pipenv-setup sync
+	@rm -rf Pipfile.lock
+	@pipenv install --dev
 
 build: ## create distribution
 	python3 setup.py build

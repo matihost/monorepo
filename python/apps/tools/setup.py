@@ -45,8 +45,8 @@ setup(
     include_package_data=True,
     python_requires=">=3.11, <4",
     install_requires=[
-        "jinja2>=3.1.2",
-        "markupsafe>=2.1.1; python_version >= '2.7' and python_version >= '3.11'",
+        "jinja2>=3.1.3",
+        "markupsafe>=2.1.3; python_version >= '2.7' and python_version >= '3.11'",
     ],
     dependency_links=[],
     entry_points={
