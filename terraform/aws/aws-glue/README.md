@@ -1,6 +1,6 @@
 # Terraform :: Glue services deployment
 
-TODO
+Deploys sample AWS Glue Job copying S3 json data from one location to another with PCI filtering.
 
 ## Prerequisites
 
@@ -20,6 +20,9 @@ aws configure
 
 # deploy Glue jobs
 make run ENV=dev MODE=apply
+
+# run CopyS3 job
+make run-job
 
 # show Terraform state
 make show-state

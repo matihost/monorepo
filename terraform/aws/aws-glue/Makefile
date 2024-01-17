@@ -24,6 +24,9 @@ init:
 run: init ## setup Glue services: make run [ENV=dev] [MODE=apply]
 	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
 
+run-job: ## run CopyS3 job
+	aws glue start-job-run --job-name CopyS3 --region us-east-1
+
 
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show
