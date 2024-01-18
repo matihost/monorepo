@@ -7,7 +7,7 @@ substitutions:
   _MVN_SETTINGS: ".mvn/settings.xml"
 steps:
 - id: algorithms
-  name: maven:3-amazoncorretto-21-debian
+  name: maven:3-eclipse-temurin-21
   entrypoint: 'bash'
   dir: "algorithms/project-euler"
   args:
@@ -16,7 +16,7 @@ steps:
   - '-c'
   - |-
     mvn -s ${_MVN_SETTINGS} clean install
-- name: maven:3-amazoncorretto-21-debian
+- name: maven:3-eclipse-temurin-21
   waitFor: ['algorithms']
   entrypoint: 'bash'
   dir: "java"

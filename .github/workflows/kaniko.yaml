@@ -35,7 +35,7 @@ jobs:
   images:
     runs-on: 'ubuntu-22.04'
     container:
-      image: maven:3-amazoncorretto-21-debian
+      image: maven:3-eclipse-temurin-21
     steps:
     - name: checkout
       uses: actions/checkout@v4

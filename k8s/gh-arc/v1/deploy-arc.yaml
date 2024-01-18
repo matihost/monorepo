@@ -40,7 +40,7 @@
           name: "{{ repo.ci_namespace | mandatory }}"
           labels:
             # Ensure Istio does not inject sidecar to runner delegated jobs as they crash automatically
-            #  ##[debug]Using image 'maven:3-amazoncorretto-21-debian' for job image
+            #  ##[debug]Using image 'maven:3-eclipse-temurin-21' for job image
             #  ##[debug]Job pod created, waiting for it to come online matihost-monorepo-8blcq-87ffq-workflow
             #  ##[debug]Job pod is ready for traffic
             #  ##[debug]{"message":"command terminated with non-zero exit code: Error executing in Docker Container: 1","details":{"causes":[{"reason":"ExitCode","message":"1"}]}}

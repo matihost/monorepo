@@ -1,9 +1,5 @@
 ARG JAR_FILE
-# TODO bring back temuring when temurin 21 is released
-# FROM eclipse-temurin:21 as jreBuilder
-# FROM amazoncorretto:21-alpine-jdk as jreBuilder
-# RUN apk add --no-cache binutils
-FROM maven:3-amazoncorretto-21-debian as jreBuilder
+FROM eclipse-temurin:21-jdk as jreBuilder
 RUN apt -y update && apt -y install binutils
 # build JRE with only modules app depens on
 # + jfr and jcmd tooling (jcmd,jps,jmap,jstack etc.) ~ adds 6 MiB to image size

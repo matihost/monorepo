@@ -40,7 +40,7 @@ jobs:
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
     timeout-minutes: 5
     container:
-      image: maven:3-amazoncorretto-21-debian
+      image: maven:3-eclipse-temurin-21
     outputs:
       GIT_COMMIT_HASH: ${{ steps.git_hash.outputs.GIT_COMMIT_HASH }}
     steps:
@@ -73,7 +73,7 @@ jobs:
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
     timeout-minutes: 30
     container:
-      image: maven:3-amazoncorretto-21-debian
+      image: maven:3-eclipse-temurin-21
     steps:
     - name: Download sources
       uses: actions/cache/restore@v3
@@ -176,7 +176,7 @@ jobs:
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
     timeout-minutes: 30
     container:
-      image: maven:3-amazoncorretto-21-debian
+      image: maven:3-eclipse-temurin-21
     steps:
     - name: Download sources
       uses: actions/cache/restore@v3

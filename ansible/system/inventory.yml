@@ -625,14 +625,18 @@ all:
         - name: visualvm
           become: false
           command: |
-            [ -d ~/bin/.visualvm ] || {
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/oracle/visualvm/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(cat ~/bin/.visualvm/VERSION 2>&1)"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               cd "$(mktemp -d)" &&
               curl -sL https://api.github.com/repos/oracle/visualvm/releases/latest | \
                 jq -r ".assets[]|select(.content_type|test(\"application/zip\"))|select(.name | test(\"visualvm\"))|.browser_download_url" | \
               xargs curl -sSLO
+              rm -rf ~/bin/.visualvm
               unzip visualvm*.zip && rm visualvm*.zip &&
               mv visualvm* ~/bin/.visualvm &&
-              ln -s ~/bin/.visualvm/bin/visualvm ~/bin/visualvm
+              ln -f -s ~/bin/.visualvm/bin/visualvm ~/bin/visualvm
+              echo "${CURRENT_VERSION}" > ~/bin/.visualvm/VERSION
             }
             [ -e ~/.local/share/applications/visualvm.desktop  ] || {
               mkdir -p ~/.local/share/applications
