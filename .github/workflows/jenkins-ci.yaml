@@ -58,7 +58,7 @@ jobs:
     needs: Checkout_sources
     steps:
     - name: Set up cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: "${{ github.workspace }}/.m2"
         key: "${{ runner.os }}-path"
