@@ -33,7 +33,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@v4
     - name: Set up cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: "${{ github.workspace }}/.m2"
         key: "${{ runner.os }}-path"
@@ -50,7 +50,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@v4
     - name: Set up cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: "${{ github.workspace }}/.m2"
         key: "${{ runner.os }}-path"
@@ -65,7 +65,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@v4
     - name: Set up cargo cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/registry
@@ -79,7 +79,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@v4
     - name: Set up cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |-
           ${{ github.workspace }}/.cache/go-build
@@ -95,7 +95,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@v4
     - name: Set up pip cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: "~/.cache/pip"
         key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"

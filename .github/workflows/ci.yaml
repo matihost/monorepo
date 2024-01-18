@@ -57,7 +57,7 @@ jobs:
       run: |
         echo "GIT_COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
     - name: Cache workspace
-      uses: actions/cache/save@v3
+      uses: actions/cache/save@v4
       with:
         # avoid using github.workspace in caching?
         # so how effectivelly share source code between jobs?
@@ -76,14 +76,14 @@ jobs:
       image: maven:3-eclipse-temurin-21
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
         fail-on-cache-miss: true
         enableCrossOsArchive: true
     - name: Cache local Maven repository
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         # TODO reading from MAVEN_CONFIG env did not work here
         path: "/root/.m2/repository"
@@ -109,7 +109,7 @@ jobs:
         path: java/apps/**/target/*.jar
         retention-days: 2
     - name: Cache java build sources
-      uses: actions/cache/save@v3
+      uses: actions/cache/save@v4
       with:
         path: ${{ github.workspace }}/java
         key: java-${{ github.run_id }}-${{ github.run_attempt }}
@@ -122,7 +122,7 @@ jobs:
       image: quay.io/matihost/gh-gcp-java-kaniko
     steps:
     - name: Download java build sources
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}/java
         key: java-${{ github.run_id }}-${{ github.run_attempt }}
@@ -150,7 +150,7 @@ jobs:
       image: quay.io/matihost/gh-gcp-java-kaniko
     steps:
     - name: Download java build sources
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}/java
         key: java-${{ github.run_id }}-${{ github.run_attempt }}
@@ -179,14 +179,14 @@ jobs:
       image: maven:3-eclipse-temurin-21
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
         fail-on-cache-miss: true
         enableCrossOsArchive: true
     - name: Cache local Maven repository
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: "/root/.m2/repository"
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -213,13 +213,13 @@ jobs:
       GO_CACHE: /go
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
         fail-on-cache-miss: true
     - name: Set up cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |-
           /go
@@ -245,7 +245,7 @@ jobs:
       image: quay.io/matihost/ansible:root
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
@@ -275,7 +275,7 @@ jobs:
       image: quay.io/matihost/ansible:root
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
@@ -292,7 +292,7 @@ jobs:
       image: rust
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
@@ -309,7 +309,7 @@ jobs:
       image: quay.io/matihost/gh-gcp-java-kaniko
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
@@ -334,7 +334,7 @@ jobs:
       image: quay.io/matihost/gh-gcp-java-kaniko
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
@@ -360,7 +360,7 @@ jobs:
       image: quay.io/matihost/gh-gcp-java-kaniko
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
