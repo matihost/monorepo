@@ -42,11 +42,17 @@ Various technology deployments, tools & code:
     * gcp-cloudbuild - setup GCP Cloud Build infrastructure to trigger build for GitHub repository
   * aws - Terragrunt / OpenTofu deployments for AWS, mainly utilizing only AWS Free Tier
     * aws-iam - setup IAM resources needed on fresh AWS account (users, roles, groups etc)
-    * aws-network - minimal AWS recommended setup with private subnet
+    * aws-network-setup - minimal AWS recommended setup with private subnet
     * aws-instance - minimal VM setup
     * aws-alb - Application Load Balancer usage
     * aws-jenkins - Jenkins deployment as AWS VMs, Packer images for Jenkins Agents
     * aws-lambda - sample AWS Lambda emulating a client hitting EC2 instance with AWS ApiGateway exposure
+    * aws-glue - sample AWS Glue / Apache Spark job wih PCI credit card removal in S3 bucket
+    * aws-ecs - sample AWS ECS Services deployment
+    * aws-rds - sample AWS RDS Aurora Serverless v2 PosrgreSQL setup
+  * ibm - Terragrunt / OpenTofu deployments for IBM Cloud
+    * ibm-iam - setup IAM resources needed on fresh IBM account (resource group)
+    * ibm-network-setup - minimal IBM Cloud recommended network setup
 * [scripts](scripts) - various bash scripts (tools for TLS handling, K8S etc.)
 * [vagrant](vagrant)  - CentOS VM buildout with Vagrant with various Linux networking tools examples
 * [algorithms](algorithms/project-euler) - Java based project solving various <https://projecteuler.net> problems

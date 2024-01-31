@@ -1,7 +1,7 @@
 ---
-- hosts: local
+- name: Updates system software versions
+  hosts: local
   gather_facts: true
-  name: Updates system software versions
   tasks:
   - when: ansible_os_family == "Debian"
     block:
@@ -86,3 +86,17 @@
       ansible.builtin.shell: vagrant plugin update
       changed_when: true
       when: vagrant_presence.rc == 0
+
+  - become: false
+    block:
+    - name: Check whether ibmcloud is present on the machine
+      ansible.builtin.shell: which vagrant
+      ignore_errors: true
+      changed_when: false
+      register: ibmcloud_presence
+    - name: Update ibmcloud CLI
+      ansible.builtin.shell: |
+        ibmcloud update
+        ibmcloud plugin update --all
+      changed_when: true
+      when: ibmcloud_presence.rc == 0
