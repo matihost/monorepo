@@ -1,5 +1,5 @@
 #cloud-config
-# EC2 location of cloud-init configuration: /var/lib/cloud/instance/cloud-config.txt
+# Cloud-init configuration location: /var/lib/cloud/instance/cloud-config.txt
 # Cloud-init output logs: /var/log/cloud-init-output.log
 ---
 repo_update: true

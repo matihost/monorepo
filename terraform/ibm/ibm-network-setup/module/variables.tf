@@ -2,10 +2,25 @@ locals {
   prefix = var.env
 }
 
+# User var.resource_group_id as it has to be provided to ibm provider
+# Here only to check whether resource_group is obtainable from env name
+#
+# tflint-ignore: terraform_unused_declarations
+data "ibm_resource_group" "resource" {
+  name = var.env
+}
+
+
 variable "env" {
   type        = string
   description = "Environment name"
 }
+
+variable "resource_group_id" {
+  type        = string
+  description = "IBM Cloud Resource Group ID to place resources"
+}
+
 
 variable "ssh_pub_key" {
   type        = string

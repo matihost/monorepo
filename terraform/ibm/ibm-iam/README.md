@@ -1,4 +1,4 @@
-# Minimal IBM CLoud IAM resources
+# Minimal IBM Cloud IAM resources
 
 Terraform scripts creating:
 
@@ -10,7 +10,8 @@ Terraform scripts creating:
 
 ```bash
 # to install https://github.com/IBM-Cloud/ibm-cloud-cli-release for Linux
-curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+
+curl -fsSL "https://clis.cloud.ibm.com/install/$([[ "$(uname -a)" == "Darmin"* ]] && echo "osx" || echo "linux" )" | sh
 
 # list available ibmcloud CLI plugins
 ibmcloud plugin repo-plugins
@@ -32,6 +33,11 @@ make ibm-authentication
 ```
 
 - Latest OpenTofu, Terragrunt, jq installed
+
+```bash
+# for Mac
+brew install opentofu terragrunt jq make
+```
 
 ## Usage
 

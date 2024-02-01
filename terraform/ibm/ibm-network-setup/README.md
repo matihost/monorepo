@@ -1,11 +1,16 @@
 # Minimal IBM CLoud recommended network setup
+
 Terraform scripts creating:
 
 - VPC with subnets
 
-- bastion with public IP and ssh access
+- bastion with public IP and ssh access, proxy being installed
 
 Bastion node exposes only SSH to computer which execute Terraform script.
+
+- (Optionally) plus sample webserver instances in private subnets.
+
+Access to private webserver via HTTP is possible via proxy on bastion - which can be accessed after setup SSH tunnel on bastion.
 
 ## Prerequisites
 
@@ -13,13 +18,15 @@ Bastion node exposes only SSH to computer which execute Terraform script.
 
 ```bash
 # to install https://github.com/IBM-Cloud/ibm-cloud-cli-release for Linux
-curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+
+curl -fsSL "https://clis.cloud.ibm.com/install/$([[ "$(uname -a)" == "Darmin"* ]] && echo "osx" || echo "linux" )" | sh
 
 # list available ibmcloud CLI plugins
 ibmcloud plugin repo-plugins
 
 # install ibmcloud plugin for "is" commands
 ibmcloud plugin install is -f
+
 
 # to later update cli and all plugins
 ibmcloud update
@@ -34,6 +41,11 @@ make ibm-authentication
 ```
 
 - Latest OpenTofu, Terragrunt, jq installed
+
+```bash
+# for Mac
+brew install opentofu terragrunt jq make
+```
 
 ## Usage
 

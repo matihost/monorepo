@@ -25,8 +25,7 @@ init: prepare
 
 ibm-authentication: ## authenticate ibmcloud CLI and create API key if needed
 	ibmcloud login -a https://cloud.ibm.com --sso
-	[ -e "$(HOME)/.ibmcloud/apikey.json" ] || { ibmcloud iam api-key-create default --file $(HOME)/.ibmcloud/apikey.json; }
-
+	[ -e "$(HOME)/.ibmcloud/apikey.json" ] || { mkdir -p $(HOME)/.ibmcloud; ibmcloud iam api-key-create default --file $(HOME)/.ibmcloud/apikey.json; }
 
 whoami: ## show current user IAM ID
 	@ibmcloud iam oauth-tokens --output json | jq -r .iam_token |cut -d" " -f2|cut -d"." -f2 |base64 -d 2>/dev/null |jq -r .iam_id

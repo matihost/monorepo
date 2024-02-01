@@ -25,7 +25,9 @@ provider "ibm" {
   zone           = var.zone
 
   # Assuming resource group is created already
-  # resource_group = var.env
+  # TODO uncomment when resource group is not ignored
+  # https://github.com/IBM-Cloud/terraform-provider-ibm/issues/5108
+  # resource_group = var.resource_group_id
 
   # Do not use public-and-private visibility as it hands with token, use default public
   # visibility = "public-and-private"
