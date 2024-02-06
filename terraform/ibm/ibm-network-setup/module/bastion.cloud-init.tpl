@@ -8,6 +8,7 @@ repo_upgrade: all
 packages:
  - tinyproxy
  - postgresql-client
+ - curl
 
 # cloud-init creates a final script in: /var/lib/cloud/instance/scripts/runcmd
 runcmd:

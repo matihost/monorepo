@@ -33,21 +33,8 @@ whoami: ## show current user IAM ID
 getaccountid: ## show current IBM Account ID
 	@ibmcloud account show --output json | jq -r .account_id
 
-run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
+run: init ## setup webservers and LBs: make run [ENV=dev] [MODE=apply]
 	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
-
-ssh: ## ssh to VPC bastion host
-	eval $(shell cd stage/$(ENV) && terragrunt output bastion_ssh)
-
-expose_bastion_proxy_locally: ## expose bastion's HTTP proxy locally
-	@[ "$(shell sudo ss -antl |grep -c 8888)" -ne 0 ] || eval "$(shell cd stage/$(ENV) && terragrunt output expose_bastion_proxy_locally)"
-
-shutdown_local_bastion_proxy: ## shutdown tunneled bastion's HTTP proxy
-	@[ "$(shell sudo ss -antl |grep -c 8888)" -eq 0 ] || sudo kill -9 $(shell sudo lsof -t -i:8888)
-
-test: expose_bastion_proxy_locally ## test private  webeserver
-	eval "$(shell cd stage/$(ENV) && terragrunt output connect_via_bastion_proxy)"
-
 
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show

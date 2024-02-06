@@ -1,8 +1,8 @@
 
-resource "ibm_is_network_acl" "default" {
+resource "ibm_is_network_acl" "all" {
   resource_group = var.resource_group_id
 
-  name = "${local.prefix}-${var.region}-default-acl"
+  name = "${local.prefix}-${var.region}-all-acl"
   vpc = ibm_is_vpc.main.id
 
   rules {
@@ -28,6 +28,12 @@ resource "ibm_is_vpc" "main" {
   # by default it assumes zones subnets cidrs can be only in respectively
   # 10.243.0.0/18,  10.243.64.0/18,  10.243.128.0/18
   address_prefix_management = "manual"
+
+  # VPC creates default ones with these names,
+  # you cannot assign existing ones, b/c in order to create one VPC has to be created before
+  default_security_group_name = "${local.prefix}-${var.region}-default-sg"
+  default_network_acl_name = "${local.prefix}-${var.region}-default-acl"
+  default_routing_table_name = "${local.prefix}-${var.region}-default-rt"
 }
 
 
@@ -54,11 +60,6 @@ resource "ibm_is_subnet" "subnet" {
   depends_on = [
     ibm_is_vpc_address_prefix.prefix
   ]
-
-  # provisioner "local-exec" {
-  #   command = "sleep 300"
-  #   when    = "destroy"
-  # }
 }
 
 resource "ibm_is_public_gateway" "pubgw" {
