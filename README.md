@@ -54,6 +54,7 @@ Various technology deployments, tools & code:
     * ibm-iam - setup IAM resources needed on fresh IBM account (resource group)
     * ibm-network-setup - minimal IBM Cloud recommended network setup
     * ibm-alb - Application and Network Load Balancer usage
+    * ibm-ocp - IBM RedHat OpenShift Kubernetes Service (ROKS) deployment
 * [scripts](scripts) - various bash scripts (tools for TLS handling, K8S etc.)
 * [vagrant](vagrant)  - CentOS VM buildout with Vagrant with various Linux networking tools examples
 * [algorithms](algorithms/project-euler) - Java based project solving various <https://projecteuler.net> problems
