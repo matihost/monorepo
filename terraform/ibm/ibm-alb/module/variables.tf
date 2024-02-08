@@ -70,9 +70,14 @@ variable "ssh_key_id" {
   description = "The name of key allowed to login to the instance, usually the bastion key id"
 }
 
-variable "security_group_name" {
+variable "private_security_group_name" {
   type        = string
-  description = "The name of security group name assigned on EC2 webserver instances"
+  description = "The name of security group name assigned on EC2 webserver instances and private LBs"
+}
+
+variable "public_lb_security_group_name" {
+  type        = string
+  description = "The name of security group name assigned on public LBs"
 }
 
 # tflint-ignore: terraform_unused_declarations

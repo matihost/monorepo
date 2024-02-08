@@ -2,15 +2,25 @@
 
 Terraform scripts creating:
 
-- Instance group spanning all VPC subnets and attach Private Application LoadBalancer to it
+- Private adn Public Application LoadBalancer along with separate Instance group spanning all VPC subnets
+- Private adn Public Network LoadBalancer along with separate Instance group single VPC subnet
+- Instance template for private access and separated one for public access
 
-- Single zone instance group and attach Network LoadBalancer to it (NLB are zonal only)
+Warnings:
+
+- NLB are zonal only
+
+- NLB are pass though LB - so security group on Instance has to accept public ip access
+
+- ALB are proxy based located in your VPC - so security group on Instance can limit traffic only from VPC.
+
+- Instance Group can be applied only to single LB.
+
+- Instance Template security group cannot be overridden in Instance Group - hence Instance Group to be used by public NLB vs private has to differ.
 
 TODOs:
 
 - how to attach iam_trusted_profile? (IG does not support instance templated with default iam trusted profile)
-
-- public LBs
 
 ## Prerequisites
 
