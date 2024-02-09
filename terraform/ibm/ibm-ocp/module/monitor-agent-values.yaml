@@ -1,0 +1,30 @@
+# default values:
+#
+# helm show values sysdig/sysdig-deploy
+# helm show values sysdig/agent
+
+# global:
+#   clusterConfig:
+#     name: .....
+#   sysdig:
+#     accessKey: a4ca0b48-0174-41ac-bbee-3156ced3470f
+agent:
+  image:
+    registry: icr.io
+  slim:
+    enabled: true
+    image:
+      repository: ext/sysdig/agent-slim
+    kmoduleImage:
+      repository: ext/sysdig/agent-kmodule
+  # collectorSettings:
+  #   collectorHost: ingest.eu-de.monitoring.cloud.ibm.com
+# Requires:
+# https://cloud.ibm.com/docs/workload-protection?topic=workload-protection-getting-started
+# enabled
+nodeAnalyzer:
+  nodeAnalyzer:
+    deploy: false
+    # apiEndpoint: eu-de.monitoring.cloud.ibm.com
+    benchmarkRunner:
+      deploy: false

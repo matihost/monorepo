@@ -6,9 +6,13 @@ Terraform scripts creating:
 
 - RedHat OpenShift Kubernetes Service (ROKS) instance
 
+- Log Analysis and Monitoring service instances
+
+- Logdna and sysdig agents installed on OpenShift to integrate with Log Analysis and Monitoring services
+
 TODO:
 
-- add KMS, logging and metrics integration
+- add KMS
 
 Warnings:
 
@@ -84,11 +88,11 @@ ibmcloud plugin update --all
 make ibm-authentication
 ```
 
-- Latest OpenTofu, Terragrunt, jq, make, oc, kubectl installed
+- Latest Docker, OpenTofu, Terragrunt, jq, make, oc, kubectl, helm, k9s (optionally) installed
 
 ```bash
 # for Mac
-brew install opentofu terragrunt jq make
+brew install opentofu terragrunt jq make openshift-cli kubectl helm k9s
 ```
 
 - The scripts assume that [ibm-network-setup](../ibm-network-setup) is already deployed (aka private networking is present).

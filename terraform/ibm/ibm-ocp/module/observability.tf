@@ -55,22 +55,28 @@ output "logs_ingestion_key" {
   sensitive   = true
 }
 
+locals {
+  sysdig_access_key = ibm_resource_key.monitoring-key.credentials["Sysdig Access Key"]
+}
 
 output "cloud_monitoring_access_key" {
-  value       = ibm_resource_key.monitoring-key.credentials["Sysdig Access Key"]
+  value       = local.sysdig_access_key
   description = "IBM cloud monitoring access key for agents to use"
   sensitive   = true
 }
 
-resource "null_resource" "deploy-log-agent" {
+resource "null_resource" "deploy-observability-agents" {
   triggers = {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = "${path.module}/deploy-log-agent.sh ${ibm_resource_key.logs-key.credentials.ingestion_key}"
+    command = "${path.module}/deploy-observability-agents.sh '${ibm_container_vpc_cluster.ocp.name}' '${var.region}' '${ibm_resource_key.logs-key.credentials.ingestion_key}' '${local.sysdig_access_key}'"
   }
 
   depends_on = [
    ibm_resource_key.logs-key,
+   ibm_resource_key.monitoring-key,
+   ibm_container_vpc_cluster.ocp,
+   ibm_container_addons.addons,
   ]
 }

@@ -38,9 +38,10 @@ resource "ibm_container_vpc_cluster" "ocp" {
   disable_public_service_endpoint = false
   # TODO define labels
   # worker_labels                   = local.default_pool.labels
-  # crk                             = local.default_pool.boot_volume_encryption_kms_config == null ? null : local.default_pool.boot_volume_encryption_kms_config.crk
-  # kms_instance_id                 = local.default_pool.boot_volume_encryption_kms_config == null ? null : local.default_pool.boot_volume_encryption_kms_config.kms_instance_id
-  # kms_account_id                  = local.default_pool.boot_volume_encryption_kms_config == null ? null : local.default_pool.boot_volume_encryption_kms_config.kms_account_id
+  # TODO kms
+  # crk                             = default pool boot volume encryption kms config crk
+  # kms_instance_id                 = default pool boot volume encryption kms config kms_instance_id
+  # kms_account_id                  = default pool boot volume encryption kms config kms_account_id
 
   # TODO define security groups
   # security_groups = local.cluster_security_groups
@@ -62,10 +63,10 @@ resource "ibm_container_vpc_cluster" "ocp" {
   # dynamic "kms_config" {
   #   for_each = var.kms_config != null ? [1] : []
   #   content {
-  #     crk_id           = var.kms_config.crk_id
-  #     instance_id      = var.kms_config.instance_id
-  #     private_endpoint = var.kms_config.private_endpoint
-  #     account_id       = var.kms_config.account_id
+  #     crk_id           = kms config crk_id
+  #     instance_id      = kms config instance_id
+  #     private_endpoint = kms config private_endpoint
+  #     account_id       = kms config account_id
   #   }
   # }
 

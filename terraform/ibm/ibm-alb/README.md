@@ -8,6 +8,14 @@ Terraform scripts creating:
 
 Warnings:
 
+- You may encounter blow during setup, repeat the run to solve it. LB is switching the mode to updating (w/o saying the reason) and during that time you cannot change anything related to LB.
+
+```txt
+"code": "load_balancer_update_conflict",
+"message": "The load balancer with ID 'r010-d1e94aba-805e-4e13-a1d1-fbebb94fb24e' cannot be updated because its status is 'UPDATE_PENDING'.",
+"more_info": "https://cloud.ibm.com/docs/vpc?topic=vpc-rias-error-messagesload_balancer_update_conflict"
+```
+
 - NLB are zonal only
 
 - NLB are pass though LB - so security group on Instance has to accept public ip access
