@@ -17,7 +17,7 @@ data "ibm_is_subnet" "subnet" {
 
 # Lookup the current default kube version
 data "ibm_container_cluster_versions" "cluster_versions" {
-  resource_group_id = var.resource_group_id
+  resource_group_id = local.resource_group_id
 }
 
 resource "ibm_container_vpc_cluster" "ocp" {

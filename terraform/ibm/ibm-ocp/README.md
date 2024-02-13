@@ -1,14 +1,24 @@
 # IBM Cloud :: RedHat OpenShift Kubernetes Service (ROKS)
 
-Terraform scripts creating:
+The following repo contains:
 
-- Cloud Object Storage
+- Terraform/OpenTofu module creating:
 
-- RedHat OpenShift Kubernetes Service (ROKS) instance
+  - Cloud Object Storage
 
-- Log Analysis and Monitoring service instances
+  - RedHat OpenShift Kubernetes Service (ROKS) instance
 
-- Logdna and sysdig agents installed on OpenShift to integrate with Log Analysis and Monitoring services
+  - Log Analysis and Monitoring service instances
+
+  - Logdna and sysdig agents installed on OpenShift to integrate with Log Analysis and Monitoring services
+
+- Deployment is realized via either:
+
+  - Terragrunt with local file state management (this readme)
+
+  or
+
+  - IBM Schemantics structure for deployment (see [schemantics](schemantics/README.md) directory for instructions how to deploy this repo with IBM Cloud Schemantics.
 
 TODO:
 

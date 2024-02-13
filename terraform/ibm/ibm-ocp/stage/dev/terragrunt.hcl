@@ -1,6 +1,4 @@
 locals {
-  current_ip = "${run_cmd("--terragrunt-quiet", "dig", "+short", "myip.opendns.com", "@resolver1.opendns.com")}"
-
   # Ensure Resource Group name is in sync with Env name
   # Free Tier can use only Default One
   resource_group_id = "${run_cmd("--terragrunt-quiet", "sh", "-c", "ibmcloud resource group dev --output json | jq -r .[0].id")}"
@@ -17,13 +15,12 @@ terraform {
 
 
 inputs = {
-  env                = "dev"
-  resource_group_id  = local.resource_group_id
-  region             = "eu-de"
-  zone               = "eu-de-1"
-  vpc_name           = "dev-eu-de"
-  external_access_ip = local.current_ip
-  instance_profile   = "cx2.8x16"
+  env               = "dev"
+  resource_group_id = local.resource_group_id
+  region            = "eu-de"
+  zone              = "eu-de-1"
+  vpc_name          = "dev-eu-de"
+  instance_profile  = "bx2.4x16"
 
   subnetworks = {
     "eu-de-1" = {

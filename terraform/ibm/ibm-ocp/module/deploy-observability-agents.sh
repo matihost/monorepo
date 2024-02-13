@@ -14,13 +14,16 @@ LOG_INGEST_KEY="${3:?LOG_INGEST_KEY is required}"
 SYSDIG_ACCESS_KEY="${4?SYSDIG_ACCESS_KEY is required}"
 
 set -e
-# set -x
+set -x
+
+# to ignore schematics errors with plugins versions updates
+ibmcloud config --check-version=false
 
 ibmcloud ks cluster config -c "${CLUSTER_NAME}" --admin
 
 # install log agent daemon set
 
-[[ -n "$(oc get project ibm-observes --ignore-not-found 2>/dev/null)" ]] || {
+[[ -n "$(oc get project ibm-observe --no-headers --ignore-not-found 2>/dev/null)" ]] || {
   oc adm new-project --node-selector='' ibm-observe
   oc create serviceaccount logdna-agent -n ibm-observe
   oc adm policy add-scc-to-user privileged system:serviceaccount:ibm-observe:logdna-agent
@@ -29,9 +32,15 @@ ibmcloud ks cluster config -c "${CLUSTER_NAME}" --admin
 oc apply -f "https://assets.${REGION}.logging.cloud.ibm.com/clients/logdna-agent/3/agent-resources-openshift.yaml"
 
 # install monitor agent daemon set
-helm repo add sysdig https://charts.sysdig.com
-helm repo update
-helm upgrade --install -n ibm-observe sysdig-agent sysdig/sysdig-deploy -f monitor-agent-values.yaml \
+helm3 version
+# curl -sSLO https://get.helm.sh/helm-v3.14.0-linux-amd64.tar.gz
+# tar -zxf helm-v.3*-linux-amd64.tar.gz
+# mv linux-amd64/helm .
+# rm -rf helm-v3.*.tar.gz linux-amd64
+# curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+helm3 repo add sysdig https://charts.sysdig.com
+helm3 repo update
+helm3 upgrade --install -n ibm-observe sysdig-agent sysdig/sysdig-deploy -f monitor-agent-values.yaml \
   --set global.clusterConfig.name="${CLUSTER_NAME}" \
   --set global.sysdig.accessKey="${SYSDIG_ACCESS_KEY}" \
   --set agent.collectorSettings.collectorHost="ingest.${REGION}.monitoring.cloud.ibm.com" \

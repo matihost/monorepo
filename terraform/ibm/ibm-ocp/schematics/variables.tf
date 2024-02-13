@@ -1,22 +1,7 @@
-locals {
-  prefix = "${var.env}-${var.region}-ocp"
-  resource_group_id = var.resource_group_id != "" ? var.resource_group_id : data.ibm_resource_group.resource.id
-}
-
-
-# tflint-ignore: terraform_unused_declarations
-data "ibm_iam_account_settings" "account" {
-}
-
-
-data "ibm_resource_group" "resource" {
-  name = var.resource_group_name != "" ? var.resource_group_name : var.env
-}
-
-
 variable "env" {
   type        = string
   description = "Environment name"
+  default = "dev"
 }
 
 variable "resource_group_name" {
@@ -31,21 +16,18 @@ variable "resource_group_id" {
   default = ""
 }
 
-
 variable "instance_profile" {
   type        = string
   description = "Instance profile for Worker nodes"
-  default = "bx2.4x16" // or cx2.8x16 or cx2.16x32
+  default = "bx2.4x16" // or cx2.8x16 or cx2.1x32
 }
 
-# tflint-ignore: terraform_unused_declarations
 variable "zone" {
   default     = "eu-de-1"
   type        = string
   description = "Preffered IBM Cloud AZ where resources need to placed, has to be compatible with region variable"
 }
 
-# tflint-ignore: terraform_unused_declarations
 variable "region" {
   default     = "eu-de"
   type        = string
@@ -55,8 +37,9 @@ variable "region" {
 
 
 variable "vpc_name" {
+  default     = "dev-eu-de"
   type        = string
-  description = "VPC Name to place instances"
+  description = "VPC Name to place EC2 instances"
 }
 
 
@@ -65,4 +48,15 @@ variable "subnetworks" {
       name = string
   }))
   description = "IBM subnetworks (key is zone, value.name is subnet name)"
+  default = {
+    "eu-de-1" = {
+      name = "dev-eu-de-1-subnet"
+    },
+    "eu-de-2" = {
+      name = "dev-eu-de-2-subnet"
+    },
+    "eu-de-3" = {
+      name = "dev-eu-de-3-subnet"
+    }
+  }
 }
