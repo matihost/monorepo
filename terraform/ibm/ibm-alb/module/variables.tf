@@ -8,13 +8,19 @@ locals {
 #
 # tflint-ignore: terraform_unused_declarations
 data "ibm_resource_group" "resource" {
-  name = var.env
+  name = var.resource_group_name != "" ? var.resource_group_name : var.env
 }
 
 
 variable "env" {
   type        = string
   description = "Environment name"
+}
+
+variable "resource_group_name" {
+  type        = string
+  description = "IBM Cloud Resource Group ID to place resources"
+  default = ""
 }
 
 variable "resource_group_id" {
