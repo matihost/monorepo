@@ -54,7 +54,7 @@ resource "ibm_is_lb_pool" "private-nlb-backend-pool" {
   protocol            = "tcp"
   health_delay        = 5
   health_retries      = 2
-  health_timeout      = 2
+  health_timeout      = 4
   health_type         = "http"
   health_monitor_port = "80"
 

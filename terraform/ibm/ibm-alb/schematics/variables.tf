@@ -1,24 +1,13 @@
-locals {
-  prefix = "${var.env}-webserver"
-}
-
-# User var.resource_group_id as it has to be provided to ibm provider
-# Here only to check whether resource_group is obtainable from env name
-#
-# tflint-ignore: terraform_unused_declarations
-data "ibm_resource_group" "resource" {
-  name = var.env
-}
-
-
 variable "env" {
   type        = string
   description = "Environment name"
+  default = "dev"
 }
 
 variable "resource_group_id" {
   type        = string
   description = "IBM Cloud Resource Group ID to place resources"
+  default = "dev"
 }
 
 
@@ -29,7 +18,7 @@ variable "instance_profile" {
 }
 
 variable "zone" {
-  default     = "us-east-1a"
+  default     = "eu-de-1"
   type        = string
   description = "Preffered IBM Cloud AZ where resources need to placed, has to be compatible with region variable"
 }
@@ -44,7 +33,7 @@ variable "region" {
 
 
 variable "vpc_name" {
-  default     = "dev-us-east-1"
+  default     = "dev-eu-de"
   type        = string
   description = "VPC Name to place EC2 instances"
 }
@@ -55,11 +44,22 @@ variable "subnetworks" {
       name = string
   }))
   description = "AWS subnetworks (key is zone, value.name is subnet name)"
+  default = {
+    "eu-de-1" = {
+      name = "dev-eu-de-1-subnet"
+    },
+    "eu-de-2" = {
+      name = "dev-eu-de-2-subnet"
+    },
+    "eu-de-3" = {
+      name = "dev-eu-de-3-subnet"
+    },
+  }
 }
 
 
 variable "ssh_key_id" {
-  default     = ""
+  default     = "dev-eu-de-bastion-ssh"
   type        = string
   description = "The name of key allowed to login to the instance, usually the bastion key id"
 }
@@ -67,15 +67,18 @@ variable "ssh_key_id" {
 variable "private_security_group_name" {
   type        = string
   description = "The name of security group name assigned on EC2 webserver instances and private LBs"
+  default = "dev-eu-de-internal-only"
 }
 
 variable "public_lb_security_group_name" {
   type        = string
   description = "The name of security group name assigned on public LBs"
+  default = "dev-eu-de-bastion"
 }
 
 # tflint-ignore: terraform_unused_declarations
 variable "iam_trusted_profile" {
   type        = string
   description = "The name of IAM trusted profile to attach to instance"
+  default = "dev-eu-de-bastion"
 }

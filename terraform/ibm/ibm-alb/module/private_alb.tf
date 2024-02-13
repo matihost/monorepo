@@ -101,30 +101,30 @@ resource "ibm_is_instance_group_manager_policy" "private-alb-target-cpu" {
 }
 
 
-# resource "ibm_is_instance_group_manager" "scheduler" {
-#   name           = "${local.prefix}-scheduler"
-#   instance_group = ibm_is_instance_group.ig.id
-#   manager_type   = "scheduled"
-#   enable_manager = true
-# }
+resource "ibm_is_instance_group_manager" "priv-alb-scheduler" {
+  name           = "${local.prefix}-scheduler-for-priv-alb"
+  instance_group = ibm_is_instance_group.private-alb-ig.id
+  manager_type   = "scheduled"
+  enable_manager = true
+}
 
-# # When AutoScale manager is active, membership count cannot be modified. Please disable AutoScale manager.",
-# resource "ibm_is_instance_group_manager_action" "scheduler-action-down" {
-#   name                   = "${local.prefix}-scheduler-down"
-#   instance_group         = ibm_is_instance_group.ig.id
-#   instance_group_manager = ibm_is_instance_group_manager.scheduler.manager_id
-#   target_manager         = ibm_is_instance_group_manager.igm.manager_id
-#   cron_spec              = "05 17 * * *"
-#   min_membership_count   = 1
-#   max_membership_count   = 6
-# }
+# When AutoScale manager is active, membership count cannot be modified. Please disable AutoScale manager.",
+resource "ibm_is_instance_group_manager_action" "priv-alb-scheduler-action-down" {
+  name                   = "${local.prefix}-priv-alb-scheduler-down"
+  instance_group         = ibm_is_instance_group.private-alb-ig.id
+  instance_group_manager = ibm_is_instance_group_manager.priv-alb-scheduler.manager_id
+  target_manager         = ibm_is_instance_group_manager.private-alb-igm.manager_id
+  cron_spec              = "05 17 * * *"
+  min_membership_count   = 1
+  max_membership_count   = 6
+}
 
-# resource "ibm_is_instance_group_manager_action" "scheduler-action-up" {
-#   name                   = "${local.prefix}-scheduler-down"
-#   instance_group         = ibm_is_instance_group.ig.id
-#   instance_group_manager = ibm_is_instance_group_manager.scheduler.manager_id
-#   target_manager         = ibm_is_instance_group_manager.igm.manager_id
-#   cron_spec              = "05 08 * * *"
-#   min_membership_count   = 3
-#   max_membership_count   = 6
-# }
+resource "ibm_is_instance_group_manager_action" "priv-alb-scheduler-action-up" {
+  name                   = "${local.prefix}-priv-alb-scheduler-down"
+  instance_group         = ibm_is_instance_group.private-alb-ig.id
+  instance_group_manager = ibm_is_instance_group_manager.priv-alb-scheduler.manager_id
+  target_manager         = ibm_is_instance_group_manager.private-alb-igm.manager_id
+  cron_spec              = "05 08 * * *"
+  min_membership_count   = 3
+  max_membership_count   = 6
+}
