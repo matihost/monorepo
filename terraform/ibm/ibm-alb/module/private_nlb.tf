@@ -1,5 +1,5 @@
 resource "ibm_is_lb" "private-nlb" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   name = "${local.prefix}-nlb-private"
 
@@ -68,7 +68,7 @@ resource "ibm_is_lb_pool" "private-nlb-backend-pool" {
 # Manage manually
 #
 # data "ibm_is_instances" "webserver" {
-#   resource_group = var.resource_group_id
+#   resource_group = local.resource_group_id
 #   # vpc            = data.ibm_is_vpc.vpc.id
 #   instance_group = ibm_is_instance_group.ig.id
 # }
@@ -91,7 +91,7 @@ resource "ibm_is_lb_pool" "private-nlb-backend-pool" {
 # also
 # NLB works only in single zone
 resource "ibm_is_instance_group" "private-nlb-zonal-ig" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   name              = "${local.prefix}-zonal-group-for-priv-nlb"
   instance_template = ibm_is_instance_template.webserver.id

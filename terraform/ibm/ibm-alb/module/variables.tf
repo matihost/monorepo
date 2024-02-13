@@ -1,5 +1,6 @@
 locals {
   prefix = "${var.env}-webserver"
+  resource_group_id = var.resource_group_id != "" ? var.resource_group_id : data.ibm_resource_group.resource.id
 }
 
 # User var.resource_group_id as it has to be provided to ibm provider
@@ -19,6 +20,7 @@ variable "env" {
 variable "resource_group_id" {
   type        = string
   description = "IBM Cloud Resource Group ID to place resources"
+  default = ""
 }
 
 

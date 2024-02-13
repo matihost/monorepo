@@ -34,14 +34,14 @@ data "ibm_is_security_group" "public-lb" {
 
 
 resource "ibm_is_placement_group" "group" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   strategy = "host_spread"
   name     = "${local.prefix}-placement-group"
 }
 
 resource "ibm_is_instance_template" "webserver" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   name    = "${local.prefix}-template"
   image   =  data.ibm_is_image.ubuntu.id

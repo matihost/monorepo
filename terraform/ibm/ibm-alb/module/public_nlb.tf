@@ -1,5 +1,5 @@
 resource "ibm_is_lb" "public-nlb" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   name = "${local.prefix}-nlb-public"
 
@@ -68,7 +68,7 @@ resource "ibm_is_lb_pool" "public-nlb-backend-pool" {
 # Manage manually
 #
 # data "ibm_is_instances" "webserver" {
-#   resource_group = var.resource_group_id
+#   resource_group = local.resource_group_id
 #   # vpc            = data.ibm_is_vpc.vpc.id
 #   instance_group = ibm_is_instance_group.ig.id
 # }
@@ -91,7 +91,7 @@ resource "ibm_is_lb_pool" "public-nlb-backend-pool" {
 # also
 # NLB works only in single zone
 resource "ibm_is_instance_group" "public-nlb-zonal-ig" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   name              = "${local.prefix}-zonal-group-for-pub-nlb"
   instance_template = ibm_is_instance_template.public-nlb-webserver.id
@@ -148,7 +148,7 @@ resource "ibm_is_instance_group_manager_policy" "public-nlb-zonal-target-cpu" {
 # Also instance group cannot override security group on network_interface
 # So to create IG for public NLB it also require to create decicated instance template as well.
 resource "ibm_is_instance_template" "public-nlb-webserver" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   name    = "${local.prefix}-public-nlb-template"
   image   =  data.ibm_is_image.ubuntu.id

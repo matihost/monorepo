@@ -6,8 +6,8 @@ variable "env" {
 
 variable "resource_group_id" {
   type        = string
-  description = "IBM Cloud Resource Group ID to place resources"
-  default = "dev"
+  description = "IBM Cloud Resource Group ID to place resources, if not provided it will be calculated from env variable"
+  default = ""
 }
 
 

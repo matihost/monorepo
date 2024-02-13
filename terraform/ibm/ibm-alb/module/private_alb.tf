@@ -1,5 +1,5 @@
 resource "ibm_is_lb" "private-alb" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   name = "${local.prefix}-alb-private"
 
@@ -49,7 +49,7 @@ resource "ibm_is_lb_pool" "private-alb-backend-pool" {
 
 
 resource "ibm_is_instance_group" "private-alb-ig" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   name              = "${local.prefix}-group-for-priv-alb"
   instance_template = ibm_is_instance_template.webserver.id
