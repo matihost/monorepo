@@ -6,13 +6,13 @@ variable "env" {
 
 variable "resource_group_name" {
   type        = string
-  description = "IBM Cloud Resource Group ID to place resources"
+  description = "IBM Cloud Resource Group Name to place resources, if missing env will be used for resource group name"
   default = "dev"
 }
 
 variable "resource_group_id" {
   type        = string
-  description = "IBM Cloud Resource Group ID to place resources, if not provided it will be calculated from env variable"
+  description = "IBM Cloud Resource Group ID to place resources, if not provided it will be calculated from resource_group_name env variable"
   default = ""
 }
 

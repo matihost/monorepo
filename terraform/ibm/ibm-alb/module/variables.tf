@@ -3,10 +3,6 @@ locals {
   resource_group_id = var.resource_group_id != "" ? var.resource_group_id : data.ibm_resource_group.resource.id
 }
 
-# User var.resource_group_id as it has to be provided to ibm provider
-# Here only to check whether resource_group is obtainable from env name
-#
-# tflint-ignore: terraform_unused_declarations
 data "ibm_resource_group" "resource" {
   name = var.resource_group_name != "" ? var.resource_group_name : var.env
 }
@@ -19,16 +15,15 @@ variable "env" {
 
 variable "resource_group_name" {
   type        = string
-  description = "IBM Cloud Resource Group ID to place resources"
-  default = ""
+  description = "IBM Cloud Resource Group Name to place resources, if missing env will be used for resource group name"
+  default = "dev"
 }
 
 variable "resource_group_id" {
   type        = string
-  description = "IBM Cloud Resource Group ID to place resources"
+  description = "IBM Cloud Resource Group ID to place resources, if not provided it will be calculated from resource_group_name variable"
   default = ""
 }
-
 
 variable "instance_profile" {
   type        = string

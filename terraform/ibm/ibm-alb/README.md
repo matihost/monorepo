@@ -1,20 +1,30 @@
 # IBM Cloud Load Balancers usage example
 
-Terraform scripts creating:
+The following repo contains:
 
-- Private adn Public Application LoadBalancer along with separate Instance group spanning all VPC subnets
-- Private adn Public Network LoadBalancer along with separate Instance group single VPC subnet
-- Instance template for private access and separated one for public access
+- Terraform/OpenTofu module creating:
+
+  - Private & Public Application LoadBalancer along with separate Instance group spanning all VPC subnets
+  - Private & Public Network LoadBalancer along with separate Instance group single VPC subnet
+  - Instance template for private access and separated one for public access
+
+- Deployment is realized via either:
+
+  - Terragrunt with local file state management (this readme)
+
+  or
+
+  - IBM Schemantics structure for deployment (see [schemantics](schemantics/README.md) directory for instructions how to deploy this repo with IBM Cloud Schemantics.
 
 Warnings:
 
 - You may encounter blow during setup, repeat the run to solve it. LB is switching the mode to updating (w/o saying the reason) and during that time you cannot change anything related to LB.
 
-```txt
-"code": "load_balancer_update_conflict",
-"message": "The load balancer with ID 'r010-d1e94aba-805e-4e13-a1d1-fbebb94fb24e' cannot be updated because its status is 'UPDATE_PENDING'.",
-"more_info": "https://cloud.ibm.com/docs/vpc?topic=vpc-rias-error-messagesload_balancer_update_conflict"
-```
+  ```txt
+  "code": "load_balancer_update_conflict",
+  "message": "The load balancer with ID 'r010-d1e94aba-805e-4e13-a1d1-fbebb94fb24e' cannot be updated because its status is 'UPDATE_PENDING'.",
+  "more_info": "https://cloud.ibm.com/docs/vpc?topic=vpc-rias-error-messagesload_balancer_update_conflict"
+  ```
 
 - NLB are zonal only
 
