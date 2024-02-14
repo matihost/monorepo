@@ -16,6 +16,8 @@ SYSDIG_ACCESS_KEY="${4?SYSDIG_ACCESS_KEY is required}"
 set -e
 set -x
 
+DIRNAME="$(dirname "$0")"
+
 # to ignore schematics errors with plugins versions updates
 ibmcloud config --check-version=false
 
@@ -32,15 +34,21 @@ ibmcloud ks cluster config -c "${CLUSTER_NAME}" --admin
 oc apply -f "https://assets.${REGION}.logging.cloud.ibm.com/clients/logdna-agent/3/agent-resources-openshift.yaml"
 
 # install monitor agent daemon set
-helm3 version
-# curl -sSLO https://get.helm.sh/helm-v3.14.0-linux-amd64.tar.gz
-# tar -zxf helm-v.3*-linux-amd64.tar.gz
-# mv linux-amd64/helm .
-# rm -rf helm-v3.*.tar.gz linux-amd64
-# curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-helm3 repo add sysdig https://charts.sysdig.com
-helm3 repo update
-helm3 upgrade --install -n ibm-observe sysdig-agent sysdig/sysdig-deploy -f monitor-agent-values.yaml \
+
+HELM=helm
+HELM_INSTALLED_VERSION="$(${HELM} version 2>/dev/null | sed -E 's/.*\{Version:"([^"]+)".*/\1/')"
+[[ "${HELM_INSTALLED_VERSION}" == "v3"* ]] || {
+  HELM=helm3
+  command -v "${HELM}" || {
+    echo "No helm CLI in the system" 1>&2
+    exit 1
+  }
+  # assuming here helm3 is... helm v3
+}
+
+"${HELM}" repo add sysdig https://charts.sysdig.com
+"${HELM}" repo update
+"${HELM}" upgrade --install -n ibm-observe sysdig-agent sysdig/sysdig-deploy -f "${DIRNAME}/monitor-agent-values.yaml" \
   --set global.clusterConfig.name="${CLUSTER_NAME}" \
   --set global.sysdig.accessKey="${SYSDIG_ACCESS_KEY}" \
   --set agent.collectorSettings.collectorHost="ingest.${REGION}.monitoring.cloud.ibm.com" \
