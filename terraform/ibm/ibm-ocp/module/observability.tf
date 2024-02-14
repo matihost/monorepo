@@ -52,7 +52,7 @@ resource "ibm_resource_key" "monitoring-key" {
 output "logs_ingestion_key" {
   value       = ibm_resource_key.logs-key.credentials.ingestion_key
   description = "Log Analysis ingest key for agents to use"
-  # sensitive   = true
+  sensitive   = true
 }
 
 locals {
@@ -62,7 +62,7 @@ locals {
 output "cloud_monitoring_access_key" {
   value       = local.sysdig_access_key
   description = "IBM cloud monitoring access key for agents to use"
-  # sensitive   = true
+  sensitive   = true
 }
 
 resource "null_resource" "deploy-observability-agents" {

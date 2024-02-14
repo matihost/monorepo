@@ -14,11 +14,11 @@ LOG_INGEST_KEY="${3:?LOG_INGEST_KEY is required}"
 SYSDIG_ACCESS_KEY="${4?SYSDIG_ACCESS_KEY is required}"
 
 set -e
-set -x
+#set -x
 
 DIRNAME="$(dirname "$0")"
 
-# to ignore schematics errors with plugins versions updates
+# to ignore IBM Schematics errors with plugins versions updates
 ibmcloud config --check-version=false
 
 ibmcloud ks cluster config -c "${CLUSTER_NAME}" --admin
@@ -33,8 +33,8 @@ ibmcloud ks cluster config -c "${CLUSTER_NAME}" --admin
 }
 oc apply -f "https://assets.${REGION}.logging.cloud.ibm.com/clients/logdna-agent/3/agent-resources-openshift.yaml"
 
-# install monitor agent daemon set
-
+# IBM Schematics helm is helm2, not helm3
+# https://cloud.ibm.com/docs/schematics?topic=schematics-sch-utilities
 HELM=helm
 HELM_INSTALLED_VERSION="$(${HELM} version 2>/dev/null | sed -E 's/.*\{Version:"([^"]+)".*/\1/')"
 [[ "${HELM_INSTALLED_VERSION}" == "v3"* ]] || {
@@ -46,6 +46,7 @@ HELM_INSTALLED_VERSION="$(${HELM} version 2>/dev/null | sed -E 's/.*\{Version:"(
   # assuming here helm3 is... helm v3
 }
 
+# install monitor agent daemon set
 "${HELM}" repo add sysdig https://charts.sysdig.com
 "${HELM}" repo update
 "${HELM}" upgrade --install -n ibm-observe sysdig-agent sysdig/sysdig-deploy -f "${DIRNAME}/monitor-agent-values.yaml" \
