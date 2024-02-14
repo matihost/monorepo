@@ -1,16 +1,22 @@
 # Minimal IBM CLoud recommended network setup
 
-Terraform scripts creating:
+The following repo contains:
 
-- VPC with subnets
+- Terraform/OpenTofu module creating:
 
-- bastion with public IP and ssh access, proxy being installed
+  - VPC with subnets
+  - bastion with public IP and ssh access, proxy being installed
+  Bastion node exposes only SSH to computer which execute Terraform script.
+  - (Optionally) plus sample webserver instances in private subnets.
+  Access to private webserver via HTTP is possible via proxy on bastion - which can be accessed after setup SSH tunnel on bastion.
 
-Bastion node exposes only SSH to computer which execute Terraform script.
+- Deployment is realized via either:
 
-- (Optionally) plus sample webserver instances in private subnets.
+  - Terragrunt with local file state management (this readme)
 
-Access to private webserver via HTTP is possible via proxy on bastion - which can be accessed after setup SSH tunnel on bastion.
+  or
+
+  - IBM Schemantics structure for deployment (see [schemantics](schemantics/README.md) directory for instructions how to deploy this repo with IBM Cloud Schemantics.
 
 ## Prerequisites
 
@@ -26,6 +32,7 @@ ibmcloud plugin repo-plugins
 
 # install ibmcloud plugin for "is" commands
 ibmcloud plugin install is -f
+ibmcloud plugin install sch -f
 
 
 # to later update cli and all plugins

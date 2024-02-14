@@ -3,7 +3,7 @@ locals {
 }
 
 resource "ibm_is_instance" "webserver" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   for_each = local.webserver_zones
 

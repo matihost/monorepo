@@ -54,7 +54,7 @@ ibmcloud plugin repo-plugins
 
 # install ibmcloud plugin for "is" commands
 ibmcloud plugin install is -f
-
+ibmcloud plugin install sch -f
 
 # to later update cli and all plugins
 ibmcloud update

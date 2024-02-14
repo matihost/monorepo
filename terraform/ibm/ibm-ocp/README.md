@@ -82,9 +82,10 @@ curl -fsSL "https://clis.cloud.ibm.com/install/$([[ "$(uname -a)" == "Darmin"* ]
 # list available ibmcloud CLI plugins
 ibmcloud plugin repo-plugins
 
-# install ibmcloud plugin for "is" and "ks" commands
+# install ibmcloud plugin for "is", "ks", "sch" commands
 ibmcloud plugin install is -f
 ibmcloud plugin install ks -f
+ibmcloud plugin install sch -f
 
 # to later update cli and all plugins
 ibmcloud update

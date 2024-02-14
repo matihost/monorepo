@@ -1,0 +1,36 @@
+{
+  "name": "dev-ibm-network-setup",
+  "type": [
+      "terraform_v1.5"
+  ],
+  "location": "eu-de",
+  "resource_group": "dev",
+  "description": "Deployment of 3 subnet VPC along with Bastion for \"dev\" resource group",
+  "tags": [
+    "resource_group:dev"
+  ],
+  "template_repo": {
+      "url": "https://github.com/matihost/monorepo",
+      "branch": "main"
+  },
+  "template_data": [
+      {
+      "folder": "terraform/ibm/ibm-network-setup/schematics",
+      "type": "terraform_v1.5",
+      "variablestore": [
+        {
+          "name": "ssh_pub_key",
+          "value": "",
+          "type": "string",
+          "secure": true
+        },
+        {
+          "name": "ssh_key",
+          "value": "",
+          "type": "string",
+          "secure": true
+        }
+      ]
+      }
+  ]
+  }

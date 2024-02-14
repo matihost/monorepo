@@ -1,5 +1,5 @@
 resource "ibm_is_ssh_key" "bastion" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   name   = "${local.prefix}-${var.region}-bastion-ssh"
   public_key = var.ssh_pub_key
@@ -13,7 +13,7 @@ data "ibm_is_image" "ubuntu" {
 
 
 resource "ibm_is_instance" "bastion" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   name    = "${local.prefix}-${var.region}-bastion"
   image   =  data.ibm_is_image.ubuntu.id
@@ -44,7 +44,7 @@ resource "ibm_is_instance" "bastion" {
 
 
 resource "ibm_is_floating_ip" "bastion" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   name   = "${local.prefix}-${var.region}-bastion"
   target = ibm_is_instance.bastion.primary_network_interface[0].id

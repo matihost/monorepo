@@ -1,7 +1,6 @@
 locals {
-  pub_ssh    = file("~/.ssh/id_rsa.ibm.vm.pub")
-  ssh_key    = file("~/.ssh/id_rsa.ibm.vm")
-  current_ip = "${run_cmd("--terragrunt-quiet", "dig", "+short", "myip.opendns.com", "@resolver1.opendns.com")}"
+  pub_ssh = file("~/.ssh/id_rsa.ibm.vm.pub")
+  ssh_key = file("~/.ssh/id_rsa.ibm.vm")
 
   # Ensure Resource Group name is in sync with Env name
   # Free Tier can use only Default One
@@ -25,7 +24,6 @@ inputs = {
   zone                   = "eu-de-1"
   ssh_pub_key            = local.pub_ssh
   ssh_key                = local.ssh_key
-  external_access_ip     = local.current_ip
   create_sample_instance = false
   instance_profile       = "cx2-2x4" # available instance profiles: ibmcloud is instance-profiles
   tags = {

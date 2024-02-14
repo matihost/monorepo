@@ -1,12 +1,3 @@
-locals {
-  prefix = var.env
-  resource_group_id = var.resource_group_id != "" ? var.resource_group_id : data.ibm_resource_group.resource.id
-}
-
-data "ibm_resource_group" "resource" {
-  name = var.resource_group_name != "" ? var.resource_group_name : var.env
-}
-
 variable "env" {
   type        = string
   description = "Environment name"
@@ -37,7 +28,7 @@ variable "ssh_key" {
 variable "create_sample_instance" {
   type        = bool
   default     = false
-  description = "Whether to span single instance in private subnet"
+  description = "Whether to span single example instance in private subnet"
 }
 
 variable "instance_profile" {
@@ -52,7 +43,6 @@ variable "zone" {
   description = "Preffered IBM Cloud AZ where resources need to placed, has to be compatible with region variable"
 }
 
-# tflint-ignore: terraform_unused_declarations
 variable "region" {
   default     = "eu-de"
   type        = string
@@ -65,4 +55,16 @@ variable "zones" {
       ip_cidr_range = string
   }))
   description = "IBM Cloud zones for VPC Subnetworks Deployment"
+  default = {
+    "eu-de-1" = {
+      ip_cidr_range = "10.0.32.0/19"
+    },
+    "eu-de-2" = {
+      ip_cidr_range = "10.0.64.0/19"
+    },
+    "eu-de-3" = {
+      ip_cidr_range = "10.0.96.0/19"
+    },
+  }
+
 }

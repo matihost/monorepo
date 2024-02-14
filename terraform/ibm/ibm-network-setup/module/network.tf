@@ -1,6 +1,6 @@
 
 resource "ibm_is_network_acl" "all" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   name = "${local.prefix}-${var.region}-all-acl"
   vpc = ibm_is_vpc.main.id
@@ -22,7 +22,7 @@ resource "ibm_is_network_acl" "all" {
 }
 
 resource "ibm_is_vpc" "main" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   name = "${local.prefix}-${var.region}"
   # by default it assumes zones subnets cidrs can be only in respectively
@@ -47,7 +47,7 @@ resource "ibm_is_vpc_address_prefix" "prefix" {
 
 
 resource "ibm_is_subnet" "subnet" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   for_each = var.zones
   name            = "${local.prefix}-${each.key}-subnet"
@@ -63,7 +63,7 @@ resource "ibm_is_subnet" "subnet" {
 }
 
 resource "ibm_is_public_gateway" "pubgw" {
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   for_each = var.zones
   name = "${local.prefix}-${each.key}-pubgw"
@@ -75,7 +75,7 @@ resource "ibm_is_public_gateway" "pubgw" {
 
 # Bastion SG
 resource "ibm_is_security_group" "bastion" {
-    resource_group = var.resource_group_id
+    resource_group = local.resource_group_id
 
     name = "${ibm_is_vpc.main.name}-bastion"
     vpc  = ibm_is_vpc.main.id
@@ -119,7 +119,7 @@ resource "ibm_is_security_group_rule" "bastion_egress_all" {
 
 # Internal access only SG
 resource "ibm_is_security_group" "internal" {
-    resource_group = var.resource_group_id
+    resource_group = local.resource_group_id
 
     name = "${ibm_is_vpc.main.name}-internal-only"
     vpc  = ibm_is_vpc.main.id

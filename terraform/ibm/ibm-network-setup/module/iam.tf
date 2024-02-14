@@ -10,7 +10,7 @@ resource "ibm_iam_trusted_profile_policy" "bastion-viewer" {
 
   resources {
     resource_type = "resource-group"
-    resource      = var.resource_group_id
+    resource      = local.resource_group_id
   }
 
 }
