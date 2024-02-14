@@ -10,7 +10,7 @@ matihost@github
 :stem: latexmath
 :toc: left
 
-http://projecteuler.net/[Project Euler] algorithms description implemented in https://github.com/matihost/monorepo/tree/master/algorithms/project-euler repository.
+http://projecteuler.net/[Project Euler] algorithms description implemented in https://github.com/matihost/monorepo/tree/main/algorithms/project-euler repository.
 
 ## Prime numbers
 

@@ -3,11 +3,11 @@ name: 'CI'
 on:
   push:
     branches:
-    - master
+    - main
     - feature/*
   pull_request:
     branches:
-    - master
+    - main
     - feature/*
   workflow_dispatch:
     # Inputs are only available for workflow_dispatch - the default is not available for other type of triggers
@@ -33,7 +33,7 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 env:
-  IMAGE_TAG: "${{ github.ref == 'refs/heads/master' && 'latest' || github.sha }}"
+  IMAGE_TAG: "${{ github.ref == 'refs/heads/main' && 'latest' || github.sha }}"
 jobs:
   sources:
     name: Checkout sources

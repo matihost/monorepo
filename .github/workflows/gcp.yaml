@@ -3,11 +3,11 @@ name: 'GCP'
 on:
   # push:
   #   branches:
-  #   - master
+  #   - main
   #   - feature/*
   # pull_request:
   #   branches:
-  #   - master
+  #   - main
   #   - feature/*
   workflow_dispatch:
     inputs:
@@ -34,7 +34,7 @@ concurrency:
   group: gcp-${{ github.ref }}
   cancel-in-progress: true
 env:
-  IMAGE_TAG: "${{ github.ref == 'refs/heads/master' && 'latest' || github.sha }}"
+  IMAGE_TAG: "${{ github.ref == 'refs/heads/main' && 'latest' || github.sha }}"
 jobs:
   gcp:
     name: Run GCP related tasks

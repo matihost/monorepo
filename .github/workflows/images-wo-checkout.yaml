@@ -4,12 +4,12 @@ on:
   # push:
   #   # paths: "k8s/images/*"
   #   branches:
-  #   - master
+  #   - main
   #   - feature/*
   # pull_request:
   #   # paths: "k8s/images/*"
   #   branches:
-  #   - master
+  #   - main
   #   - feature/*
   workflow_dispatch:
   # Inputs are only available for workflow_dispatch - the default is not available for other type of triggers
@@ -31,7 +31,7 @@ concurrency:
   group: images-wo-checkout-${{ github.ref }}
   cancel-in-progress: true
 env:
-  IMAGE_TAG: "${{ github.ref == 'refs/heads/master' && 'latest' || github.sha }}"
+  IMAGE_TAG: "${{ github.ref == 'refs/heads/main' && 'latest' || github.sha }}"
 jobs:
   image-build-on-gcp-artifact-registry:
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
