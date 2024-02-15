@@ -1,6 +1,7 @@
 variable "env" {
   type        = string
   description = "Environment name"
+  default = "dev"
 }
 
 variable "resource_group_name" {
