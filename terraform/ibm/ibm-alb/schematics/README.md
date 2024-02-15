@@ -2,6 +2,16 @@
 
 This directory contains Terraform resources compatible with IBM Cloud Schematics folder structure.
 
+## Create IBM CLoud Schematics Workspace from CLI
+
+```bash
+# to create default dev Schematics workspace for ibm-network-setup
+# optionally point existing tf state file
+ibmcloud sch ws new -f schematics/workspace.json [-s stage/target/...../dev/terraform.tfstate]
+
+# then override variables if necessary
+```
+
 ## Create IBM Cloud Schematics Workspace procedure
 
 * Go to [https://cloud.ibm.com/schematics/workspaces/create](https://cloud.ibm.com/schematics/workspaces/create)

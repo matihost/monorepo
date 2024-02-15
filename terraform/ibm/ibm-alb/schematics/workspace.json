@@ -1,0 +1,22 @@
+{
+  "name": "dev-ibm-alb",
+  "type": [
+      "terraform_v1.5"
+  ],
+  "location": "eu-de",
+  "resource_group": "dev",
+  "description": "Deployment of private and public NLB and ALB in \"dev\" resource group",
+  "tags": [
+    "resource_group:dev"
+  ],
+  "template_repo": {
+      "url": "https://github.com/matihost/monorepo",
+      "branch": "main"
+  },
+  "template_data": [
+      {
+      "folder": "terraform/ibm/ibm-alb/schematics",
+      "type": "terraform_v1.5"
+      }
+  ]
+  }

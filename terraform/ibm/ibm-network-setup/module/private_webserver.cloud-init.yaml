@@ -3,6 +3,9 @@
 repo_update: true
 repo_upgrade: all
 
+# Mezmo/LogDna configuration options
+# https://github.com/logdna/logdna-agent-v2/blob/master/docs/README.md
+# https://cloud.ibm.com/docs/log-analysis?topic=log-analysis-ubuntu
 write_files:
   - path: /etc/logdna.env
     content: |

@@ -1,6 +1,9 @@
 #cloud-config
 # Cloud-init configuration location: /var/lib/cloud/instance/cloud-config.txt
 # Cloud-init output logs: /var/log/cloud-init-output.log
+#
+# cloud init cli
+# cloud-init status
 ---
 repo_update: true
 repo_upgrade: all
@@ -11,6 +14,9 @@ packages:
  - curl
  - wget
 
+# Mezmo/LogDna configuration options
+# https://github.com/logdna/logdna-agent-v2/blob/master/docs/README.md
+# https://cloud.ibm.com/docs/log-analysis?topic=log-analysis-ubuntu
 write_files:
   - path: /etc/logdna.env
     content: |
