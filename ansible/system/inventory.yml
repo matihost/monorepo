@@ -42,9 +42,9 @@ all:
           4ops.packer
           4ops.terraform
           asciidoctor.asciidoctor-vscode
-          DavidAnson.vscode-markdownlint
+          davidanson.vscode-markdownlint
           donjayamanne.githistory
-          DotJoshJohnson.xml
+          dotjoshjohnson.xml
           eamodio.gitlens
           formulahendry.code-runner
           foxundermoon.shell-format
@@ -55,6 +55,7 @@ all:
           joaompinto.asciidoctor-vscode
           ms-azuretools.vscode-docker
           ms-kubernetes-tools.vscode-kubernetes-tools
+          ms-python.debugpy
           ms-python.isort
           ms-python.python
           ms-python.vscode-pylance
@@ -73,8 +74,8 @@ all:
           streetsidesoftware.code-spell-checker
           techer.open-in-browser
           tomoki1207.pdf
-          VisualStudioExptTeam.intellicode-api-usage-examples
-          VisualStudioExptTeam.vscodeintellicode
+          visualstudioexptteam.intellicode-api-usage-examples
+          visualstudioexptteam.vscodeintellicode
           vmware.vscode-spring-boot
           vscjava.vscode-java-debug
           vscjava.vscode-java-dependency
@@ -230,6 +231,7 @@ all:
         - pipenv
         - yamllint
         - youtubedl-gui
+        - libxcb-cursor0 # calibre dependency
         snaps:
         - mc-installer
         - notepad-plus-plus
