@@ -20,9 +20,9 @@ packages:
 write_files:
   - path: /etc/logdna.env
     content: |
-      MZ_INGESTION_KEY=${log_ingestion_key}
-      MZ_APIHOST=api.${region}.logging.cloud.ibm.com
-      MZ_LOGHOST=logs.${region}.logging.cloud.ibm.com
+      LOGDNA_INGESTION_KEY=${log_ingestion_key}
+      LOGDNA_APIHOST=api.${region}.logging.cloud.ibm.com
+      LOGDNA_LOGHOST=logs.${region}.logging.cloud.ibm.com
 
 
 
