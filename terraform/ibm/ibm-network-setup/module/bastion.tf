@@ -37,6 +37,8 @@ resource "ibm_is_instance" "bastion" {
   user_data = templatefile("${path.module}/bastion.cloud-init.tpl", {
     ssh_key = base64encode(var.ssh_key),
     ssh_pub = base64encode(var.ssh_pub_key),
+    log_ingestion_key = ibm_resource_key.logs-key.credentials.ingestion_key,
+    region = var.region,
     }
   )
 }
@@ -54,7 +56,7 @@ resource "ibm_is_floating_ip" "bastion" {
 
 output "bastion_ssh" {
   description = "Connect to bastion to be able to connect to other private only servers"
-  value       = format("ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_ibm.aws.vm ubuntu@%s", ibm_is_floating_ip.bastion.address)
+  value       = format("ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.ibm.vm ubuntu@%s", ibm_is_floating_ip.bastion.address)
 }
 
 output "bastion_id" {

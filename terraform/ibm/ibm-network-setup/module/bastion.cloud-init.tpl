@@ -9,6 +9,16 @@ packages:
  - tinyproxy
  - postgresql-client
  - curl
+ - wget
+
+write_files:
+  - path: /etc/logdna.env
+    content: |
+      LOGDNA_INGESTION_KEY=${log_ingestion_key}
+      LOGDNA_APIHOST=api.${region}.logging.cloud.ibm.com
+      LOGDNA_LOGHOST=logs.${region}.logging.cloud.ibm.com
+
+
 
 # cloud-init creates a final script in: /var/lib/cloud/instance/scripts/runcmd
 runcmd:
@@ -17,3 +27,8 @@ runcmd:
  - cat /home/ubuntu/.ssh/id_rsa.pub >> /home/ubuntu/.ssh/authorized_keys
  - 'chown ubuntu:ubuntu /home/ubuntu/.ssh/id_rsa*'
  - chmod 400 /home/ubuntu/.ssh/id_rsa
+ - echo "deb https://assets.logdna.com stable main" > /etc/apt/sources.list.d/logdna.list
+ - wget -qO - https://assets.logdna.com/logdna.gpg | apt-key add -
+ - apt-get update
+ - apt-get -y install logdna-agent
+ - systemctl enable --now logdna-agent
