@@ -3,8 +3,21 @@
 repo_update: true
 repo_upgrade: all
 
+write_files:
+  - path: /etc/logdna.env
+    content: |
+      LOGDNA_INGESTION_KEY=${log_ingestion_key}
+      LOGDNA_APIHOST=api.${region}.logging.cloud.ibm.com
+      LOGDNA_LOGHOST=logs.${region}.logging.cloud.ibm.com
+
 packages:
- - nginx
+  - nginx
+  - wget
 
 runcmd:
- - systemctl start --now nginx
+  - systemctl start --now nginx
+  - echo "deb https://assets.logdna.com stable main" > /etc/apt/sources.list.d/logdna.list
+  - wget -qO - https://assets.logdna.com/logdna.gpg | apt-key add -
+  - apt-get update
+  - apt-get -y install logdna-agent
+  - systemctl enable --now logdna-agent

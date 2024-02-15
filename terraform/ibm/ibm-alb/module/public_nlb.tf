@@ -169,7 +169,11 @@ resource "ibm_is_instance_template" "public-nlb-webserver" {
 
   vpc       = data.ibm_is_vpc.vpc.id
   keys      = [ data.ibm_is_ssh_key.key.id ]
-  user_data = file("${path.module}/webserver.cloud-init.yaml")
+  user_data = templatefile("${path.module}/webserver.cloud-init.yaml", {
+    log_ingestion_key = data.ibm_resource_key.logs-key.credentials.ingestion_key,
+    region = var.region,
+    }
+  )
 
   placement_group = ibm_is_placement_group.group.id
 

@@ -26,7 +26,12 @@ resource "ibm_is_instance" "webserver" {
   vpc       = ibm_is_vpc.main.id
   zone      = each.key
   keys      = [ ibm_is_ssh_key.bastion.id ]
-  user_data = file("${path.module}/private_webserver.cloud-init.yaml")
+
+  user_data = templatefile("${path.module}/private_webserver.cloud-init.yaml", {
+    log_ingestion_key = ibm_resource_key.logs-key.credentials.ingestion_key,
+    region = var.region,
+    }
+  )
 }
 
 
