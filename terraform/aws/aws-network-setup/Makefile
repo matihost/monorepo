@@ -63,6 +63,5 @@ help: ## show usage and tasks (default)
 .PHONY: help run clean
 
 
-
 prepare:
 	@[ -e "$(HOME)/.ssh/id_rsa.aws.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.aws.vm; }
