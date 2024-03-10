@@ -123,7 +123,6 @@ awswhoami
 make run MODE=apply
 ```
 
-
 ## AWS Identity Center With Keycloak as IdP
 
 ### Setup SSO

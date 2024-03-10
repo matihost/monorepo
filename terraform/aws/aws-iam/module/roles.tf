@@ -60,7 +60,7 @@ resource "aws_iam_instance_profile" "s3reader" {
 
 resource "aws_iam_role" "lambda-basic" {
   name               = "lambda-basic"
-  description        = "Allow lambda to access VPC resources, S3 objecys, and CloudWatch logs"
+  description        = "Allow lambda to access VPC resources, S3 objects, and CloudWatch logs"
   assume_role_policy = <<-EOF
   {
     "Version": "2012-10-17",

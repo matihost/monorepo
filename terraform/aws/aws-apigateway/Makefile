@@ -1,0 +1,45 @@
+.EXPORT_ALL_VARIABLES:
+
+DEBUG := false
+ifeq ($(strip $(DEBUG)),true)
+	TF_LOG := DEBUG
+endif
+
+MODE := apply
+ifeq ($(strip $(MODE)),apply)
+	MODE_STR := apply -auto-approve
+else ifeq ($(strip $(MODE)),destroy)
+	MODE_STR := destroy -auto-approve
+else
+	MODE_STR := plan
+endif
+
+ENV := dev
+
+init:
+	cd stage/$(ENV) && terragrunt init -upgrade=true
+
+run: init   ## deploy API Gateway exposing Lambda, usage: make run [ENV=dev] [MODE=apply]
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
+
+test: ## invoke Lambda programatically
+	aws lambda invoke --function-name=$(ENV)-synthetic-ec2-tester response.json && cat response.json
+	@-rm -rf response.json
+
+test-api: ## invoke Lambda via API Gateway endpoint
+	curl "$(shell cd stage/$(ENV) && terragrunt output base_url)"
+
+show-state: ## show state
+	cd stage/$(ENV) && terragrunt state list && terragrunt show
+
+clean: ## clean cached plugins and data
+	find . -name ".terra*" -exec rm -rf {} +
+	find . -name "target" -exec rm -rf {} +
+
+upgrade-providers-version: init
+
+
+help: ## show usage and tasks (default)
+	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
+.DEFAULT_GOAL := help
+.PHONY: help run clean

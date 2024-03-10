@@ -7,26 +7,27 @@ Use  AWS resources eliglible to AWS Free Tier __only__.
 
 ## Prerequisites
 
-* Logged to AWS Account
+* Logged to AWS Account, for detailed instruction how to login to AWS see [../aws-iam](../aws-iam).
 
-```bash
-aws configure
-```
+* Latest Terragrunt, Terraform or OpenTofu installed
 
-* Latest Terraform installed
+* * [../aws-network-setup](../aws-network-setup) - installed for `dev` env, aka installation VM in own VPC. The `default` env deploys instance in the default VPC.
 
 ## Usage
 
 ```bash
 
-# deploy EC2 instance and related resources
-make apply
+# setup free-tier eliglible Ubuntu instance
+make run [ENV=dev] [MODE=apply]
 
-# connects to EC2 intances Nginx
+# connects to EC2 intance Nginx
 make test
 
 # ssh to EC2 instance
 make ssh
+
+# ssh to EC2 instance over SSM SSH
+make ssm-ssh
 
 # show Terraform state along with current EC2 instance user_date startup script
 make show-state

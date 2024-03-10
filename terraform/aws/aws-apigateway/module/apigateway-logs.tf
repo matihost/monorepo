@@ -1,8 +1,33 @@
+resource "aws_iam_role" "apigateway-cloudwatch" {
+  name = "${local.prefix}-apigateway-cloudwatch"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "apiGatewayCloudWatchAssignment" {
+  role       = aws_iam_role.apigateway-cloudwatch.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+}
+
 # settings of an API Gateway Account - the settings is applied region-wide per provider block.
 # As there is no API method for deleting account settings or resetting it to defaults,
 # destroying this resource will keep your account settings intact
 resource "aws_api_gateway_account" "apigateway" {
-  cloudwatch_role_arn = data.aws_iam_role.apigateway-cloudwatch.arn
+  cloudwatch_role_arn = aws_iam_role.apigateway-cloudwatch.arn
 }
 
 #
