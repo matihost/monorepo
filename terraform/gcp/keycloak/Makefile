@@ -38,8 +38,11 @@ clean: ## clean Terraform cached plugins and data
 
 
 TAG := latest
+# TODO update cloud-sql-jdbc-socket-factory
+# https://github.com/GoogleCloudPlatform/cloud-sql-jdbc-socket-factory
+# https://repo.maven.apache.org/maven2/com/google/cloud/sql/postgres-socket-factory/1.17.1/
 POSTGRESQL_JDBC_VERSION := 1.13.1
-KEYCLOAK_METRICS_SPI_VERSION := 4.0.0
+KEYCLOAK_METRICS_SPI_VERSION := 5.0.0
 CURRENT_PROJECT := $(shell gcloud config get-value project)
 
 configure-docker-registry:

@@ -19,7 +19,7 @@ The following scripts creates:
   ```
 
 * (Optionally, but recommended) Enable required GCP APIs. Deployments ensure that particular API is enabled first, but Google often claims that API is enabled, but later on deployment claims it is not yet, and several minutes waiting is really required that API is truly enabled on GCP side.
-  The list of required APIs: [Compute](https://console.cloud.google.com/apis/library/compute.googleapis.com), [Service Networkking](https://console.cloud.google.com/apis/library/servicenetworking.googleapis.com), [Dns](https://console.cloud.google.com/apis/library/dns.googleapis.com)
+  The list of required APIs: [Compute](https://console.cloud.google.com/apis/library/compute.googleapis.com), [Service Networking](https://console.cloud.google.com/apis/library/servicenetworking.googleapis.com), [Dns](https://console.cloud.google.com/apis/library/dns.googleapis.com)
 
 * Latest OpenTofu and Terragrunt installed
 

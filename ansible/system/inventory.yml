@@ -26,13 +26,14 @@ all:
           virtualbox_ubuntu_version: "jammy"
           # TODO change to {{ ansible_distribution_release }} when mantic/23.10 is supported Ubuntu
           cri_dockerd_ubuntu_version: "jammy"
-          mq: 9.3.4.0
+          # MQ Version available at: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/
+          mq: 9.3.5.0
           # TODO change to {{ ansible_distribution_version }} when mantic/23.10 is supported Ubuntu
           # List of supported Ubuntu versions: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive
-          onedrive_ubuntu_version: "23.04"
-                    # TODO change to {{ ansible_distribution_release }} when mantic/23.10 is supported Ubuntu
+          onedrive_ubuntu_version: "23.10"
+          # TODO change to {{ ansible_distribution_release }} when mantic/23.10 is supported Ubuntu
           # List of supported Ubuntu versions: https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/
-          pgadmin_ubuntu_version: "lunar"
+          pgadmin_ubuntu_version: "mantic"
         virtual_interface_ip: 192.168.10.1
         update_cache_timeout: 30
         systemd_journal:
@@ -781,7 +782,7 @@ all:
           become: true
           command: |
             # TODO consider full server version
-            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/9.3.4.0-IBM-MQ-Advanced-for-Developers-UbuntuLinuxX64.tar.gz
+            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/9.3.5.0-IBM-MQ-Advanced-for-Developers-UbuntuLinuxX64.tar.gz
             # TODO add detect a new version
             [ -e /opt/mqm ] || {
               rm -rf /tmp/mq && mkdir -p /tmp/mq && cd /tmp/mq
