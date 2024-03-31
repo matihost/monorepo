@@ -45,7 +45,7 @@
     <maven.test.skip>false</maven.test.skip>
 
     <!-- Spring Boot -->
-    <spring.boot.version>3.2.2</spring.boot.version>
+    <spring.boot.version>3.2.4</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -57,19 +57,19 @@
     <enforce.maven.version>3.6</enforce.maven.version>
 
     <!-- Spock -->
-    <spock.version>2.4-M1-groovy-4.0</spock.version>
+    <spock.version>2.4-M4-groovy-4.0</spock.version>
 
     <!-- Scala 3-->
     <scala.compat.version>3</scala.compat.version>
-    <scala.version>${scala.compat.version}.3.1</scala.version>
+    <scala.version>${scala.compat.version}.4.1</scala.version>
     <scala.spec2.version>5.5.1</scala.spec2.version>
     <scala.test.version>3.2.18</scala.test.version>
     <scala.test.plus.version>3.2.18.0</scala.test.plus.version>
     <!-- Scala 3 still depends on Scala 2 for backward compatibility -->
-    <scala2.version>2.13.12</scala2.version>
+    <scala2.version>2.13.13</scala2.version>
 
     <!-- IBM MQ client -->
-    <mq.version>9.3.4.1</mq.version>
+    <mq.version>9.3.5.0</mq.version>
   </properties>
 
   <profiles>
@@ -382,7 +382,7 @@
               https://ossindex.sonatype.org/vulnerability/CVE-2023-51074?component-type=maven&component-name=com.jayway.jsonpath%2Fjson-path&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
               https://ossindex.sonatype.org/component/pkg:maven/com.jayway.jsonpath/json-path@2.8.0?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
               -->
-              <exclude>CVE-2023-51074</exclude>
+              <!-- <exclude>CVE-2023-51074</exclude> -->
             </excludeVulnerabilityIds>
             <reportFile>${project.build.directory}/audit-report.json</reportFile>
           </configuration>
