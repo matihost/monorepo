@@ -45,7 +45,7 @@
     <maven.test.skip>false</maven.test.skip>
 
     <!-- Spring Boot -->
-    <spring.boot.version>3.2.4</spring.boot.version>
+    <spring.boot.version>3.2.5</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -377,12 +377,14 @@
           <configuration>
           <excludeVulnerabilityIds>
               <!--
-              com.jayway.jsonpath:json-path:jar:2.8.0:test;
-              [CVE-2023-51074] CWE-787: Out-of-bounds Write (7.5);
-              https://ossindex.sonatype.org/vulnerability/CVE-2023-51074?component-type=maven&component-name=com.jayway.jsonpath%2Fjson-path&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-              https://ossindex.sonatype.org/component/pkg:maven/com.jayway.jsonpath/json-path@2.8.0?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+                org.bouncycastle:bcprov-jdk18on:jar:1.77:compile; https://ossindex.sonatype.org/component/pkg:maven/org.bouncycastle/bcprov-jdk18on@1.77?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+                  * [CVE-2024-29857] CWE-400: Uncontrolled Resource Consumption ('Resource Exhaustion') (7.5); https://ossindex.sonatype.org/vulnerability/CVE-2024-29857?component-type=maven&component-name=org.bouncycastle%2Fbcprov-jdk18on&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+                  * [CVE-2024-30171] CWE-208: Information Exposure Through Timing Discrepancy (5.9); https://ossindex.sonatype.org/vulnerability/CVE-2024-30171?component-type=maven&component-name=org.bouncycastle%2Fbcprov-jdk18on&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+                  * [CVE-2024-30172] CWE-835: Loop with Unreachable Exit Condition ('Infinite Loop') (5.9); https://ossindex.sonatype.org/vulnerability/CVE-2024-30172?component-type=maven&component-name=org.bouncycastle%2Fbcprov-jdk18on&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
               -->
-              <!-- <exclude>CVE-2023-51074</exclude> -->
+              <exclude>CVE-2024-29857</exclude>
+              <exclude>CVE-2024-30171</exclude>
+              <exclude>CVE-2024-30172</exclude>
             </excludeVulnerabilityIds>
             <reportFile>${project.build.directory}/audit-report.json</reportFile>
           </configuration>
