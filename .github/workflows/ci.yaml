@@ -208,7 +208,7 @@ jobs:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
     timeout-minutes: 30
-    container: golang:1.21
+    container: golang:1.22
     env:
       GO_CACHE: /go
     steps:
@@ -225,6 +225,8 @@ jobs:
           /go
         key: "${{ runner.os }}-gopath"
     # https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/running-codeql-code-scanning-in-a-container
+    - name: Install CodeQL dependencies
+      run: apt update && apt -y install file
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:

@@ -1,4 +1,4 @@
-FROM golang:1.21 as builder
+FROM golang:1.22 as builder
 COPY . /tmp/build
 WORKDIR /tmp/build
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=mod -o . ./cmd/language
@@ -9,7 +9,7 @@ ENTRYPOINT ["./language"]
 LABEL Name=language Version=0.0.1
 
 # The GOPATH version of build, has to be first build step, executable in /go/bin/language
-# FROM golang:1.18 as builder
+# FROM golang:1.22 as builder
 # WORKDIR /go/src/github.com/matihost/monorepo/go/learning
 # COPY . .
 # WORKDIR cmd/language

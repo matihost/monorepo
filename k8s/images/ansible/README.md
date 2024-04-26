@@ -19,10 +19,10 @@ make build
 make push
 
 # create additional tag for latest image
-make tag TAG=2.14.5
+make tag TAG=2.16.6
 
 # push image with tag to quay.io
-make push TAG=2.14.5
+make push TAG=2.16.6
 ```
 
 ## Jenkins CI under GKE

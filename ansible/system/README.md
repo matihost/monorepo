@@ -2,15 +2,15 @@
 
 Various playbooks for Ubuntu machine management.
 
-Supported Ubuntu distribution: **23.10 (mantic)**
+Supported Ubuntu distribution: **24.04 LTS (noble)**
 
 ## Prerequisites
 
 * Ensure your Linux user is on sudoers with NOPASSWD. In Ubuntu it can be achieved by
 
   ```bash
-  groupadd admin
-  usermod -aG admin <your user name>
+  sudo groupadd admin
+  sudo usermod -aG admin <your user name>
   sudo visudo
   ```
 
@@ -27,8 +27,8 @@ Supported Ubuntu distribution: **23.10 (mantic)**
 * Install Python and Ansible
 
   ```bash
-  # install Python3
-  sudo apt install -y build-essential libssl-dev libffi-dev python3-dev python3-pip
+  # install Python3, GitHub CLI and Git
+  sudo apt install -y build-essential libssl-dev libffi-dev python3-dev python3-pip gh git
 
   # make sure Ansible is installed
   sudo apt install -y python3-ansible-runner
@@ -38,6 +38,25 @@ Supported Ubuntu distribution: **23.10 (mantic)**
 
   # ensure user Python apps can be run
   echo 'PATH="$HOME/.local/bin:$HOME/bin:$PATH"' >> ~/.bashrc
+  ```
+
+* Setup git and checkout this repo
+
+  ```bash
+  # setup your git user name and email
+  git config --global user.name "Name Surname"
+  git config --global user.email "your@email"
+
+  # clone this repo
+  mkidr -p ~/src && cd ~/src
+  gh repo clone matihost/monorepo
+
+  # setup pre-commit hooks in the checkout repo
+  cd monorepo
+  pre-commit install --install-hooks
+
+  # go to this playbook location
+  cd monorepo/ansible/system
   ```
 
 ## Running

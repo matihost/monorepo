@@ -1,6 +1,6 @@
 """Versioning utility functions."""
 import subprocess
-import pkg_resources
+import importlib.metadata as importlib_metadata
 
 
 def git_version():
@@ -16,8 +16,4 @@ def git_version():
 
 def package_version(package):
     """Retrieve python package version."""
-    try:
-        version = pkg_resources.get_distribution(package).version
-    except pkg_resources.DistributionNotFound:
-        version = "0.0.1.dev1"
-    return version
+    return importlib_metadata.version(package)

@@ -1,4 +1,4 @@
-FROM python:3.11-alpine
+FROM python:3.12-alpine
 RUN apk add git
 RUN pip3 install --no-cache-dir --upgrade pip && \
   adduser --uid 1000 --disabled-password --ingroup root default

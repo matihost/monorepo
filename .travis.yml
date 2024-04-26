@@ -34,7 +34,7 @@ jobs:
     before_script: cd rust/guessing_game
     cache: cargo
   - language: go
-    go: "1.20" # Travis does not support go 1.21 yet'
+    go: "1.22" # Travis does not support go 1.21, neither 1.22 yet'
     before_install: cd go/learning
     script:
     - go build -mod=mod -o .  ./...
@@ -45,7 +45,7 @@ jobs:
       - $HOME/.cache/go-build  # Cache the binaries
       - $HOME/gopath/pkg/mod   # Cache the Go modules
   - language: python
-    python: "3.11"
+    python: "3.12"
     before_install: cd python/apps/exchange-rate
     install:
     - pip3 install tox

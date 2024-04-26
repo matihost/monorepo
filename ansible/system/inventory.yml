@@ -7,7 +7,7 @@ all:
       vars:
         versions:
           # represents path to local gems, see: 'gem environment' output for example:  ~/.gem/ruby/3.1.0/bin
-          ruby: 3.1.0
+          ruby: 3.2.0
           crio: 1.28
           # libcontainers && cri-o
           # List supported Ubuntu versions: https://github.com/cri-o/cri-o/blob/master/install.md#apt-based-operating-systems
@@ -21,7 +21,7 @@ all:
           openvpn_repo_ubuntu_version: "lunar"
           # TODO change to {{ ansible_distribution_release }} when mantic/23.10 is supported Ubuntu
           # List of supported Ubuntu versions: https://www.hashicorp.com/official-packaging-guide?product_intent=terraform
-          terraform_ubuntu_version: "lunar"
+          terraform_ubuntu_version: "mantic"
           # List of supported Ubuntu versions: https://download.virtualbox.org/virtualbox/debian/dists/
           virtualbox_ubuntu_version: "jammy"
           # TODO change to {{ ansible_distribution_release }} when mantic/23.10 is supported Ubuntu
@@ -156,7 +156,7 @@ all:
         - hplip
         - hplip-gui
         - ddclient
-        - golang-1.21-go
+        - golang-go
         - golang-golang-x-tools
         - python3-pip
         - graphviz
@@ -172,20 +172,21 @@ all:
         - curl
         - keepass2
         - code
-        - onedrive
+        #- onedrive, # not working yet under 24.04
         - nautilus-dropbox
         - ffmpeg
         - openssh-server
         - iftop
         - dosbox
-        - libva-x11-2 # it is steam app dependency
-        - steam
+        #- libva-x11-2 # it is steam app dependency
+        #- steam
         - virt-manager
         - docker.io
         - docker-buildx
         - conntrack
         - fuse-overlayfs
-        - virtualbox-7.0
+        #- virtualbox-7.0 # Virtual Box from Oracle repo, # not working yet under 24.04, installing from Ubuntu
+        - virtualbox
         - containernetworking-plugins
         - cri-o
         - podman
@@ -661,7 +662,7 @@ all:
           command: |
             CURRENT_VERSION="$(curl -sL https://calibre-ebook.com/download_linux |grep 'The latest release of calibre is' | sed -E 's/.*The latest release of calibre is (.+)\..*/\1/')"
             INSTALLED_VERSION="$(calibre --version 2>/dev/null | sed -E 's/.*\(calibre (.*)\)/\1/')"
-            [[ "${CURRENT_VERSION}" == "${INSTALLED_VERSION}"* ]] || {
+            [[ -n ${INSTALLED_VERSION}" && ("${CURRENT_VERSION}" == "${INSTALLED_VERSION}"*) ]] || {
               wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo bash
             }
         - name: kubectl plugins

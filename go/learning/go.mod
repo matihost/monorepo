@@ -1,12 +1,12 @@
 module github.com/matihost/monorepo/go/learning
 
-go 1.21
+go 1.22
 
 require (
 	github.com/pkg/errors v0.9.1
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.63.2
-	google.golang.org/grpc/examples v0.0.0-20240423190515-5a24fc18083c
+	google.golang.org/grpc/examples v0.0.0-20240425232638-1e8b9b7fc655
 )
 
 require (

@@ -33,7 +33,7 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Build Tools",
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
     keywords="exchange rate nbp",  # Optional
     # When your source code is in a subdirectory under the project root, e.g.
@@ -43,7 +43,7 @@ setup(
     # Ensures that non .py files are included in package
     setup_requires=["setuptools_scm"],
     include_package_data=True,
-    python_requires=">=3.11, <4",
+    python_requires=">=3.12, <4",
     install_requires=[
         "jinja2>=3.1.3",
         "markupsafe>=2.1.3; python_version >= '2.7' and python_version >= '3.11'",
