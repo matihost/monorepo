@@ -77,38 +77,66 @@ resource "google_storage_bucket_object" "minecraft-code" {
   depends_on = [null_resource.scheduler-code]
 }
 
-# TODO migrate to google_cloudfunctions2_function
-resource "google_cloudfunctions_function" "minecraft-lifecycle-executor" {
+
+data "google_artifact_registry_repository" "repository" {
+  location      = var.region
+  repository_id = var.repository_id
+}
+
+resource "google_cloudfunctions2_function" "minecraft-lifecycle-executor" {
   name        = "${var.minecraft_server_name}-minecraft-lifecycle-executor"
+  location    = var.region
   description = "Minecraft server ${var.minecraft_server_name} lifecycle executor"
   # supported runtimes versions:
   # https://cloud.google.com/functions/docs/concepts/execution-environment#runtimes
-  runtime     = "go121"
 
-  available_memory_mb   = 128
-  source_archive_bucket = google_storage_bucket.minecraft-data.name
-  source_archive_object = google_storage_bucket_object.minecraft-code.name
+  build_config {
+    runtime     = "go122"
+    entry_point = "Handle"
+    docker_repository = data.google_artifact_registry_repository.repository.id
 
-
-  event_trigger {
-    event_type = "google.pubsub.topic.publish"
-    resource   = google_pubsub_topic.minecraft-lifecycle-topic.id
+    source {
+      storage_source {
+        bucket = google_storage_bucket.minecraft-data.name
+        object = google_storage_bucket_object.minecraft-code.name
+      }
+    }
   }
 
-  timeout     = 60
-  entry_point = "Handle"
+  service_config {
+    max_instance_count  = 1
+    min_instance_count = 1
+    available_memory    = "128Mi"
+    timeout_seconds     = 60
+    max_instance_request_concurrency = 1
+    available_cpu = "1"
+
+    environment_variables = {
+      MINECRAFT_SERVER_NAME = google_compute_instance_group_manager.minecraft_group_manager.name
+      GCP_ZONE              = var.zone
+      GCP_PROJECT_ID        = var.project
+    }
+
+    ingress_settings = "ALLOW_INTERNAL_ONLY"
+    all_traffic_on_latest_revision = true
+    service_account_email = google_service_account.minecraft-scheduler.email
+  }
+
+  event_trigger {
+    trigger_region = var.region
+    event_type     = "google.cloud.pubsub.topic.v1.messagePublished"
+    pubsub_topic   = google_pubsub_topic.minecraft-lifecycle-topic.id
+    retry_policy   = "RETRY_POLICY_RETRY"
+  }
+
 
   labels = {
     purpose = "lifecycle"
   }
 
-  environment_variables = {
-    MINECRAFT_SERVER_NAME = google_compute_instance_group_manager.minecraft_group_manager.name
-    GCP_ZONE              = var.zone
-    GCP_PROJECT_ID        = var.project
-  }
-
-  service_account_email = google_service_account.minecraft-scheduler.email
+  depends_on = [
+    google_project_service.apis
+  ]
 }
 
 resource "google_service_account" "minecraft-scheduler" {

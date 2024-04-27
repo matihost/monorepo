@@ -1,31 +1,31 @@
 locals {
-  bucket = "${local.project}-terraform-state"
+  bucket  = "${local.project}-terraform-state"
   project = "${run_cmd("--terragrunt-quiet", "gcloud", "config", "get-value", "project")}"
-  region = "${run_cmd("--terragrunt-quiet", "gcloud", "config", "get-value", "compute/region")}"
-  zone = "${run_cmd("--terragrunt-quiet", "gcloud", "config", "get-value", "compute/zone")}"
+  region  = "${run_cmd("--terragrunt-quiet", "gcloud", "config", "get-value", "compute/region")}"
+  zone    = "${run_cmd("--terragrunt-quiet", "gcloud", "config", "get-value", "compute/zone")}"
 }
 
 remote_state {
   backend = "gcs"
 
   config = {
-    bucket = local.bucket
-    prefix = "${basename(abspath("${get_parent_terragrunt_dir()}/.."))}/${basename(get_parent_terragrunt_dir())}/${path_relative_to_include()}"
-    project = local.project
+    bucket   = local.bucket
+    prefix   = "${basename(abspath("${get_parent_terragrunt_dir()}/.."))}/${basename(get_parent_terragrunt_dir())}/${path_relative_to_include()}"
+    project  = local.project
     location = local.region
   }
 
   generate = {
-    path = "state.tf"
+    path      = "state.tf"
     if_exists = "overwrite_terragrunt"
   }
 }
 
 
 generate "provider" {
-  path = "provider.tf"
+  path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
-  contents = <<EOF
+  contents  = <<EOF
 provider "google" {
   region  = var.region
   zone    = var.zone
@@ -44,8 +44,10 @@ terraform {
   }
 }
 
-inputs ={
+inputs = {
   project = local.project
-  region = local.region
-  zone = local.zone
+  region  = local.region
+  zone    = local.zone
+
+  regions = ["us-central1", "europe-central2"]
 }

@@ -34,6 +34,8 @@ TODO include png in base64 for when GitHup md renderer supports it
 
 * Terraform `../gcp-network-setup` has been deployed - for networking setup
 
+* Terraform `../gcp-repository` has been deployed - for Artifact repository for Cloud Functions images
+
 * Cloud Scheduler requires AppEngine setup in your GCP project in the same region where you intent do deploy app.
 
 ## Usage

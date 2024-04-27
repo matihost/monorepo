@@ -34,6 +34,12 @@ variable "project" {
   description = "GCP Project For Deployment"
 }
 
+variable "repository_id" {
+  type        = string
+  default     = "docker"
+  description = "Artifact docker repository_id in the var.region, assumption gcp-repository has been already run"
+}
+
 variable "minecraft_server_url" {
   type        = string
   default     = "https://piston-data.mojang.com/v1/objects/8dd1a28015f51b1803213892b50b7b4fc76e594d/server.jar"

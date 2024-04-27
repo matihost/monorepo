@@ -1,3 +1,9 @@
+variable "regions" {
+  type = list(string)
+  description = "GCP Regions for artifact registry deployment"
+}
+
+# tflint-ignore: terraform_unused_declarations
 variable "region" {
   type        = string
   default     = "us-central1"

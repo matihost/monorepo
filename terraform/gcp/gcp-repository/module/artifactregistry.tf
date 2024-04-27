@@ -1,5 +1,7 @@
 resource "google_artifact_registry_repository" "docker" {
-  location      = var.region
+  for_each = toset(var.regions)
+
+  location      = each.key
   repository_id = "docker"
   description   = "Docker hosted repository"
   format        = "DOCKER"
