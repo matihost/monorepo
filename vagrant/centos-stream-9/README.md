@@ -15,14 +15,24 @@ Creates SSH keys automatically on the host for connecting to vagrant via ssh
   * 0.0.0.0/0 ::/0
   ```
 
+* Download base OS image:
+
+  ```bash
+  # download Vagrant image
+  make ensure-latest-base-vm
+  ```
+
 ## Usage
 
 ```bash
+# download Vagrant image
+make ensure-latest-base-vm
+
 # run VM
 man run
 
 # run VM with GUI and Guest Additions
-man run
+make run-with-gui
 
 # ssh to VM via vagrant
 make ssh

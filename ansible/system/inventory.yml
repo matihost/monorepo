@@ -185,7 +185,13 @@ all:
         - docker-buildx
         - conntrack
         - fuse-overlayfs
-        #- virtualbox-7.0 # Virtual Box from Oracle repo, # not working yet under 24.04, installing from Ubuntu
+        # not working yet under 24.04, installing from Ubuntu
+        #- virtualbox-7.0 # Virtual Box from Oracle repo,
+        # TODO attempt to automate
+        #
+        # When SecureBoot is enabled - VirtualBox vboxdrv module needs to be signed:
+        # https://askubuntu.com/a/1199583
+        # in order for VirtualBox to run
         - virtualbox
         - containernetworking-plugins
         - cri-o
@@ -289,6 +295,7 @@ all:
           become: true
           command: |
             [ -e "/etc/vbox/networks.conf" ] || {
+              mkdir -p /etc/vbox
               cat <<EOF > /etc/vbox/networks.conf
             * 0.0.0.0/0 ::/0
             EOF

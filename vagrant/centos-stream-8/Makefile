@@ -40,7 +40,8 @@ update-vm: ## check for updates for vagrant box image
 	vagrant box update
 
 ensure-latest-base-vm: ## cleans base box so that if Vagrant file contains newer base box it will be downloaded
-	vagrant box remove -f centos/centos-stream-8
+	-vagrant box remove -f centos/centos-stream-8
+	vagrant box add centos/centos-stream-8 https://cloud.centos.org/centos/8-stream/x86_64/images/CentOS-Stream-Vagrant-8-latest.x86_64.vagrant-virtualbox.box
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
