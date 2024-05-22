@@ -12,28 +12,24 @@ all:
           # libcontainers && cri-o
           # List supported Ubuntu versions: https://github.com/cri-o/cri-o/blob/master/install.md#apt-based-operating-systems
           # use {{ ansible_distribution_version }} instead of current Ubuntu version is supported, otherwise hardcode version
-          # TODO change to {{ ansible_distribution_version }} when mantic/23.10 is supported Ubuntu
+          # TODO change to {{ ansible_distribution_version }} when noble/24.04 is supported Ubuntu
           libcontainers_repo_ubuntu_version: "22.04"
           libcontainers_crio_repo_ubuntu_version: "22.04"
-          # TODO change to {{ ansible_distribution_version }} when mantic/23.10 is supported Ubuntu
+          # TODO change to {{ ansible_distribution_version }} when noble/24.04 is supported Ubuntu
           # List of supported Ubuntu versions:
           # https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos#DebianUbuntu:UsingOpenVPNaptrepositories
           openvpn_repo_ubuntu_version: "lunar"
-          # TODO change to {{ ansible_distribution_release }} when mantic/23.10 is supported Ubuntu
           # List of supported Ubuntu versions: https://www.hashicorp.com/official-packaging-guide?product_intent=terraform
-          terraform_ubuntu_version: "mantic"
-          # List of supported Ubuntu versions: https://download.virtualbox.org/virtualbox/debian/dists/
-          virtualbox_ubuntu_version: "jammy"
-          # TODO change to {{ ansible_distribution_release }} when mantic/23.10 is supported Ubuntu
+          terraform_ubuntu_version: "noble"
+          virtualbox_ubuntu_version: "noble"
+          # TODO change to {{ ansible_distribution_release }} when noble/24.04 is supported Ubuntu
           cri_dockerd_ubuntu_version: "jammy"
           # MQ Version available at: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/
-          mq: 9.3.5.0
-          # TODO change to {{ ansible_distribution_version }} when mantic/23.10 is supported Ubuntu
+          mq: 9.3.5.1
           # List of supported Ubuntu versions: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive
-          onedrive_ubuntu_version: "23.10"
-          # TODO change to {{ ansible_distribution_release }} when mantic/23.10 is supported Ubuntu
+          onedrive_ubuntu_version: "24.04"
           # List of supported Ubuntu versions: https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/
-          pgadmin_ubuntu_version: "mantic"
+          pgadmin_ubuntu_version: "noble"
         virtual_interface_ip: 192.168.10.1
         update_cache_timeout: 30
         systemd_journal:
@@ -172,34 +168,33 @@ all:
         - curl
         - keepass2
         - code
-        #- onedrive, # not working yet under 24.04
+        - onedrive
         - nautilus-dropbox
         - ffmpeg
         - openssh-server
         - iftop
         - dosbox
         #- libva-x11-2 # it is steam app dependency
-        #- steam
         - virt-manager
         - docker.io
         - docker-buildx
         - conntrack
         - fuse-overlayfs
-        # not working yet under 24.04, installing from Ubuntu
-        #- virtualbox-7.0 # Virtual Box from Oracle repo,
-        # TODO attempt to automate
-        #
         # When SecureBoot is enabled - VirtualBox vboxdrv module needs to be signed:
         # https://askubuntu.com/a/1199583
-        # in order for VirtualBox to run
-        - virtualbox
+        # in order for VirtualBox to run you need to recompile kernel module
+        # and sign for UEFI Secure Boot:
+        # Run:
+        # sudo /sbin/vboxconfig
+        #
+        - virtualbox-7.0 # Virtual Box from Oracle repo,
+        # - virtualbox # Ubuntu packaged VirtualBox
         - containernetworking-plugins
         - cri-o
         - podman
         - buildah
         - skopeo
-        # switch to OpenTofu
-        # - terraform
+        # - terraform # OpenTofu is used instead
         - packer
         - vagrant
         - sshpass
@@ -243,6 +238,7 @@ all:
         snaps:
         - mc-installer
         - notepad-plus-plus
+        - steam
         # Uncomment to use snap packages for gcloud sdk
         # classic_snaps:
         # - google-cloud-sdk

@@ -61,15 +61,15 @@
 
     <!-- Scala 3-->
     <scala.compat.version>3</scala.compat.version>
-    <scala.version>${scala.compat.version}.4.1</scala.version>
+    <scala.version>${scala.compat.version}.4.2</scala.version>
     <scala.spec2.version>5.5.1</scala.spec2.version>
     <scala.test.version>3.2.18</scala.test.version>
     <scala.test.plus.version>3.2.18.0</scala.test.plus.version>
     <!-- Scala 3 still depends on Scala 2 for backward compatibility -->
-    <scala2.version>2.13.13</scala2.version>
+    <scala2.version>2.13.14</scala2.version>
 
     <!-- IBM MQ client -->
-    <mq.version>9.3.5.0</mq.version>
+    <mq.version>9.3.5.1</mq.version>
   </properties>
 
   <profiles>
@@ -377,14 +377,21 @@
           <configuration>
           <excludeVulnerabilityIds>
               <!--
+                org.xmlunit:xmlunit-core:jar:2.9.1:test; https://ossindex.sonatype.org/component/pkg:maven/org.xmlunit/xmlunit-core@2.9.1?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+                * [CVE-2024-31573] CWE-1188 (9.8); https://ossindex.sonatype.org/vulnerability/CVE-2024-31573?component-type=maven&component-name=org.xmlunit%2Fxmlunit-core&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+              -->
+              <exclude>CVE-2024-31573</exclude>
+              <!--
                 org.bouncycastle:bcprov-jdk18on:jar:1.77:compile; https://ossindex.sonatype.org/component/pkg:maven/org.bouncycastle/bcprov-jdk18on@1.77?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
                   * [CVE-2024-29857] CWE-400: Uncontrolled Resource Consumption ('Resource Exhaustion') (7.5); https://ossindex.sonatype.org/vulnerability/CVE-2024-29857?component-type=maven&component-name=org.bouncycastle%2Fbcprov-jdk18on&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
                   * [CVE-2024-30171] CWE-208: Information Exposure Through Timing Discrepancy (5.9); https://ossindex.sonatype.org/vulnerability/CVE-2024-30171?component-type=maven&component-name=org.bouncycastle%2Fbcprov-jdk18on&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
                   * [CVE-2024-30172] CWE-835: Loop with Unreachable Exit Condition ('Infinite Loop') (5.9); https://ossindex.sonatype.org/vulnerability/CVE-2024-30172?component-type=maven&component-name=org.bouncycastle%2Fbcprov-jdk18on&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+                  * [CVE-2024-34447] CWE-297: Improper Validation of Certificate with Host Mismatch (7.7); https://ossindex.sonatype.org/vulnerability/CVE-2024-34447?component-type=maven&component-name=org.bouncycastle%2Fbcprov-jdk18on&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
               -->
               <exclude>CVE-2024-29857</exclude>
               <exclude>CVE-2024-30171</exclude>
               <exclude>CVE-2024-30172</exclude>
+              <exclude>CVE-2024-34447</exclude>
             </excludeVulnerabilityIds>
             <reportFile>${project.build.directory}/audit-report.json</reportFile>
           </configuration>

@@ -86,7 +86,10 @@ resource "google_cloud_run_service" "keycloak" {
     metadata {
       annotations = {
         "run.googleapis.com/sessionAffinity"       = "true",
-        "autoscaling.knative.dev/minScale"         = "1",
+        # Set to 0 to reduce
+        # Idle Min-Instance CPU Allocation Time and Idle Min-Instance Memory Allocation Time
+        # One idle instance costs 20 $ / month
+        "autoscaling.knative.dev/minScale"         = "0",
         "autoscaling.knative.dev/maxScale"         = "5",
         "run.googleapis.com/execution-environment" = "gen2",
         "run.googleapis.com/cpu-throttling"        = "true",

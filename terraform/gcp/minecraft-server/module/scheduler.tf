@@ -105,7 +105,10 @@ resource "google_cloudfunctions2_function" "minecraft-lifecycle-executor" {
 
   service_config {
     max_instance_count  = 1
-    min_instance_count = 1
+    # Set to 0 to reduce
+    # Idle Min-Instance CPU Allocation Time (2nd Gen) and Idle Min-Instance Memory Allocation Time (2nd Gen)
+    # One idle instance costs 20 $ / month
+    min_instance_count = 0
     available_memory    = "128Mi"
     timeout_seconds     = 60
     max_instance_request_concurrency = 1
