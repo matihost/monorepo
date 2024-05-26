@@ -23,13 +23,13 @@ variable "external_access_ip" {
 variable "ec2_instance_type" {
   type        = string
   description = "Instance type for EC2 deployments"
-  default = "t3.micro"
+  default     = "t3.micro"
 }
 
 variable "ec2_architecture" {
   type        = string
   description = "Instance type for EC2 deployments"
-  default = "x86_64"
+  default     = "x86_64"
 }
 
 # tflint-ignore: terraform_unused_declarations
@@ -47,7 +47,7 @@ variable "region" {
 }
 
 variable "aws_tags" {
-  type = map(string)
+  type        = map(string)
   description = "AWS tags"
 }
 
@@ -66,7 +66,7 @@ variable "vpc_name" {
 
 
 variable "zones" {
-  type = set(string)
+  type        = set(string)
   description = "AWS zones for VPC Subnetworks Deployment"
 }
 

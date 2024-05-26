@@ -37,13 +37,13 @@ variable "create_sample_instance" {
 variable "ec2_instance_type" {
   type        = string
   description = "Instance type for EC2 deployments"
-  default = "t3.micro"
+  default     = "t3.micro"
 }
 
 variable "ec2_architecture" {
   type        = string
   description = "Instance type for EC2 deployments"
-  default = "x86_64"
+  default     = "x86_64"
 }
 
 variable "zone" {
@@ -67,8 +67,8 @@ variable "vpc_ip_cidr_range" {
 
 variable "zones" {
   type = map(object({
-      public_ip_cidr_range = string
-      private_ip_cidr_range = string
+    public_ip_cidr_range  = string
+    private_ip_cidr_range = string
   }))
   description = "AWS zones for VPC Subnetworks Deployment"
 }

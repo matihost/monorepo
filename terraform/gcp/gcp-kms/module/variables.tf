@@ -1,5 +1,5 @@
 variable "regions" {
-  type = set(string)
+  type        = set(string)
   description = "Regions to place KMS keys"
 }
 

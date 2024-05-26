@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "glue-data" {
-  bucket =  "${var.env}-glue-data-${local.account_id}"
+  bucket = "${var.env}-glue-data-${local.account_id}"
 
   force_destroy = true
 }
@@ -73,8 +73,8 @@ resource "aws_s3_object" "sparkHistoryLogs-dir" {
 }
 
 resource "aws_s3_object" "input" {
-  bucket = aws_s3_bucket.glue-data.id
-  key    = "data/input/input.json"
+  bucket  = aws_s3_bucket.glue-data.id
+  key     = "data/input/input.json"
   content = <<EOF
 {"name": "John Doe", "address" : "111 Some Dr 76726282 Irving TX, US", "cc": "4242424242424242"}
 {"name": "Anna Doe", "address" : "111 Some Dr 12323453 Irving TX, US", "cc": "5555555555554444"}
@@ -123,5 +123,5 @@ resource "aws_glue_job" "pci-s3-job" {
   timeout           = "120"
   worker_type       = "G.1X"
 
-  depends_on = [ aws_s3_object.script ]
+  depends_on = [aws_s3_object.script]
 }

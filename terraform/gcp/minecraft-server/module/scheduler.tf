@@ -91,8 +91,8 @@ resource "google_cloudfunctions2_function" "minecraft-lifecycle-executor" {
   # https://cloud.google.com/functions/docs/concepts/execution-environment#runtimes
 
   build_config {
-    runtime     = "go122"
-    entry_point = "Handle"
+    runtime           = "go122"
+    entry_point       = "Handle"
     docker_repository = data.google_artifact_registry_repository.repository.id
 
     source {
@@ -104,15 +104,15 @@ resource "google_cloudfunctions2_function" "minecraft-lifecycle-executor" {
   }
 
   service_config {
-    max_instance_count  = 1
+    max_instance_count = 1
     # Set to 0 to reduce
     # Idle Min-Instance CPU Allocation Time (2nd Gen) and Idle Min-Instance Memory Allocation Time (2nd Gen)
     # One idle instance costs 20 $ / month
-    min_instance_count = 0
-    available_memory    = "128Mi"
-    timeout_seconds     = 60
+    min_instance_count               = 0
+    available_memory                 = "128Mi"
+    timeout_seconds                  = 60
     max_instance_request_concurrency = 1
-    available_cpu = "1"
+    available_cpu                    = "1"
 
     environment_variables = {
       MINECRAFT_SERVER_NAME = google_compute_instance_group_manager.minecraft_group_manager.name
@@ -120,9 +120,9 @@ resource "google_cloudfunctions2_function" "minecraft-lifecycle-executor" {
       GCP_PROJECT_ID        = var.project
     }
 
-    ingress_settings = "ALLOW_INTERNAL_ONLY"
+    ingress_settings               = "ALLOW_INTERNAL_ONLY"
     all_traffic_on_latest_revision = true
-    service_account_email = google_service_account.minecraft-scheduler.email
+    service_account_email          = google_service_account.minecraft-scheduler.email
   }
 
   event_trigger {

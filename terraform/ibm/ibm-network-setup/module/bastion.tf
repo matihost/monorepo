@@ -1,7 +1,7 @@
 resource "ibm_is_ssh_key" "bastion" {
   resource_group = local.resource_group_id
 
-  name   = "${local.prefix}-${var.region}-bastion-ssh"
+  name       = "${local.prefix}-${var.region}-bastion-ssh"
   public_key = var.ssh_pub_key
 }
 
@@ -16,29 +16,29 @@ resource "ibm_is_instance" "bastion" {
   resource_group = local.resource_group_id
 
   name    = "${local.prefix}-${var.region}-bastion"
-  image   =  data.ibm_is_image.ubuntu.id
-  profile =  var.instance_profile
+  image   = data.ibm_is_image.ubuntu.id
+  profile = var.instance_profile
 
   default_trusted_profile_target = ibm_iam_trusted_profile.bastion.id
 
   metadata_service {
-    enabled = true
+    enabled  = true
     protocol = "https"
   }
   primary_network_interface {
     name            = "eth0"
     subnet          = ibm_is_subnet.subnet[var.zone].id
-    security_groups = [ ibm_is_security_group.bastion.id ]
+    security_groups = [ibm_is_security_group.bastion.id]
   }
 
-  vpc       = ibm_is_vpc.main.id
-  zone      = var.zone
-  keys      = [ ibm_is_ssh_key.bastion.id ]
+  vpc  = ibm_is_vpc.main.id
+  zone = var.zone
+  keys = [ibm_is_ssh_key.bastion.id]
   user_data = templatefile("${path.module}/bastion.cloud-init.tpl", {
-    ssh_key = base64encode(var.ssh_key),
-    ssh_pub = base64encode(var.ssh_pub_key),
+    ssh_key           = base64encode(var.ssh_key),
+    ssh_pub           = base64encode(var.ssh_pub_key),
     log_ingestion_key = ibm_resource_key.logs-key.credentials.ingestion_key,
-    region = var.region,
+    region            = var.region,
     }
   )
 }

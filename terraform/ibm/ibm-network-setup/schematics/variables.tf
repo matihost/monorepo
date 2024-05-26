@@ -1,19 +1,19 @@
 variable "env" {
   type        = string
   description = "Environment name"
-  default = "dev"
+  default     = "dev"
 }
 
 variable "resource_group_name" {
   type        = string
   description = "IBM Cloud Resource Group Name to place resources, if missing env will be used for resource group name"
-  default = "dev"
+  default     = "dev"
 }
 
 variable "resource_group_id" {
   type        = string
   description = "IBM Cloud Resource Group ID to place resources, if not provided it will be calculated from resource_group_name variable"
-  default = ""
+  default     = ""
 }
 
 variable "ssh_pub_key" {
@@ -35,7 +35,7 @@ variable "create_sample_instance" {
 variable "instance_profile" {
   type        = string
   description = "Instance profile for EC2 deployments"
-  default = "cx2-2x4"
+  default     = "cx2-2x4"
 }
 
 variable "zone" {
@@ -53,7 +53,7 @@ variable "region" {
 
 variable "zones" {
   type = map(object({
-      ip_cidr_range = string
+    ip_cidr_range = string
   }))
   description = "IBM Cloud zones for VPC Subnetworks Deployment"
   default = {

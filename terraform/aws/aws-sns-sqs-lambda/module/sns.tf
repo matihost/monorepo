@@ -1,8 +1,8 @@
 resource "aws_sns_topic" "image-resize" {
-  display_name                             = "Topic for S3 create object events being new pictures to be resized"
-  fifo_topic                               = "false"
+  display_name = "Topic for S3 create object events being new pictures to be resized"
+  fifo_topic   = "false"
 
-  name                                     = "${local.prefix}-ImageResize-Topic"
+  name = "${local.prefix}-ImageResize-Topic"
 
   # default policy allowing any user from account publishing to topic
   # and
@@ -52,7 +52,7 @@ resource "aws_sns_topic" "image-resize" {
 }
 POLICY
 
-  tracing_config                   = "PassThrough"
+  tracing_config = "PassThrough"
 }
 
 

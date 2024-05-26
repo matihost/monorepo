@@ -54,7 +54,7 @@ resource "google_compute_health_check" "http-health-check" {
 }
 
 output "public_ip" {
-  value = google_compute_instance.vm.network_interface.0.access_config.0.nat_ip
+  value = google_compute_instance.vm.network_interface[0].access_config[0].nat_ip
 }
 
 
@@ -70,7 +70,7 @@ variable "name" {
   description = "Name prefix for VM"
 }
 
-#  Default variables
+# tflint-ignore: terraform_unused_declarations
 variable "region" {
   type        = string
   default     = "us-central1"
@@ -83,6 +83,7 @@ variable "zone" {
   description = "GCP Zone For Deployment"
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "project" {
   type        = string
   description = "GCP Project For Deployment"

@@ -1,5 +1,5 @@
-locals{
-  public_subnet_ids =  [for subnet in data.aws_subnet.public: subnet.id]
+locals {
+  public_subnet_ids = [for subnet in data.aws_subnet.public : subnet.id]
 }
 
 data "aws_security_group" "public_lb_security_group" {
@@ -16,13 +16,13 @@ data "aws_security_group" "public_lb_security_group" {
 #
 # Details: https://aws.amazon.com/premiumsupport/knowledge-center/public-load-balancer-private-ec2/
 resource "aws_lb" "webserver" {
-  name = local.prefix
+  name               = local.prefix
   internal           = false
   load_balancer_type = "application"
   security_groups    = [data.aws_security_group.public_lb_security_group.id]
 
   # TODO replace with subnet mapping to reserver EIP
-  subnets            = local.public_subnet_ids
+  subnets = local.public_subnet_ids
 }
 
 resource "aws_lb_listener" "webserver" {
@@ -43,7 +43,7 @@ resource "aws_lb_listener" "webserver" {
 }
 
 resource "aws_lb_target_group" "webserver" {
-  name = local.prefix
+  name     = local.prefix
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.default.id

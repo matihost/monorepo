@@ -1,5 +1,5 @@
-locals{
-  private_subnet_ids =  [for subnet in data.aws_subnet.private: subnet.id]
+locals {
+  private_subnet_ids = [for subnet in data.aws_subnet.private : subnet.id]
 }
 
 data "aws_ami" "ubuntu" {
@@ -32,7 +32,7 @@ data "aws_vpc" "default" {
 }
 
 data "aws_subnet" "private" {
-  for_each = var.zones
+  for_each          = var.zones
   vpc_id            = data.aws_vpc.default.id
   availability_zone = each.key
   tags = {
@@ -42,7 +42,7 @@ data "aws_subnet" "private" {
 
 
 data "aws_subnet" "public" {
-  for_each = var.zones
+  for_each          = var.zones
   vpc_id            = data.aws_vpc.default.id
   availability_zone = each.key
   tags = {
@@ -62,7 +62,7 @@ data "aws_security_group" "webserver" {
 
 
 resource "aws_launch_template" "webserver" {
-  name_prefix = "${local.prefix}-"
+  name_prefix            = "${local.prefix}-"
   update_default_version = true
 
   iam_instance_profile {
@@ -134,7 +134,7 @@ resource "aws_autoscaling_policy" "webserver" {
 
 
 resource "aws_placement_group" "webserver" {
-  name     = local.prefix
-  strategy = "partition"
+  name            = local.prefix
+  strategy        = "partition"
   partition_count = 3
 }

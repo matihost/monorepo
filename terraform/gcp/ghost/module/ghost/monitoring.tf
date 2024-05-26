@@ -2,7 +2,7 @@
 
 resource "google_monitoring_service" "ghost" {
   project  = var.project
-  for_each = { for instance in var.instances : "${instance.region}" => instance }
+  for_each = { for instance in var.instances : instance.region => instance }
 
   service_id   = "${local.name}-${each.key}-svc"
   display_name = "Cloud Run ${local.name}-${each.key} Monitoring Service"
@@ -25,7 +25,7 @@ resource "google_monitoring_service" "ghost" {
 
 resource "google_monitoring_slo" "ghost" {
   project  = var.project
-  for_each = { for instance in var.instances : "${instance.region}" => instance }
+  for_each = { for instance in var.instances : instance.region => instance }
 
   service = google_monitoring_service.ghost[each.key].service_id
 

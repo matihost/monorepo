@@ -1,5 +1,5 @@
 variable "regions" {
-  type = list(string)
+  type        = list(string)
   description = "GCP Regions for artifact registry deployment"
 }
 

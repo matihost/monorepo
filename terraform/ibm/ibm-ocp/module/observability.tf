@@ -1,11 +1,11 @@
 resource "ibm_resource_instance" "logs" {
   resource_group_id = local.resource_group_id
 
-  name              = "${local.prefix}-logs"
+  name = "${local.prefix}-logs"
 
-  service           = "logdna"
-  plan              = "7-day"
-  location          = var.region
+  service  = "logdna"
+  plan     = "7-day"
+  location = var.region
   # tags              = ....
   service_endpoints = "public-and-private"
 
@@ -27,10 +27,10 @@ resource "ibm_resource_key" "logs-key" {
 resource "ibm_resource_instance" "monitoring" {
   resource_group_id = local.resource_group_id
 
-  name              = "${local.prefix}-monitoring"
-  service           = "sysdig-monitor"
-  plan              = "graduated-tier"
-  location          = var.region
+  name     = "${local.prefix}-monitoring"
+  service  = "sysdig-monitor"
+  plan     = "graduated-tier"
+  location = var.region
   # tags              = ...
   service_endpoints = "public-and-private"
 
@@ -41,7 +41,7 @@ resource "ibm_resource_instance" "monitoring" {
 
 # IBM Cloud Monitoring access key (Sysdig)
 resource "ibm_resource_key" "monitoring-key" {
-  name                 = "${local.prefix}-monitoring-manager"
+  name = "${local.prefix}-monitoring-manager"
 
   resource_instance_id = ibm_resource_instance.monitoring.id
   role                 = "Manager"
@@ -74,9 +74,9 @@ resource "null_resource" "deploy-observability-agents" {
   }
 
   depends_on = [
-   ibm_resource_key.logs-key,
-   ibm_resource_key.monitoring-key,
-   ibm_container_vpc_cluster.ocp,
-   ibm_container_addons.addons,
+    ibm_resource_key.logs-key,
+    ibm_resource_key.monitoring-key,
+    ibm_container_vpc_cluster.ocp,
+    ibm_container_addons.addons,
   ]
 }

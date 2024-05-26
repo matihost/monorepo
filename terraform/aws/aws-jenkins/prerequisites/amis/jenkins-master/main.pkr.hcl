@@ -10,7 +10,7 @@ variable "ami_name_prefix" {
 
 locals {
   timestamp = regex_replace(timestamp(), "[- TZ:]", "")
-  ami_name = "${var.ami_name_prefix}-${local.timestamp}"
+  ami_name  = "${var.ami_name_prefix}-${local.timestamp}"
 }
 
 source "amazon-ebs" "main" {
@@ -35,7 +35,7 @@ build {
 
   provisioner "shell" {
     inline = ["echo Building AMI: ${local.ami_name} on ${build.User}@${build.Host}", "echo 'Waiting for cloud-init'; while [ ! -f /var/lib/cloud/instance/boot-finished ]; do sleep 1; done; echo 'Done'",
-      "echo `whoami`"]
+    "echo `whoami`"]
   }
   provisioner "shell" {
     scripts = ["jenkins-master.buildout.sh"]

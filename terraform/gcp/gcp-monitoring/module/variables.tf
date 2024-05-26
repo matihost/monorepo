@@ -1,10 +1,12 @@
-# Mandatory variables for GCP Provider and GS storage for TF state setup
+
+# tflint-ignore: terraform_unused_declarations
 variable "region" {
   type        = string
   default     = "us-central1"
   description = "GCP Region For Deployment"
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "zone" {
   type        = string
   default     = "us-central1-a"

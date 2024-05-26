@@ -4,9 +4,12 @@ provider "google" {
   project = var.project
 }
 
+# tflint-ignore: terraform_unused_declarations
 data "google_client_config" "current" {}
+# tflint-ignore: terraform_unused_declarations
 data "google_project" "current" {
 }
+# tflint-ignore: terraform_unused_declarations
 data "google_compute_network" "default" {
   name = "default"
 }

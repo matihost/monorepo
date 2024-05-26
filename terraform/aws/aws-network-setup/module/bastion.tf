@@ -112,7 +112,7 @@ resource "aws_instance" "bastion_vm" {
     Name = "${local.prefix}-${var.region}-bastion"
   }
 
-  depends_on = [ aws_default_route_table.main ]
+  depends_on = [aws_default_route_table.main]
 }
 
 output "bastion_id" {

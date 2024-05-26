@@ -1,25 +1,25 @@
 variable "env" {
   type        = string
   description = "Environment name"
-  default = "dev"
+  default     = "dev"
 }
 
 variable "resource_group_name" {
   type        = string
   description = "IBM Cloud Resource Group Name to place resources, if missing env will be used for resource group name"
-  default = "dev"
+  default     = "dev"
 }
 
 variable "resource_group_id" {
   type        = string
   description = "IBM Cloud Resource Group ID to place resources, if not provided it will be calculated from resource_group_name variable"
-  default = ""
+  default     = ""
 }
 
 variable "instance_profile" {
   type        = string
   description = "Instance profile for Worker nodes"
-  default = "bx2.4x16" // or cx2.8x16 or cx2.1x32
+  default     = "bx2.4x16" // or cx2.8x16 or cx2.1x32
 }
 
 variable "zone" {
@@ -45,7 +45,7 @@ variable "vpc_name" {
 
 variable "subnetworks" {
   type = map(object({
-      name = string
+    name = string
   }))
   description = "IBM subnetworks (key is zone, value.name is subnet name)"
   default = {

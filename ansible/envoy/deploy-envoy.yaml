@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Ensure Envoy proxy is deployed
+  hosts: localhost
   become: true
   vars:
     files: "{{ playbook_dir }}/files"
@@ -15,16 +16,21 @@
     ansible.builtin.copy:
       dest: "/etc/envoy/admin.yaml"
       content: "{{ lookup('template', files + '/admin.yaml.j2') }}"
+      mode: "644"
   - name: Ensure Envoy main config file present
     ansible.builtin.copy:
       dest: "/etc/envoy/envoy.yaml"
-      content: "{{ lookup('template', files + '/' + envoy.template_config|mandatory) }}"
+      content: "{{ lookup('template', files + '/' + envoy.template_config | mandatory) }}"
+      mode: "644"
   - name: Ensure Envoy systemd config setup
     ansible.builtin.copy:
       dest: "/etc/systemd/system/envoy.service"
       src: "{{ files }}/envoy.service"
+      mode: "644"
 
   - name: Ensure TLS for Envoy is present
+    become: true
+    when: envoy.tls.cn is defined and envoy.tls.cn
     block:
     - name: "Ensure self-signed TLS CN={{ envoy.tls.cn }} is present"
       ansible.builtin.include_role:
@@ -35,14 +41,13 @@
     - name: Ensure Envoy TLS key file present
       ansible.builtin.copy:
         dest: "/etc/envoy/tls.key"
+        mode: "640"
         content: "{{ tls.key | b64decode }}"
     - name: Ensure Envoy TLS cert file present
       ansible.builtin.copy:
         dest: "/etc/envoy/tls.crt"
+        mode: "640"
         content: "{{ tls.crt | b64decode }}"
-    become: true
-    when: envoy.tls.cn is defined and envoy.tls.cn
-
 
   - name: Ensure Envoy systemd service is restarted
     ansible.builtin.systemd:

@@ -1,15 +1,16 @@
 ---
-- hosts: local
+- name: Ensures Jenkins contains jobs
+  hosts: local
   tasks:
   - name: Check mandatory variables
-    fail:
+    ansible.builtin.fail:
       msg: Variable {{ item }} was not provided
     when: vars[item] is undefined
     loop:
     - env
 
   - name: Load {{ env }} variables files
-    include_vars:
+    ansible.builtin.include_vars:
       dir: "{{ inventory_dir }}/{{ env }}"
       depth: 1
       extensions:
@@ -17,8 +18,8 @@
       - yml
 
   - name: Process Jobs
-    include_role:
+    ansible.builtin.include_role:
       name: setup_job
-    loop: "{{ jenkins_jobs|default([]) }}"
+    loop: "{{ jenkins_jobs | default([]) }}"
     loop_control:
       loop_var: job

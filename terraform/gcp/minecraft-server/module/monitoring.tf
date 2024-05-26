@@ -6,10 +6,10 @@
 
 
 resource "google_logging_project_bucket_config" "minecraft" {
-    project        = var.project
-    location       = "global"
-    retention_days = 30
-    bucket_id      = "${var.minecraft_server_name}-minecraft"
+  project        = var.project
+  location       = "global"
+  retention_days = 30
+  bucket_id      = "${var.minecraft_server_name}-minecraft"
 }
 
 resource "google_logging_project_sink" "minecraft-audit" {
@@ -18,7 +18,7 @@ resource "google_logging_project_sink" "minecraft-audit" {
   destination = "logging.googleapis.com/projects/${var.project}/locations/global/buckets/${google_logging_project_bucket_config.minecraft.bucket_id}"
 
 
-  filter  = join(" AND ", [
+  filter = join(" AND ", [
     "resource.type=\"gce_instance\"",
     "log_id(\"syslog\")",
     "labels.\"compute.googleapis.com/resource_name\"=~\"${var.minecraft_server_name}.*\"",

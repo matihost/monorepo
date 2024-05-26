@@ -25,6 +25,7 @@
     ansible.builtin.shell: "sed -i 's/[multiverse |universe ]*partner[ multiverse| universe]*.*/ partner/g' /etc/apt/sources.list"
     when: apt_repo.name in ['multiverse', 'universe']
     register: shell_out
+    changed_when: shell_out.rc != 0
 
 
 - name: Ensure package {{ apt_repo.name }} repositories when is external

@@ -4,9 +4,9 @@ resource "ibm_is_lb" "public-alb" {
   name = "${local.prefix}-alb-public"
 
   subnets = local.subnet_ids
-  type = "public"
+  type    = "public"
 
-  security_groups = [ data.ibm_is_security_group.public-lb.id ]
+  security_groups = [data.ibm_is_security_group.public-lb.id]
 
   # dns   {
   #   instance_crn = "crn:v1:staging:public:dns-svcs:global:a/exxxxxxxxxxxxx-xxxxxxxxxxxxxxxxx:5xxxxxxx-xxxxx-xxxxxxxxxxxxxxx-xxxxxxxxxxxxxxx::"
@@ -22,12 +22,12 @@ resource "ibm_is_lb" "public-alb" {
 
 
 resource "ibm_is_lb_listener" "public-alb-frontend-listener" {
-  lb       = ibm_is_lb.public-alb.id
-  protocol = "http"
-  port     = 80
+  lb           = ibm_is_lb.public-alb.id
+  protocol     = "http"
+  port         = 80
   default_pool = ibm_is_lb_pool.public-alb-backend-pool.id
 
-  connection_limit = 1000
+  connection_limit        = 1000
   idle_connection_timeout = 120
 }
 
@@ -43,7 +43,7 @@ resource "ibm_is_lb_pool" "public-alb-backend-pool" {
   health_type         = "http"
   health_monitor_port = "80"
   # https://cloud.ibm.com/docs/vpc?topic=vpc-advanced-traffic-management#proxy-protocol-enablement
-  proxy_protocol      = "disabled"
+  proxy_protocol           = "disabled"
   session_persistence_type = "source_ip"
 }
 
@@ -60,9 +60,9 @@ resource "ibm_is_instance_group" "public-alb-ig" {
   # If the membership count of an instance group is set to 0,
   # you can change the load balancer pool that is associated with the instance group.
   # You can select a different load balancer that is available, or select none to stop using an assigned load balancer.
-  application_port = 80
-  load_balancer = ibm_is_lb.public-alb.id
-  load_balancer_pool =  element(split("/", ibm_is_lb_pool.public-alb-backend-pool.id), 1)
+  application_port   = 80
+  load_balancer      = ibm_is_lb.public-alb.id
+  load_balancer_pool = element(split("/", ibm_is_lb_pool.public-alb-backend-pool.id), 1)
 
 
   lifecycle {

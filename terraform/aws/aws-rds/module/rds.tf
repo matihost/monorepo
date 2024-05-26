@@ -37,34 +37,34 @@ resource "aws_security_group" "internal_access" {
 resource "aws_rds_cluster" "db" {
   for_each = var.dbs
 
-  cluster_identifier                  = each.key
-  database_name                       = each.value.db_name
+  cluster_identifier = each.key
+  database_name      = each.value.db_name
 
   # allocated_storage                   = "1"
-  availability_zones                  = var.zones
-  backtrack_window                    = "0"
-  backup_retention_period             = "7"
-  copy_tags_to_snapshot               = "true"
-  db_subnet_group_name                = aws_db_subnet_group.private.name
-  deletion_protection                 = "false"
-  apply_immediately                   = true
+  availability_zones      = var.zones
+  backtrack_window        = "0"
+  backup_retention_period = "7"
+  copy_tags_to_snapshot   = "true"
+  db_subnet_group_name    = aws_db_subnet_group.private.name
+  deletion_protection     = "false"
+  apply_immediately       = true
   # http_endpoint not supported by Aurora Serverless v2
   # enable_http_endpoint                = true
-  enabled_cloudwatch_logs_exports     = ["postgresql"]
-  engine                              = "aurora-postgresql"
+  enabled_cloudwatch_logs_exports = ["postgresql"]
+  engine                          = "aurora-postgresql"
   # engine_mode                         = "provisioned"
   engine_version                      = "15.4"
   iam_database_authentication_enabled = "true"
   # iops                                = "0"
   # db_cluster_parameter_group_name     = "default.aurora-postgresql15"
 
-  master_username                     = "postgres"
-  master_password                     = random_password.postgres[each.key].result
-  network_type                        = "IPV4"
-  port                                = "5432"
-  preferred_backup_window             = "06:43-07:13"
-  preferred_maintenance_window        = "mon:10:25-mon:10:55"
-  skip_final_snapshot = true
+  master_username              = "postgres"
+  master_password              = random_password.postgres[each.key].result
+  network_type                 = "IPV4"
+  port                         = "5432"
+  preferred_backup_window      = "06:43-07:13"
+  preferred_maintenance_window = "mon:10:25-mon:10:55"
+  skip_final_snapshot          = true
 
   serverlessv2_scaling_configuration {
     max_capacity = "16"
@@ -72,7 +72,7 @@ resource "aws_rds_cluster" "db" {
   }
 
   storage_encrypted      = "false"
-  vpc_security_group_ids = [ aws_security_group.internal_access.id ]
+  vpc_security_group_ids = [aws_security_group.internal_access.id]
 }
 
 
@@ -95,17 +95,17 @@ resource "aws_rds_cluster_instance" "db_instance_1" {
 resource "random_password" "postgres" {
   for_each = var.dbs
 
-  length           = 10
-  special          = false
+  length  = 10
+  special = false
 }
 
 
 output "postgres-password" {
-  value = values(random_password.postgres)[*].result
+  value     = values(random_password.postgres)[*].result
   sensitive = true
 }
 
 
-output "psql-cmd"{
-  value = [[for key, db in var.dbs: "psql -U postgres -W -h ${aws_rds_cluster.db[key].endpoint} ${db.db_name}" ] ]
+output "psql-cmd" {
+  value = [[for key, db in var.dbs : "psql -U postgres -W -h ${aws_rds_cluster.db[key].endpoint} ${db.db_name}"]]
 }

@@ -1,9 +1,10 @@
 ---
-- hosts: local
+- name: Ansible basic example
+  hosts: local
   gather_facts: false
   tasks:
     - name: Set initial facts
-      set_fact:
+      ansible.builtin.set_fact:
         dictionaries:
           books:
             valid-k8s-name:
@@ -14,19 +15,19 @@
               author: cat
 
     - name: Show all dictionaries
-      debug:
+      ansible.builtin.debug:
         msg: "{{ dictionaries }}"
 
     - name: Set fact some_books
-      set_fact:
+      ansible.builtin.set_fact:
         some_books: "{{ dictionaries.books }}"
 
     - name: Show books
-      debug:
+      ansible.builtin.debug:
         msg: "{{ some_books }}"
 
     - name: Show all books
-      include_role:
+      ansible.builtin.include_role:
         name: show_books
       vars:
         books: "{{ some_books }}"

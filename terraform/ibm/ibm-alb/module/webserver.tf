@@ -1,5 +1,5 @@
-locals{
-  subnet_ids =  [for subnet in data.ibm_is_subnet.subnet: subnet.id]
+locals {
+  subnet_ids = [for subnet in data.ibm_is_subnet.subnet : subnet.id]
 }
 
 data "ibm_is_ssh_key" "key" {
@@ -34,7 +34,7 @@ data "ibm_is_security_group" "public-lb" {
 
 
 data "ibm_resource_key" "logs-key" {
-  name                 = "${var.env}-instances-logs-manager"
+  name = "${var.env}-instances-logs-manager"
 }
 
 resource "ibm_is_placement_group" "group" {
@@ -48,11 +48,11 @@ resource "ibm_is_instance_template" "webserver" {
   resource_group = local.resource_group_id
 
   name    = "${local.prefix}-template"
-  image   =  data.ibm_is_image.ubuntu.id
-  profile =  var.instance_profile
+  image   = data.ibm_is_image.ubuntu.id
+  profile = var.instance_profile
 
   metadata_service {
-    enabled = true
+    enabled  = true
     protocol = "https"
   }
 
@@ -61,15 +61,15 @@ resource "ibm_is_instance_template" "webserver" {
   primary_network_interface {
     name            = "eth0"
     subnet          = data.ibm_is_subnet.subnet[var.zone].id
-    security_groups = [ data.ibm_is_security_group.private.id ]
+    security_groups = [data.ibm_is_security_group.private.id]
   }
 
-  vpc       = data.ibm_is_vpc.vpc.id
-  keys      = [ data.ibm_is_ssh_key.key.id ]
+  vpc  = data.ibm_is_vpc.vpc.id
+  keys = [data.ibm_is_ssh_key.key.id]
 
   user_data = templatefile("${path.module}/webserver.cloud-init.yaml", {
     log_ingestion_key = data.ibm_resource_key.logs-key.credentials.ingestion_key,
-    region = var.region,
+    region            = var.region,
     }
   )
 

@@ -8,10 +8,10 @@ terraform {
 }
 
 inputs = {
-  env = "dev"
-  ha = false
+  env  = "dev"
+  ha   = false
   name = "matihost"
-  url = "http://matihost.dev.mooo.com"
+  url  = "http://matihost.dev.mooo.com"
   instances = [
     { region = "us-central1", image = "ghost:latest" },
   ]

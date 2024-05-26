@@ -1,27 +1,28 @@
 ---
 - name: Check books
-  fail:
+  ansible.builtin.fail:
     msg: No books variable provided
   when: books is not defined
 - name: Show books
-  debug:
+  ansible.builtin.debug:
     msg: "ISBN: {{ book.key }}
           Book: {{ book.value.title }}
           Author: {{ book.value.author }}"
-  loop: "{{ books|dict2items }}"
+  loop: "{{ books | dict2items }}"
   loop_control:
     loop_var: book
 
 - name: Set files path
-  set_fact:
+  ansible.builtin.set_fact:
     files: "{{ role_path }}/files"
 
 # Debugging Jinja templates
 - name: Show books as XML
-  debug:
+  ansible.builtin.debug:
     msg: "{{ lookup('template', role_path + '/files/book-report.xml.j2') }}"
 
 - name: Creating a file with template content
-  copy:
+  ansible.builtin.copy:
     dest: "/tmp/books.xml"
     content: "{{ lookup('template', files + '/book-report.xml.j2') }}"
+    mode: "644"

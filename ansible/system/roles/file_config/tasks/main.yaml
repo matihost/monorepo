@@ -12,6 +12,7 @@
   ansible.builtin.blockinfile:
     path: "{{ file_config.file }}"
     block: "{{ file_config.content }}"
+    mode: "644"
     create: true
   register: blockinfile_result
 

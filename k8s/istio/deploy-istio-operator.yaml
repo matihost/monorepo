@@ -1,7 +1,7 @@
 ---
-- hosts: localhost
+- name: Deploys Istio via Istio operator
+  hosts: localhost
   become: false
-  name: Deploys Istio via Istio operator
   vars:
     files: "{{ playbook_dir }}/files"
     internal_wildcard_cn: "*.{{ ingress_gateway.default_dns_suffix }}"

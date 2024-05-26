@@ -10,7 +10,7 @@ variable "ami_name_prefix" {
 
 locals {
   timestamp = regex_replace(timestamp(), "[- TZ:]", "")
-  ami_name = "${var.ami_name_prefix}-${local.timestamp}"
+  ami_name  = "${var.ami_name_prefix}-${local.timestamp}"
 }
 
 source "amazon-ebs" "main" {

@@ -10,7 +10,7 @@ locals {
 variable "env" {
   type        = string
   description = "Environment name"
-  default = "dev"
+  default     = "dev"
 }
 
 
@@ -46,13 +46,13 @@ variable "subnet" {
 variable "ec2_instance_type" {
   type        = string
   description = "Instance type for EC2 deployments"
-  default = "t3.micro"
+  default     = "t3.micro"
 }
 
 variable "ec2_architecture" {
   type        = string
   description = "Instance type for EC2 deployments"
-  default = "x86_64"
+  default     = "x86_64"
 }
 
 variable "zone" {
@@ -69,7 +69,7 @@ variable "region" {
 
 # tflint-ignore: terraform_unused_declarations
 variable "aws_tags" {
-  type = map(string)
+  type        = map(string)
   description = "AWS tags"
 }
 

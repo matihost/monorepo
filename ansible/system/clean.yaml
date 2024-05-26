@@ -1,7 +1,7 @@
 ---
-- hosts: local
+- name: Clean current system
+  hosts: local
   gather_facts: true
-  name: Clean current system
   tasks:
   - name: Clean systemd journal /var/log/journal logs
     ansible.builtin.shell:
@@ -100,7 +100,8 @@
     failed_when: false
     args:
       executable: /bin/bash
-  - block:
+  - become: false
+    block:
     - name: Clean all podman (user) containers, images and volumes
       ansible.builtin.shell: |
         command -v podman 1>/dev/null 2>/dev/null && {
@@ -112,8 +113,8 @@
       register: clean_out
       changed_when: clean_out.stdout
       failed_when: false
-    become: false
-  - block:
+  - become: false
+    block:
     - name: Clean Terraform cached plugins
       ansible.builtin.shell: |
         TERRAFORM_PLUGINS="${HOME}/.terraform.d/plugins"
@@ -124,4 +125,3 @@
       register: clean_out
       changed_when: clean_out.stderr
       failed_when: false
-    become: false

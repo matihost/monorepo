@@ -3,7 +3,7 @@ resource "null_resource" "lambda-package-build" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command =<<EOF
+    command = <<EOF
 	cd ${path.module} && python -m venv target && . ./target/bin/activate && \
 	pip install boto3 Pillow && cd target/lib/python3*/site-packages && \
 	zip -r ../../../../lambda.zip . && cd ../../../.. && \
@@ -15,7 +15,7 @@ EOF
 
 data "local_file" "lambda-package" {
   filename   = "${path.module}/target/lambda.zip"
-  depends_on = [ null_resource.lambda-package-build ]
+  depends_on = [null_resource.lambda-package-build]
 }
 
 resource "aws_lambda_function" "thumbnail" {
@@ -23,13 +23,13 @@ resource "aws_lambda_function" "thumbnail" {
   description   = "Creates thumbnail from /ingest directory"
 
 
-  filename         = data.local_file.lambda-package.filename
+  filename = data.local_file.lambda-package.filename
 
   # TODO add with try
   # source_code_hash =
 
-  handler          = "CreateThumbnail.handler"
-  runtime          = "python3.11"
+  handler = "CreateThumbnail.handler"
+  runtime = "python3.11"
 
   role = aws_iam_role.lambdarole.arn
 
@@ -66,10 +66,10 @@ resource "aws_lambda_function" "mobile" {
   description   = "Creates mobile sized image from /ingest directory"
 
 
-  filename         = data.local_file.lambda-package.filename
+  filename = data.local_file.lambda-package.filename
 
-  handler          = "CreateMobileImage.handler"
-  runtime          = "python3.11"
+  handler = "CreateMobileImage.handler"
+  runtime = "python3.11"
 
   role = aws_iam_role.lambdarole.arn
 
@@ -106,10 +106,10 @@ resource "aws_lambda_function" "web" {
   description   = "Creates web sized image from /ingest directory"
 
 
-  filename         = data.local_file.lambda-package.filename
+  filename = data.local_file.lambda-package.filename
 
-  handler          = "CreateWebImage.handler"
-  runtime          = "python3.11"
+  handler = "CreateWebImage.handler"
+  runtime = "python3.11"
 
   role = aws_iam_role.lambdarole.arn
 

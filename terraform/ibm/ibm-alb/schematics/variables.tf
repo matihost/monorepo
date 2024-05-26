@@ -1,26 +1,26 @@
 variable "env" {
   type        = string
   description = "Environment name"
-  default = "dev"
+  default     = "dev"
 }
 
 variable "resource_group_name" {
   type        = string
   description = "IBM Cloud Resource Group Name to place resources, if missing env will be used for resource group name"
-  default = "dev"
+  default     = "dev"
 }
 
 variable "resource_group_id" {
   type        = string
   description = "IBM Cloud Resource Group ID to place resources, if not provided it will be calculated from resource_group_name env variable"
-  default = ""
+  default     = ""
 }
 
 
 variable "instance_profile" {
   type        = string
   description = "Instance profile for EC2 deployments"
-  default = "cx2-2x4"
+  default     = "cx2-2x4"
 }
 
 variable "zone" {
@@ -47,7 +47,7 @@ variable "vpc_name" {
 
 variable "subnetworks" {
   type = map(object({
-      name = string
+    name = string
   }))
   description = "AWS subnetworks (key is zone, value.name is subnet name)"
   default = {
@@ -73,18 +73,18 @@ variable "ssh_key_id" {
 variable "private_security_group_name" {
   type        = string
   description = "The name of security group name assigned on EC2 webserver instances and private LBs"
-  default = "dev-eu-de-internal-only"
+  default     = "dev-eu-de-internal-only"
 }
 
 variable "public_lb_security_group_name" {
   type        = string
   description = "The name of security group name assigned on public LBs"
-  default = "dev-eu-de-bastion"
+  default     = "dev-eu-de-bastion"
 }
 
 # tflint-ignore: terraform_unused_declarations
 variable "iam_trusted_profile" {
   type        = string
   description = "The name of IAM trusted profile to attach to instance"
-  default = "dev-eu-de-bastion"
+  default     = "dev-eu-de-bastion"
 }

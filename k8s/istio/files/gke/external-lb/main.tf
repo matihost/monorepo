@@ -4,7 +4,10 @@ provider "google" {
   project = var.project
 }
 
+# tflint-ignore: terraform_unused_declarations
 data "google_client_config" "current" {}
+
+# tflint-ignore: terraform_unused_declarations
 data "google_project" "current" {
 }
 
@@ -18,9 +21,10 @@ data "google_dns_managed_zone" "gke-dns-zone" {
 }
 
 locals {
-  zone         = "${var.region}-${var.zone_letter}"
-  gke_name     = var.cluster_name
-  location     = var.regional_cluster ? var.region : local.zone
+  zone     = "${var.region}-${var.zone_letter}"
+  gke_name = var.cluster_name
+  location = var.regional_cluster ? var.region : local.zone
+  # tflint-ignore: terraform_unused_declarations
   gke_nodes_sa = data.google_container_cluster.gke.node_config[0].service_account
 }
 
@@ -59,6 +63,7 @@ variable "external_wildcard_cn" {
   description = "CN for default external DNS, for example: *.external.gke.shared1.dev.gcp.testing"
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "external_wildcard_name" {
   type        = string
   default     = "wildcard-external-gke"

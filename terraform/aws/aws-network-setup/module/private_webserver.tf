@@ -13,14 +13,14 @@ resource "aws_instance" "webserver" {
   associate_public_ip_address = false
   key_name                    = aws_key_pair.vm_key.key_name
   vpc_security_group_ids      = [aws_security_group.internal_access.id]
-  iam_instance_profile = aws_iam_instance_profile.ssm-ec2.name
+  iam_instance_profile        = aws_iam_instance_profile.ssm-ec2.name
   user_data                   = file("${path.module}/private_webserver.cloud-init.yaml")
   tags = {
     Name = "${local.prefix}-${each.key}-webserver"
   }
 
   # ensure private only EC2 is started after NAT instance is attached to private subnet
-  depends_on = [ aws_route_table_association.private ]
+  depends_on = [aws_route_table_association.private]
 }
 
 

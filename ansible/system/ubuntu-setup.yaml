@@ -1,7 +1,7 @@
 ---
-- hosts: local
+- name: Setup Ubuntu based Desktop system
+  hosts: local
   gather_facts: true
-  name: Setup Ubuntu based Desktop system
   tasks:
   - name: Ensure ~/bin is present
     become: false

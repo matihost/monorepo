@@ -1,7 +1,7 @@
 locals {
   project = "${run_cmd("--terragrunt-quiet", "gcloud", "config", "get-value", "project")}"
-  cn = "id.matihost.mooo.com"
-  tls_crt = "${run_cmd("--terragrunt-quiet", find_in_parent_folders("create-selfsigned-tls.sh") , local.cn )}"
+  cn      = "id.matihost.mooo.com"
+  tls_crt = "${run_cmd("--terragrunt-quiet", find_in_parent_folders("create-selfsigned-tls.sh"), local.cn)}"
   tls_key = file(find_in_parent_folders("target/${local.cn}.key"))
 }
 
@@ -16,13 +16,13 @@ terraform {
 }
 
 inputs = {
-  env = "prod"
-  ha = false
-  name = "idp"
-  url = "https://${local.cn}"
+  env          = "prod"
+  ha           = false
+  name         = "idp"
+  url          = "https://${local.cn}"
   welcome_page = "/realms/id/account/#/"
-  tls_key = local.tls_key
-  tls_crt = local.tls_crt
+  tls_key      = local.tls_key
+  tls_crt      = local.tls_crt
   instances = [
     { region = "us-central1", image = "us-central1-docker.pkg.dev/${local.project}/docker/keycloak-postgres-cloudsql:latest" },
   ]

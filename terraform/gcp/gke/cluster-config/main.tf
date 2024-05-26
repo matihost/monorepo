@@ -57,8 +57,9 @@ module "gke_auth" {
   use_private_endpoint = false
 }
 
-
+# tflint-ignore: terraform_unused_declarations
 data "google_client_config" "current" {}
+# tflint-ignore: terraform_unused_declarations
 data "google_project" "current" {
 }
 

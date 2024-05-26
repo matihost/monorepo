@@ -8,5 +8,5 @@ terraform {
 }
 
 inputs = {
-  name   = "supervm"
+  name = "supervm"
 }

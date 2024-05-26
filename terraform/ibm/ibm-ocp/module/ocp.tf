@@ -1,4 +1,4 @@
-locals{
+locals {
   default_ocp_version = "${data.ibm_container_cluster_versions.cluster_versions.default_openshift_version}_openshift"
 }
 
@@ -21,14 +21,14 @@ data "ibm_container_cluster_versions" "cluster_versions" {
 }
 
 resource "ibm_container_vpc_cluster" "ocp" {
-  resource_group_id               = var.resource_group_id
+  resource_group_id = var.resource_group_id
 
-  name                            = local.prefix
-  vpc_id                          = data.ibm_is_vpc.vpc.id
+  name   = local.prefix
+  vpc_id = data.ibm_is_vpc.vpc.id
   # TODO taggin
   # tags                            = var.tags
-  kube_version                    = local.default_ocp_version
-  flavor                          = var.instance_profile
+  kube_version = local.default_ocp_version
+  flavor       = var.instance_profile
   # empty means w/o licence, obtaining one automatically (more expensive)
   # entitlement                     = "cloud_pak"
   cos_instance_crn                = ibm_resource_instance.cos.id
@@ -87,7 +87,7 @@ resource "ibm_container_vpc_cluster" "ocp" {
 # When version is not provide, initial creation may be successful, but change will notice to remove old and install new
 # leading to error
 resource "ibm_container_addons" "addons" {
-  depends_on = [ ibm_container_vpc_cluster.ocp ]
+  depends_on = [ibm_container_vpc_cluster.ocp]
 
   cluster = ibm_container_vpc_cluster.ocp.name
 

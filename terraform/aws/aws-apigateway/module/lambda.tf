@@ -3,7 +3,7 @@ resource "null_resource" "lambda-package-build" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command =<<EOF
+    command = <<EOF
 	cd ${path.module} && python -m venv target && . ./target/bin/activate && \
 	pip install boto3 && cd target/lib/python3*/site-packages && \
 	zip -r ../../../../lambda.zip . && cd ../../../.. && \
@@ -15,7 +15,7 @@ EOF
 
 data "local_file" "lambda-package" {
   filename   = "${path.module}/target/lambda.zip"
-  depends_on = [ null_resource.lambda-package-build ]
+  depends_on = [null_resource.lambda-package-build]
 }
 
 
@@ -30,7 +30,7 @@ data "aws_instance" "instance" {
 data "aws_vpc" "default" {
   default = var.vpc == "default" ? true : null
 
-  tags = var.vpc == "default" ? null :  {
+  tags = var.vpc == "default" ? null : {
     Name = var.vpc
   }
 }
@@ -41,7 +41,7 @@ data "aws_subnet" "public_zone" {
 
   default_for_az = var.subnet == "default" ? true : null
 
-  tags = var.subnet == "default" ? null :  {
+  tags = var.subnet == "default" ? null : {
     Tier = var.subnet
   }
 }
@@ -83,7 +83,7 @@ resource "aws_lambda_function" "synthetic-ec2-tester" {
   function_name = "${var.env}-${var.lambda_function_name}"
   description   = "Function tests configured IP_TO_TEST http endpoint"
 
-  filename         = data.local_file.lambda-package.filename
+  filename = data.local_file.lambda-package.filename
 
   source_code_hash = filebase64sha256("${path.module}/sli-synthetic-client.py")
   handler          = "sli-synthetic-client.lambda_handler"

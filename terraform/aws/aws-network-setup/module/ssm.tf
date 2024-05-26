@@ -83,8 +83,8 @@ resource "aws_security_group" "ssm" {
 }
 
 
-locals{
-  subnet_ids =  [for subnet in aws_subnet.private: subnet.id]
+locals {
+  subnet_ids = [for subnet in aws_subnet.private : subnet.id]
 }
 
 # VPC endpoint for the Systems Manager service

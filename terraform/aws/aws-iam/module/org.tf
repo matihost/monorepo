@@ -1,8 +1,8 @@
 resource "aws_organizations_organization" "org" {
   enabled_policy_types = ["SERVICE_CONTROL_POLICY", "TAG_POLICY"]
   # In order to Cloud Identity be able to work sso.amazonaws.com has to be explicitely mentioned
-  aws_service_access_principals = [ "sso.amazonaws.com" ]
-  feature_set          = "ALL"
+  aws_service_access_principals = ["sso.amazonaws.com"]
+  feature_set                   = "ALL"
 }
 
 

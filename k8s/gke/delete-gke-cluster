@@ -55,4 +55,4 @@ set -x
 gcloud beta container \
   clusters delete "${1:?Cluster name is mandatory}" \
   --zone "${GCP_ZONE}" \
-  ${FORCE}
+  "${FORCE}"

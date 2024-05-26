@@ -85,7 +85,7 @@ resource "google_cloud_run_service" "keycloak" {
     }
     metadata {
       annotations = {
-        "run.googleapis.com/sessionAffinity"       = "true",
+        "run.googleapis.com/sessionAffinity" = "true",
         # Set to 0 to reduce
         # Idle Min-Instance CPU Allocation Time and Idle Min-Instance Memory Allocation Time
         # One idle instance costs 20 $ / month

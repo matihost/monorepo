@@ -1,5 +1,5 @@
 - name: Check mandatory variables
-  fail:
+  ansible.builtin.fail:
     msg: Variable {{ item }} was not provided
   when: vars[item] is undefined
   loop:
@@ -8,21 +8,21 @@
   - jenkins_admin_pass
 
 - name: Prepare job form
-  set_fact:
+  ansible.builtin.set_fact:
     job_definition: "{{ lookup('template', role_path + '/files/' + job.type + '-job.template.xml') }}"
 
 - name: Prepare script
-  set_fact:
+  ansible.builtin.set_fact:
     script_value: "{{ lookup('template', role_path + '/files/ensure-job.template.groovy') }}"
 
 
 - name: Get Jenkins crump
-  uri:
+  ansible.builtin.uri:
     url: "https://{{ jenkins_ingress.host }}//crumbIssuer/api/xml?xpath=concat(//crumbRequestField,\":\",//crumb)"
     validate_certs: no
     force_basic_auth: yes
-    user: "{{ jenkins_admin_user|default('admin') }}"
-    password: "{{ jenkins_admin_pass|mandatory }}"
+    user: "{{ jenkins_admin_user | default('admin') }}"
+    password: "{{ jenkins_admin_pass | mandatory }}"
     method: GET
     status_code: 200
     return_content: true
@@ -30,12 +30,12 @@
 
 
 - name: Ensure Job {{ job.name }} is present
-  uri:
+  ansible.builtin.uri:
     url: https://{{ jenkins_ingress.host }}/scriptText
     validate_certs: no
     force_basic_auth: yes
-    user: "{{ jenkins_admin_user|default('admin') }}"
-    password: "{{ jenkins_admin_pass|mandatory }}"
+    user: "{{ jenkins_admin_user | default('admin') }}"
+    password: "{{ jenkins_admin_pass | mandatory }}"
     method: POST
     body_format: form-urlencoded
     body:

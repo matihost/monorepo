@@ -1,6 +1,6 @@
 
 resource "aws_cloudwatch_log_group" "logs" {
-  name = "/ecs/${local.prefix}"
+  name              = "/ecs/${local.prefix}"
   retention_in_days = 7
 }
 
@@ -14,7 +14,7 @@ resource "aws_ecs_cluster" "cluster" {
 
   configuration {
     execute_command_configuration {
-      logging    = "OVERRIDE"
+      logging = "OVERRIDE"
 
       log_configuration {
         cloud_watch_encryption_enabled = false

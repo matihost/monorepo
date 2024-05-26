@@ -14,26 +14,26 @@
   register: cert_stat
 
 - name: Ensure "{{ cert_base_path }}/{{ tls_file_name }}.crt is present
+  no_log: true
+  when: not( cert_stat.stat.exists is defined and cert_stat.stat.exists )
   block:
   - name: Generate an OpenSSL private key for Jenkins CN={{ certificate_def.cn }}
-    ansible.builtin.openssl_privatekey:
+    community.crypto.openssl_privatekey:
       path: "{{ cert_base_path }}/{{ tls_file_name }}.pem"
       size: "{{ certificate_def.size | default(cert_size) }}"
       mode: '644'
   - name: Generate an OpenSSL Certificate Signing Request for CN={{ certificate_def.cn }}
-    ansible.builtin.openssl_csr:
+    community.crypto.openssl_csr:
       path: "{{ cert_base_path }}/{{ tls_file_name }}.csr"
       privatekey_path: "{{ cert_base_path }}/{{ tls_file_name }}.pem"
       common_name: "{{ certificate_def.cn }}"
       mode: '644'
   - name: Generate a Self Signed OpenSSL certificate for CN={{ certificate_def.cn }}
-    ansible.builtin.openssl_certificate:
+    community.crypto.x509_certificate:
       path: "{{ cert_base_path }}/{{ tls_file_name }}.crt"
       privatekey_path: "{{ cert_base_path }}/{{ tls_file_name }}.pem"
       csr_path: "{{ cert_base_path }}/{{ tls_file_name }}.csr"
       provider: selfsigned
-  no_log: true
-  when: not( cert_stat.stat.exists is defined and cert_stat.stat.exists )
 
 - name: Set tls fact
   ansible.builtin.set_fact:

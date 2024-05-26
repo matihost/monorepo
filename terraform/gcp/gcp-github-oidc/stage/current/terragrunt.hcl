@@ -1,5 +1,5 @@
 locals {
-  gh_repo = get_env("GH_REPO")
+  gh_repo  = get_env("GH_REPO")
   gh_owner = get_env("GH_OWNER")
 }
 
@@ -16,6 +16,6 @@ terraform {
 
 # some inputs duplication due to https://github.com/gruntwork-io/terragrunt/issues/1566
 inputs = {
-  gh_repo_name = local.gh_repo
+  gh_repo_name  = local.gh_repo
   gh_repo_owner = local.gh_owner
 }

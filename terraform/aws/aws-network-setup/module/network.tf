@@ -1,7 +1,7 @@
 resource "aws_vpc" "main" {
-  cidr_block         = var.vpc_ip_cidr_range
-  instance_tenancy   = "default"
-  enable_dns_support = true
+  cidr_block           = var.vpc_ip_cidr_range
+  instance_tenancy     = "default"
+  enable_dns_support   = true
   enable_dns_hostnames = true
 
   tags = {
@@ -33,7 +33,7 @@ resource "aws_internet_gateway" "igw" {
 }
 
 resource "aws_subnet" "public" {
-  for_each = var.zones
+  for_each                = var.zones
   vpc_id                  = aws_vpc.main.id
   cidr_block              = each.value.public_ip_cidr_range
   availability_zone       = each.key
@@ -125,12 +125,12 @@ resource "aws_instance" "nat" {
     Name = "${local.prefix}-${var.region}-nat"
   }
 
-  depends_on = [ aws_default_route_table.main ]
+  depends_on = [aws_default_route_table.main]
 }
 
 
 resource "aws_subnet" "private" {
-  for_each = var.zones
+  for_each                = var.zones
   vpc_id                  = aws_vpc.main.id
   cidr_block              = each.value.private_ip_cidr_range
   availability_zone       = each.key
@@ -142,7 +142,7 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_route_table_association" "private" {
-  for_each = var.zones
+  for_each       = var.zones
   subnet_id      = aws_subnet.private[each.key].id
   route_table_id = aws_route_table.nat.id
 }

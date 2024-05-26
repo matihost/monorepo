@@ -1,6 +1,6 @@
 ---
-- hosts: local
-  name: Deploy Jenkins to K8S
+- name: Deploy Jenkins to K8S
+  hosts: local
   tasks:
   - name: Check mandatory variables
     ansible.builtin.fail:

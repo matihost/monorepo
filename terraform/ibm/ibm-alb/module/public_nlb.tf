@@ -14,14 +14,14 @@ resource "ibm_is_lb" "public-nlb" {
   # "more_info": "https://cloud.ibm.com/docs/vpc?topic=vpc-rias-error-messagesload_balancer_subnet_over_quota",
   #
   # while the closest is : https://cloud.ibm.com/docs/vpc?topic=vpc-rias-error-messages#load-balancer-over-quota
-  subnets = [ data.ibm_is_subnet.subnet[var.zone].id ]
+  subnets = [data.ibm_is_subnet.subnet[var.zone].id]
 
   # "network-fixed" for NLB, empty for ALB
   profile = "network-fixed"
 
   type = "public"
 
-  security_groups = [ data.ibm_is_security_group.public-lb.id ]
+  security_groups = [data.ibm_is_security_group.public-lb.id]
 
   # dns   {
   #   instance_crn = "crn:v1:staging:public:dns-svcs:global:a/exxxxxxxxxxxxx-xxxxxxxxxxxxxxxxx:5xxxxxxx-xxxxx-xxxxxxxxxxxxxxx-xxxxxxxxxxxxxxx::"
@@ -37,9 +37,9 @@ resource "ibm_is_lb" "public-nlb" {
 
 
 resource "ibm_is_lb_listener" "public-nlb-frontend-listener" {
-  lb       = ibm_is_lb.public-nlb.id
-  protocol = "tcp"
-  port     = 80
+  lb           = ibm_is_lb.public-nlb.id
+  protocol     = "tcp"
+  port         = 80
   default_pool = ibm_is_lb_pool.public-nlb-backend-pool.id
 
   # error: Network load balancer does not support Connection Limit.
@@ -96,15 +96,15 @@ resource "ibm_is_instance_group" "public-nlb-zonal-ig" {
   name              = "${local.prefix}-zonal-group-for-pub-nlb"
   instance_template = ibm_is_instance_template.public-nlb-webserver.id
   instance_count    = 2
-  subnets           = [ data.ibm_is_subnet.subnet[var.zone].id ]
+  subnets           = [data.ibm_is_subnet.subnet[var.zone].id]
 
 
   # If the membership count of an instance group is set to 0,
   # you can change the load balancer pool that is associated with the instance group.
   # You can select a different load balancer that is available, or select none to stop using an assigned load balancer.
-  application_port = 80
-  load_balancer = ibm_is_lb.public-nlb.id
-  load_balancer_pool =  element(split("/", ibm_is_lb_pool.public-nlb-backend-pool.id), 1)
+  application_port   = 80
+  load_balancer      = ibm_is_lb.public-nlb.id
+  load_balancer_pool = element(split("/", ibm_is_lb_pool.public-nlb-backend-pool.id), 1)
 
 
   lifecycle {
@@ -151,11 +151,11 @@ resource "ibm_is_instance_template" "public-nlb-webserver" {
   resource_group = local.resource_group_id
 
   name    = "${local.prefix}-public-nlb-template"
-  image   =  data.ibm_is_image.ubuntu.id
-  profile =  var.instance_profile
+  image   = data.ibm_is_image.ubuntu.id
+  profile = var.instance_profile
 
   metadata_service {
-    enabled = true
+    enabled  = true
     protocol = "https"
   }
 
@@ -164,14 +164,14 @@ resource "ibm_is_instance_template" "public-nlb-webserver" {
   primary_network_interface {
     name            = "eth0"
     subnet          = data.ibm_is_subnet.subnet[var.zone].id
-    security_groups = [ data.ibm_is_security_group.public-lb.id ]
+    security_groups = [data.ibm_is_security_group.public-lb.id]
   }
 
-  vpc       = data.ibm_is_vpc.vpc.id
-  keys      = [ data.ibm_is_ssh_key.key.id ]
+  vpc  = data.ibm_is_vpc.vpc.id
+  keys = [data.ibm_is_ssh_key.key.id]
   user_data = templatefile("${path.module}/webserver.cloud-init.yaml", {
     log_ingestion_key = data.ibm_resource_key.logs-key.credentials.ingestion_key,
-    region = var.region,
+    region            = var.region,
     }
   )
 

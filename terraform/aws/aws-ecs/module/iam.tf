@@ -28,7 +28,7 @@ EOF
 
   # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html?icmpid=docs_ecs_hp-task-definition#ecs-exec-required-iam-permissions
   inline_policy {
-    name = "EcsExec"
+    name   = "EcsExec"
     policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -73,10 +73,10 @@ resource "aws_iam_role" "exec-role" {
 }
 EOF
 
-# https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html?icmpid=docs_ecs_hp-task-definition#task-execution-private-auth
-inline_policy {
-  name = "PrivateECRAuth"
-  policy = <<EOF
+  # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html?icmpid=docs_ecs_hp-task-definition#task-execution-private-auth
+  inline_policy {
+    name   = "PrivateECRAuth"
+    policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -96,7 +96,7 @@ inline_policy {
   ]
 }
 EOF
-}
+  }
 
 }
 

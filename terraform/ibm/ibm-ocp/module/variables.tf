@@ -1,5 +1,5 @@
 locals {
-  prefix = "${var.env}-${var.region}-ocp"
+  prefix            = "${var.env}-${var.region}-ocp"
   resource_group_id = var.resource_group_id != "" ? var.resource_group_id : data.ibm_resource_group.resource.id
 }
 
@@ -22,20 +22,20 @@ variable "env" {
 variable "resource_group_name" {
   type        = string
   description = "IBM Cloud Resource Group Name to place resources, if missing env will be used for resource group name"
-  default = "dev"
+  default     = "dev"
 }
 
 variable "resource_group_id" {
   type        = string
   description = "IBM Cloud Resource Group ID to place resources, if not provided it will be calculated from resource_group_name variable"
-  default = ""
+  default     = ""
 }
 
 
 variable "instance_profile" {
   type        = string
   description = "Instance profile for Worker nodes"
-  default = "bx2.4x16" // or cx2.8x16 or cx2.16x32
+  default     = "bx2.4x16" // or cx2.8x16 or cx2.16x32
 }
 
 # tflint-ignore: terraform_unused_declarations
@@ -62,7 +62,7 @@ variable "vpc_name" {
 
 variable "subnetworks" {
   type = map(object({
-      name = string
+    name = string
   }))
   description = "IBM subnetworks (key is zone, value.name is subnet name)"
 }

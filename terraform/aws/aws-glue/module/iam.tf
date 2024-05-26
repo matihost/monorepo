@@ -132,13 +132,13 @@ resource "aws_iam_role" "aws-glue-service-role" {
 }
 POLICY
 
-  managed_policy_arns  = [aws_iam_policy.glue-s3-service-policy.arn,
-     "arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess",
-     "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-     "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+  managed_policy_arns = [aws_iam_policy.glue-s3-service-policy.arn,
+    "arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess",
+    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+    "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
   ]
-  name                 = "AWSGlueServiceRole"
-  path                 = "/service-role/"
+  name = "AWSGlueServiceRole"
+  path = "/service-role/"
 }
 
 resource "aws_iam_policy" "glue-s3-service-policy" {

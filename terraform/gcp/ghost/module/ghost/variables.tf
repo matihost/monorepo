@@ -42,6 +42,7 @@ variable "region" {
   description = "GCP Region For Deployment"
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "zone" {
   type        = string
   default     = "us-central1-a"

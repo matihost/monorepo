@@ -10,9 +10,9 @@ terraform {
 inputs = {
   env = "prod"
   # ha = true
-  ha = false
+  ha   = false
   name = "matihost"
-  url = "http://matihost.mooo.com"
+  url  = "http://matihost.mooo.com"
   instances = [
     { region = "us-central1", image = "ghost:latest" },
     # { region = "us-west1", image = "ghost:latest" },

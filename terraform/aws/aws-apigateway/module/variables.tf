@@ -29,7 +29,7 @@ variable "region" {
 
 # tflint-ignore: terraform_unused_declarations
 variable "aws_tags" {
-  type = map(string)
+  type        = map(string)
   description = "AWS tags"
 }
 

@@ -1,8 +1,8 @@
 resource "aws_lb" "private-web" {
-  enable_deletion_protection       = "false"
-  internal                         = "true"
-  ip_address_type                  = "ipv4"
-  load_balancer_type               = "network"
+  enable_deletion_protection = "false"
+  internal                   = "true"
+  ip_address_type            = "ipv4"
+  load_balancer_type         = "network"
   # by default traffic for TLP LB stays in the zone,
   # if there is not enough instance, traffic may not reach target
   # switching to
@@ -41,12 +41,12 @@ resource "aws_lb_target_group" "tcp-webserver" {
     unhealthy_threshold = "2"
   }
 
-  ip_address_type                   = "ipv4"
-  name                              = "${local.prefix}-private"
-  port                              = "80"
-  preserve_client_ip                = "true"
-  protocol                          = "TCP"
-  proxy_protocol_v2                 = "false"
+  ip_address_type    = "ipv4"
+  name               = "${local.prefix}-private"
+  port               = "80"
+  preserve_client_ip = "true"
+  protocol           = "TCP"
+  proxy_protocol_v2  = "false"
 
   stickiness {
     cookie_duration = "0"

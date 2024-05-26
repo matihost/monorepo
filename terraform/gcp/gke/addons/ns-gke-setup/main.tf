@@ -4,15 +4,20 @@ provider "google" {
   project = var.project
 }
 
+# tflint-ignore: terraform_unused_declarations
 data "google_client_config" "current" {}
+# tflint-ignore: terraform_unused_declarations
 data "google_project" "current" {
 }
+
+# tflint-ignore: terraform_unused_declarations
 data "google_compute_network" "default" {
   name = "default"
 }
 
 module "gke_auth" {
-  source = "terraform-google-modules/kubernetes-engine/google//modules/auth"
+  source  = "terraform-google-modules/kubernetes-engine/google//modules/auth"
+  version = ">= 30"
 
   project_id   = var.project
   cluster_name = local.gke_name

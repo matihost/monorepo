@@ -16,7 +16,7 @@ variable "vpc_name" {
 
 
 variable "zones" {
-  type = set(string)
+  type        = set(string)
   description = "AWS zones for VPC Subnetworks Deployment"
 }
 
@@ -45,6 +45,6 @@ variable "region" {
 
 # tflint-ignore: terraform_unused_declarations
 variable "aws_tags" {
-  type = map(string)
+  type        = map(string)
   description = "AWS tags"
 }

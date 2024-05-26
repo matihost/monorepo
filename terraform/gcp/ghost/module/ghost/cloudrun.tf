@@ -10,7 +10,7 @@
 resource "google_cloud_run_service" "ghost" {
   provider = google-beta
   project  = var.project
-  for_each = { for instance in var.instances : "${instance.region}" => instance }
+  for_each = { for instance in var.instances : instance.region => instance }
 
 
   name     = "${local.name}-${each.key}"
@@ -108,7 +108,7 @@ resource "google_cloud_run_service" "ghost" {
 
   lifecycle {
     ignore_changes = [
-      metadata.0.annotations,
+      metadata[0].annotations,
     ]
   }
 
@@ -128,7 +128,7 @@ data "google_iam_policy" "noauth" {
 
 resource "google_cloud_run_service_iam_policy" "noauth" {
   project  = var.project
-  for_each = { for instance in var.instances : "${instance.region}" => instance }
+  for_each = { for instance in var.instances : instance.region => instance }
 
   location    = google_cloud_run_service.ghost[each.key].location
   service     = google_cloud_run_service.ghost[each.key].name
@@ -137,7 +137,7 @@ resource "google_cloud_run_service_iam_policy" "noauth" {
 
 resource "google_compute_region_network_endpoint_group" "ghost" {
   project  = var.project
-  for_each = { for instance in var.instances : "${instance.region}" => instance }
+  for_each = { for instance in var.instances : instance.region => instance }
 
   name                  = google_cloud_run_service.ghost[each.key].name
   network_endpoint_type = "SERVERLESS"

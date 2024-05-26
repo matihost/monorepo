@@ -1,7 +1,7 @@
 data "aws_vpc" "default" {
   default = var.vpc == "default" ? true : null
 
-  tags = var.vpc == "default" ? null :  {
+  tags = var.vpc == "default" ? null : {
     Name = var.vpc
   }
 }
@@ -12,7 +12,7 @@ data "aws_subnet" "public_zone" {
 
   default_for_az = var.subnet == "default" ? true : null
 
-  tags = var.subnet == "default" ? null :  {
+  tags = var.subnet == "default" ? null : {
     Tier = var.subnet
   }
 
@@ -98,7 +98,7 @@ resource "aws_instance" "vm" {
   vpc_security_group_ids = [aws_security_group.private_access.id]
   subnet_id              = data.aws_subnet.public_zone.id
 
-  iam_instance_profile   = var.instance_profile
+  iam_instance_profile = var.instance_profile
   # to use cloud-init and bash script
   # use https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/cloudinit_config
   user_data = templatefile("${path.module}/ec2.cloud-init.tpl", {

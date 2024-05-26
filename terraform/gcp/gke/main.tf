@@ -4,6 +4,7 @@ provider "google" {
   project = var.project
 }
 
+# tflint-ignore: terraform_unused_declarations
 data "google_client_config" "current" {}
 data "google_project" "current" {
 }

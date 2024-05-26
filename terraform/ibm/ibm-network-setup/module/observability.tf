@@ -1,11 +1,11 @@
 resource "ibm_resource_instance" "logs" {
   resource_group_id = local.resource_group_id
 
-  name              = "${local.prefix}-instances-logs"
+  name = "${local.prefix}-instances-logs"
 
-  service           = "logdna"
-  plan              = "7-day"
-  location          = var.region
+  service  = "logdna"
+  plan     = "7-day"
+  location = var.region
   # tags              = ....
   service_endpoints = "public-and-private"
 

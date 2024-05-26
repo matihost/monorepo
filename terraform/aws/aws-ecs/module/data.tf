@@ -1,5 +1,5 @@
-locals{
-  private_subnet_ids =  [for subnet in data.aws_subnet.private: subnet.id]
+locals {
+  private_subnet_ids = [for subnet in data.aws_subnet.private : subnet.id]
 }
 
 data "aws_vpc" "vpc" {
@@ -9,7 +9,7 @@ data "aws_vpc" "vpc" {
 }
 
 data "aws_subnet" "private" {
-  for_each = var.zones
+  for_each          = var.zones
   vpc_id            = data.aws_vpc.vpc.id
   availability_zone = each.key
   tags = {

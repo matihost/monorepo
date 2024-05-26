@@ -50,4 +50,4 @@ gcloud beta compute instances delete \
   "${1:?Instance name is mandatory}" \
   --project="${GCP_PROJECT}" \
   --zone="${GCP_ZONE}" \
-  ${FORCE}
+  "${FORCE}"

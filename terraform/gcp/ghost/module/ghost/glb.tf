@@ -37,7 +37,7 @@ resource "google_compute_backend_service" "ghost" {
   affinity_cookie_ttl_sec = "0"
 
   dynamic "backend" {
-    for_each = { for instance in var.instances : "${instance.region}" => instance }
+    for_each = { for instance in var.instances : instance.region => instance }
     iterator = it
 
     content {

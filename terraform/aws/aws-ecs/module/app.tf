@@ -60,11 +60,11 @@ resource "aws_ecs_task_definition" "app" {
         memory    = each.value.memory
         cpu       = each.value.cpu
         essential = true,
-        portMappings = each.value.port !=0 ? [
+        portMappings = each.value.port != 0 ? [
           {
             # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#container_definition_portmappings
             containerPort = each.value.port
-            appProtocol = try(each.value.protocol, "http")
+            appProtocol   = try(each.value.protocol, "http")
           }
         ] : []
         environment = each.value.env_vars
@@ -88,7 +88,7 @@ resource "aws_ecs_task_definition" "app" {
 
 data "aws_security_group" "app-security-group" {
   for_each = var.apps
-  vpc_id = data.aws_vpc.vpc.id
+  vpc_id   = data.aws_vpc.vpc.id
   tags = {
     Name = each.value.security_group_name
   }
@@ -105,8 +105,8 @@ resource "aws_ecs_service" "app" {
   launch_type = "FARGATE"
 
   network_configuration {
-    subnets = local.private_subnet_ids
-    security_groups = [ data.aws_security_group.app-security-group[each.key].id ]
+    subnets         = local.private_subnet_ids
+    security_groups = [data.aws_security_group.app-security-group[each.key].id]
   }
 
   deployment_maximum_percent         = "200"

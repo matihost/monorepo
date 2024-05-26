@@ -1,5 +1,6 @@
 locals {
-  name          = "${var.env}-${var.name}"
+  name = "${var.env}-${var.name}"
+  # tflint-ignore: terraform_unused_declarations
   regional_name = "${var.env}-${var.name}-${var.region}"
 }
 
@@ -48,6 +49,7 @@ variable "region" {
   description = "GCP Region For Deployment"
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "zone" {
   type        = string
   default     = "us-central1-a"

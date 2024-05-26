@@ -17,23 +17,23 @@ variable "vpc_name" {
 
 
 variable "zones" {
-  type = set(string)
+  type        = set(string)
   description = "AWS zones for VPC Subnetworks Deployment"
 }
 
 
 variable "apps" {
   type = map(object({
-    name = string
-    image  = string
-    memory = number
-    cpu = number
-    port = number
-    protocol = string
-    desired_instances = number
+    name                = string
+    image               = string
+    memory              = number
+    cpu                 = number
+    port                = number
+    protocol            = string
+    desired_instances   = number
     security_group_name = string
-    env_vars = list(map(string))
-    docker_labels = map(string)
+    env_vars            = list(map(string))
+    docker_labels       = map(string)
   }))
   description = "Map of apps to deploy as ECS tasks,"
 }
@@ -62,6 +62,6 @@ variable "region" {
 
 # tflint-ignore: terraform_unused_declarations
 variable "aws_tags" {
-  type = map(string)
+  type        = map(string)
   description = "AWS tags"
 }
