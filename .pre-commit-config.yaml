@@ -32,9 +32,11 @@ repos:
 - repo: https://github.com/antonbabenko/pre-commit-terraform
   rev: v1.90.0
   hooks:
-  # - id: terraform_trivy
+  - id: terraform_trivy
+    args:
+    - --args=-s=CRITICAL
+    - --args=--ignorefile=__GIT_WORKING_DIR__/.trivyignore.yaml
   - id: terraform_fmt
-  # - id: terraform_docs
   # - id: terrascan
   # - id: tfupdate
 - repo: https://github.com/jumanjihouse/pre-commit-hooks

@@ -665,7 +665,7 @@ all:
           command: |
             CURRENT_VERSION="$(curl -sL https://calibre-ebook.com/download_linux |grep 'The latest release of calibre is' | sed -E 's/.*The latest release of calibre is (.+)\..*/\1/')"
             INSTALLED_VERSION="$(calibre --version 2>/dev/null | sed -E 's/.*\(calibre (.*)\)/\1/')"
-            [[ -n ${INSTALLED_VERSION}" && ("${CURRENT_VERSION}" == "${INSTALLED_VERSION}"*) ]] || {
+            [[ -n "${INSTALLED_VERSION}" && ("${CURRENT_VERSION}" == "${INSTALLED_VERSION}"*) ]] || {
               wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo bash
             }
         - name: kubectl plugins
@@ -772,6 +772,20 @@ all:
                   xargs curl -s -L -o "/usr/local/bin/terragrunt"
               chmod a+x /usr/local/bin/terragrunt
               echo "Terragrunt has been installed"
+            }
+        - name: trivy
+          become: true
+          desc: Ensure latest version of Trivy is installed
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/aquasecurity/trivy/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="v$(trivy --version 2>/dev/null |grep Version | sed -E 's/Version: (.*)/\1/g')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/aquasecurity/trivy/releases/latest | jq -r ".assets[] |
+                select(.name | test(\"Linux-64bit.tar.gz$\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/trivy.tar.gz"
+              cd /tmp && tar -xzf trivy.tar.gz trivy && rm trivy.tar.gz && mv trivy /usr/local/bin
+              chmod a+x /usr/local/bin/trivy
+              echo "Trivy has been installed"
             }
         - name: ibm-mq-client
           desc: |

@@ -1,0 +1,10 @@
+---
+misconfigurations:
+  # Firewall rule allows ingress traffic from multiple addresses on the public internet.
+  - id: AVD-GCP-0027
+  # Security group rule allows egress to multiple public internet addresses.
+  - id: AVD-AWS-0104
+  # Security group rule allows ingress from public internet.
+  - id: AVD-AWS-0107
+  # Listener for application load balancer does not use HTTPS.
+  - id: AVD-AWS-0054
