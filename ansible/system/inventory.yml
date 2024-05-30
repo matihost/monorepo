@@ -95,9 +95,6 @@ all:
         - name: teams
           repo: "deb [arch=amd64] https://packages.microsoft.com/repos/ms-teams stable main"
           key_url: "https://packages.microsoft.com/keys/microsoft.asc"
-        - name: skype-stable
-          repo: "deb [arch=amd64] https://repo.skype.com/deb stable main"
-          key_url: https://repo.skype.com/data/SKYPE-GPG-KEY
         - name: google-chrome
           repo: "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main"
           key_url: https://dl.google.com/linux/linux_signing_key.pub
@@ -210,7 +207,6 @@ all:
         # requirement for Jetbrains Toolbox
         - libfuse2
         # Skipped packages:
-        # - skypeforlinux
         # OpenVPN 3 is supported only on Ubuntu LTS: https://openvpn.net/cloud-docs/openvpn-3-client-for-linux/
         # - openvpn3
         - gh
@@ -239,6 +235,7 @@ all:
         - mc-installer
         - notepad-plus-plus
         - steam
+        # - skype
         # Uncomment to use snap packages for gcloud sdk
         # classic_snaps:
         # - google-cloud-sdk
