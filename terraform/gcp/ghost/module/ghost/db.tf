@@ -2,7 +2,7 @@
 # TODO handle user management and password taken from GCP Secret
 
 resource "google_sql_database_instance" "ghost" {
-  database_version = "MYSQL_8_0_26"
+  database_version = "MYSQL_8_0_37"
   instance_type    = "CLOUD_SQL_INSTANCE"
   name             = local.regional_name
   project          = var.project
@@ -36,7 +36,7 @@ resource "google_sql_database_instance" "ghost" {
     ip_configuration {
       enable_private_path_for_google_cloud_services = "false"
       ipv4_enabled                                  = "true"
-      require_ssl                                   = "false"
+      ssl_mode                                      = "ALLOW_UNENCRYPTED_AND_ENCRYPTED"
     }
 
 

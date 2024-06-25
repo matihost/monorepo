@@ -1,5 +1,5 @@
 locals {
-  apis = ["eventarc"]
+  apis = ["eventarc", "run"]
 }
 
 resource "google_project_service" "apis" {

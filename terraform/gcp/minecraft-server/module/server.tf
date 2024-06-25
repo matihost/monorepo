@@ -91,7 +91,7 @@ resource "google_compute_instance_group_manager" "minecraft_group_manager" {
 
 data "google_compute_image" "ubuntu-latest" {
   # OpsAgents supported OS: https://cloud.google.com/monitoring/agent/ops-agent?hl=en_US#supported_operating_systems
-  family  = "ubuntu-minimal-2204-lts"
+  family  = "ubuntu-minimal-2404-lts-amd64"
   project = "ubuntu-os-cloud"
 }
 

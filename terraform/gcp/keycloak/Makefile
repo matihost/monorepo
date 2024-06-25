@@ -36,21 +36,24 @@ clean: ## clean Terraform cached plugins and data
 	find . -name "target" -exec rm -rf {} +
 	find . -name "node_modules" -exec rm -rf {} +
 
-
 TAG := latest
-# TODO update cloud-sql-jdbc-socket-factory
-# https://github.com/GoogleCloudPlatform/cloud-sql-jdbc-socket-factory
-# https://repo.maven.apache.org/maven2/com/google/cloud/sql/postgres-socket-factory/1.17.1/
-POSTGRESQL_JDBC_VERSION := 1.13.1
+POSTGRESQL_JDBC_VERSION := 1.19.0
 KEYCLOAK_METRICS_SPI_VERSION := 5.0.0
 CURRENT_PROJECT := $(shell gcloud config get-value project)
 
 configure-docker-registry:
 	gcloud auth configure-docker us-central1-docker.pkg.dev
 
-image: ## builds keycloak image with support to PostreSQL GC ClouSQL
+build-sql-connector: # build https://github.com/GoogleCloudPlatform/cloud-sql-jdbc-socket-factory a dependency for Keycloak
 	mkdir -p target
-	curl -sL https://storage.googleapis.com/cloud-sql-connectors-java/v$(POSTGRESQL_JDBC_VERSION)/postgres-socket-factory-$(POSTGRESQL_JDBC_VERSION)-jar-with-dependencies.jar -o target/postgres-socket-factory-jar-with-dependencies.jar
+	curl -sL https://github.com/GoogleCloudPlatform/cloud-sql-jdbc-socket-factory/archive/refs/tags/v$(POSTGRESQL_JDBC_VERSION).zip -o target/sql.zip
+	cd target && unzip sql.zip && \
+	  cd cloud-sql-jdbc-socket-factory-$(POSTGRESQL_JDBC_VERSION) && \
+	  mvn -P jar-with-dependencies clean package -DskipTests && \
+	  mv jdbc/postgres/target/postgres-socket-factory-$(POSTGRESQL_JDBC_VERSION)-jar-with-dependencies.jar ../postgres-socket-factory-jar-with-dependencies.jar && \
+	  cd .. && rm -rf sql.zip cloud-sql-jdbc-socket-factory-*
+
+image: build-sql-connector ## builds keycloak image with support to PostreSQL GC ClouSQL
 	curl -sL https://github.com/aerogear/keycloak-metrics-spi/releases/download/$(KEYCLOAK_METRICS_SPI_VERSION)/keycloak-metrics-spi-$(KEYCLOAK_METRICS_SPI_VERSION).jar -o target/keycloak-metrics-spi.jar
 	DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build -t quay.io/matihost/keycloak-postgres-cloudsql:$(TAG) .
 	docker push quay.io/matihost/keycloak-postgres-cloudsql:$(TAG)

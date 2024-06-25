@@ -13,7 +13,8 @@ ENV KC_DB_DRIVER=org.postgresql.Driver
 COPY target/postgres-socket-factory-jar-with-dependencies.jar /opt/keycloak/providers/
 
 # Install custom providers
-COPY target/keycloak-metrics-spi.jar /opt/keycloak/providers/
+# TODO disable until fixed https://github.com/aerogear/keycloak-metrics-spi/issues/199 for Keycloak 25.x
+# COPY target/keycloak-metrics-spi.jar /opt/keycloak/providers/
 
 RUN /opt/keycloak/bin/kc.sh build --transaction-xa-enabled=false
 

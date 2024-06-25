@@ -8,7 +8,7 @@ function install_software() {
   curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
   bash add-google-cloud-ops-agent-repo.sh --also-install
   # minecraft specific
-  apt -y install -y openjdk-17-jre-headless inotify-tools
+  apt -y install -y openjdk-21-jre-headless inotify-tools less
 }
 
 # Configure Cloud Ops JMX integration to retrieve JMX Metrics from Java application
