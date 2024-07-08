@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 apt -y update
-apt -y install bash-completion vim bind9-dnsutils less mlocate iputils-ping ncat firewalld
+apt -y install bash-completion vim bind9-dnsutils less plocate iputils-ping ncat firewalld
 
 sysctl -w net.ipv4.ip_forward=1
 echo 'net.ipv4.ip_forward=1' >/etc/sysctl.d/30-nat-forward.conf

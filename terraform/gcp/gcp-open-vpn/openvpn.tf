@@ -13,7 +13,7 @@ resource "google_compute_instance" "vm" {
     initialize_params {
       # OpsAgents support only LTS:
       # https://cloud.google.com/monitoring/agent/ops-agent?hl=en_US#supported_operating_systems
-      image = "ubuntu-os-cloud/ubuntu-minimal-2204-lts"
+      image = "ubuntu-os-cloud/ubuntu-minimal-2404-lts-amd64"
     }
   }
 

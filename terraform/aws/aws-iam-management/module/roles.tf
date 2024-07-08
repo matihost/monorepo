@@ -33,7 +33,7 @@ resource "aws_iam_role_policy_attachment" "lambda-basic-vpc-access" {
 
 
 resource "aws_iam_role" "read-only" {
-  name = "ReadOnly"
+  name = "ReadOnlyAccess"
 
   assume_role_policy = <<EOF
 {
@@ -63,7 +63,7 @@ resource "aws_iam_role_policy_attachment" "read-only-attachment" {
 
 
 resource "aws_iam_role" "admin" {
-  name = "FullAdmin"
+  name = "FullAdminAccess"
 
   assume_role_policy = <<EOF
 {

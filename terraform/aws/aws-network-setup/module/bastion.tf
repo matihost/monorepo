@@ -10,7 +10,7 @@ data "aws_ami" "ubuntu" {
   # aws ec2 describe-images --region us-east-1 --image-ids ami-0fc5d935ebf8bc3bc
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-*-server-*"]
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-*-server-*"]
   }
 
   filter {

@@ -3,7 +3,7 @@ set -x
 
 function install_software() {
   apt update
-  apt -y install bash-completion vim bind9-dnsutils less mlocate iputils-ping ncat
+  apt -y install bash-completion vim bind9-dnsutils less plocate iputils-ping ncat
   apt -y install -y openvpn openssl ca-certificates firewalld
 
   # install OpsAgent (it reserves 8888 and 2020 ports)

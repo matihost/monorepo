@@ -143,6 +143,7 @@ all:
         - bind9
         - cifs-utils
         - dlocate
+        - plocate
         - ubuntu-restricted-extras
         - gnome-shell-extensions
         - gnome-tweaks

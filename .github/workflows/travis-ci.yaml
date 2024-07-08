@@ -43,7 +43,7 @@ jobs:
         java-version: '21'
     - run: cd java && make build
   project-euler:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       CACHE: algorithms/project-euler
     steps:
@@ -60,7 +60,7 @@ jobs:
         java-version: '21'
     - run: cd algorithms/project-euler && make build
   rust:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: checkout
       uses: actions/checkout@v4
@@ -74,7 +74,7 @@ jobs:
         key: "${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}"
     - run: cd rust/guessing_game && cargo build --verbose && cargo test --verbose
   go:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: checkout
       uses: actions/checkout@v4
@@ -90,7 +90,7 @@ jobs:
         go-version: '1.21'
     - run: cd go/learning && go get -d ./... && go build -mod=mod -o .  ./... && go test ./pkg/language && ./language
   python:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: checkout
       uses: actions/checkout@v4
