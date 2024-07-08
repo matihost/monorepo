@@ -4,4 +4,4 @@ repo_update: true
 repo_upgrade: all
 
 packages:
-  - openjdk-11-jdk
+  - openjdk-21-jdk

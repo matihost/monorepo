@@ -132,6 +132,9 @@ all:
         - name: onedrive
           repo: "deb [arch=amd64] https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_{{ versions.onedrive_ubuntu_version }}/ ./"
           key_url: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_{{ versions.onedrive_ubuntu_version }}/Release.key
+        - name: jenkins
+          repo: "deb [arch=amd64] https://pkg.jenkins.io/debian-stable binary/"
+          key_url: "https://pkg.jenkins.io/debian/jenkins.io-2023.key"
         packages:
         - neofetch
         - mc
@@ -205,6 +208,7 @@ all:
         - google-cloud-sdk-kpt
         - kubectl
         - getenvoy-envoy
+        # - jenkins
         # requirement for Jetbrains Toolbox
         - libfuse2
         # Skipped packages:
