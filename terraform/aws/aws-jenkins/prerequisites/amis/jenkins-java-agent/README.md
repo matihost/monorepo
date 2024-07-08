@@ -6,7 +6,7 @@ Use  AWS resources eliglible to AWS Free Tier __only__.
 
 ## Prerequisites
 
-* Logged to AWS with account allowing creating AMIs. You may install `.../terraform/aws-iam` to install role `ami-builder` with least privilidges to build AMIs
+* Logged to AWS with account allowing creating AMIs. You may install `.../terraform/aws-iam-linked` to install role `ami-builder` with least privileges to build AMIs
 
 ## Usage
 

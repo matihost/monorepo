@@ -15,7 +15,7 @@ aws configure
 * Latest Terraform installed
 
 * The terraform variable: `instance_profile` (default: `jenkins-master`) is already deployed IAM Role.
-  The role have to allow acces to create EC2 isntances. It will applied on Jenkins Master EC2 instance so that it can spin Jenkins Agents as EC2 instances. It can be achieved by install `..\aws-iam` terraform script before.
+  The role have to allow acces to create EC2 instances. It will applied on Jenkins Master EC2 instance so that it can spin Jenkins Agents as EC2 instances. It can be achieved by install `..\aws-iam-linked` terraform script before.
 
 * AMIs for Jenkins Master and Agent are already build. Check and build `prerequisites/amis/...`
 

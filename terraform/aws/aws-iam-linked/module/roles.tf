@@ -91,6 +91,7 @@ resource "aws_iam_role_policy_attachment" "lambda-basic-vpc-access" {
 }
 
 
+# TODO move to aws-jenkins
 
 resource "aws_iam_role" "jenkins-master" {
   name               = "jenkins-master"
@@ -128,40 +129,6 @@ resource "aws_iam_role_policy_attachment" "jenkins-master-s3-attach" {
 resource "aws_iam_role_policy_attachment" "jenkins-master-ec2-attach" {
   role       = aws_iam_role.jenkins-master.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
-}
-
-
-
-# definining a role to be used by all API Gateways in current region
-# the role has to  be able to create CloudWatch log groups for API Gateway logging
-# it then can be enabled via:
-# resource "aws_api_gateway_account" "apigateway" {
-#   cloudwatch_role_arn = aws_iam_role.apigateway-cloudwatch.arn
-# }
-
-resource "aws_iam_role" "apigateway-cloudwatch" {
-  name = "apigateway-cloudwatch"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "apigateway.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "apiGatewayCloudWatchAssignment" {
-  role       = aws_iam_role.apigateway-cloudwatch.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }
 
 
@@ -205,8 +172,12 @@ resource "aws_iam_role_policy_attachment" "amiBuilderToPassInstanceProfile" {
 }
 
 
+#  Allowing access from current and management account
+# Lack of MFA presence - b/c with SSO it is not present:
+# Details:
+#  https://repost.aws/questions/QUqgjWSTfJRweHXaD1keQC0A/cross-account-access-not-possible-to-switch-role-when-this-one-has-mfa-enabled
 resource "aws_iam_role" "read-only" {
-  name = "ReadOnly"
+  name = "ReadOnlyAccess"
 
   assume_role_policy = <<EOF
 {
@@ -215,14 +186,9 @@ resource "aws_iam_role" "read-only" {
         {
             "Effect": "Allow",
             "Principal": {
-                "AWS": "${local.account_id}"
+                "AWS": [ "${local.account_id}", "${local.org_management_account_id}" ]
             },
-            "Action": "sts:AssumeRole",
-            "Condition": {
-                "Bool": {
-                    "aws:MultiFactorAuthPresent": "true"
-                }
-            }
+            "Action": "sts:AssumeRole"
         }
     ]
 }
@@ -236,7 +202,7 @@ resource "aws_iam_role_policy_attachment" "read-only-attachment" {
 
 
 resource "aws_iam_role" "admin" {
-  name = "Admin"
+  name = "FullAdminAccess"
 
   assume_role_policy = <<EOF
 {

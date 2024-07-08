@@ -7,7 +7,7 @@ Use  AWS resources eliglible to AWS Free Tier __only__.
 
 ## Prerequisites
 
-* Logged to AWS Account, for detailed instruction how to login to AWS see [../aws-iam](../aws-iam).
+* Logged to AWS Account, for detailed instruction how to login to AWS see [../aws-iam-management](../aws-iam-management).
 
 * Latest Terragrunt, Terraform or OpenTofu installed
 

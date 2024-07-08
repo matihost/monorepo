@@ -1,4 +1,4 @@
-# Terraform :: Minimal set of IAM
+# Terraform :: Minimal set of IAM for AWS Management Account
 
 Setup minimal IAM resources:
 

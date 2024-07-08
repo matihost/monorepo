@@ -10,7 +10,7 @@ Optionally setup the Lambda triggers:
 
 ## Prerequisites
 
-* Logged to AWS Account, for detailed instruction how to login to AWS see [../aws-iam](../aws-iam).
+* Logged to AWS Account, for detailed instruction how to login to AWS see [../aws-iam-management](../aws-iam-management).
 
 * [../aws-instance](../aws-instance) - installed
 

@@ -118,7 +118,7 @@ resource "aws_iam_policy" "assume-read-only" {
 }
 
 resource "aws_iam_policy" "assume-admin" {
-  name        = "AssumeRole_Admin"
+  name        = "AssumeRole_FullAdmin"
   path        = "/"
   description = "Allow assuming role (act as a role)"
 
@@ -131,7 +131,7 @@ resource "aws_iam_policy" "assume-admin" {
               "Action": [
                   "sts:AssumeRole"
               ],
-              "Resource": "arn:aws:iam:::role/ReadOnly"
+              "Resource": "arn:aws:iam:::role/FullAdminAccess"
           }
       ]
   }
