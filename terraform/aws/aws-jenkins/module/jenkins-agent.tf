@@ -1,9 +1,10 @@
 resource "aws_security_group" "jenkins_agent" {
-  name        = "jenkins_agent"
+  name        = "${local.prefix}-agent"
   description = "For jenkins-agent EC2 - allow SSH access from Jenkins Master"
+  vpc_id      = data.aws_vpc.default.id
 
   tags = {
-    Name = "jenkins_agent"
+    Name = "${local.prefix}-agent"
   }
 
   ingress {

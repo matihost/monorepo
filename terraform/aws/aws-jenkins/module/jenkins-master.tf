@@ -1,13 +1,10 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_security_group" "jenkins_master" {
-  name        = "jenkins_master"
+  name        = "${local.prefix}-master"
   description = "Allow HTTP access from single computer and opens SSH"
+  vpc_id      = data.aws_vpc.default.id
 
   tags = {
-    Name = "jenkins_master"
+    Name = "${local.prefix}-master"
   }
 
   ingress {
@@ -44,8 +41,8 @@ resource "aws_security_group" "jenkins_master" {
 
 
 resource "aws_key_pair" "jenkins_key" {
-  key_name   = "jenkins"
-  public_key = file("~/.ssh/id_rsa.aws.vm.pub")
+  key_name   = local.prefix
+  public_key = var.ssh_pub_key
 }
 
 
@@ -54,12 +51,17 @@ data "aws_ami" "master" {
 
   filter {
     name   = "name"
-    values = ["${var.jenkins_master_name}-*"]
+    values = ["jenkins-master-${var.ec2_architecture}-*"]
   }
 
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = [var.ec2_architecture]
   }
 
   owners = ["self"]
@@ -70,12 +72,17 @@ data "aws_ami" "agent" {
 
   filter {
     name   = "name"
-    values = ["${var.jenkins_agent_name}-*"]
+    values = ["jenkins-java-agent-${var.ec2_architecture}-*"]
   }
 
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = [var.ec2_architecture]
   }
 
   owners = ["self"]
@@ -99,35 +106,35 @@ data "template_cloudinit_config" "config" {
 
   part {
     content_type = "text/x-shellscript"
-    content = templatefile("jenkins-master.ssh.sh.tpl", {
-      ssh_key = filebase64("~/.ssh/id_rsa.aws.vm"),
-      ssh_pub = filebase64("~/.ssh/id_rsa.aws.vm.pub"),
+    content = templatefile("${path.module}/jenkins-master.ssh.sh.tpl", {
+      ssh_key = base64encode(var.ssh_key),
+      ssh_pub = base64encode(var.ssh_pub_key),
     })
   }
 
   part {
     content_type = "text/x-shellscript"
-    content = templatefile("jenkins-master.startup.sh.tpl", {
-      jenkins_agent_ami  = data.aws_ami.agent.id,
-      jenkins_agent_name = var.jenkins_agent_name,
-      zone               = var.zone,
-      admin_password     = var.admin_password,
+    content = templatefile("${path.module}/jenkins-master.startup.sh.tpl", {
+      jenkins_agent_ami            = data.aws_ami.agent.id,
+      jenkins_name                 = local.prefix,
+      jenkins_agent_security_group = aws_security_group.jenkins_agent.name,
+      jenkins_agent_subnets        = join(",", local.subnet_ids)
     })
   }
 
 }
 
 resource "aws_launch_template" "jenkins" {
-  name_prefix            = "jenkins"
+  name_prefix            = "${local.prefix}-master-"
   update_default_version = true
 
   iam_instance_profile {
-    name = var.instance_profile
+    name = aws_iam_instance_profile.jenkins-master.name
   }
 
   image_id = data.aws_ami.master.id
 
-  instance_type = "t4g.small"
+  instance_type = var.ec2_instance_type
 
   key_name = aws_key_pair.jenkins_key.key_name
 
@@ -137,7 +144,7 @@ resource "aws_launch_template" "jenkins" {
     resource_type = "instance"
 
     tags = {
-      Name = "jenkins"
+      Name = "${local.prefix}-master"
     }
   }
 
@@ -146,12 +153,12 @@ resource "aws_launch_template" "jenkins" {
 }
 
 resource "aws_autoscaling_group" "jenkins" {
-  name = "jenkins"
+  name = "${local.prefix}-master"
   launch_template {
     id      = aws_launch_template.jenkins.id
     version = "$Latest"
   }
-  availability_zones = [var.zone]
+  vpc_zone_identifier = local.subnet_ids
 
   max_size         = 1
   desired_capacity = 1
@@ -185,48 +192,3 @@ resource "aws_autoscaling_group" "jenkins" {
 #   description = "Intance user_data (aka init config)"
 #   value       = format("aws ec2 describe-instance-attribute --instance-id %s --attribute userData --output text --query \"UserData.Value\" | base64 --decode", data.aws_instances.jenkins.ids[0])
 # }
-
-
-variable "external_access_ip" {
-  type        = string
-  description = "The public IP which is allowed to access instance"
-}
-
-variable "instance_profile" {
-  default     = "jenkins-master"
-  type        = string
-  description = "The name of instance_profile to be assigned to EC2 with Jenkins. The role "
-}
-
-variable "zone" {
-  default     = "us-east-1a"
-  type        = string
-  description = "Preffered AWS AZ where resources need to placed, has to be compatible with region used"
-}
-
-variable "jenkins_master_name" {
-  type        = string
-  description = <<-EOF
-  Prefix of the AMI in the current account to be used as Jenkins Master AMI
-  Default: jenkins-master - which is a build of prerequisites/amis/jenkins-master
-  EOF
-
-  default = "jenkins-master"
-}
-
-variable "jenkins_agent_name" {
-  type        = string
-  description = <<-EOF
-  Prefix of the AMI in the current account to be used as Jenkins Agent AMI
-  Default: jenkins-java-agent - which is a build of prerequisites/amis/jenkins-java-agent
-  EOF
-
-  default = "jenkins-java-agent"
-}
-
-
-variable "admin_password" {
-  default     = "admin"
-  type        = string
-  description = "Password to be used for Jenkins Master"
-}

@@ -1,0 +1,146 @@
+jenkins:
+  systemMessage: Welcome to the Matihost CI\CD server.
+  agentProtocols:
+  - "JNLP4-connect"
+  - "Ping"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: false
+  disableRememberMe: false
+  labelAtoms:
+  - name: "built-in"
+  markupFormatter: "plainText"
+  mode: NORMAL
+  myViewsTabBar: "standard"
+  nodeMonitors:
+  - "architecture"
+  - "responseTime"
+  - "clock"
+  - tmpSpace:
+      freeSpaceThreshold: "1GiB"
+      freeSpaceWarningThreshold: "2GiB"
+  - "swapSpace"
+  - diskSpace:
+      freeSpaceThreshold: "1GiB"
+      freeSpaceWarningThreshold: "2GiB"
+  numExecutors: 2
+  primaryView:
+    all:
+      name: "all"
+  projectNamingStrategy: "standard"
+  quietPeriod: 5
+  scmCheckoutRetryCount: 0
+  securityRealm:
+    local:
+      allowsSignup: false
+      enableCaptcha: false
+      users:
+      - id: "admin"
+        name: "admin"
+        password: "admin"
+        properties:
+        - "apiToken"
+        - "consoleUrlProvider"
+        - "experimentalFlags"
+        - "mailer"
+        - preferredProvider:
+            providerId: "default"
+  slaveAgentPort: -1
+  updateCenter:
+    sites:
+    - id: "default"
+      url: "https://updates.jenkins.io/update-center.json"
+  views:
+  - all:
+      name: "all"
+  viewsTabBar: "standard"
+globalCredentialsConfiguration:
+  configuration:
+    providerFilter: "none"
+    typeFilter: "none"
+appearance:
+  prism:
+    theme: PRISM
+  simpleTheme:
+    elements:
+    - cssUrl:
+        url: "https://tobix.github.io/jenkins-neo2-theme/dist/neo-light.css"
+security:
+  apiToken:
+    creationOfLegacyTokenEnabled: false
+    tokenGenerationOnCreationEnabled: false
+    usageStatisticsEnabled: true
+  gitHooks:
+    allowedOnAgents: false
+    allowedOnController: false
+  gitHostKeyVerificationConfiguration:
+    sshHostKeyVerificationStrategy: "knownHostsFileVerificationStrategy"
+  sSHD:
+    port: -1
+  scriptApproval:
+    approvedSignatures:
+    - "method groovy.json.JsonSlurperClassic parseText java.lang.String"
+    - "new groovy.json.JsonSlurperClassic"
+unclassified:
+  buildDiscarders:
+    configuredBuildDiscarders:
+    - "jobBuildDiscarder"
+  fingerprints:
+    fingerprintCleanupDisabled: false
+    storage: "file"
+  gitHubConfiguration:
+    apiRateLimitChecker: ThrottleForNormalize
+  gitHubPluginConfig:
+    hookUrl: "http://localhost:8080/github-webhook/"
+  junitTestResultStorage:
+    storage: "file"
+  location:
+    adminAddress: "address not configured yet <nobody@nowhere>"
+  mailer:
+    charset: "UTF-8"
+    useSsl: false
+    useTls: false
+  pollSCM:
+    pollingThreadCount: 10
+  prometheusConfiguration:
+    appendParamLabel: false
+    appendStatusLabel: false
+    collectCodeCoverage: false
+    collectDiskUsage: true
+    collectNodeStatus: true
+    collectingMetricsPeriodInSeconds: 120
+    countAbortedBuilds: true
+    countFailedBuilds: true
+    countNotBuiltBuilds: true
+    countSuccessfulBuilds: true
+    countUnstableBuilds: true
+    defaultNamespace: "default"
+    fetchTestResults: true
+    jobAttributeName: "jenkins_job"
+    path: "prometheus"
+    perBuildMetrics: false
+    processingDisabledBuilds: false
+    useAuthenticatedEndpoint: false
+  scmGit:
+    addGitTagAction: false
+    allowSecondFetch: false
+    createAccountBasedOnEmail: false
+    disableGitToolChooser: false
+    hideCredentials: false
+    showEntireCommitSummaryInChanges: false
+    useExistingAccountWithSameEmail: false
+  timestamper:
+    allPipelines: false
+    elapsedTimeFormat: "'<b>'HH:mm:ss.S'</b> '"
+    systemTimeFormat: "'<b>'HH:mm:ss'</b> '"
+tool:
+  git:
+    installations:
+    - home: "git"
+      name: "Default"
+  mavenGlobalConfig:
+    globalSettingsProvider: "standard"
+    settingsProvider: "standard"

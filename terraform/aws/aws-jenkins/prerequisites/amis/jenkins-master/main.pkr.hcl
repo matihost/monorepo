@@ -1,3 +1,12 @@
+packer {
+  required_plugins {
+    amazon = {
+      version = "~> 1"
+      source  = "github.com/hashicorp/amazon"
+    }
+  }
+}
+
 variable "region" {
   type    = string
   default = "us-east-1"
@@ -8,26 +17,50 @@ variable "ami_name_prefix" {
   default = "jenkins-master"
 }
 
+variable "ec2_instance_type" {
+  type        = string
+  description = "Instance type for EC2 deployments"
+  default     = "t3.micro" # or "t4g.small"
+}
+
+variable "ec2_architecture" {
+  type        = string
+  description = "Instance type for EC2 deployments"
+  default     = "x86_64" # or "arm64"
+}
+
 locals {
   timestamp = regex_replace(timestamp(), "[- TZ:]", "")
-  ami_name  = "${var.ami_name_prefix}-${local.timestamp}"
+  ami_name  = "${var.ami_name_prefix}-${var.ec2_architecture}-${local.timestamp}"
 }
+
 
 source "amazon-ebs" "main" {
   ami_name      = "${local.ami_name}"
-  instance_type = "t4g.small"
+  instance_type = var.ec2_instance_type
   region        = "${var.region}"
   source_ami_filter {
     filters = {
       name                = "ubuntu/images/hvm-ssd-*/ubuntu-noble-24.04-*-server-*"
       root-device-type    = "ebs"
       virtualization-type = "hvm"
+      architecture        = var.ec2_architecture
     }
     most_recent = true
     owners      = ["099720109477"]
   }
-  ssh_username   = "ubuntu"
-  user_data_file = "jenkins-master.cloud-init.yaml"
+  subnet_filter {
+    filters = {
+      "tag:Tier" : "private"
+    }
+    most_free = true
+    random    = false
+  }
+  ssh_username         = "ubuntu"
+  ssh_interface        = "session_manager"
+  communicator         = "ssh"
+  iam_instance_profile = "SSM-EC2"
+  user_data_file       = "jenkins-master.cloud-init.yaml"
 }
 
 build {
@@ -36,6 +69,18 @@ build {
   provisioner "shell" {
     inline = ["echo Building AMI: ${local.ami_name} on ${build.User}@${build.Host}", "echo 'Waiting for cloud-init'; while [ ! -f /var/lib/cloud/instance/boot-finished ]; do sleep 1; done; echo 'Done'",
     "echo `whoami`"]
+  }
+  provisioner "file" {
+    destination = "/tmp/jenkins.yaml"
+    source      = "./jenkins.yaml"
+  }
+  provisioner "file" {
+    destination = "/tmp/basic.groovy"
+    source      = "./basic.groovy"
+  }
+  provisioner "file" {
+    destination = "/tmp/systemd.conf"
+    source      = "./systemd.conf"
   }
   provisioner "shell" {
     scripts = ["jenkins-master.buildout.sh"]

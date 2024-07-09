@@ -7,63 +7,6 @@ resource "aws_ssm_service_setting" "default_host_management" {
 }
 
 
-resource "aws_iam_role" "default_host_management" {
-  name = "DefaultHostManagement"
-
-  assume_role_policy = <<-EOF
-  {
-      "Version": "2012-10-17",
-      "Statement": [
-          {
-              "Effect": "Allow",
-              "Principal": {
-                  "Service": "ssm.amazonaws.com"
-              },
-              "Action": "sts:AssumeRole"
-          }
-      ]
-  }
-  EOF
-}
-
-resource "aws_iam_role_policy_attachment" "default_host_management" {
-  role       = aws_iam_role.default_host_management.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedEC2InstanceDefaultPolicy"
-}
-
-
-# To connect/ssh to EC2 via SSM
-# ECM2 has to be either:
-# public facing (be in public subnet)
-# or
-# it can be private only but it has to have assigned
-# instance profile containing minimally AmazonSSMManagedInstanceCore policy
-resource "aws_iam_role" "ssm-ec2" {
-  name               = "SSM-EC2"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": {
-    "Effect": "Allow",
-    "Principal": {"Service": "ec2.amazonaws.com"},
-    "Action": "sts:AssumeRole"
-  }
-}
-EOF
-}
-
-resource "aws_iam_instance_profile" "ssm-ec2" {
-  name = "SSM-EC2"
-  role = aws_iam_role.ssm-ec2.name
-}
-
-
-
-resource "aws_iam_role_policy_attachment" "ssm-ec2" {
-  role       = aws_iam_role.ssm-ec2.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
 resource "aws_security_group" "ssm" {
   name        = "${local.prefix}-ssm"
   description = "Allow TLS inbound traffic for SSM/EC2 endpoints"
