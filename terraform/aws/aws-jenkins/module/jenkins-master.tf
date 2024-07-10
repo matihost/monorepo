@@ -115,10 +115,11 @@ data "template_cloudinit_config" "config" {
   part {
     content_type = "text/x-shellscript"
     content = templatefile("${path.module}/jenkins-master.startup.sh.tpl", {
-      jenkins_agent_ami            = data.aws_ami.agent.id,
-      jenkins_name                 = local.prefix,
-      jenkins_agent_security_group = aws_security_group.jenkins_agent.name,
-      jenkins_agent_subnets        = join(",", local.subnet_ids)
+      jenkins_agent_ami              = data.aws_ami.agent.id,
+      jenkins_name                   = local.prefix,
+      jenkins_agent_security_group   = aws_security_group.jenkins_agent.name,
+      jenkins_agent_subnets          = join(",", local.agent_subnet_ids)
+      jenkins_agent_ec2_architecture = var.ec2_architecture
     })
   }
 
@@ -158,7 +159,7 @@ resource "aws_autoscaling_group" "jenkins" {
     id      = aws_launch_template.jenkins.id
     version = "$Latest"
   }
-  vpc_zone_identifier = local.subnet_ids
+  vpc_zone_identifier = local.master_subnet_ids
 
   max_size         = 1
   desired_capacity = 1

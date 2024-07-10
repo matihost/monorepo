@@ -44,12 +44,14 @@ function configure_jenkins() {
   [ -e jenkins.yaml ] && {
     sudo cp jenkins.yaml /var/lib/jenkins/casc_configs
     sudo cp basic.groovy /var/lib/jenkins/init.groovy.d
+    sudo cp reload-casc.groovy /var/lib/jenkins/init.groovy.d
     sudo cp systemd.conf /etc/systemd/system/jenkins.service.d/override.conf
   }
   # so that scripts work with Packer
   [ -e /tmp/jenkins.yaml ] && {
     sudo cp /tmp/jenkins.yaml /var/lib/jenkins/casc_configs
     sudo cp /tmp/basic.groovy /var/lib/jenkins/init.groovy.d
+    sudo cp /tmp/reload-casc.groovy /var/lib/jenkins/init.groovy.d
     sudo cp /tmp/systemd.conf /etc/systemd/system/jenkins.service.d/override.conf
   }
   sudo chown -R jenkins:jenkins /var/lib/jenkins/init.groovy.d /var/lib/jenkins/casc_configs

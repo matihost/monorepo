@@ -3,7 +3,13 @@
 # TODO replace wwhen https://github.com/hashicorp/terraform-provider-aws/issues/30474 implemented
 resource "aws_ssm_service_setting" "default_host_management" {
   setting_id    = "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:servicesetting/ssm/managed-instance/default-ec2-instance-management-role"
-  setting_value = aws_iam_role.default_host_management.name
+  setting_value = data.aws_iam_role.default_host_management.name
+}
+
+# Role is created in aws-iam-linked module
+data "aws_iam_role" "default_host_management" {
+  name = "DefaultHostManagement"
+
 }
 
 

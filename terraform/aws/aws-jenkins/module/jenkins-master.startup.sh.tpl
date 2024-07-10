@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+export AGENT_EC_ARCHITECTURE='${jenkins_agent_ec2_architecture}'
 
 function configure_ec2_plugin(){
   cp /home/ubuntu/.ssh/id_rsa /var/lib/jenkins/secrets
@@ -21,13 +22,16 @@ credentials:
   echo -n "$${config_data}" >/var/lib/jenkins/casc_configs/jenkins_credentials.yaml
   chown jenkins:jenkins /var/lib/jenkins/casc_configs/jenkins_credentials.yaml
 
+  export AGENT_INSTANCE_TYPE='T3Micro'
+
+  [ "$${AGENT_EC_ARCHITECTURE}" == "arm64" ] && {
+    export AGENT_INSTANCE_TYPE='T4gSmall'
+  }
+
 # Use ACCEPT-NEW strategy because of https://issues.jenkins-ci.org/browse/JENKINS-62724
 # (it takes 5-10 min to connect to instance)
 # and since it is only Jenkins Master able to connect to Agent (via SecGroup limit)
 # the risk of MiM attack is minimal
-#
-# Use the same AZ as Jenkins Master to reduce cost of data transfer
-# (traffic between AZs is not free-tier eliglible)
 #
   config_data="
 jenkins:
@@ -78,7 +82,7 @@ jenkins:
         - name: \"Name\"
           value: \"${jenkins_name}-agent\"
         tenancy: Default
-        type: T3Micro
+        type: $${AGENT_INSTANCE_TYPE}
         useEphemeralDevices: false
       useInstanceProfileForCredentials: true"
   echo -n "$${config_data}" >/var/lib/jenkins/casc_configs/ec2.yaml
@@ -87,8 +91,6 @@ jenkins:
 
 
 # Main
-
 configure_ec2_plugin
-systemctl enable jenkins --now
-# TODO force reload casc:
-# https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/configurationReload.md
+systemctl enable jenkins
+systemctl restart jenkins

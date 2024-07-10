@@ -134,7 +134,7 @@ resource "aws_iam_role_policy_attachment" "amiBuilderToPassInstanceProfile" {
 }
 
 
-#  Allowing access from current and management account
+# Allowing access from current and management account
 # Lack of MFA presence - b/c with SSO it is not present:
 # Details:
 #  https://repost.aws/questions/QUqgjWSTfJRweHXaD1keQC0A/cross-account-access-not-possible-to-switch-role-when-this-one-has-mfa-enabled
@@ -151,6 +151,13 @@ resource "aws_iam_role" "read-only" {
                 "AWS": [ "${local.account_id}", "${local.org_management_account_id}" ]
             },
             "Action": "sts:AssumeRole"
+        },
+        {
+          "Effect": "Allow",
+          "Principal": {
+            "Service": "ts.amazonaws.com"
+          },
+          "Action": "sts:AssumeRole"
         }
     ]
 }
@@ -160,6 +167,16 @@ EOF
 resource "aws_iam_role_policy_attachment" "read-only-attachment" {
   role       = aws_iam_role.read-only.name
   policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "support-attachment" {
+  role       = aws_iam_role.read-only.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSSupportAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "tools-attachment" {
+  role       = aws_iam_role.read-only.name
+  policy_arn = aws_iam_policy.tools-access.arn
 }
 
 

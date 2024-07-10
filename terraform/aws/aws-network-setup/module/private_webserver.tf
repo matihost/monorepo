@@ -2,6 +2,12 @@ locals {
   webserver_zones = var.create_sample_instance ? var.zones : {}
 }
 
+# Role is created in aws-iam-linked module
+data "aws_iam_instance_profile" "ssm-ec2" {
+  name = "SSM-EC2"
+}
+
+
 resource "aws_instance" "webserver" {
   for_each = local.webserver_zones
 
@@ -13,7 +19,7 @@ resource "aws_instance" "webserver" {
   associate_public_ip_address = false
   key_name                    = aws_key_pair.vm_key.key_name
   vpc_security_group_ids      = [aws_security_group.internal_access.id]
-  iam_instance_profile        = aws_iam_instance_profile.ssm-ec2.name
+  iam_instance_profile        = data.aws_iam_instance_profile.ssm-ec2.name
   user_data                   = file("${path.module}/private_webserver.cloud-init.yaml")
   tags = {
     Name = "${local.prefix}-${each.key}-webserver"

@@ -289,3 +289,28 @@ resource "aws_iam_policy" "amiBuilder" {
   }
   EOF
 }
+
+
+resource "aws_iam_policy" "tools-access" {
+  description = "Allow pass ReadOnlyAccess role to Tools"
+  name        = "AllowPassReadOnlyAccessRoleToTools"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "ts:*",
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [ "iam:PassRole", "iam:GetRole" ],
+            "Resource": "arn:aws:iam::${local.account_id}:role/ReadOnlyAccess",
+            "Condition": {"StringEquals": {"iam:PassedToService": "ts.amazonaws.com"}}
+        }
+    ]
+}
+EOF
+}

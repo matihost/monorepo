@@ -23,15 +23,24 @@ aws configure
 
 ```bash
 
-# deploy Jenkins EC2 instance and related resources, usage: make apply PASS=passwordForJenkinsMaster
-make apply PASS=passwordToJenkinsMaster
+# deploy Jenkins EC2 master instance and related resources
+make run MODE=apply [ENV=dev-arm]
+
+
+# terminates all AWS resource for Jenkins master,
+# prerequisite: terminate all EC2 jenkins-agent instances- otherwise security group for agents cannot be destroyed
+# Warning: it does not destroy Jenkins Master nor Agent AMIs!
+# In order to destroy them run `make clean-amis` in `prerequisites/amis/...` directories.
+make destroy-jenkins-agents  [ENV=dev-arm]
+make run MODE=destroy [ENV=dev-arm]
+
 
 # open web browser with Jenkins instance
 # use login: admin and password: the one you provided to PASS variable during make apply
-make open-jenkins
+make open-jenkins [ENV=dev-arm]
 
 # ssh to Jenkins EC2 instance
-make ssh
+make ssh [ENV=dev-arm]
 
 
 # recreate Jenkins VM instance to ensure its latest LaunchTemplate is used
@@ -40,13 +49,8 @@ make ssh
 # scaling down/up has to be triggered manually
 # this task scaled down ASG to 0 (aka destroy VM with Jenkisn Master)
 # and then scale up - to spin new fresh Jenkins VM instance
-make recreate-instance
+make recreate-instance [ENV=dev-arm]
 
-# show Terraform state along with current EC2 instance user_date startup script
+# show  state along with current EC2 instance user_date startup script
 make show-state
-
-# terminates all AWS resource created with apply task, it also proactively terminate all EC2 jenkins-agent instances.
-# Warning: it does not destroy Jenkins Master nor Agent AMIs!
-# In order to destroy them run `make clean-amis` in `prerequisites/amis/...` directories.
-make destroy
 ```

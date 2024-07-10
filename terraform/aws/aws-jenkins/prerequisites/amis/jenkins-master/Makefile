@@ -3,10 +3,13 @@ AMI_NAME := jenkins-master
 build: init ## build
 	packer build .
 
+build-arm: init ## build
+	packer build -var 'ec2_architecture=arm64' -var 'ec2_instance_type=t4g.small' .
+
 list-amis: ## list AMI and accompanied them EBS snapshot
 	@aws ec2 describe-images --owners self --filters "Name=name,Values=$(AMI_NAME)*" --query 'sort_by(Images, &CreationDate)[]' | jq -j '.[]|"AMI:"+.ImageId + ",EBS Snapshot:"+(.BlockDeviceMappings[]|select(.Ebs.SnapshotId != null).Ebs.SnapshotId)+"\n"'
 
-clean-amis: ## clean all AMI with prefix of AMI_NAME (default: jenkinsjava-agent) and accompanied them snapshot (assume EBS type AMIs)
+clean-amis: ## clean all AMI with prefix of AMI_NAME (default: jenkins-master) and accompanied them snapshot (assume EBS type AMIs)
 	@for ami_snapshot_pair in `aws ec2 describe-images --owners self --filters "Name=name,Values=$(AMI_NAME)*" --query 'sort_by(Images, &CreationDate)[]' | jq -j '.[]|.ImageId + ","+(.BlockDeviceMappings[]|select(.Ebs.SnapshotId != null).Ebs.SnapshotId)+"\n"'` ; do \
     aws ec2 deregister-image --image-id `echo -n $$ami_snapshot_pair |cut -d"," -f1` ; \
 		aws ec2 delete-snapshot --snapshot-id `echo -n $$ami_snapshot_pair |cut -d"," -f2` ; \

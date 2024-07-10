@@ -3,6 +3,8 @@ AMI_NAME := jenkins-java-agent
 build: init ## build
 	packer build .
 
+build-arm: init ## build
+	packer build -var 'ec2_architecture=arm64' -var 'ec2_instance_type=t4g.small' .
 
 list-amis: ## list AMI and accompanied them EBS snapshot
 	@aws ec2 describe-images --owners self --filters "Name=name,Values=$(AMI_NAME)*" --query 'sort_by(Images, &CreationDate)[]' | jq -j '.[]|"AMI:"+.ImageId + ",EBS Snapshot:"+(.BlockDeviceMappings[]|select(.Ebs.SnapshotId != null).Ebs.SnapshotId)+"\n"'

@@ -79,6 +79,10 @@ build {
     source      = "./basic.groovy"
   }
   provisioner "file" {
+    destination = "/tmp/reload-casc.groovy"
+    source      = "./reload-casc.groovy"
+  }
+  provisioner "file" {
     destination = "/tmp/systemd.conf"
     source      = "./systemd.conf"
   }

@@ -6,7 +6,8 @@ locals {
 
   prefix = "${var.env}-${var.region}-${var.name}"
 
-  subnet_ids = [for subnet in data.aws_subnet.subnet : subnet.id]
+  master_subnet_ids = [for subnet in data.aws_subnet.master_subnet : subnet.id]
+  agent_subnet_ids  = [for subnet in data.aws_subnet.agent_subnet : subnet.id]
 }
 
 
@@ -20,17 +21,28 @@ data "aws_vpc" "default" {
 
 
 
-data "aws_subnet" "subnet" {
+data "aws_subnet" "master_subnet" {
   for_each          = var.zones
   vpc_id            = data.aws_vpc.default.id
   availability_zone = each.key
-  default_for_az    = var.subnet == "default" ? true : null
+  default_for_az    = var.master_subnet == "default" ? true : null
 
-  tags = var.subnet == "default" ? null : {
-    Tier = var.subnet
+  tags = var.master_subnet == "default" ? null : {
+    Tier = var.master_subnet
   }
 }
 
+
+data "aws_subnet" "agent_subnet" {
+  for_each          = var.zones
+  vpc_id            = data.aws_vpc.default.id
+  availability_zone = each.key
+  default_for_az    = var.agent_subnet == "default" ? true : null
+
+  tags = var.agent_subnet == "default" ? null : {
+    Tier = var.agent_subnet
+  }
+}
 
 
 variable "env" {
@@ -62,9 +74,15 @@ variable "vpc" {
   default     = "default"
 }
 
-variable "subnet" {
+variable "master_subnet" {
   type        = string
-  description = "Subnet name where to place VM, when 'default' value, default subnet for zone is used, otherwise Tier tag name is used"
+  description = "Subnet name where to place VM of Jenkins Master, when 'default' value, default subnet for zone is used, otherwise Tier tag name is used"
+  default     = "default"
+}
+
+variable "agent_subnet" {
+  type        = string
+  description = "Subnet name where to place VMs of Jenkins Agents, when 'default' value, default subnet for zone is used, otherwise Tier tag name is used"
   default     = "default"
 }
 

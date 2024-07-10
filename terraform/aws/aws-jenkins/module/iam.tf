@@ -47,7 +47,8 @@ resource "aws_iam_role_policy_attachment" "jenkins-master-cloudwatch" {
 }
 
 
-
+# TODO apply instance profile on Jenkins Agents
+# https://plugins.jenkins.io/ec2/#plugin-content-iam-setup
 resource "aws_iam_role" "jenkins-agent" {
   name               = "${local.prefix}-agent"
   description        = "Should be applied to EC2 with Jenkins Agent"
