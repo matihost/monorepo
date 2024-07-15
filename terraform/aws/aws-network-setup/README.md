@@ -1,4 +1,4 @@
-#  Minimal AWS recommended setup with private subnet
+# Minimal AWS recommended setup with private subnet
 
 Terraform scripts creating:
 
@@ -8,6 +8,13 @@ Terraform scripts creating:
 
 - NAT instance in public subnet to allow private subnet access internet.
   In production NAT Gateway should be used. NAT instance is AWS free-tier eligible version of NAT Gateway.
+
+- SSM enablemend.
+
+- SSM related VPC endpoints - to be able to SSM to private only EC2 instances.
+
+  **Warning**: configured via `create_ssm_private_access_vpc_endpoints` variable flag. VPC endpoint costs 0.01$ per instance per hour.
+  Private SSM access requires 6 VPC endpoints - which leads to 4.32 $ minimal cost for VPC endpoints per day.
 
 - (Optionally) plus sample webserver instance in private subnet.
 

@@ -34,6 +34,12 @@ variable "create_sample_instance" {
   description = "Whether to span single instance in private subnet"
 }
 
+variable "create_ssm_private_access_vpc_endpoints" {
+  type        = bool
+  default     = true
+  description = "Whether to create VPC endpoints reguired to be able to connect to EC2 instances w/o public IP via System Manager"
+}
+
 variable "ec2_instance_type" {
   type        = string
   description = "Instance type for EC2 deployments"

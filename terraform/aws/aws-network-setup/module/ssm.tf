@@ -39,6 +39,8 @@ locals {
 # VPC endpoint for the Systems Manager service
 # - https://aws.amazon.com/premiumsupport/knowledge-center/ec2-systems-manager-vpc-endpoints/
 resource "aws_vpc_endpoint" "ssm_endpoint" {
+  count = var.create_ssm_private_access_vpc_endpoints ? 1 : 0
+
   vpc_id              = aws_vpc.main.id
   service_name        = "com.amazonaws.${var.region}.ssm"
   vpc_endpoint_type   = "Interface"
@@ -53,6 +55,8 @@ resource "aws_vpc_endpoint" "ssm_endpoint" {
 
 # VPC endpoint for SSM Agent to make calls to the Systems Manager service
 resource "aws_vpc_endpoint" "ec2_messages_endpoint" {
+  count = var.create_ssm_private_access_vpc_endpoints ? 1 : 0
+
   vpc_id              = aws_vpc.main.id
   service_name        = "com.amazonaws.${var.region}.ec2messages"
   vpc_endpoint_type   = "Interface"
@@ -67,6 +71,8 @@ resource "aws_vpc_endpoint" "ec2_messages_endpoint" {
 
 # VPC endpoint for connecting to EC2 instances through a secure data channel using Session Manager
 resource "aws_vpc_endpoint" "ssm_messages_endpoint" {
+  count = var.create_ssm_private_access_vpc_endpoints ? 1 : 0
+
   vpc_id              = aws_vpc.main.id
   service_name        = "com.amazonaws.${var.region}.ssmmessages"
   vpc_endpoint_type   = "Interface"
@@ -90,6 +96,8 @@ resource "aws_vpc_endpoint" "ssm_messages_endpoint" {
 
 # VPC endpoint for Systems Manager to create VSS-enabled snapshots
 resource "aws_vpc_endpoint" "ec2_endpoint" {
+  count = var.create_ssm_private_access_vpc_endpoints ? 1 : 0
+
   vpc_id              = aws_vpc.main.id
   service_name        = "com.amazonaws.${var.region}.ec2"
   vpc_endpoint_type   = "Interface"
@@ -104,6 +112,8 @@ resource "aws_vpc_endpoint" "ec2_endpoint" {
 
 # VPC endpoint for AWS Key Management Service (AWS KMS) encryption for Session Manager or Parameter Store parameters
 resource "aws_vpc_endpoint" "kms_endpoint" {
+  count = var.create_ssm_private_access_vpc_endpoints ? 1 : 0
+
   vpc_id              = aws_vpc.main.id
   service_name        = "com.amazonaws.${var.region}.kms"
   vpc_endpoint_type   = "Interface"
@@ -118,6 +128,8 @@ resource "aws_vpc_endpoint" "kms_endpoint" {
 
 # VPC endpoint for Amazon CloudWatch Logs (CloudWatch Logs) for Session Manager, Run Command, or SSM Agent logs
 resource "aws_vpc_endpoint" "logs_endpoint" {
+  count = var.create_ssm_private_access_vpc_endpoints ? 1 : 0
+
   vpc_id              = aws_vpc.main.id
   service_name        = "com.amazonaws.${var.region}.logs"
   vpc_endpoint_type   = "Interface"
