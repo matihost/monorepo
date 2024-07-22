@@ -736,8 +736,23 @@ all:
             --resources=dns,monitoring,addresses,autoscalers,regionAutoscalers,globalForwardingRules,healthChecks,globalAddresses,regionBackendServices,urlMaps,regionSslCertificates,forwardingRules,httpHealthChecks,targetTcpProxies,regionInstanceGroupManagers,targetHttpsProxies,backendServices,sslCertificates
             Sample for AWS
             awsume rolename@accounr
+            cd "$(mktemp -d)"
+            echo "
+            terraform {
+              required_providers {
+                aws = {
+                  source  = "hashicorp/aws"
+                  version = "~> 5"
+                }
+              }
+              required_version = ">= 1.0"
+            }" > versions.tf
+            # terraformer supports only Terraform
+            sudo apt install terraform
+            terraform init
             # TODO https://github.com/GoogleCloudPlatform/terraformer/issues/1743
             terraformer import aws --resources=api_gateway,alb --regions=us-east-1 --profile=""
+            sudo apt -y remove terraform
           become: true
           command: |
             CURRENT_VERSION="$(curl -sL https://api.github.com/repos/GoogleCloudPlatform/terraformer/releases/latest | grep tag_name | cut -d '"' -f 4)"
