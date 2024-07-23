@@ -2,6 +2,8 @@
 
 Setup minimal IAM resources:
 
+* Opens S3 Account Public Access. In order to expose a site via S3 bucket it needs to be opened. AWS block public access on account level, bucket level and resource policy on IAM level. This module opens access on account level. You still needs to open public access on bucket and bucket IAM resource policy level as well.
+
 * Managed Policy: _BillingViewAccess_ to be able to see Billing Console content. To take effect root AWS account has to follow [this procedure](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_billing.html?icmpid=docs_iam_console#tutorial-billing-step1) to enable billing access for IAM users.
 
 * Managed Policy: _PassInstanceProfileToEC2_ to be able to pass instance profile to EC2 instance

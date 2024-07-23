@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #0047AB; /* Cobalt color */
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            text-align: center;
+        }
+        .error {
+            background: white;
+            padding: 50px;
+            margin-top: 50px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .error h1 {
+            font-size: 48px;
+            margin: 0;
+        }
+        .error p {
+            font-size: 24px;
+            margin: 10px 0 20px;
+        }
+        .error a {
+            display: inline-block;
+            text-decoration: none;
+            color: white;
+            background-color: #0047AB; /* Cobalt color */
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .error a:hover {
+            background-color: #002f6c; /* Darker shade of cobalt */
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        .social-links {
+            margin-top: 10px;
+        }
+        .social-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+            font-size: 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .social-links a.github {
+            background-color: #333;
+        }
+        .social-links a.linkedin {
+            background-color: #0077b5;
+        }
+        .social-links a:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Are you sure the page exists?</h1>
+        <p>If yes, please come back to home page and let me know via LinkedIn or GitHub about a bug. Thank You!</p>
+    </header>
+
+    <div class="container">
+        <div class="error">
+            <h1>404 :(</h1>
+            <p>Page Not Found</p>
+            <a href="/">Go Back to Home</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; <span id="year"></span> Mateusz Nowakowski</p>
+        <script>
+            document.getElementById("year").textContent = new Date().getFullYear();
+        </script>
+    </footer>
+</body>
+</html>

@@ -1,10 +1,5 @@
-resource "random_id" "id" {
-  byte_length = 8
-}
-
-
 resource "aws_s3_bucket" "bucket" {
-  bucket              = "${local.prefix}-${random_id.id.hex}"
+  bucket              = var.dns
   force_destroy       = "true"
   object_lock_enabled = "false"
 }
@@ -66,22 +61,6 @@ data "aws_iam_policy_document" "public_policy" {
 }
 
 
-resource "aws_s3_object" "cached-dir" {
-  bucket = aws_s3_bucket.bucket.id
-  key    = "CachedObjects/"
-}
-
-
-resource "aws_s3_object" "input" {
-  bucket  = aws_s3_bucket.bucket.id
-  key     = "CachedObjects/input.json"
-  content = <<EOF
-{"name": "John Doe", "address" : "111 Some Dr 76726282 Irving TX, US", "cc": "4242424242424242"}
-{"name": "Anna Doe", "address" : "111 Some Dr 12323453 Irving TX, US", "cc": "5555555555554444"}
-EOF
-}
-
-
-output "s3_url_for_input" {
-  value = "https://${aws_s3_bucket.bucket.bucket}.s3.amazonaws.com/CachedObjects/input.json"
+output "s3_url" {
+  value = "https://${aws_s3_bucket.bucket.bucket}.s3.amazonaws.com"
 }

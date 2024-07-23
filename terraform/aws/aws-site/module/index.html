@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mateusz Nowakowski</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #0047AB; /* Cobalt */
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 2.5em;
+            margin: 0;
+        }
+        header h3 {
+            font-size: 1.5em;
+            margin: 10px 0 20px;
+            color: #d0d0d0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            padding-bottom: 100px;
+        }
+        .profile {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .profile img {
+            float: left;
+            margin-right: 20px;
+            border-radius: 50%;
+        }
+        .profile h1 {
+            margin-top: 0;
+        }
+        .skills h2 {
+            text-align: center;
+        }
+        .clear {
+            clear: both;
+        }
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            background: #e2e2e2;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .skills div {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .skills ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .skills ul li {
+            background: #0047AB; /* Cobalt */
+            color: white;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .certificates {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            background: #e2e2e2;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .certificates div {
+            flex: 1;
+            min-width: 150px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        footer p {
+            font-size: 0.8em;
+        }
+        .social-links {
+            margin-top: 10px;
+        }
+        .social-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+            font-size: 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .social-links a.github {
+            background-color: #333;
+        }
+        .social-links a.linkedin {
+            background-color: #0077b5;
+        }
+        .social-links a:hover {
+            background-color: #555;
+        }
+        .badge {
+            display: inline-block;
+            background: #0047AB; /* Cobalt */
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin: 5px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .badge img {
+            width: 100px;
+            height: auto;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+        a.drummer {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Mateusz Nowakowski</h1>
+        <h3>Leader / SRE / Product / Engineer / Architect</h3>
+        <div class="social-links">
+            <a href="https://github.com/matihost/monorepo" target="_blank" class="github">GitHub</a>
+            <a href="https://www.linkedin.com/in/matihost/" target="_blank" class="linkedin">LinkedIn</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="profile">
+            <img src="https://media.licdn.com/dms/image/D4D03AQGd0aUk4Xr5IA/profile-displayphoto-shrink_200_200/0/1682423580688?e=1727308800&v=beta&t=6wsSF31gNvwHIfkpcaPzZSKkJe8WgN9aFOnDfVZA684" alt="Mateusz Nowakowski" width="200" height="200">
+            <h1>Professional Summary</h1>
+            <p>Hello! I'm Mateusz Nowakowski, a Site Reliability Engineer (SRE) / Leader / Product / Engineer / Architect.
+            <p>20+ years of career with many generations of software/architecture/operations & leadership</p>
+            <p>In my spare time, I'm an amateur <a href="https://www.youtube.com/watch?v=-UYgORr5Qhg" class="drummer">drummer</a>, an amateur ultra marathon biker and a tech geek.</p>
+            <p>Checkout my <a href="https://github.com/matihost/monorepo">GitHub</a> and <a href="https://www.linkedin.com/in/matihost/">LinkedIn</a> profile for details!</p>
+            <div class="clear"></div>
+        </div>
+
+        <div class="skills">
+            <div>
+                <h2>Areas of Expertise</h2>
+                <ul>
+                    <li>Automation (Terraform, Ansible, Helm, GitHub Actions, Jenkins etc.)</li>
+                    <li>Google Cloud</li>
+                    <li>AWS</li>
+                    <li>IBM Cloud</li>
+                    <li>Software Development (Java, Spring Boot, MQ, Python, GoLang etc.)</li>
+                    <li>Kubernetes (GKE & OpenShift)</li>
+                    <li>Linux</li>
+                    <li>Scrum, Kanban</li>
+                    <li>Product Management</li>
+                    <li>Management 3.0</li>
+                </ul>
+            </div>
+            <div>
+                <h2>Certifications</h2>
+                <div class="certificates">
+                    <div>
+                        <a href="https://www.credly.com/badges/a4b652bf-2d61-4ab9-9485-b2468980068e/linked_in_profile" target="_blank" class="badge">
+                            <img src="https://images.credly.com/size/340x340/images/0e284c3f-5164-4b21-8660-0d84737941bc/image.png" alt="AWS Certified Solutions Architect - Associate">
+                            <p>AWS Certified Solutions Architect - Associate</p>
+                        </a>
+                    </div>
+                    <div>
+                        <a href="https://www.credly.com/badges/849c2ac8-6281-44be-8a73-fe179ddb8534/linked_in_profile" target="_blank" class="badge">
+                            <img src="https://images.credly.com/size/340x340/images/0b6c6b08-b3f0-46b3-a0fc-87aa627f749c/C9005800_BADGE_EMBLEM_FILE_IBMCertifiedProfessionalArchitectCloudv6.png" alt="IBM Certified Professional Architect - Cloud v6">
+                            <p>IBM Certified Professional Architect - Cloud v6</p>
+                        </a>
+                    </div>
+                    <div>
+                        <a href="https://rhtapps.redhat.com/certifications/badge/verify/I6L2PTXATL46UOGXBAIYJVF34AAEQU3CUPSQX2KSDXT6RW46LQ3T7ULZ55KZZ56SKO7EQ3ETTLYZQ4U5NQYTCNA62RUWOCM34WWBUYQ=" target="_blank" class="badge">
+                            <img src="https://images.credly.com/size/340x340/images/572de0ba-2c59-4816-a59d-b0e1687e45ee/image.png" alt="Certificate 3">
+                            <p>Red Hat Certified System Administrator (RHCSA)</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; <span id="year"></span> Mateusz Nowakowski</p>
+        <script>
+            document.getElementById("year").textContent = new Date().getFullYear();
+        </script>
+        <p>This page is hosted almost for free. See my full source code <a href="https://github.com/matihost/monorepo/tree/main/terraform/aws/aws-site">here</a> for free!</p>
+    </footer>
+</body>
+</html>

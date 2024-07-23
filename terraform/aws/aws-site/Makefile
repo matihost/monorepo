@@ -25,9 +25,21 @@ run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
 	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
 
 
-test: ## test ALB Nginx instance
-	curl http://$(shell cd stage/$(ENV) && terragrunt output public_alb_dns):80
+test-site:  ## test S3 site URL
+	curl -sL $(shell cd stage/$(ENV) && terragrunt output s3_site_url)
 
+test-s3: ## test S3 URL
+	curl -sLk $(shell cd stage/$(ENV) && terragrunt output s3_url)/index.html
+
+
+get-cname-target: ## show domain which should be targeted with CNAME
+	@echo -n $(shell cd stage/$(ENV) && terragrunt output s3_site_url) | sed -E 's/.*\/\/(.+)/\1/'
+
+check-dns: ## check whether public resolvers correctly resolves your DNS
+ifndef DOMAIN
+	$(error Env DOMAIN is not defined. Usage make check-dns DOMAIN=matihost.mooo.com)
+endif
+	while true; do nslookup $(DOMAIN) 1.1.1.1; echo "Press [CTRL+C] to stop.."; sleep 5; done
 
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show

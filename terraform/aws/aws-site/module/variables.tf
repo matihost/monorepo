@@ -5,12 +5,19 @@ locals {
   # tflint-ignore: terraform_unused_declarations
   account_id = data.aws_caller_identity.current.account_id
 
+  # tflint-ignore: terraform_unused_declarations
   prefix = "${var.name}-${var.env}-${var.region}"
 }
 
 variable "name" {
   type        = string
   description = "Name of the objects"
+}
+
+
+variable "dns" {
+  type        = string
+  description = "DNS of the site"
 }
 
 # Default variables

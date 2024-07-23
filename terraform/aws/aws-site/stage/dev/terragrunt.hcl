@@ -10,7 +10,8 @@ terraform {
 
 inputs = {
   env    = "dev"
-  name   = "supername"
+  name   = "matihost-site"
+  dns    = "matihost.mooo.com"
   region = "us-east-1"
   zone   = "us-east-1a"
   aws_tags = {
