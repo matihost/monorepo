@@ -45,7 +45,7 @@ repos:
   - id: forbid-binary
     exclude: |
       (?x)^(
-        .*.png
+        .*.(png|jpg)
       )$
   - id: git-check
   # TODO reenable when ruby3.0 is not required

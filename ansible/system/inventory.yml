@@ -92,9 +92,6 @@ all:
         - name: vscode
           repo: "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main"
           key_url: "https://packages.microsoft.com/keys/microsoft.asc"
-        - name: teams
-          repo: "deb [arch=amd64] https://packages.microsoft.com/repos/ms-teams stable main"
-          key_url: "https://packages.microsoft.com/keys/microsoft.asc"
         - name: google-chrome
           repo: "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main"
           key_url: https://dl.google.com/linux/linux_signing_key.pub
@@ -200,7 +197,7 @@ all:
         - vagrant
         - sshpass
         - notepadqq
-          #- teams
+        - certbot
         - google-chrome-stable
         - google-cloud-sdk
         - google-cloud-sdk-gke-gcloud-auth-plugin
@@ -737,8 +734,7 @@ all:
             Sample for AWS
             awsume rolename@accounr
             cd "$(mktemp -d)"
-            echo "
-            terraform {
+            echo 'terraform {
               required_providers {
                 aws = {
                   source  = "hashicorp/aws"
@@ -746,7 +742,7 @@ all:
                 }
               }
               required_version = ">= 1.0"
-            }" > versions.tf
+            }' > versions.tf
             # terraformer supports only Terraform
             sudo apt install terraform
             terraform init

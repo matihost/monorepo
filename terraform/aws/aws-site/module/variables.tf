@@ -7,6 +7,8 @@ locals {
 
   # tflint-ignore: terraform_unused_declarations
   prefix = "${var.name}-${var.env}-${var.region}"
+
+  dns_prefix = replace(var.dns, ".", "-")
 }
 
 variable "name" {
@@ -18,6 +20,13 @@ variable "name" {
 variable "dns" {
   type        = string
   description = "DNS of the site"
+}
+
+
+variable "enable_tls" {
+  type        = bool
+  description = "DNS of the site"
+  default     = false
 }
 
 # Default variables

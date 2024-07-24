@@ -21,6 +21,16 @@ resource "aws_s3_object" "index" {
   content_type = "text/html"
 }
 
+resource "aws_s3_object" "photo" {
+  bucket = aws_s3_bucket.bucket.id
+  key    = "matz.jpg"
+  source = "${path.module}/matz.jpg"
+  etag   = filemd5("${path.module}/matz.jpg")
+
+  content_type = "image/jpeg"
+}
+
+
 resource "aws_s3_object" "error" {
   bucket = aws_s3_bucket.bucket.id
   key    = "error.html"
@@ -28,6 +38,12 @@ resource "aws_s3_object" "error" {
   etag   = filemd5("${path.module}/error.html")
 
   content_type = "text/html"
+}
+
+
+resource "aws_s3_object" "acme-challenge" {
+  bucket = aws_s3_bucket.bucket.id
+  key    = ".well-known/acme-challenge/"
 }
 
 

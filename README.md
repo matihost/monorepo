@@ -40,6 +40,7 @@ Various technology deployments, tools & code:
     * gcp-workstations - setup GCP Workstations infrastructure for remote development
     * gcp-cloudbuild - setup GCP Cloud Build infrastructure to trigger build for GitHub repository
   * aws - Terragrunt / OpenTofu deployments for AWS, mainly utilizing only AWS Free Tier
+    * aws-site - sample web site exposure via S3 and CloudFront
     * aws-iam-management, aws-iam-linked - setup IAM resources needed on fresh AWS management account (users, roles, groups etc) and subsequent linked AWS accounts
     * aws-network-setup - minimal AWS recommended setup with private subnet
     * aws-instance - minimal VM setup

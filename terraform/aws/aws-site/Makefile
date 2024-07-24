@@ -32,8 +32,12 @@ test-s3: ## test S3 URL
 	curl -sLk $(shell cd stage/$(ENV) && terragrunt output s3_url)/index.html
 
 
-get-cname-target: ## show domain which should be targeted with CNAME
+get-cname-target-fors3site: ## show domain which should be targeted with CNAME
 	@echo -n $(shell cd stage/$(ENV) && terragrunt output s3_site_url) | sed -E 's/.*\/\/(.+)/\1/'
+
+get-cname-target-forcloudfront: ## show domain which should be targeted with CNAME
+	@echo -n $(shell cd stage/$(ENV) && terragrunt output cloudfront_domain)
+
 
 check-dns: ## check whether public resolvers correctly resolves your DNS
 ifndef DOMAIN
@@ -49,6 +53,22 @@ clean: ## clean cached plugins and data
 	find . -name "target" -exec rm -rf {} +
 
 upgrade-providers-version: init
+
+
+generate-letsencrypt-cert: ## generate Let's Encrypt TLS certificate
+ifndef DOMAIN
+	$(error Env DOMAIN is not defined. Usage make check-dns DOMAIN=matihost.mooo.com)
+endif
+	mkdir -p ~/.tls
+	sudo certbot certonly --manual -d www.matihost.pl
+	sudo cp -Lr /etc/letsencrypt/live/$(DOMAIN) ~/.tls
+	sudo chown -R $(shell whoami):$(shell whoami) ~/.tls
+	sudo chmod -R go-rwx ~/.tls
+
+list-server-certificates: ## show certificates uploaded to AWS
+	aws iam list-server-certificates
+
+
 
 
 help: ## show usage and tasks (default)
