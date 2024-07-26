@@ -28,9 +28,15 @@ You may run  [../aws-iam-linked](../aws-iam-linked) module - which is opinionate
 
 ## Deployment (with HTTP only)
 
+* Ensure `enable_tls` variable is `false` (which is default when not provided).
+
 ```bash
-# setup S3 based site
-make run MODE=apply
+# show expected changes tp the infrastructure,
+# variable MODEs: plan, apply, destroy,  optional ENV a directory under stage directory
+make run MODE=plan [ENV=dev]
+
+# when changes are valid, apply them
+make run MODE=apply [ENV=dev]
 
 
 # test availbility of AWS S3 site addresses
@@ -53,13 +59,21 @@ make check-dns DOMAIN=matihost.mooo.com
 
 ## HTTPS exposure
 
-In order to expose via HTTPs the setup requires additional steps.
+HTTPs exposure requires additional steps.
 
-* Obtain Domain. You need to buy one. Unfortunately it cannot be FreeDNS public subdomain as Let's Encrypt [does not support it](https://repost.aws/questions/QUAlePGv3PSkmeeEVfRVKpVw/cloudfront-distribution-cannot-be-removed).
+* Obtain a Domain. It can be free FreeDNS public subdomain - This repo was tested with FreeDNS provider as well.
+
+  * However FreeDNS DNS changes propagation is slow (CloudFlare's resolver 1.1.1.1 even 1h to wait, Google's resolver: 8.8.8.8 - a bit faster).
+  HTTPS exposure in this repository - relies on the fact that first you expose HTTP endpoint directly from S3 so that Let's Encrypt can use HTTP method to prove that you own the domain - and FreeDNS supports that method for public, free, FreeDNS subdomain.
+  However  Let's Encrypt offers other method of verification via DNS TXT which [is not supported](https://github.com/acmesh-official/acme.sh/wiki/dnsapi#dns_freedns) if you use FreeDNS public subdomain. TXT method is supported from FreeDNS if you buy top level domain from FreeDNS.
+
+  * Recommended is to buy a domain for HTTPS exposure. It does not have to be Route53 from AWS. It can be whatever Domain provider allowing you manually define CNAME records.
+
+  * You only need a domain. You don't need additional services from Domain provider. TLS certificate is taken from free Let's Encrypt provider.
 
 * Decide about subdomain for the site (for example: [www.mydomain.com](www.mydomain.com) when you own [mydomain.com](mydomain.com))
 
-* First follow [deployment for HTTP](#deployment-with-http-only) with  `enable_tls` being false (which is default).
+* First follow [deployment for HTTP](#deployment-with-http-only) with  `enable_tls` being `false` (which is default).
 Ensure you have working [http://www.mydomain.com](http://www.mydomain.com) site point to S3 site url as CNAME
 
 * Generate TLS certificate via Let's Encrypt: (certbot tool required):
@@ -102,3 +116,23 @@ It will create IAM certifacte and create CloudFront distribution.
 
 * But also **remove CNAME record from your domain name pointing to CloudFront distribution**!
 If you don't do and you want to recreate CloudFront distribution using same alias/CNAME - it will be rejected with [error](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/troubleshooting-distributions.html#troubleshoot-incorrectly-configured-DNS-record-error).
+
+* If you want to recreate deployment - please bear in mind this repo uses S3 bucket being name of your site DNS (see [prerequisites](#prerequisites) why). S3 buckets are globally unique and information about bucket is eventual consistent.. Translating to human language:
+When you remove S3 bucket and you want to create it again - [you may need to wait from several minutes to several hours](https://serverfault.com/a/770488) - for AWS to let you create S3 bucket with the same name.
+
+### Refresh TLS certificate
+
+Let's Encrypt TLS certificate is valid for 3 months.
+Run these steps before certificate is invalid:
+
+```bash
+# regenerate TLS certificate
+make generate-letsencrypt-cert DOMAIN=www.mydomain.com
+
+# check proposed changes
+make run MODE=plan ENV=prod
+
+
+# when TLS certificate is to be changed and CloudFront distribution - apply
+make run MODE=apply ENV=prod
+```

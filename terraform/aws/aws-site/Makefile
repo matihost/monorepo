@@ -60,7 +60,7 @@ ifndef DOMAIN
 	$(error Env DOMAIN is not defined. Usage make check-dns DOMAIN=matihost.mooo.com)
 endif
 	mkdir -p ~/.tls
-	sudo certbot certonly --manual -d www.matihost.pl
+	sudo certbot certonly --manual -d $(DOMAIN)
 	sudo cp -Lr /etc/letsencrypt/live/$(DOMAIN) ~/.tls
 	sudo chown -R $(shell whoami):$(shell whoami) ~/.tls
 	sudo chmod -R go-rwx ~/.tls

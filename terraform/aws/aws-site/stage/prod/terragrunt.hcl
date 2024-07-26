@@ -12,6 +12,7 @@ inputs = {
   env  = "prod"
   name = "matihost-site"
   dns  = "www.matihost.pl"
+  # use false to expose only HTTP exposure from S3 directly
   # when true, you has to have TLS certificates present in ~/.tls/DNS directory,
   # run to generate one:
   # make generate-letsencrypt-cert DOMAIn=www.matihost.pl
