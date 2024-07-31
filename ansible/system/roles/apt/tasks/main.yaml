@@ -5,13 +5,13 @@
   when: apt_repo is not defined or apt_repo.name is not defined
 
 - name: Ensure apt key is present
-  ansible.builtin.apt_key:
-    url: "{{ apt_key }}"
-    state: present
+  ansible.builtin.include_tasks: apt_key.yaml
   loop: "{{ apt_repo.key_url if ((apt_repo.key_url is defined) and (apt_repo.key_url | type_debug == 'list'))
     else [apt_repo.key_url] if ((apt_repo.key_url is defined) and (apt_repo.key_url | type_debug == 'AnsibleUnsafeText')) else [] }}"
   loop_control:
     loop_var: apt_key
+    extended: true
+    extended_allitems: false
 
 # https://github.com/ansible/ansible/issues/48714 apt_repository module does not support standard repositories
 - name: Ensure {{ apt_repo.name }} is present as a standard package repository when it is standard repo

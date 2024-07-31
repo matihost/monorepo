@@ -1,0 +1,14 @@
+---
+- name: Set apt key file name
+  ansible.builtin.set_fact:
+    apt_key_filename: "/etc/apt/trusted.gpg.d/{{ apt_repo.name }}{{ '' if ansible_loop.index0 == 0 else ansible_loop.index0 }}.{{ apt_repo.key_format | default('asc') }}"
+- name: Check whether {{ apt_key_filename }} exists
+  ansible.builtin.stat:
+    path: "{{ apt_key_filename }}"
+  register: apt_key_exists
+- name: Ensure gpg file is present
+  when: not apt_key_exists.stat.exists
+  ansible.builtin.get_url:
+    url: "{{ apt_key }}"
+    dest: "{{ apt_key_filename }}"
+    mode: '0640'

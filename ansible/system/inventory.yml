@@ -45,6 +45,7 @@ all:
           eamodio.gitlens
           formulahendry.code-runner
           foxundermoon.shell-format
+          george-alisson.html-preview-vscode
           github.vscode-github-actions
           golang.go
           hashicorp.terraform
@@ -114,18 +115,21 @@ all:
         - name: google-cloud-sdk
           repo: "deb [arch=amd64] https://packages.cloud.google.com/apt cloud-sdk main"
           key_url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+          key_format: asc
         # - name: openvpn
         #   repo: "deb [arch=amd64] https://swupdate.openvpn.net/community/openvpn3/repos {{ versions.openvpn_repo_ubuntu_version }} main"
         #   key_url: https://swupdate.openvpn.net/repos/openvpn-repo-pkg-key.pub
         - name: terraform
           repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ versions.terraform_ubuntu_version }} main"
           key_url: https://apt.releases.hashicorp.com/gpg
+          key_format: asc
         - name: envoy
           repo: "deb [arch=amd64] https://deb.dl.getenvoy.io/public/deb/ubuntu {{ ansible_distribution_release }} main"
           key_url: ["https://deb.dl.getenvoy.io/public/gpg.8115BA8E629CC074.key"]
         - name: github
           repo: "deb [arch=amd64] https://cli.github.com/packages stable main"
           key_url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+          key_format: gpg
         - name: onedrive
           repo: "deb [arch=amd64] https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_{{ versions.onedrive_ubuntu_version }}/ ./"
           key_url: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_{{ versions.onedrive_ubuntu_version }}/Release.key
@@ -715,12 +719,12 @@ all:
                 echo 'export PATH=$PATH:$HOME/.istioctl/bin' >> ~/.bashrc
               }
             }
-        - name: terraform-config
+        - name: terraform-tofu-config
           desc: |
             additional terraform cli configuration, added autocomplete and plugins caching
           become: false
           command: |
-            [ "$(grep -c 'complete -C /usr/bin/terraform terraform' ~/.bashrc)" -ne 0 ] || terraform -install-autocomplete
+            [ "$(grep -c 'complete -C /usr/bin/tofu tofu' ~/.bashrc)" -ne 0 ] || tofu -install-autocomplete
             [ "$(grep -c 'plugin_cache_dir' ~/.terraformrc 2>/dev/null || echo 0)" -ne 0 ] || {
               mkdir -p ~/.terraform.d/plugins
               echo -e 'plugin_cache_dir = "$HOME/.terraform.d/plugins"\nplugin_cache_may_break_dependency_lock_file = true' > ~/.terraformrc
