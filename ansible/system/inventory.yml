@@ -8,13 +8,8 @@ all:
         versions:
           # represents path to local gems, see: 'gem environment' output for example:  ~/.gem/ruby/3.1.0/bin
           ruby: 3.2.0
-          crio: 1.28
-          # libcontainers && cri-o
-          # List supported Ubuntu versions: https://github.com/cri-o/cri-o/blob/master/install.md#apt-based-operating-systems
-          # use {{ ansible_distribution_version }} instead of current Ubuntu version is supported, otherwise hardcode version
-          # TODO change to {{ ansible_distribution_version }} when noble/24.04 is supported Ubuntu
-          libcontainers_repo_ubuntu_version: "22.04"
-          libcontainers_crio_repo_ubuntu_version: "22.04"
+          kubernetes: v1.31
+          crio: v1.30
           # TODO change to {{ ansible_distribution_version }} when noble/24.04 is supported Ubuntu
           # List of supported Ubuntu versions:
           # https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos#DebianUbuntu:UsingOpenVPNaptrepositories
@@ -93,6 +88,8 @@ all:
         - name: vscode
           repo: "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main"
           key_url: "https://packages.microsoft.com/keys/microsoft.asc"
+        - name: azure-cli
+          repo: "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ noble main"
         - name: google-chrome
           repo: "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main"
           key_url: https://dl.google.com/linux/linux_signing_key.pub
@@ -102,16 +99,16 @@ all:
           key_url:
           - https://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc
           - https://download.virtualbox.org/virtualbox/debian/oracle_vbox_2016.asc
-        - name: libcontainers
+        - name: kubernetes
           repo: >-
-            deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ versions.libcontainers_repo_ubuntu_version }}/ /
+            deb [arch=amd64] https://pkgs.k8s.io/core:/stable:/{{ versions.kubernetes }}/deb/ /
           key_url: >-
-            https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x{{ ansible_distribution }}_{{ versions.libcontainers_repo_ubuntu_version }}/Release.key
-        - name: libcontainers-crio
+            https://pkgs.k8s.io/core:/stable:/{{ versions.kubernetes }}/deb/Release.key
+        - name: crio
           repo: >-
-            deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ versions.crio }}/x{{ ansible_distribution }}_{{ versions.libcontainers_crio_repo_ubuntu_version }}/ /
+            deb [arch=amd64] https://pkgs.k8s.io/addons:/cri-o:/stable:/{{ versions.crio}}/deb/ /
           key_url: >-
-            https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ versions.crio }}/x{{ ansible_distribution }}_{{ versions.libcontainers_crio_repo_ubuntu_version }}/Release.key
+            https://pkgs.k8s.io/addons:/cri-o:/stable:/{{ versions.crio}}/deb/Release.key
         - name: google-cloud-sdk
           repo: "deb [arch=amd64] https://packages.cloud.google.com/apt cloud-sdk main"
           key_url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
@@ -192,6 +189,9 @@ all:
         - virtualbox-7.0 # Virtual Box from Oracle repo,
         # - virtualbox # Ubuntu packaged VirtualBox
         - containernetworking-plugins
+        - kubelet
+        - kubeadm
+        - kubectl
         - cri-o
         - podman
         - buildah
@@ -207,7 +207,6 @@ all:
         - google-cloud-sdk-gke-gcloud-auth-plugin
         - google-cloud-sdk-cloud-build-local
         - google-cloud-sdk-kpt
-        - kubectl
         - getenvoy-envoy
         # - jenkins
         # requirement for Jetbrains Toolbox
@@ -237,6 +236,8 @@ all:
         - yamllint
         - youtubedl-gui
         - libxcb-cursor0 # calibre dependency
+        - apt-transport-https
+        - azure-cli
         snaps:
         - mc-installer
         - notepad-plus-plus

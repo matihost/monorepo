@@ -85,24 +85,20 @@ function ensureCriDockerdPresent() {
 }
 
 function ensureCrioPresent() {
-  CRIO_VERSION=1.28
+  CRIO_VERSION=v1.30
 
   [ -x /usr/bin/crio ] || (
     # shellcheck disable=SC1091
     . /etc/os-release
 
-    sudo sh -c "echo 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x${NAME}_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list"
-    wget -nv "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x${NAME}_${VERSION_ID}/Release.key" -O Release.key
-    sudo apt-key add Release.key
-    rm -f Release.key
+    curl -fsSL https://pkgs.k8s.io/core:/stable:/$CRIO_VERSION/deb/Release.key |
+      sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
-    sudo sh -c "echo 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/${CRIO_VERSION}/x${NAME}_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:crio:stable.list"
-    wget -nv "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/${CRIO_VERSION}/x${NAME}_${VERSION_ID}/Release.key" -O Release.key
-    sudo apt-key add Release.key
-    rm -f Release.key
+    echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/$CRIO_VERSION/deb/ /" |
+      sudo tee /etc/apt/sources.list.d/kubernetes.list
 
     sudo apt-get update -qq
-    sudo apt-get install -y cri-o cri-o-runc podman buildah
+    sudo apt-get install -y cri-o cri-o-runc buildah
   )
   [ -x /opt/cni/bin/bridge ] || (
     sudo apt -y install containernetworking-plugins

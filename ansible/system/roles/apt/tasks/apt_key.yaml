@@ -11,4 +11,4 @@
   ansible.builtin.get_url:
     url: "{{ apt_key }}"
     dest: "{{ apt_key_filename }}"
-    mode: '0640'
+    mode: '0644'
