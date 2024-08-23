@@ -329,6 +329,14 @@ all:
               echo 'HISTTIMEFORMAT="[%F %T] "' >> ~/.bashrc
               echo "Bash history configured"
             }
+        - name: azure-cli config
+          become: false
+          command: |
+            az config get extension.use_dynamic_install 2>/dev/null >/dev/null || {
+              az config set extension.dynamic_install_allow_preview=true
+              az config set extension.use_dynamic_install=yes_without_prompt
+              echo "Azure CLI configured"
+            }
         - name: golang-bin-on-path
           desc: Ensure ~/go/bin is on PATH
           become: false
