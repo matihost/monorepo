@@ -4,6 +4,8 @@ Setup minimal IAM resources:
 
 * Resource Group
 
+* Policies on Subscription level to enforce resource regions and VM sizes
+
 ## Prerequisites
 
 * Latest Terraform installed

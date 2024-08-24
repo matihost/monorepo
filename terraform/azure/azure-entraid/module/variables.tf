@@ -2,9 +2,23 @@ data "azurerm_subscription" "current" {
 }
 
 locals {
-  # tflint-ignore: terraform_unused_declarations
   subscription_id = data.azurerm_subscription.current.id
 }
+
+
+variable "locations" {
+  default     = ["Poland Central"]
+  type        = list(string)
+  description = "Allowed locations to be used in subscription"
+}
+
+variable "vm_sizes" {
+  default     = ["Standard_B1s", "Standard_B2ats_v2"]
+  type        = list(string)
+  description = "Allowed VM possible sizes to be used in subscription"
+}
+
+
 
 # tflint-ignore: terraform_unused_declarations
 variable "zone" {

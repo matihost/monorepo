@@ -9,5 +9,8 @@ terraform {
 
 
 inputs = {
-  env = "dev"
+  env       = "dev"
+  locations = ["Poland Central"]
+  vm_sizes  = ["Standard_B1s", "Standard_B2ats_v2"]
+
 }
