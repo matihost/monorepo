@@ -2,11 +2,11 @@
 
 Setup minimal network resources:
 
-* Virtual Network in resource group region
+* Virtual Network in resource group region - with disable default outbound connectivity (so that NAT is required)
 
 * 3 Subnetworks
 
-* Nat Gateway associated with all subnetworks
+* Nat Gateway along with PublicIP associated with all subnetworks
 
 ## Prerequisites
 

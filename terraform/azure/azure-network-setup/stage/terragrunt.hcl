@@ -1,11 +1,13 @@
 locals {
   subscription_id       = "${run_cmd("--terragrunt-quiet", "az", "account", "show", "--query", "id", "-o", "tsv")}"
-  subscription_name     = "${run_cmd("--terragrunt-quiet", "az", "account", "list", "--query", "[?id=='${local.subscription_id}'].name", "-o", "tsv")}"
-  state_resource_group  = "${local.subscription_name}-gitops"
-  state_storage_account = "${local.subscription_name}gitops"
-  tenant_id             = "${run_cmd("--terragrunt-quiet", "az", "account", "show", "--query", "tenantId", "-o", "tsv")}"
-  region                = "polandcentral"
-  zone                  = "polandcentral-az1"
+  subscription_name     = "${run_cmd("--terragrunt-quiet", "az", "account", "list", "--query", "[?id=='${local.subscription_id}'].name", "-o", "tsv", "--all")}"
+  state_resource_group  = "${run_cmd("--terragrunt-quiet", find_in_parent_folders("get_state_rg_name.sh"))}"
+  state_storage_account = "${run_cmd("--terragrunt-quiet", find_in_parent_folders("get_state_storage_account_name.sh"))}"
+  state_container       = "${run_cmd("--terragrunt-quiet", find_in_parent_folders("get_state_container_name.sh"))}"
+
+  tenant_id = "${run_cmd("--terragrunt-quiet", "az", "account", "show", "--query", "tenantId", "-o", "tsv")}"
+  region    = "polandcentral"
+  zone      = "polandcentral-az1"
 }
 
 remote_state {
@@ -17,7 +19,7 @@ remote_state {
   config = {
     resource_group_name  = local.state_resource_group
     storage_account_name = local.state_storage_account
-    container_name       = local.subscription_name
+    container_name       = local.state_container
     key                  = "${basename(abspath("${get_parent_terragrunt_dir()}/.."))}/${basename(get_parent_terragrunt_dir())}/${path_relative_to_include()}/terraform.tfstate"
     tenant_id            = local.tenant_id
     subscription_id      = local.subscription_id
@@ -47,6 +49,7 @@ inputs = {
   subscription_name     = local.subscription_name
   state_resource_group  = local.state_resource_group
   state_storage_account = local.state_storage_account
+  state_container       = local.state_container
   region                = local.region
   zone                  = local.zone
 }

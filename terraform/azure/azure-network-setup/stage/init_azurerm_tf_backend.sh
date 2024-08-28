@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
-SUB_ID="$(az account show --query id -o tsv)"
-SUB_NAME="$(az account list --query "[?id=='${SUB_ID}'].name" --output tsv)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+
 LOCATION=polandcentral
-STATE_RG="${SUB_NAME}-gitops"
-# Storage account name must be between 3 and 24 characters in length and use numbers and lower-case letters only.
-STATE_STORAGE_ACCOUNT="${SUB_NAME}gitops"
-STATE_CONTAINER_NAME="${SUB_NAME}"
+
+STATE_RG="$("${SCRIPT_DIR}"/get_state_rg_name.sh)"
+STATE_STORAGE_ACCOUNT="$("${SCRIPT_DIR}"/get_state_storage_account_name.sh)"
+STATE_CONTAINER_NAME="$("${SCRIPT_DIR}"/get_state_container_name.sh)"
 
 [ "$(az group list --query "[?name=='${STATE_RG}'].name" --output tsv 2>/dev/null)" == "${STATE_RG}" ] || {
   az group create --name "${STATE_RG}" --location "${LOCATION}"

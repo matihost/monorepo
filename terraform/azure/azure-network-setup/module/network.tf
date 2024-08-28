@@ -24,9 +24,66 @@ resource "azurerm_nat_gateway" "nat" {
   resource_group_name = local.resource_group_name
 }
 
+resource "azurerm_public_ip" "nat" {
+  name                = "${local.prefix}-natgateway"
+  location            = local.resource_group_location
+  resource_group_name = local.resource_group_name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+resource "azurerm_nat_gateway_public_ip_association" "nat" {
+  nat_gateway_id       = azurerm_nat_gateway.nat.id
+  public_ip_address_id = azurerm_public_ip.nat.id
+}
+
+
 resource "azurerm_subnet_nat_gateway_association" "nat" {
   for_each = var.subnets
 
   subnet_id      = azurerm_subnet.subnet[each.key].id
   nat_gateway_id = azurerm_nat_gateway.nat.id
 }
+
+
+# resource "azurerm_network_security_group" "example" {
+#   name                = "example-nsg"
+#   location            = azurerm_resource_group.example.location
+#   resource_group_name = azurerm_resource_group.example.name
+
+#   security_rule {
+#     name                       = "test123"
+#     priority                   = 100
+#     direction                  = "Inbound"
+#     access                     = "Allow"
+#     protocol                   = "Tcp"
+#     source_port_range          = "*"
+#     destination_port_range     = "*"
+#     source_address_prefix      = "*"
+#     destination_address_prefix = "*"
+#   }
+# }
+
+# resource "azurerm_subnet_network_security_group_association" "example" {
+#   subnet_id                 = azurerm_subnet.example.id
+#   network_security_group_id = azurerm_network_security_group.example.id
+# }
+
+
+# resource "azurerm_route_table" "example" {
+#   name                = "example-routetable"
+#   location            = azurerm_resource_group.example.location
+#   resource_group_name = azurerm_resource_group.example.name
+
+#   route {
+#     name                   = "example"
+#     address_prefix         = "10.100.0.0/14"
+#     next_hop_type          = "VirtualAppliance"
+#     next_hop_in_ip_address = "10.10.1.1"
+#   }
+# }
+
+# resource "azurerm_subnet_route_table_association" "example" {
+#   subnet_id      = azurerm_subnet.example.id
+#   route_table_id = azurerm_route_table.example.id
+# }
