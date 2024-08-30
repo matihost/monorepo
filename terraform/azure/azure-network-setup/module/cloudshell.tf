@@ -8,7 +8,9 @@ resource "azurerm_subnet" "cloudshell" {
   delegation {
     name = "CloudShellDelegation"
     service_delegation {
-      name = "Microsoft.ContainerInstance/containerGroups"
+      # even it is optional, it appears in a state and TF consider it as a change
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+      name    = "Microsoft.ContainerInstance/containerGroups"
     }
   }
 
@@ -18,7 +20,7 @@ resource "azurerm_subnet" "cloudshell" {
 
 resource "azurerm_network_security_group" "cloudshell" {
   name                = azurerm_subnet.cloudshell.name
-  location            = local.resource_group_location
+  location            = local.location
   resource_group_name = local.resource_group_name
 
   security_rule {
@@ -47,7 +49,7 @@ resource "azurerm_subnet_network_security_group_association" "cloudshell" {
 
 resource "azurerm_network_profile" "cloudshell" {
   name                = azurerm_subnet.cloudshell.name
-  location            = local.resource_group_location
+  location            = local.location
   resource_group_name = local.resource_group_name
 
   container_network_interface {
@@ -70,7 +72,7 @@ resource "azurerm_role_assignment" "cloudshell" {
 
 resource "azurerm_relay_namespace" "relay" {
   name                = "${azurerm_virtual_network.vnet.name}-relay"
-  location            = local.resource_group_location
+  location            = local.location
   resource_group_name = local.resource_group_name
 
   sku_name = "Standard"
@@ -108,7 +110,7 @@ resource "azurerm_subnet_nat_gateway_association" "relay" {
 
 resource "azurerm_private_endpoint" "relay" {
   name                = azurerm_relay_namespace.relay.name
-  location            = local.resource_group_location
+  location            = local.location
   resource_group_name = local.resource_group_name
   subnet_id           = azurerm_subnet.relay.id
 
@@ -121,8 +123,8 @@ resource "azurerm_private_endpoint" "relay" {
 }
 
 
-
-resource "azurerm_private_dns_zone" "privatelink" {
+# Managed in azuare-entraid module per resource group
+data "azurerm_private_dns_zone" "privatelink" {
   name                = "privatelink.servicebus.windows.net"
   resource_group_name = local.resource_group_name
 }
@@ -130,7 +132,7 @@ resource "azurerm_private_dns_zone" "privatelink" {
 
 resource "azurerm_private_dns_a_record" "relay" {
   name                = azurerm_relay_namespace.relay.name
-  zone_name           = azurerm_private_dns_zone.privatelink.name
+  zone_name           = data.azurerm_private_dns_zone.privatelink.name
   resource_group_name = local.resource_group_name
   ttl                 = 300
   records             = [azurerm_private_endpoint.relay.custom_dns_configs[0].ip_addresses[0]]
@@ -139,7 +141,7 @@ resource "azurerm_private_dns_a_record" "relay" {
 resource "azurerm_private_dns_zone_virtual_network_link" "example" {
   name                  = azurerm_relay_namespace.relay.name
   resource_group_name   = local.resource_group_name
-  private_dns_zone_name = azurerm_private_dns_zone.privatelink.name
+  private_dns_zone_name = data.azurerm_private_dns_zone.privatelink.name
   virtual_network_id    = azurerm_virtual_network.vnet.id
   registration_enabled  = false
 }
@@ -149,7 +151,7 @@ resource "azurerm_storage_account" "cloudshell" {
   name                = var.cloudshell.storage_account_name
   resource_group_name = local.resource_group_name
 
-  location                 = local.resource_group_location
+  location                 = local.location
   account_tier             = "Standard"
   account_replication_type = "ZRS"
   account_kind             = "StorageV2" # CloudShell are ok with SMBA, Premium if NFSv4 is needed
@@ -168,7 +170,9 @@ resource "azurerm_storage_account" "cloudshell" {
 
 
 resource "azurerm_storage_share" "cloudshell" {
-  name                 = "${var.env}-cloudshell"
+  for_each = toset(var.cloudshell.shares)
+
+  name                 = each.key
   storage_account_name = azurerm_storage_account.cloudshell.name
   quota                = 6 # GB
 }

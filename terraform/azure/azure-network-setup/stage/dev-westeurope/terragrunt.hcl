@@ -3,7 +3,10 @@ include {
 }
 
 locals {
-  storage_account = "${substr(run_cmd("--terragrunt-quiet", find_in_parent_folders("get_state_storage_account_name.sh")), 0, 19)}shell"
+  env             = "dev"
+  storage_account = "cshell2${local.env}2we2${substr(uuidv5("dns", run_cmd("--terragrunt-quiet", find_in_parent_folders("get_state_storage_account_name.sh"))), 0, 6)}"
+  region          = "westeurope"
+  zone            = "westeurope-az1"
 }
 
 terraform {
@@ -14,10 +17,13 @@ terraform {
 
 inputs = {
   env                = "dev"
+  region             = local.region
+  zone               = local.zone
   vnet_ip_cidr_range = "10.0.0.0/16"
   cloudshell = {
     cidr_range           = "10.0.0.0/24"
     storage_account_name = local.storage_account
+    shares               = ["shared-cloudshell-storage"]
   }
   relay = {
     cidr_range = "10.0.1.0/24"

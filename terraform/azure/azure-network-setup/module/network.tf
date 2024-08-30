@@ -1,6 +1,6 @@
 resource "azurerm_virtual_network" "vnet" {
   address_space       = [var.vnet_ip_cidr_range]
-  location            = local.resource_group_location
+  location            = local.location
   name                = "${local.prefix}-vnet"
   resource_group_name = local.resource_group_name
 }
@@ -20,13 +20,13 @@ resource "azurerm_subnet" "subnet" {
 
 resource "azurerm_nat_gateway" "nat" {
   name                = "${local.prefix}-natgateway"
-  location            = local.resource_group_location
+  location            = local.location
   resource_group_name = local.resource_group_name
 }
 
 resource "azurerm_public_ip" "nat" {
   name                = "${local.prefix}-natgateway"
-  location            = local.resource_group_location
+  location            = local.location
   resource_group_name = local.resource_group_name
   allocation_method   = "Static"
   sku                 = "Standard"

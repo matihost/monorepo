@@ -4,9 +4,11 @@ Setup minimal network resources:
 
 * Virtual Network in resource group region - with disable default outbound connectivity (so that NAT is required)
 
-* 3 Subnetworks
+* Subnetworks for VM and Containers (opinionated names)
 
 * Nat Gateway along with PublicIP associated with all subnetworks
+
+* Infrastructure to run CloudShell in VNet and dedicated Storage Class Share for mounting cloud disk.
 
 ## Prerequisites
 

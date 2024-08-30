@@ -3,7 +3,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 
-LOCATION=polandcentral
+LOCATION=westeurope
 
 STATE_RG="$("${SCRIPT_DIR}"/get_state_rg_name.sh)"
 STATE_STORAGE_ACCOUNT="$("${SCRIPT_DIR}"/get_state_storage_account_name.sh)"

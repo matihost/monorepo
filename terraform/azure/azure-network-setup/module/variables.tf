@@ -7,10 +7,10 @@ data "azurerm_resource_group" "rg" {
 
 locals {
   # tflint-ignore: terraform_unused_declarations
-  subscription_id         = data.azurerm_subscription.current.id
-  resource_group_name     = data.azurerm_resource_group.rg.name
-  resource_group_location = data.azurerm_resource_group.rg.location
-  prefix                  = var.env
+  subscription_id     = data.azurerm_subscription.current.id
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = var.region
+  prefix              = "${var.env}-${var.region}"
 }
 
 
@@ -38,6 +38,7 @@ variable "cloudshell" {
   type = object({
     cidr_range           = string
     storage_account_name = string
+    shares               = list(string)
   })
   description = "CloudShell Subnet and Related Resource Configuration"
 }
@@ -53,14 +54,14 @@ variable "relay" {
 
 # tflint-ignore: terraform_unused_declarations
 variable "zone" {
-  default     = "polandcentral-az1"
+  default     = "westeurope-az1"
   type        = string
   description = "Preffered Azure AZ where resources need to placed, has to be compatible with region variable"
 }
 
 # tflint-ignore: terraform_unused_declarations
 variable "region" {
-  default     = "polandcentral"
+  default     = "westeurope"
   type        = string
   description = "Preffered Azure region where resource need to be placed"
 }

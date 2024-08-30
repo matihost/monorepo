@@ -6,8 +6,8 @@ locals {
   state_container       = "${run_cmd("--terragrunt-quiet", find_in_parent_folders("get_state_container_name.sh"))}"
 
   tenant_id = "${run_cmd("--terragrunt-quiet", "az", "account", "show", "--query", "tenantId", "-o", "tsv")}"
-  region    = "polandcentral"
-  zone      = "polandcentral-az1"
+  region    = "westeurope"
+  zone      = "westeurope-az1"
 }
 
 remote_state {

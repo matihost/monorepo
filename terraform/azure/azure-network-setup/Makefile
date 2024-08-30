@@ -16,7 +16,7 @@ else
 endif
 
 
-ENV := dev
+ENV := dev-westeurope
 
 init: init-tf-backend
 	cd stage/$(ENV) && terragrunt init -upgrade=true
