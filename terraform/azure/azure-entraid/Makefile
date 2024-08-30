@@ -3,15 +3,16 @@
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
+	DEBUG_MODE :=--terragrunt-log-level debug --terragrunt-debug
 endif
 
 MODE := apply
 ifeq ($(strip $(MODE)),apply)
-	MODE_STR := apply -auto-approve
+	MODE_STR := apply -auto-approve $(DEBUG_MODE)
 else ifeq ($(strip $(MODE)),destroy)
-	MODE_STR := destroy -auto-approve
+	MODE_STR := destroy -auto-approve $(DEBUG_MODE)
 else
-	MODE_STR := plan
+	MODE_STR := plan $(DEBUG_MODE)
 endif
 
 

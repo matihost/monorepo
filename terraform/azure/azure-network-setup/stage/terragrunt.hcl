@@ -5,9 +5,11 @@ locals {
   state_storage_account = "${run_cmd("--terragrunt-quiet", find_in_parent_folders("get_state_storage_account_name.sh"))}"
   state_container       = "${run_cmd("--terragrunt-quiet", find_in_parent_folders("get_state_container_name.sh"))}"
 
-  tenant_id = "${run_cmd("--terragrunt-quiet", "az", "account", "show", "--query", "tenantId", "-o", "tsv")}"
-  region    = "polandcentral"
-  zone      = "polandcentral-az1"
+  tenant_id             = "${run_cmd("--terragrunt-quiet", "az", "account", "show", "--query", "tenantId", "-o", "tsv")}"
+  container_instance_id = "${run_cmd("--terragrunt-quiet", "az", "ad", "sp", "list", "--display-name", "Azure Container Instance", "--query", "[].id", "-o", "tsv")}"
+
+  region = "polandcentral"
+  zone   = "polandcentral-az1"
 }
 
 remote_state {
@@ -50,6 +52,7 @@ inputs = {
   state_resource_group  = local.state_resource_group
   state_storage_account = local.state_storage_account
   state_container       = local.state_container
+  container_instance_id = local.container_instance_id
   region                = local.region
   zone                  = local.zone
 }

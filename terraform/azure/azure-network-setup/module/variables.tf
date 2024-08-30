@@ -29,6 +29,28 @@ variable "subnets" {
 
 
 
+variable "container_instance_id" {
+  type        = string
+  description = "Object Id of Azure Container Instance Service Principal. We have to grant this permission to create hybrid connections in the Azure Relay you specify. To get it: Get-AzADServicePrincipal -DisplayNameBeginsWith 'Azure Container Instance'"
+}
+
+variable "cloudshell" {
+  type = object({
+    cidr_range           = string
+    storage_account_name = string
+  })
+  description = "CloudShell Subnet and Related Resource Configuration"
+}
+
+
+variable "relay" {
+  type = object({
+    cidr_range = string
+  })
+  description = "Relay Subnet and Related Resource Configuration"
+}
+
+
 # tflint-ignore: terraform_unused_declarations
 variable "zone" {
   default     = "polandcentral-az1"
