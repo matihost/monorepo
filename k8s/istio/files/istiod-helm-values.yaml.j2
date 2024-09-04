@@ -4,7 +4,7 @@
 # and compare with this file
 
 #.Values.pilot for discovery and mesh wide config
-
+profile: ambient
 ## Discovery Settings
 pilot:
   # TODO enable when istiod is capable to define max hpa value
@@ -35,6 +35,11 @@ pilot:
   # Set to `type: RuntimeDefault` to use the default profile if available.
   seccompProfile: {}
 
+  # Whether to use an existing CNI installation
+  cni:
+    enabled: false
+    provider: default
+
   # Additional container arguments
   extraContainerArgs: []
 
@@ -45,9 +50,23 @@ pilot:
     PILOT_ENABLE_STATUS: false
     PILOT_ENABLE_CONFIG_DISTRIBUTION_TRACKING: true
     ENABLE_STACKDRIVER_MONITORING: "{{ options.gke_mode|default("false") }}"
+  # Settings related to the untaint controller
+  # This controller will remove `cni.istio.io/not-ready` from nodes when the istio-cni pod becomes ready
+  # It should be noted that cluster operator/owner is responsible for having the taint set by their infrastructure provider when new nodes are added to the cluster; the untaint controller does not taint nodes
+  taint:
+    # Controls whether or not the untaint controller is active
+    enabled: false
+    # What namespace the untaint controller should watch for istio-cni pods. This is only required when istio-cni is running in a different namespace than istiod
+    namespace: ""
+
+  affinity: {}
+
+  tolerations: []
 
   cpu:
     targetAverageUtilization: 80
+  memory: {}
+    # targetAverageUtilization: 80
 
   # Additional volumeMounts to the istiod container
   volumeMounts: []
@@ -55,14 +74,10 @@ pilot:
   # Additional volumes to the istiod pod
   volumes: []
 
-  # if protocol sniffing is enabled for outbound
-  enableProtocolSniffingForOutbound: true
-  # if protocol sniffing is enabled for inbound
-  enableProtocolSniffingForInbound: true
-
   nodeSelector: {}
   podAnnotations: {}
   serviceAnnotations: {}
+  serviceAccountAnnotations: {}
 
   topologySpreadConstraints: []
 
@@ -70,14 +85,6 @@ pilot:
   # in PEM format. This will then be trusted by pilot when resolving
   # JWKS URIs.
   jwksResolverExtraRootCA: ""
-
-  # This is used to set the source of configuration for
-  # the associated address in configSource, if nothing is specified
-  # the default MCP is assumed.
-  configSource:
-    subscribedResources: []
-
-  plugins: []
 
   # The following is used to limit how long a sidecar can be connected
   # to a pilot. It balances out load across pilot instances at the cost of
@@ -99,6 +106,14 @@ pilot:
   # Setup how istiod Service is configured. See https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services
   ipFamilyPolicy: ""
   ipFamilies: []
+
+  # Ambient mode only.
+  # Set this if you install ztunnel to a different namespace from `istiod`.
+  # If set, `istiod` will allow connections from trusted node proxy ztunnels
+  # in the provided namespace.
+  # If unset, `istiod` will assume the trusted node proxy ztunnel resides
+  # in the same namespace as itself.
+  trustedZtunnelNamespace: ""
 
 sidecarInjectorWebhook:
   # You can use the field called alwaysInjectSelector and neverInjectSelector which will always inject the sidecar or
@@ -170,25 +185,17 @@ istiodRemote:
   # Sidecar injector mutating webhook configuration path value for the clientConfig.service field.
   # Override to pass env variables, for example: /inject/cluster/remote/net/network2
   injectionPath: "/inject"
+
+  injectionCABundle: ""
 telemetry:
   enabled: true
   v2:
     # For Null VM case now.
     # This also enables metadata exchange.
     enabled: true
-    metadataExchange:
-      # Indicates whether to enable WebAssembly runtime for metadata exchange filter.
-      wasmEnabled: false
     # Indicate if prometheus stats filter is enabled or not
     prometheus:
       enabled: true
-      # Indicates whether to enable WebAssembly runtime for stats filter.
-      wasmEnabled: false
-      # overrides stats EnvoyFilter configuration.
-      configOverride:
-        gateway: {}
-        inboundSidecar: {}
-        outboundSidecar: {}
 {% if options.gke_mode|default(false)  %}
     # stackdriver filter settings.
     stackdriver:
@@ -199,16 +206,6 @@ telemetry:
       disableOutbound: false
       #  configOverride parts give you the ability to override the low level configuration params passed to envoy filter.
 {% endif %}
-      configOverride: {}
-      #  e.g.
-      #  disable_server_access_logging: false
-      #  disable_host_header_fallback: true
-    # Access Log Policy Filter Settings. This enables filtering of access logs from stackdriver.
-    accessLogPolicy:
-      enabled: false
-      # To reduce the number of successful logs, default log window duration is
-      # set to 12 hours.
-      logWindowDuration: "43200s"
 # Revision is set as 'version' label and part of the resource names when installing multiple control planes.
 revision: ""
 
@@ -221,38 +218,10 @@ ownerName: ""
 # meshConfig defines runtime configuration of components, including Istiod and istio-agent behavior
 # See https://istio.io/docs/reference/config/istio.mesh.v1alpha1/ for all available options
 meshConfig:
-  enableTracing: true
-  defaultConfig:
-    tracing:
-      sampling: 50
-  accessLogFile: /dev/stdout
-  accessLogEncoding: JSON
   enablePrometheusMerge: true
-  # Config for the default ProxyConfig.
-  # Initially using directly the proxy metadata - can also be activated using annotations
-  # on the pod. This is an unsupported low-level API, pending review and decisions on
-  # enabling the feature. Enabling the DNS listener is safe - and allows further testing
-  # and gradual adoption by setting capture only on specific workloads. It also allows
-  # VMs to use other DNS options, like dnsmasq or unbound.
 
-  # The namespace to treat as the administrative root namespace for Istio configuration.
-  # When processing a leaf namespace Istio will search for declarations in that namespace first
-  # and if none are found it will search in the root namespace. Any matching declaration found in the root namespace
-  # is processed as if it were declared in the leaf namespace.
-
-  rootNamespace:
-
-  # The trust domain corresponds to the trust root of a system
-  # Refer to https://github.com/spiffe/spiffe/blob/master/standards/SPIFFE-ID.md#21-trust-domain
-  trustDomain: "cluster.local"
-
-  # TODO: the intent is to eventually have this enabled by default when security is used.
-  # It is not clear if user should normally need to configure - the metadata is typically
-  # used as an escape and to control testing and rollout, but it is not intended as a long-term
-  # stable API.
-
-  # What we may configure in mesh config is the ".global" - and use of other suffixes.
-  # No hurry to do this in 1.6, we're trying to prove the code.
+experimental:
+  stableValidationPolicy: false
 
 global:
   # Used to locate istiod.
@@ -319,10 +288,6 @@ global:
 
   omitSidecarInjectorConfigMap: false
 
-  # Whether to restrict the applications namespace the controller manages;
-  # If not set, controller watches all namespaces
-  oneNamespace: false
-
   # Configure whether Operator manages webhook configurations. The current behavior
   # of Istiod is to manage its own webhook configurations.
   # When this option is set as true, Istio Operator, instead of webhooks, manages the
@@ -385,6 +350,10 @@ global:
     # Expected values are: trace|debug|info|warning|error|critical|off
     logLevel: info
 
+    # Specify the path to the outlier event log.
+    # Example: /dev/stdout
+    outlierLogPath: ""
+
     #If set to true, istio-proxy container will have privileged securityContext
     privileged: false
 
@@ -422,14 +391,9 @@ global:
     # Default port for Pilot agent health checks. A value of 0 will disable health checking.
     statusPort: 15020
 
-    # Specify which tracer to use. One of: zipkin, lightstep, datadog, stackdriver.
+    # Specify which tracer to use. One of: zipkin, lightstep, datadog, stackdriver, none.
     # If using stackdriver tracer outside GCP, set env GOOGLE_APPLICATION_CREDENTIALS to the GCP credential file.
-    tracer: "{{ "stackdriver" if options.gke_mode|default(false) else "zipkin" }}"
-
-    # Controls if sidecar is injected at the front of the container list and blocks the start of the other containers until the proxy is ready
-    # Set to true to avoid
-    # https://github.com/actions/actions-runner-controller/blob/master/TROUBLESHOOTING.md#runner-coming-up-before-network-available
-    holdApplicationUntilProxyStarts: true
+    tracer: "{{ "stackdriver" if options.gke_mode|default(false) else "none" }}"
 
   proxy_init:
     # Base name for the proxy_init container, used to configure iptables.
@@ -463,9 +427,8 @@ global:
   # Configure a remote cluster as the config cluster for an external istiod.
   configCluster: false
 
-  # Configure the policy for validating JWT.
-  # Currently, two options are supported: "third-party-jwt" and "first-party-jwt".
-  jwtPolicy: "third-party-jwt"
+  # configValidation enables the validation webhook for Istio configuration.
+  configValidation: true
 
   # Mesh ID means Mesh Identifier. It should be unique within the scope where
   # meshes will interact with each other, but it is not required to be
@@ -569,14 +532,18 @@ base:
   # For istioctl usage to disable istio config crds in base
   enableIstioConfigCRDs: true
 
-  # If enabled, gateway-api types will be validated using the standard upstream validation logic.
-  # This is an alternative to deploying the standalone validation server the project provides.
-  # This is disabled by default, as the cluster may already have a validation server; while technically
-  # it works to have multiple redundant validations, this adds complexity and operational risks.
-  # Users should consider enabling this if they want full gateway-api validation but don't have other validation servers.
-  validateGateway: false
-
-# keep in sync with settings used when installing the Istio CNI chart
+# `istio_cni` has been deprecated and will be removed in a future release. use `pilot.cni` instead
 istio_cni:
-  enabled: false
+  # `chained` has been deprecated and will be removed in a future release. use `provider` instead
   chained: true
+  provider: default
+
+# Gateway Settings
+gateways:
+  # Define the security context for the pod.
+  # If unset, this will be automatically set to the minimum privileges required to bind to port 80 and 443.
+  # On Kubernetes 1.22+, this only requires the `net.ipv4.ip_unprivileged_port_start` sysctl.
+  securityContext: {}
+
+  # Set to `type: RuntimeDefault` to use the default profile for templated gateways, if your container runtime supports it
+  seccompProfile: {}

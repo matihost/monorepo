@@ -20,7 +20,7 @@ all:
           # TODO change to {{ ansible_distribution_release }} when noble/24.04 is supported Ubuntu
           cri_dockerd_ubuntu_version: "jammy"
           # MQ Version available at: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/
-          mq: 9.3.5.1
+          mq: 9.4.0.0
           # List of supported Ubuntu versions: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive
           onedrive_ubuntu_version: "24.04"
           # List of supported Ubuntu versions: https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/
@@ -70,6 +70,7 @@ all:
           visualstudioexptteam.intellicode-api-usage-examples
           visualstudioexptteam.vscodeintellicode
           vmware.vscode-spring-boot
+          vscjava.vscode-gradle
           vscjava.vscode-java-debug
           vscjava.vscode-java-dependency
           vscjava.vscode-java-pack
@@ -537,6 +538,7 @@ all:
               chmod a+x minikube && sudo mv minikube /usr/bin/ && echo "minikube installed"
             }
         - name: cilium-cli
+          desc: due to https://github.com/cilium/cilium-cli/issues/2774 version check fail leading to reinstall each run
           become: false
           command: |
             CURRENT_VERSION="$(curl -sL https://api.github.com/repos/cilium/cilium-cli/releases/latest | jq -r ".tag_name")"
@@ -826,7 +828,7 @@ all:
           become: true
           command: |
             # TODO consider full server version
-            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/9.3.5.0-IBM-MQ-Advanced-for-Developers-UbuntuLinuxX64.tar.gz
+            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/9.4.0.0-IBM-MQ-Advanced-for-Developers-LinuxX64.tar.gz
             # TODO add detect a new version
             [ -e /opt/mqm ] || {
               rm -rf /tmp/mq && mkdir -p /tmp/mq && cd /tmp/mq

@@ -1,6 +1,7 @@
 # for update run:
 # helm show values istio/cni > new-cni.values.yaml
 # and compare with this file
+profile: ambient
 cni:
   hub: ""
   tag: ""
@@ -8,10 +9,9 @@ cni:
   image: install-cni
   pullPolicy: ""
 
-  # Configuration log level of istio-cni binary
-  # by default istio-cni send all logs to UDS server
-  # if want to see them you need change global.logging.level with cni:debug
-  logLevel: debug
+  # Same as `global.logging.level`, but will override it if set
+  logging:
+    level: "debug"
 
   # Configuration file to insert istio-cni plugin configuration
   # by default this will be the first file found in the cni-conf-dir
@@ -29,7 +29,7 @@ cni:
 
 
   excludeNamespaces:
-    - istio-system
+    # - istio-system
     - kube-system
 
   # Allows user to set custom affinity for the DaemonSet
@@ -38,18 +38,9 @@ cni:
   # Custom annotations on pod level, if you need them
   podAnnotations: {}
 
-  # If this value is set a RoleBinding will be created
-  # in the same namespace as the istio-cni DaemonSet is created.
-  # This can be used to bind a preexisting ClusterRole to the istio/cni ServiceAccount
-  # e.g. if you use PodSecurityPolicies
-  psp_cluster_role: ""
-
   # Deploy the config files as plugin chain (value "true") or as standalone files in the conf dir (value "false")?
   # Some k8s flavors (e.g. OpenShift) do not support the chain approach, set to false if this is the case
   chained: true
-
-  # Allow the istio-cni container to run in privileged mode, needed for some platforms (e.g. OpenShift) or features (repairPods)
-  privileged: false
 
   # Custom configuration happens based on the CNI provider.
   # Possible values: "default", "multus"
@@ -58,11 +49,13 @@ cni:
   # Configure ambient settings
   ambient:
     # If enabled, ambient redirection will be enabled
-    enabled: false
-    # Set ambient redirection mode: "iptables" or "ebpf"
-    redirectMode: "iptables"
+    enabled: true
     # Set ambient config dir path: defaults to /etc/ambient-config
     configDir: ""
+    # If enabled, and ambient is enabled, DNS redirection will be enabled
+    dnsCapture: false
+    # If enabled, and ambient is enabled, enables ipv6 support
+    ipv6: true
 
 
   repair:
@@ -75,13 +68,15 @@ cni:
 
     # labelPods will label all pods with <brokenPodLabelKey>=<brokenPodLabelValue>.
     # This is only capable of identifying broken pods; the user is responsible for fixing them (generally, by deleting them).
+    # Note this gives the DaemonSet a relatively high privilege, as modifying pod metadata/status can have wider impacts.
     labelPods: false
     # deletePods will delete any broken pod. These will then be rescheduled, hopefully onto a node that is fully ready.
-    deletePods: true
+    # Note this gives the DaemonSet a relatively high privilege, as it can delete any Pod.
+    deletePods: false
     # repairPods will dynamically repair any broken pod by setting up the pod networking configuration even after it has started.
     # Note the pod will be crashlooping, so this may take a few minutes to become fully functional based on when the retry occurs.
-    # This requires no RBAC privilege, but does require `securityContext.privileged`.
-    repairPods: false
+    # This requires no RBAC privilege, but does require `securityContext.privileged/CAP_SYS_ADMIN`.
+    repairPods: true
 
     initContainerName: "istio-validation"
 
@@ -132,7 +127,7 @@ global:
 
   # change cni scope level to control logging out of istio-cni-node DaemonSet
   logging:
-    level: default:info,cni:info
+    level: info
 
   logAsJson: true
 

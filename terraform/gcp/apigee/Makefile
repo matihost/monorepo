@@ -71,7 +71,7 @@ destroy-exchanges-provider: ## destroy exchange-rate-web VM
 
 deploy-echoserver: ## deploys exchange-rate-web app as container on VM (sample Apigee targetServer for exchanges API proxy)
 	gcloud compute instances create-with-container echoserver-web \
-    --container-image k8s.gcr.io/echoserver:1.10 --container-restart-policy=always \
+    --container-image registry.k8s.io/echoserver:1.10 --container-restart-policy=always \
     --subnet private-subnet-us-east1 --zone us-east1-b --no-address --metadata enable-oslogin=TRUE \
     --machine-type=e2-micro \
     --image-project=cos-cloud \

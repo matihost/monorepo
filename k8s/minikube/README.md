@@ -4,23 +4,23 @@ Various script to manage Minikube with "none" mode on Ubuntu.
 
 Tested environment:
 
-* Ubuntu 23.10
+* Ubuntu 24.04.1 LTS
 
 * CNI: Cilium v1.14.3
 
-* Minikube 1.30.1 (and K8S 1.26.3)
+* Minikube 1.33.1 (and K8S 1.30.0)
 
 And CRI:
 
-* Docker 24.0.5 + cri-dockerd 0.3.6
+* Docker 24.0.7 + cri-dockerd 0.3.14
 
 Or
 
-* Containerd 1.7.2
+* Containerd 1.7.12
 
 Or
 
-* CRIO 1.28.0
+* CRIO 1.30.5
 
 Tested working configurations:
 

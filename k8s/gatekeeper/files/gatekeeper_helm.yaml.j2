@@ -7,6 +7,7 @@ metricsBackends: ["prometheus"]
 auditMatchKindOnly: false
 constraintViolationsLimit: 20
 auditFromCache: true
+disableAudit: false
 disableMutation: false
 disableValidatingWebhook: false
 validatingWebhookName: gatekeeper-validating-webhook-configuration
@@ -15,9 +16,12 @@ validatingWebhookFailurePolicy: Ignore
 validatingWebhookAnnotations: {}
 validatingWebhookExemptNamespacesLabels: {}
 validatingWebhookObjectSelector: {}
+validatingWebhookMatchConditions: []
 validatingWebhookCheckIgnoreFailurePolicy: Fail
 validatingWebhookCustomRules: {}
+validatingWebhookURL: null
 enableDeleteOperations: false
+enableConnectOperations: false
 enableExternalData: true
 enableGeneratorResourceExpansion: false
 enableTLSHealthcheck: false
@@ -28,8 +32,10 @@ mutatingWebhookReinvocationPolicy: Never
 mutatingWebhookAnnotations: {}
 mutatingWebhookExemptNamespacesLabels: {}
 mutatingWebhookObjectSelector: {}
+mutatingWebhookMatchConditions: []
 mutatingWebhookTimeoutSeconds: 1
 mutatingWebhookCustomRules: {}
+mutatingWebhookURL: null
 mutationAnnotations: false
 auditChunkSize: 500
 logLevel: INFO
@@ -40,6 +46,8 @@ emitAuditEvents: false
 admissionEventsInvolvedNamespace: false
 auditEventsInvolvedNamespace: false
 resourceQuota: true
+externaldataProviderResponseCacheTTL: 3m
+enableK8sNativeValidation: true
 image:
   repository: openpolicyagent/gatekeeper
   crdRepository: openpolicyagent/gatekeeper-crds
@@ -51,6 +59,9 @@ preInstall:
       repository: null
 postUpgrade:
   labelNamespace:
+    serviceAccount:
+      name: gatekeeper-update-namespace-label-post-upgrade
+      create: true
     enabled: false
     image:
       repository: openpolicyagent/gatekeeper-crds
@@ -64,6 +75,7 @@ postUpgrade:
       "pod-security.kubernetes.io/enforce=restricted",
       "pod-security.kubernetes.io/enforce-version=v1.24"]
     extraAnnotations: {}
+    priorityClassName: ""
   affinity: {}
   tolerations: []
   nodeSelector: {kubernetes.io/os: linux}
@@ -79,6 +91,9 @@ postUpgrade:
     runAsUser: 1000
 postInstall:
   labelNamespace:
+    serviceAccount:
+      name: gatekeeper-update-namespace-label
+      create: true
     enabled: true
     extraRules: []
     image:
@@ -93,6 +108,7 @@ postInstall:
       "pod-security.kubernetes.io/enforce=restricted",
       "pod-security.kubernetes.io/enforce-version=v1.24"]
     extraAnnotations: {}
+    priorityClassName: ""
   probeWebhook:
     enabled: true
     image:
@@ -102,6 +118,7 @@ postInstall:
     waitTimeout: 60
     httpTimeout: 2
     insecureHTTPS: false
+    priorityClassName: ""
   affinity: {}
   tolerations: []
   nodeSelector: {kubernetes.io/os: linux}
@@ -116,12 +133,16 @@ postInstall:
     runAsUser: 1000
 preUninstall:
   deleteWebhookConfigurations:
+    serviceAccount:
+      name: gatekeeper-delete-webhook-configs
+      create: true
     extraRules: []
     enabled: false
     image:
       repository: openpolicyagent/gatekeeper-crds
       pullPolicy: IfNotPresent
       pullSecrets: []
+    priorityClassName: ""
   affinity: {}
   tolerations: []
   nodeSelector: {kubernetes.io/os: linux}
@@ -136,11 +157,14 @@ preUninstall:
     runAsNonRoot: true
     runAsUser: 1000
 podAnnotations: {}
+auditPodAnnotations: {}
 podLabels: {}
 podCountLimit: "100"
 secretAnnotations: {}
 enableRuntimeDefaultSeccompProfile: true
 controllerManager:
+  serviceAccount:
+    name: gatekeeper-admin
   exemptNamespaces: []
   exemptNamespacePrefixes: []
   hostNetwork: false
@@ -154,6 +178,9 @@ controllerManager:
   disableCertRotation: false
   tlsMinVersion: 1.3
   clientCertName: ""
+  strategyType: RollingUpdate
+  strategyRollingUpdate: {}
+  podLabels: {}
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
@@ -197,6 +224,11 @@ controllerManager:
       #   - ipBlock:
       #       cidr: 0.0.0.0/0
 audit:
+  serviceAccount:
+    name: gatekeeper-admin
+  enablePubsub: false
+  connection: audit-connection
+  channel: audit-channel
   hostNetwork: false
   dnsPolicy: ClusterFirst
   metricsPort: 8888
@@ -204,7 +236,8 @@ audit:
   readinessTimeout: 1
   livenessTimeout: 1
   priorityClassName: system-cluster-critical
-  disableCertRotation: true
+  disableCertRotation: false
+  podLabels: {}
   affinity: {}
   tolerations: []
   nodeSelector: {kubernetes.io/os: linux}
@@ -252,10 +285,17 @@ disabledBuiltins: ["{http.send}"]
 psp:
   enabled: {{ 'true' if lookup('pipe', 'kubectl version -o json | jq -r .serverVersion.minor') | int < 25 else 'false' }}
 upgradeCRDs:
+  serviceAccount:
+    create: true
+    name: gatekeeper-admin-upgrade-crds
   enabled: true
   extraRules: []
+  priorityClassName: ""
 rbac:
   create: true
 externalCertInjection:
   enabled: false
   secretName: gatekeeper-webhook-server-cert
+  serviceAccount:
+  gatekeeperAdmin:
+    create: true

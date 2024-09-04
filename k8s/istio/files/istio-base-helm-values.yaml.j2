@@ -12,14 +12,10 @@ global:
   # Used to locate istiod.
   istioNamespace: istio-system
 
-  istiod:
-    enableAnalysis: false
-
-  configValidation: true
   externalIstiod: false
   remotePilotAddress: ""
 
-# Platform where Istio is deployed. Possible values are: "openshift", "gcp".
+  # Platform where Istio is deployed. Possible values are: "openshift", "gcp".
   # An empty value means it is a vanilla Kubernetes distribution, therefore no special
   # treatment will be considered.
   platform: ""
@@ -36,8 +32,12 @@ base:
   # Validation webhook configuration url
   # For example: https://$remotePilotAddress:15017/validate
   validationURL: ""
+  # Validation webhook caBundle value. Useful when running pilot with a well known cert
+  validationCABundle: ""
 
   # For istioctl usage to disable istio config crds in base
   enableIstioConfigCRDs: true
 
 defaultRevision: "default"
+experimental:
+  stableValidationPolicy: false

@@ -45,7 +45,7 @@ subjects:
   name: default
   namespace: learning
   " | kubectl apply -f -
-  kubectl create deployment echoserver --image=k8s.gcr.io/echoserver:1.10
+  kubectl create deployment echoserver --image=registry.k8s.io/echoserver:1.10
   kubectl expose deployment echoserver --type=NodePort --port=80 --target-port=8080
   openssl req -x509 -sha256 -nodes -days 365 -subj "/CN=echoserver.learning.minikube" -newkey rsa:2048 -keyout /tmp/echoserver.learning.minikube.key -out /tmp/echoserver.learning.minikube.crt
   echo "---

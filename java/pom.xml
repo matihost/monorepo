@@ -45,7 +45,7 @@
     <maven.test.skip>false</maven.test.skip>
 
     <!-- Spring Boot -->
-    <spring.boot.version>3.2.5</spring.boot.version>
+    <spring.boot.version>3.3.3</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -61,15 +61,15 @@
 
     <!-- Scala 3-->
     <scala.compat.version>3</scala.compat.version>
-    <scala.version>${scala.compat.version}.4.2</scala.version>
-    <scala.spec2.version>5.5.1</scala.spec2.version>
-    <scala.test.version>3.2.18</scala.test.version>
-    <scala.test.plus.version>3.2.18.0</scala.test.plus.version>
+    <scala.version>${scala.compat.version}.5.0</scala.version>
+    <scala.spec2.version>5.5.3</scala.spec2.version>
+    <scala.test.version>3.2.19</scala.test.version>
+    <scala.test.plus.version>3.2.19.0</scala.test.plus.version>
     <!-- Scala 3 still depends on Scala 2 for backward compatibility -->
-    <scala2.version>2.13.14</scala2.version>
+    <scala2.version>2.13.15-M1</scala2.version>
 
     <!-- IBM MQ client -->
-    <mq.version>9.3.5.1</mq.version>
+    <mq.version>9.4.0.0</mq.version>
   </properties>
 
   <profiles>
@@ -223,7 +223,7 @@
         <plugin>
           <groupId>org.graalvm.buildtools</groupId>
           <artifactId>native-maven-plugin</artifactId>
-          <version>0.9.18</version>
+          <version>0.10.2</version>
           <extensions>true</extensions>
         </plugin>
         <plugin>
@@ -248,7 +248,7 @@
         <plugin>
           <groupId>io.github.git-commit-id</groupId>
           <artifactId>git-commit-id-maven-plugin</artifactId>
-          <version>6.0.0</version>
+          <version>9.0.1</version>
           <executions>
             <execution>
               <goals>
@@ -291,7 +291,7 @@
         <plugin>
           <groupId>net.alchim31.maven</groupId>
           <artifactId>scala-maven-plugin</artifactId>
-          <version>4.8.1</version>
+          <version>4.9.2</version>
           <executions>
             <execution>
               <goals>
@@ -330,7 +330,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.5.0</version>
           <executions>
             <execution>
               <id>enforce-maven</id>
@@ -378,20 +378,9 @@
           <excludeVulnerabilityIds>
               <!--
                 org.xmlunit:xmlunit-core:jar:2.9.1:test; https://ossindex.sonatype.org/component/pkg:maven/org.xmlunit/xmlunit-core@2.9.1?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-                * [CVE-2024-31573] CWE-1188 (9.8); https://ossindex.sonatype.org/vulnerability/CVE-2024-31573?component-type=maven&component-name=org.xmlunit%2Fxmlunit-core&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+                * [CVE-2024-31573] CWE-1188 (9.2); https://ossindex.sonatype.org/vulnerability/CVE-2024-31573?component-type=maven&component-name=org.xmlunit%2Fxmlunit-core&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
               -->
               <exclude>CVE-2024-31573</exclude>
-              <!--
-                org.bouncycastle:bcprov-jdk18on:jar:1.77:compile; https://ossindex.sonatype.org/component/pkg:maven/org.bouncycastle/bcprov-jdk18on@1.77?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-                  * [CVE-2024-29857] CWE-400: Uncontrolled Resource Consumption ('Resource Exhaustion') (7.5); https://ossindex.sonatype.org/vulnerability/CVE-2024-29857?component-type=maven&component-name=org.bouncycastle%2Fbcprov-jdk18on&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-                  * [CVE-2024-30171] CWE-208: Information Exposure Through Timing Discrepancy (5.9); https://ossindex.sonatype.org/vulnerability/CVE-2024-30171?component-type=maven&component-name=org.bouncycastle%2Fbcprov-jdk18on&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-                  * [CVE-2024-30172] CWE-835: Loop with Unreachable Exit Condition ('Infinite Loop') (5.9); https://ossindex.sonatype.org/vulnerability/CVE-2024-30172?component-type=maven&component-name=org.bouncycastle%2Fbcprov-jdk18on&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-                  * [CVE-2024-34447] CWE-297: Improper Validation of Certificate with Host Mismatch (7.7); https://ossindex.sonatype.org/vulnerability/CVE-2024-34447?component-type=maven&component-name=org.bouncycastle%2Fbcprov-jdk18on&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-              -->
-              <exclude>CVE-2024-29857</exclude>
-              <exclude>CVE-2024-30171</exclude>
-              <exclude>CVE-2024-30172</exclude>
-              <exclude>CVE-2024-34447</exclude>
             </excludeVulnerabilityIds>
             <reportFile>${project.build.directory}/audit-report.json</reportFile>
           </configuration>
@@ -402,7 +391,7 @@
         <!-- Versions can be taken from  mvn -T1 versions:display-plugin-updates -->
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.11.0</version>
+          <version>3.13.0</version>
           <configuration>
             <!-- The -release option ensures that the code is compiled following the rules of the programming language of the specified release,
             and that generated classes target the release as well as the public API of that release.
@@ -415,7 +404,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>3.5.0</version>
           <configuration>
             <skipTests>${maven.test.skip}</skipTests>
           </configuration>
@@ -423,11 +412,11 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>3.5.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>3.2.0</version>
+          <version>3.4.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>
@@ -435,15 +424,15 @@
         </plugin>
         <plugin>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>3.1.1</version>
+          <version>3.1.3</version>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
-          <version>3.1.1</version>
+          <version>3.1.3</version>
         </plugin>
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.4.2</version>
           <configuration>
             <archive>
               <manifest>
@@ -454,7 +443,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
-          <version>4.0.0-M8</version>
+          <version>4.0.0-M16</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -475,7 +464,7 @@
         <plugin>
           <groupId>org.basepom.maven</groupId>
           <artifactId>duplicate-finder-maven-plugin</artifactId>
-          <version>2.0.0</version>
+          <version>2.0.1</version>
           <executions>
             <execution>
               <id>default</id>

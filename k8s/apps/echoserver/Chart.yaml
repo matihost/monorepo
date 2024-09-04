@@ -21,5 +21,5 @@ version: 0.1.0
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # Update to the latest version from:
-# gcloud container images list-tags k8s.gcr.io/echoserver
+# gcloud container images list-tags registry.k8s.io/echoserver
 appVersion: 1.10
