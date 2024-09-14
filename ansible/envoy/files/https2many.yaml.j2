@@ -30,6 +30,8 @@ static_resources:
             subject: true
           http_filters:
             - name: envoy.filters.http.router
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
           access_log:
           - name: envoy.access_loggers.file
             typed_config:
@@ -76,7 +78,6 @@ static_resources:
               header:
                 key: "X-Forwarded-For"
                 value: "%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT%"
-              append: false  # override value
             virtual_hosts:
               - name: https_backend
                 domains: ["api.https.*"]

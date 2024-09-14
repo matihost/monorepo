@@ -17,6 +17,11 @@ resource "aws_iam_server_certificate" "cert" {
 locals {
   origin_id = aws_s3_bucket.bucket.id
 }
+
+data "aws_cloudfront_cache_policy" "policy" {
+  name = "Managed-CachingOptimized"
+}
+
 resource "aws_cloudfront_distribution" "distro" {
   count = var.enable_tls ? 1 : 0
 
@@ -41,18 +46,12 @@ resource "aws_cloudfront_distribution" "distro" {
     connection_timeout  = 5
   }
   default_cache_behavior {
+    cache_policy_id        = data.aws_cloudfront_cache_policy.policy.id
     allowed_methods        = ["GET", "HEAD"] // "OPTIONS", "PUT", "POST", "PATCH", "DELETE"
     cached_methods         = ["GET", "HEAD"] // "OPTIONS"
     target_origin_id       = local.origin_id
     viewer_protocol_policy = "allow-all"
     compress               = true
-    forwarded_values {
-      headers      = []
-      query_string = true
-      cookies {
-        forward = "all"
-      }
-    }
   }
   restrictions {
     geo_restriction {

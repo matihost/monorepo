@@ -15,13 +15,14 @@
     vars:
       apt_repo: "{{ item }}"
     loop: "{{ repositories }}"
-
+  - name: Update the repository cache
+    ansible.builtin.apt:
+      update_cache: yes
   - name: Ensure required packages are latest
     ansible.builtin.apt:
       name: "{{ packages }}"
       state: latest
-      update_cache: true
-      cache_valid_time: "{{ update_cache_timeout }}"
+      update_cache: false
       force_apt_get: yes
 
   - name: Install required snaps

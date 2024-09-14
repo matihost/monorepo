@@ -66,6 +66,8 @@ static_resources:
                   rsFlags: "%RESPONSE_FLAGS%"
           http_filters:
           - name: envoy.filters.http.router
+            typed_config:
+             "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
           route_config:
             name: local_route
             request_headers_to_remove: "X-Forwarded-For"
@@ -73,7 +75,6 @@ static_resources:
               header:
                 key: "X-Forwarded-For"
                 value: "%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT%"
-              append: false  # override value
             virtual_hosts:
             - name: local_service
               domains: ["*"]

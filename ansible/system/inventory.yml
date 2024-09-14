@@ -25,6 +25,8 @@ all:
           onedrive_ubuntu_version: "24.04"
           # List of supported Ubuntu versions: https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/
           pgadmin_ubuntu_version: "noble"
+          # List of supported Ubuntu versions: https://apt.envoyproxy.io/
+          envoy_ubuntu_version: "jammy"
         virtual_interface_ip: 192.168.10.1
         update_cache_timeout: 30
         systemd_journal:
@@ -33,19 +35,30 @@ all:
         vs_code_extensions: |
           4ops.packer
           4ops.terraform
+          amazonwebservices.aws-toolkit-vscode
           asciidoctor.asciidoctor-vscode
+          batisteo.vscode-django
+          charliermarsh.ruff
           davidanson.vscode-markdownlint
           donjayamanne.githistory
+          donjayamanne.python-environment-manager
+          donjayamanne.python-extension-pack
+          dotenv.dotenv-vscode
           dotjoshjohnson.xml
           eamodio.gitlens
+          esbenp.prettier-vscode
           formulahendry.code-runner
           foxundermoon.shell-format
+          garytyler.darcula-pycharm
           george-alisson.html-preview-vscode
           github.vscode-github-actions
+          github.vscode-pull-request-github
           golang.go
           hashicorp.terraform
           jebbs.plantuml
-          joaompinto.asciidoctor-vscode
+          kevinrose.vsc-python-indent
+          magicstack.magicpython
+          moshfeu.compare-folders
           ms-azuretools.vscode-docker
           ms-kubernetes-tools.vscode-kubernetes-tools
           ms-python.debugpy
@@ -59,12 +72,15 @@ all:
           ms-toolsai.vscode-jupyter-slideshow
           ms-vscode-remote.remote-containers
           ms-vscode.makefile-tools
+          njpwerner.autodocstring
           redhat.fabric8-analytics
           redhat.java
           redhat.vscode-commons
           redhat.vscode-yaml
+          samuelcolvin.jinjahtml
           scala-lang.scala
           streetsidesoftware.code-spell-checker
+          streetsidesoftware.code-spell-checker-polish
           techer.open-in-browser
           tomoki1207.pdf
           visualstudioexptteam.intellicode-api-usage-examples
@@ -79,7 +95,9 @@ all:
           vscjava.vscode-maven
           vscjava.vscode-spring-boot-dashboard
           vscjava.vscode-spring-initializr
+          vue.volar
           wholroyd.jinja
+          yzhang.markdown-all-in-one
         repositories:
         - name: universe
         - name: multiverse
@@ -122,8 +140,8 @@ all:
           key_url: https://apt.releases.hashicorp.com/gpg
           key_format: asc
         - name: envoy
-          repo: "deb [arch=amd64] https://deb.dl.getenvoy.io/public/deb/ubuntu {{ ansible_distribution_release }} main"
-          key_url: ["https://deb.dl.getenvoy.io/public/gpg.8115BA8E629CC074.key"]
+          repo: "deb [arch=amd64] https://apt.envoyproxy.io {{ versions.envoy_ubuntu_version }} main"
+          key_url: ["https://apt.envoyproxy.io/signing.key"]
         - name: github
           repo: "deb [arch=amd64] https://cli.github.com/packages stable main"
           key_url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
@@ -134,6 +152,9 @@ all:
         - name: jenkins
           repo: "deb [arch=amd64] https://pkg.jenkins.io/debian-stable binary/"
           key_url: "https://pkg.jenkins.io/debian/jenkins.io-2023.key"
+        - name: dbeaver
+          repo: "deb [arch=amd64] https://dbeaver.io/debs/dbeaver-ce /"
+          key_url: "https://dbeaver.io/debs/dbeaver.gpg.key"
         packages:
         - neofetch
         - mc
@@ -208,7 +229,7 @@ all:
         - google-cloud-sdk-gke-gcloud-auth-plugin
         - google-cloud-sdk-cloud-build-local
         - google-cloud-sdk-kpt
-        - getenvoy-envoy
+        - envoy
         # - jenkins
         # requirement for Jetbrains Toolbox
         - libfuse2
@@ -239,6 +260,7 @@ all:
         - libxcb-cursor0 # calibre dependency
         - apt-transport-https
         - azure-cli
+        - dbeaver-ce
         snaps:
         - mc-installer
         - notepad-plus-plus
@@ -538,7 +560,6 @@ all:
               chmod a+x minikube && sudo mv minikube /usr/bin/ && echo "minikube installed"
             }
         - name: cilium-cli
-          desc: due to https://github.com/cilium/cilium-cli/issues/2774 version check fail leading to reinstall each run
           become: false
           command: |
             CURRENT_VERSION="$(curl -sL https://api.github.com/repos/cilium/cilium-cli/releases/latest | jq -r ".tag_name")"
@@ -723,7 +744,7 @@ all:
             CURRENT_VERSION="$(curl -sL https://github.com/istio/istio/releases | \
                   grep -o 'releases/[0-9]*.[0-9]*.[0-9]*/' | sort --version-sort | \
                   tail -1 | awk -F'/' '{ print $2}')"
-            INSTALLED_VERSION=$(istioctl version --remote=false 2>/dev/null | grep -E '^([0-9]+.){2,3}[0-9]+$')
+            INSTALLED_VERSION="$(istioctl version --remote=false 2>/dev/null |sed -E 's/.*version: (.+)/\1/')"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl -sL https://istio.io/downloadIstioctl | sh -
               [[ "${PATH}" == *istioctl/bin* ]] || {
@@ -910,7 +931,7 @@ all:
           desc: To install ibmcloud cli
           command: |
             CURRENT_VERSION="$(curl -sL "https://api.github.com/repos/IBM-Cloud/ibm-cloud-cli-release/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"v([^"]+)".*/\1/')"
-            INSTALLED_VERSION="$(ibmcloud --version 2>/dev/null | grep version |  sed -E 's/.*version ([^"]+)/\1/')"
+            INSTALLED_VERSION="$(ibmcloud --version 2>/dev/null | sed -E 's/ibmcloud (.+)\+.*T.*/\1/')"
             [[ "${INSTALLED_VERSION}" == "${CURRENT_VERSION}"* ]] || {
               curl -fsSL https://clis.cloud.ibm.com/install/linux | sudo sh
               ibmcloud plugin install is -f
@@ -1014,6 +1035,15 @@ all:
               curl -s -L -o "/tmp/discord.deb" "${DOWNLOAD_URL}"
               apt -y install /tmp/discord.deb
             }
+        - name: poetry
+          become: false
+          command: |
+            [ -x ~/.local/bin/poetry ] || (
+              curl -sSL https://install.python-poetry.org | python3 -
+              poetry completions bash >> ~/.bash_completion
+              # ensure poetry will create virtualenv in project directory
+              poetry config virtualenvs.in-project true
+            )
         files_config:
         - file: /etc/gai.conf
           content: |

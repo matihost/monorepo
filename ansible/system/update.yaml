@@ -100,3 +100,18 @@
         ibmcloud plugin update --all
       changed_when: true
       when: ibmcloud_presence.rc == 0
+
+  - become: false
+    block:
+    - name: Check whether poetry is present on the machine
+      ansible.builtin.shell: which vagrant
+      ignore_errors: true
+      changed_when: false
+      register: poetry_presence
+    - name: Update poetry CLI
+      ansible.builtin.shell: |
+        poetry self update
+      register: sdk_result
+      changed_when:
+      - sdk_result.stdout is not regex('No dependencies to install or update')
+      when: poetry_presence.rc == 0
