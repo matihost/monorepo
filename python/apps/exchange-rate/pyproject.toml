@@ -1,4 +1,33 @@
+[tool.poetry]
+name = "exchange-rate"
+version = "0.2.0"
+description = "A sample Python project showing exchange rate between two currencies"
+authors = ["Mateusz Nowakowski <mateusz.nowakowski@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "exchange_rate", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+requests = "^2.32.3"
+Flask = "^3.0.3"
+waitress = "^3.0.0"
+babel = "^2.16.0"
+
+[tool.poetry.scripts]
+exchange-rate = 'exchange_rate.cli.exchange_rate:main'
+exchange-rate-web = 'exchange_rate.cli.exchange_rate_web:main'
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.6.5"
+mypy = "^1.11.2"
+pytest = "^8.3.3"
+
 [build-system]
-# Minimum requirements for the build system to execute.
-requires = ["setuptools", "setuptools_scm"]  # PEP 508 specifications.
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]

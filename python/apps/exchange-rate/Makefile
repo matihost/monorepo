@@ -1,13 +1,22 @@
 TAG := latest
 
-dist: ## create distribution
-	python3 setup.py build
+init: ## install poetry dependencies
+	poetry install
+
+run-exchange-rate: ## run exchange-rate from poery
+	poetry run exchange-rate
+
+run-exchange-rate-web:
+	poetry run exchange-rate
 
 build: ## build
-	tox
+	poetry run build
 
-develop: ensure-custom-user-venv ## install locally in editable mode, so that it can be debug locally
-	$(HOME)/.venv/user/bin/pip3 install -e .
+test: ## unit tests
+	poetry run pytest
+
+update: ## update dependencies
+	poetry update
 
 install: ensure-custom-user-venv ## install locally
 	$(HOME)/.venv/user/bin/pip3 install --force-reinstall .
@@ -16,22 +25,7 @@ uninstall: ensure-custom-user-venv ## uninstall locally
 	$(HOME)/.venv/user/bin/pip3 uninstall -y exchange-rate
 
 clean: ## clean
-	@echo "Cleaning up distutils stuff"
-	@python3 setup.py clean
-	@rm -rf build
-	@rm -rf dist
-	@rm -rf src/*.egg-info
-	@echo "Cleaning up byte compiled python stuff"
-	@find . -type f -regex ".*\.py[co]$$" -delete
-	@find . -type d -name "__pycache__" -delete
-	@echo "Cleaning up output from test runs"
-	@rm -rf tests/test_data
-	@rm -rf .pytest_cache
-	@rm -rf logs/
-	@rm -rf .cache/ .venv .tox
-	@rm -f tests/units/.coverage*
-	@rm -rf tests/results/*/*
-	@find tests/ -type f -name '*.retry' -delete
+	rm -rf .venv dist .pytest_cache
 
 
 build-image: ## builds docker image

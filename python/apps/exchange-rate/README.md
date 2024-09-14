@@ -15,19 +15,31 @@ exchange-rate
 exchange-rate CHF
 ```
 
+## Prerequisites
+
+* Python 3.12
+
+* Poetry
+
+```bash
+# install poetry
+curl -sSL https://install.python-poetry.org | python3 -
+poetry completions bash >> ~/.bash_completion
+# ensure poetry will create virtualenv in project directory
+poetry config virtualenvs.in-project true
+```
+
 ## Develop
 
 ```bash
-# run tox build
-make build
+# init Poetry build system, install dependencies (single time)
+make init
 
 # install app locally
-make install
+make run-exchange-rate
 
-# remove
-make uninstall
 
-# clean build leftovers
+# clean .venv, requires make init to start develop again
 make clean
 
 # builds docker image
