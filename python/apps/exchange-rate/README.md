@@ -45,6 +45,9 @@ make tests
 # update dependencies
 make update
 
+# lint entire source code
+make lint
+
 # install into local user ~/.venv
 make install
 
@@ -77,7 +80,7 @@ To debug under VS Code:
 
   * Ctrl+Shift+P 'Python: Select interpreter'
   * Select at workspace level
-  * Select "~/.venv/user/bin/python"
+  * Select project ".venv/bin/python" or "~/.venv/user/bin/python" if you test on user space virtualenv
 
 * Select Run and Debug on the left pane, click Settings
 
@@ -112,8 +115,7 @@ To debug under VS Code:
 * Run external debugger from venv directory (important: otherwise VSCode cannot match code with breakpoints...):
 
   ```bash
-  cd ~/.venv/user/bin
-  ./python3 -Xfrozen_modules=off -m debugpy --wait-for-client --listen 5678 exchange-rate USD
+  poetry run python3 -Xfrozen_modules=off -m debugpy --wait-for-client --listen 5678 exchange-rate USD
   ```
 
 * Select Run and Debug on the left pane and run Python debugger.

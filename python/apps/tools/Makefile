@@ -1,41 +1,39 @@
-run-automount-cifs: init ## run application ensuring all deps are in place
-	@pipenv run automount-cifs
+init: ## install poetry dependencies, required to be run once
+	poetry install
 
-run-setup-open-dns: init ## run application ensuring all deps are in place
-	@pipenv run setup-opendns
+run-automount-cifs: ## run application ensuring all deps are in place
+	poetry run automount-cifs
 
-lint: init ## linter source code
-	@pipenv run pylint src/ tests/
+run-setup-open-dns: ## run application ensuring all deps are in place
+	poetry run setup-opendns
 
-setup.py: init ## ensure setup.py exists and deps are locked with Pipfile.lock
-	#@pipenv-setup sync
-	@rm -rf Pipfile.lock
-	@pipenv install --dev
+build: ## build
+	poetry build
 
-build: ## create distribution
-	python3 setup.py build
+tests: ## unit tests
+	poetry run pytest
 
-develop: ensure-custom-user-venv ## install locally in editable mode, so that it can be debug locally
-	$(HOME)/.venv/user/bin/pip3 install -e .
+update: ## update dependencies
+	poetry update
 
-test: init ## run tests
-	@pipenv run pytest tests
+lint: # run ruff on all files
+	poetry run ruff check  --fix --force-exclude
+	poetry run ruff format --force-exclude
 
-install: build ## install globally to make cli switchable to root working
+install: ## install globally to make cli switchable to root working
 	sudo pip3 install . --break-system-packages
 
-install-user: ## install locally in editable mode (apps switching to root internally may stop working)
+install-user: ensure-custom-user-venv ## install locally  (apps switching to root internally may stop working)
 	$(HOME)/.venv/user/bin/pip3 install --force-reinstall .
 
 uninstall: ## uninstall locally
 	sudo pip3 uninstall -y tools --break-system-packages
 
+uninstall-user: ensure-custom-user-venv ## uninstall locally
+	$(HOME)/.venv/user/bin/pip3 uninstall -y exchange-rate
+
 clean: ## clean
-	@echo "Cleaning up distutils stuff"
-	@python3 setup.py clean
-	@rm -rf build
-	@rm -rf dist
-	@rm -rf src/*.egg-info
+	rm -rf .venv dist .pytest_cache .ruff_cache
 	@echo "Cleaning up byte compiled python stuff"
 	@find . -type f -regex ".*\.py[co]$$" -delete
 	@find . -type d -name "__pycache__" -delete
@@ -49,23 +47,13 @@ clean: ## clean
 	@find tests/ -type f -name '*.retry' -delete
 
 
-clean-all: clean ## clean also virtualenv
-	@pipenv --rm
-
-init: ## ensure virtualenv contains all dependencies and app is installed in editable mode within virtual env
-	@pipenv --venv 1>/dev/null || pipenv install --dev -e .
-
 ensure-custom-user-venv:
 ifeq ($(wildcard $(HOME)/.venv/user),)
 	python3 -m venv $(HOME)/.venv/user
+	[ "$$(grep -c '.venv/user/bin' ~/.bashrc)" -gt 0 ] || echo 'PATH=$${PATH}:$${HOME}/.venv/user/bin' >> $(HOME)/.bashrc
 endif
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help setup.py clean install uninstall build lint run test init
-
-.EXPORT_ALL_VARIABLES:
-
-PIPENV_IGNORE_VIRTUALENVS = 1
-PIPENV_VENV_IN_PROJECT = true
+.PHONY: help clean install uninstall build tests init

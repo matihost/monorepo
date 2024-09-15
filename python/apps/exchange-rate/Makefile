@@ -20,6 +20,10 @@ tests: ## unit tests
 update: ## update dependencies
 	poetry update
 
+lint: # run ruff on all files
+	poetry run ruff check  --fix --force-exclude
+	poetry run ruff format --force-exclude
+
 install: ensure-custom-user-venv ## install locally
 	$(HOME)/.venv/user/bin/pip3 install --force-reinstall .
 
@@ -27,7 +31,18 @@ uninstall: ensure-custom-user-venv ## uninstall locally
 	$(HOME)/.venv/user/bin/pip3 uninstall -y exchange-rate
 
 clean: ## clean
-	rm -rf .venv dist .pytest_cache
+	rm -rf .venv dist .pytest_cache .ruff_cache
+	@echo "Cleaning up byte compiled python stuff"
+	@find . -type f -regex ".*\.py[co]$$" -delete
+	@find . -type d -name "__pycache__" -delete
+	@echo "Cleaning up output from test runs"
+	@rm -rf tests/test_data
+	@rm -rf .pytest_cache
+	@rm -rf logs/
+	@rm -rf .cache/
+	@rm -f tests/units/.coverage*
+	@rm -rf tests/results/*/*
+	@find tests/ -type f -name '*.retry' -delete
 
 
 build-image: ## builds docker image

@@ -21,21 +21,37 @@ setup-opendns -u opendns@user.com -p password Home1
 ## Develop
 
 ```bash
-# install this module in local workstation
-make install
+# init Poetry build system, install dependencies (single time)
+make init
 
-
-# install locally in editable mode
-# apps switching to root internally may stop working
-make install-user
-
-# run smoke
+# run tool
 make run-automount-cifs
 make run-setup-opendns
 
-# ensure setup.py is synced with Pipfile.lock
-make setup.py
+# run tests
+make tests
 
-# lint source code
+# update dependencies
+make update
+
+# lint entire source code
 make lint
+# install this module as root, so that command are visible for everyone
+make install
+
+# uninstall
+make uninstall
+
+# install into local user ~/.venv
+# apps switching to root internally may stop working
+make install-user
+
+# uninstall from local user ~/.venv
+make uninstall-user
+
+# prepare build
+make build
+
+# clean .venv, requires make init to start develop again
+make clean
 ```

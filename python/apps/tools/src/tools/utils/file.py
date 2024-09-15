@@ -16,11 +16,11 @@ def read_file(file_path, ignore_error=False):
             return file.read()
     except OSError as err:
         if ignore_error:
-            return ''
+            return ""
         raise err
 
 
-def write_file(file_path, content, mode='w'):
+def write_file(file_path, content, mode="w"):
     """Store content to file."""
     with open(file_path, mode, encoding="utf-8") as file:
         return file.write(content)

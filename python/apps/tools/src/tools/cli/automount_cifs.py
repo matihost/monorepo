@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""
-Mount SAMBA/CIFS 1.0 resource to be automatically mounted when available and reached.
+"""Mount SAMBA/CIFS 1.0 resource to be automatically mounted when available and reached.
 
 (using system autofs service)
 """
+
 import argparse
 import subprocess
 
 from tools.utils.file import read_file, write_file
+from tools.utils.system import reexecute_self_as_root, run
 from tools.utils.version import package_version
-from tools.utils.system import run, reexecute_self_as_root
 
 reexecute_self_as_root()
 
@@ -21,19 +21,17 @@ automount-cifs //192.168.1.1/all /mnt/nas/router/all -u admin -p passwordForReso
 
 
 def _parse_program_argv():
-    parser = argparse.ArgumentParser(description=_DESCRIPTION, epilog=_EPILOG,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('server_url', metavar='server_url', type=str,
-                        help='the url to mount, for example: //192.168.1.1/all')
-    parser.add_argument('mount_path', metavar='mount_path', type=str,
-                        help='mount path, example: /mnt/nas/router/all')
-    parser.add_argument('-u', '--user', metavar='user', nargs='?', type=str,
-                        help='user')
-    parser.add_argument('-p', '--password', metavar='password', nargs='?', type=str,
-                        help='name to mount')
+    parser = argparse.ArgumentParser(
+        description=_DESCRIPTION, epilog=_EPILOG, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        "server_url", metavar="server_url", type=str, help="the url to mount, for example: //192.168.1.1/all"
+    )
+    parser.add_argument("mount_path", metavar="mount_path", type=str, help="mount path, example: /mnt/nas/router/all")
+    parser.add_argument("-u", "--user", metavar="user", nargs="?", type=str, help="user")
+    parser.add_argument("-p", "--password", metavar="password", nargs="?", type=str, help="name to mount")
 
-    parser.add_argument('-v', '--version', action='version',
-                        version=package_version('tools'))
+    parser.add_argument("-v", "--version", action="version", version=package_version("tools"))
     args = parser.parse_args()
     return args.server_url, args.mount_path, args.user, args.password
 
@@ -50,7 +48,7 @@ def main():
 def is_automount_installed():
     """Check whether automout is present in the system."""
     try:
-        run('command -v automount')
+        run("command -v automount")
         return True
     except subprocess.CalledProcessError:
         return False
@@ -59,14 +57,14 @@ def is_automount_installed():
 def ensure_autofs_present():
     """Ensure autofs package is installed."""
     if not is_automount_installed():
-        print('Installing autofs')
-        run('apt-get -y install autofs')
+        print("Installing autofs")
+        run("apt-get -y install autofs")
 
 
 def ensure_direct_mapping_present():
     """Ensure automount diract mappiint to router CIFS is present."""
     desired_config = "/-  /etc/auto.direct\n"
-    direct_mapping_filename = '/etc/auto.master.d/direct.autofs'
+    direct_mapping_filename = "/etc/auto.master.d/direct.autofs"
     current_config = read_file(direct_mapping_filename, ignore_error=True)
     if current_config != desired_config:
         write_file(direct_mapping_filename, desired_config)
@@ -75,23 +73,23 @@ def ensure_direct_mapping_present():
 def ensure_mapping2url_present(url, mount_path, user, password):
     """Convert mount data to autofs mapping."""
     desired_line = f"{mount_path} -fstype=cifs,user={user},password={password},rw,vers=1.0 :{url}\n"
-    direct_filename = '/etc/auto.direct'
+    direct_filename = "/etc/auto.direct"
     current_config = read_file(direct_filename, ignore_error=True)
     # TODO what is file mapping is already there
     if desired_line not in current_config:
         # TODO ensure mount directory is present except the last directory
         print(f"Writing {direct_filename} with {url} mapping to {mount_path}")
-        write_file(direct_filename, desired_line, mode='a')
+        write_file(direct_filename, desired_line, mode="a")
         return True
     return False
 
 
 def ensure_autofs_running_and_enabled():
     """Ensure autofs is running and enabled."""
-    print('Restarting autofs service')
-    run('systemctl restart autofs')
-    print('Enabling autofs service')
-    run('systemctl enable autofs')
+    print("Restarting autofs service")
+    run("systemctl restart autofs")
+    print("Enabling autofs service")
+    run("systemctl enable autofs")
 
 
 if __name__ == "__main__":
