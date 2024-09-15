@@ -29,7 +29,7 @@ RUN apt -y -o Acquire::AllowInsecureRepositories=true -o Acquire::AllowDowngrade
 USER default
 # in case use site packages are available
 ENV PATH=${PATH}:/home/default/.local/bin
-RUN pip3 install ansible openshift pipenv tox pylint pytest pre-commit ansible-lint --no-cache-dir --user --upgrade && \
+RUN pip3 install ansible openshift pipenv tox pylint pytest poetry ruff pre-commit ansible-lint --no-cache-dir --user --upgrade && \
   ansible-galaxy collection install community.kubernetes
 # for python libraries needed own virtual env
 ENV PATH=${PATH}:/home/default/.venv/user/bin

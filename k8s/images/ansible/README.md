@@ -1,10 +1,10 @@
-# Ansible Docker image
+# Ansible & Python Docker image
 
 Image useful to use as an additional container in K8S Jenkins agent. In principle:
 
 * it runs as user id 1000 (same as inbound-agent/jnlp)
 * contains: `ansible` along with `openshift` python modules and kubernetes ansible community bundle (aka `k8s` and `helm` Ansible modules can work)
-* `pipenv` - so that image can be used as base Python agent
+* `pipenv`, `tox`, `poetry`, `ruff`, `pytest`, `pylint` - so that image can be used as base Python CI agent
 
 ## Running
 
@@ -19,10 +19,10 @@ make build
 make push
 
 # create additional tag for latest image
-make tag TAG=2.16.6
+make tag TAG=2.17.4
 
 # push image with tag to quay.io
-make push TAG=2.16.6
+make push TAG=2.17.4
 ```
 
 ## Jenkins CI under GKE

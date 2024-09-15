@@ -1,4 +1,5 @@
 """Currencies utility functions."""
+
 from babel import numbers
 
 

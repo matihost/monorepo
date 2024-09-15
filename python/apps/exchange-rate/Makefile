@@ -1,18 +1,20 @@
 TAG := latest
 
-init: ## install poetry dependencies
+init: ## install poetry dependencies, required to be run once
 	poetry install
+
+run: run-exchange-rate ## run exchange-rate from poery
 
 run-exchange-rate: ## run exchange-rate from poery
 	poetry run exchange-rate
 
 run-exchange-rate-web:
-	poetry run exchange-rate
+	poetry run exchange-rate-web
 
 build: ## build
-	poetry run build
+	poetry build
 
-test: ## unit tests
+tests: ## unit tests
 	poetry run pytest
 
 update: ## update dependencies
@@ -58,4 +60,4 @@ endif
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help build clean install uninstall
+.PHONY: help build clean install uninstall tests

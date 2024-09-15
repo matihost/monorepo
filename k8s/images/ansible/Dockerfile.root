@@ -3,7 +3,7 @@ RUN pip3 install --no-cache-dir --upgrade pip \
     && apt-get -y -o Acquire::AllowInsecureRepositories=true -o Acquire::AllowDowngradeToInsecureRepositories=true update \
     && apt-get install --allow-unauthenticated -y python3-venv \
     && rm -rf /var/lib/apt/lists/* \
-    && pip3 install ansible openshift pipenv tox pylint pytest pre-commit ansible-lint --no-cache-dir --upgrade \
+    && pip3 install ansible openshift pipenv tox pylint pytest poetry ruff pre-commit ansible-lint --no-cache-dir --upgrade \
     && ansible-galaxy collection install community.kubernetes
 # for python libraries needed own virtual env
 ENV PATH=${PATH}:/root/.venv/user/bin

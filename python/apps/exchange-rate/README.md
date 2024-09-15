@@ -35,9 +35,24 @@ poetry config virtualenvs.in-project true
 # init Poetry build system, install dependencies (single time)
 make init
 
-# install app locally
+# run application
 make run-exchange-rate
+make run-exchange-rate-web
 
+# run tests
+make tests
+
+# update dependencies
+make update
+
+# install into local user ~/.venv
+make install
+
+# uninstall from local user ~/.venv
+make uninstall
+
+# prepare build
+make build
 
 # clean .venv, requires make init to start develop again
 make clean

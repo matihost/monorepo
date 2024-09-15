@@ -2,7 +2,7 @@
 name = "exchange-rate"
 version = "0.2.0"
 description = "A sample Python project showing exchange rate between two currencies"
-authors = ["Mateusz Nowakowski <mateusz.nowakowski@gmail.com>"]
+authors = ["matihost"]
 license = "MIT"
 readme = "README.md"
 packages = [{include = "exchange_rate", from = "src"}]
@@ -31,3 +31,26 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "N",  # PEP8 naming convetions
+    "D"  # pydocstyle
+]
+ignore = [
+    "E501",  # line too long
+    "D401",  # imperative mood
+    "D104"   # missing docstring in public package
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

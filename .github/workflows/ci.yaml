@@ -259,12 +259,16 @@ jobs:
         queries: security-extended,security-and-quality
     - name: Build Python exchange-rate app
       run: |-
+        make init
         make build
+        make tests
         # make install
-        # TODO github overrides HOME with /home/github - so if venv is stored in oryginal HOME dir it has to be defined explicitely
+        # TODO github overrides HOME with /home/github - so if venv is stored in original HOME dir it has to be defined explicitely
         /root/.venv/user/bin/pip3 install --force-reinstall .
         exchange-rate
       working-directory: python/apps/exchange-rate
+    - name: Run Ruff
+      run: ruff check --output-format=github .
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:
