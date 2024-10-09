@@ -55,9 +55,9 @@ clean: ## clean cached plugins and data
 upgrade-providers-version: init
 
 
-generate-letsencrypt-cert: ## generate Let's Encrypt TLS certificate
+generate-letsencrypt-cert: ## generate Let's Encrypt TLS certificate, usage make generate-letsencrypt-cert DOMAIN=matihost.mooo.com
 ifndef DOMAIN
-	$(error Env DOMAIN is not defined. Usage make check-dns DOMAIN=matihost.mooo.com)
+	$(error Env DOMAIN is not defined. Usage make generate-letsencrypt-cert DOMAIN=matihost.mooo.com)
 endif
 	mkdir -p ~/.tls
 	sudo certbot certonly --manual -d $(DOMAIN)

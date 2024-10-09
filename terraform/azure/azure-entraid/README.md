@@ -13,7 +13,11 @@ Setup minimal IAM resources:
 
 * Azure Subscription. Azure FreeTier Subscription is ok.
 
-* Logged to Azure Subscription.
+* Logged to Azure Subscription:
+
+  ```bash
+  make login
+  ```
 
 * Initialize Azure Storage Account and Container for keeping Terraform state
 

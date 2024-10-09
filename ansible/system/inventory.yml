@@ -1036,6 +1036,7 @@ all:
               apt -y install /tmp/discord.deb
             }
         - name: poetry
+          desc: Dependency management for Python
           become: false
           command: |
             [ -x ~/.local/bin/poetry ] || (
@@ -1044,6 +1045,16 @@ all:
               # ensure poetry will create virtualenv in project directory
               poetry config virtualenvs.in-project true
             )
+        - name: nvm
+          desc: Node.js swithing engine
+          become: false
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/nvm-sh/nvm/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="v$(~/.nvm/nvm.sh && nvm --version)"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${CURRENT_VERSION}/install.sh" | bash
+              ~/.nvm/nvm.sh && nvm install --lts
+            }
         files_config:
         - file: /etc/gai.conf
           content: |
