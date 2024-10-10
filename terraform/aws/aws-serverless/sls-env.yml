@@ -1,0 +1,3 @@
+STAGE: ${self:provider.stage}
+#DB_CONNECTION_STRING: ${ssm:/website/db-connection-string}
+#AUTH_SERVICE_URL: ${self.custom.stageVars.auth_url}

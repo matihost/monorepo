@@ -1,22 +1,16 @@
 [tool.poetry]
-name = "exchange-rate"
-version = "0.2.0"
-description = "A sample Python project showing exchange rate between two currencies"
+name = "website-api"
+version = "0.1.0"
+description = "Website API"
 authors = ["matihost"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "exchange_rate", from = "src"}]
+packages = [{include = "website", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.12"
-requests = "^2.32.3"
-Flask = "^3.0.3"
-waitress = "^3.0.0"
-babel = "^2.16.0"
-
-[tool.poetry.scripts]
-exchange-rate = 'exchange_rate.cli.exchange_rate:main'
-exchange-rate-web = 'exchange_rate.cli.exchange_rate_web:main'
+fastapi = {extras = ["standard"], version = "^0.115.0"}
+mangum = "^0.19.0"
 
 
 [tool.poetry.group.dev.dependencies]
