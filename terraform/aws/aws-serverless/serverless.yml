@@ -1,0 +1,74 @@
+frameworkVersion: '4'
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: website
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: website-api
+
+
+provider:
+  name: aws
+  runtime: python3.12
+  deploymentMethod: direct
+  # deploymentPrefix: ???
+  region: us-east-1
+  architecture: arm64
+  stage: ${opt:stage, 'dev'}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+            - sqs:GetQueueUrl
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - lambda:InvokeFunction
+            - lambda:GetFunctionConfiguration
+            - lambda:UpdateFunctionConfiguration
+          Resource: "*"
+        - Effect: Allow
+          Action: ssm:GetParameter
+          Resource: "*"
+  # vpc:
+  #   securityGroupIds:
+  #     - "..."
+  #   subnetIds:
+  #     - "...
+  environment: ${file(./sls-env.yml)}
+  stackTags:
+    App: website
+  layers:
+    - Ref: PythonRequirementsLambdaLayer
+
+functions:
+  api:
+    handler: src/website/api/api.handler
+    timeout: 30
+    enabled: 'true'
+    provisionedConcurrency: ${self:custom.stageVars.provisioned_concurrency}
+    events:
+      - http:
+          path: /
+          method: ANY
+      - http:
+          path: /{proxy+}
+          method: ANY
+
+plugins:
+  - serverless-python-requirements
+  - serverless-offline-ssm
+  - serverless-offline
+  - serverless-plugin-conditional-functions
+  - serverless-plugin-resource-tagging
+  # - serverless-domain-manager
+
+custom: ${file(./sls-custom.yml)}
+
+package:
+  patterns:
+    - '!./**'
+    - src/**

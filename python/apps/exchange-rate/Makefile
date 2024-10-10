@@ -3,9 +3,9 @@ TAG := latest
 init: ## install poetry dependencies, required to be run once
 	poetry install
 
-run: run-exchange-rate ## run exchange-rate from poery
+run: run-exchange-rate ## run exchange-rate from poetry
 
-run-exchange-rate: ## run exchange-rate from poery
+run-exchange-rate: ## run exchange-rate from poetry
 	poetry run exchange-rate
 
 run-exchange-rate-web:

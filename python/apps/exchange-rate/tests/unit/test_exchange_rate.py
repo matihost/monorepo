@@ -10,19 +10,19 @@ exchange_rates = ExchangeRateToPLN()
 
 
 @pytest.mark.parametrize(
-    ("currency", "range"),
+    ("currency", "value_range"),
     [
         ("USD", (2, 6)),
         ("EUR", (2, 7)),
         ("CHF", (2, 7)),
     ],
 )
-def test_exchange_rate_for_last_fixing(currency, range):
+def test_exchange_rate_for_last_fixing(currency, value_range):
     """Test exchange rate."""
     # when
     rate = exchange_rates.get_exchange_rate_to_pln(currency)
     # then
-    assert range[0] <= float(rate.replace(",", ".")) <= range[1]
+    assert value_range[0] <= float(rate.replace(",", ".")) <= value_range[1]
 
 
 @pytest.mark.parametrize(

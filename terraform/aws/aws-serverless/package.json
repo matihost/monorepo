@@ -1,0 +1,20 @@
+{
+  "name": "website-api",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": "^22"
+  },
+  "devDependencies": {
+    "serverless": "^4",
+    "serverless-domain-manager": "^7.4.0",
+    "serverless-offline": "^14.3.2",
+    "serverless-offline-ssm": "^6.2.0",
+    "serverless-plugin-conditional-functions": "^1.0.8",
+    "serverless-plugin-resource-tagging": "^1.2.0",
+    "serverless-python-requirements": "^6.1.1"
+  },
+  "scripts": {
+    "offline": "sls offline --stage offline"
+  }
+}

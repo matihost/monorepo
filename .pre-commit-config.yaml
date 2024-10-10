@@ -51,6 +51,10 @@ repos:
   # TODO reenable when ruby3.0 is not required
   # - id: markdownlint
   - id: require-ascii
+    exclude: |
+      (?x)^(
+        .*.(lock)
+      )$
   - id: shellcheck
   - id: shfmt
 - repo: https://github.com/adrienverge/yamllint.git

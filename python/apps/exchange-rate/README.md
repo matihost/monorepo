@@ -62,7 +62,7 @@ make clean
 
 # builds docker image
 make build-image
-# push image with tag to quay.io repository (assume docker login quay.io has been perfomed)
+# push image with tag to quay.io repository (assume docker login quay.io has been performed)
 make push-image
 
 # run image locally

@@ -1,0 +1,42 @@
+variables:
+  prod:
+    provisioned_concurrency: 4
+    cors_origin: "*"
+  dev:
+    provisioned_concurrency: 0
+    cors_origin: "*"
+  offline:
+    provisioned_concurrency: 0
+    cors_origin: "*"
+
+stageVars: ${self:custom.variables.${self:provider.stage}}
+
+pythonRequirements:
+  requirePoetryLockFile: true
+  layer: true
+  slim: true
+  slimPatternsAppendDefaults: false
+  slimPatterns:
+  - '**/*.egg-info*'
+  - '**/*.py[c|o]'
+  - '**/__pycache__'
+  - '**/tests'
+  strip: false
+  noDeploy:
+  - boto3
+  # https://docs.aws.amazon.com/lambda/latest/dg/python-package.html#python-package-native-libraries
+  pipCmdExtraArgs: ['--platform manylinux2014_aarch64', '--implementation cp', '--python-version 3.12', '--only-binary=:all:']
+
+serverless-offline:
+  httpPort: 3001
+  noPrependStageInUrl: true
+
+# customDomain:
+#   domainName: ${self:custom.stageVars.api_domain}
+#   autoDomain: true
+
+serverless-offline-ssm:
+  stages:
+  - offline
+  ssm:
+    /website/db-connection-string: test
