@@ -2,7 +2,7 @@
 
 Various playbooks for Ubuntu machine management.
 
-Supported Ubuntu distribution: **24.04 LTS (noble)**
+Supported Ubuntu distribution: **24.10 (oracular)**
 
 ## Prerequisites
 
@@ -84,3 +84,7 @@ onedrive
 systemctl enable --now  --user onedrive.service
 journalctl --user -u onedrive --follow
 ```
+
+## Ubuntu upgrade instructions
+
+* Check

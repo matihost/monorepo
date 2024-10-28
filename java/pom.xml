@@ -45,7 +45,7 @@
     <maven.test.skip>false</maven.test.skip>
 
     <!-- Spring Boot -->
-    <spring.boot.version>3.3.3</spring.boot.version>
+    <spring.boot.version>3.3.5</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -61,15 +61,15 @@
 
     <!-- Scala 3-->
     <scala.compat.version>3</scala.compat.version>
-    <scala.version>${scala.compat.version}.5.0</scala.version>
-    <scala.spec2.version>5.5.3</scala.spec2.version>
+    <scala.version>${scala.compat.version}.6.1</scala.version>
+    <scala.spec2.version>5.5.8</scala.spec2.version>
     <scala.test.version>3.2.19</scala.test.version>
     <scala.test.plus.version>3.2.19.0</scala.test.plus.version>
     <!-- Scala 3 still depends on Scala 2 for backward compatibility -->
-    <scala2.version>2.13.15-M1</scala2.version>
+    <scala2.version>2.13.15</scala2.version>
 
     <!-- IBM MQ client -->
-    <mq.version>9.4.0.0</mq.version>
+    <mq.version>9.4.1.0</mq.version>
   </properties>
 
   <profiles>

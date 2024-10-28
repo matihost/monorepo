@@ -15,6 +15,10 @@
     vars:
       apt_repo: "{{ item }}"
     loop: "{{ repositories }}"
+  - name: Ensure repositroy cache is cleaned
+    ansible.builtin.apt:
+      clean: true
+      autoclean: true
   - name: Update the repository cache
     ansible.builtin.apt:
       update_cache: yes

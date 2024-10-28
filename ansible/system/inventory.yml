@@ -6,21 +6,27 @@ all:
         localhost:
       vars:
         versions:
-          # represents path to local gems, see: 'gem environment' output for example:  ~/.gem/ruby/3.1.0/bin
-          ruby: 3.2.0
+          # represents path to local gems, see: 'gem environment' output for example: ~/.local/share/gem/ruby/3.3.0/bin
+          ruby_user_path: "${HOME}/.local/share/gem/ruby/3.3.0/bin"
+          # Current supported kubernetess and crio versions:
+          # https://github.com/cri-o/packaging/blob/main/README.md#define-the-kubernetes-version-and-used-cri-o-stream
           kubernetes: v1.31
-          crio: v1.30
-          # TODO change to {{ ansible_distribution_version }} when noble/24.04 is supported Ubuntu
+          crio: v1.31
+          # TODO change to {{ ansible_distribution_version }} when oracular/24.10 is supported Ubuntu
+          # List of supported Ubuntu versions:
+          # https://packages.microsoft.com/repos/azure-cli/dists/
+          azure_repo_ubuntu_version: "noble"
+          # OpenVPN3 repo Supports only LTSs versions
           # List of supported Ubuntu versions:
           # https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos#DebianUbuntu:UsingOpenVPNaptrepositories
-          openvpn_repo_ubuntu_version: "lunar"
+          openvpn_repo_ubuntu_version: "noble"
           # List of supported Ubuntu versions: https://www.hashicorp.com/official-packaging-guide?product_intent=terraform
           terraform_ubuntu_version: "noble"
           virtualbox_ubuntu_version: "noble"
-          # TODO change to {{ ansible_distribution_release }} when noble/24.04 is supported Ubuntu
+          # TODO change to {{ ansible_distribution_release }} when noble/24.04 is supported Ubuntu LTS
           cri_dockerd_ubuntu_version: "jammy"
           # MQ Version available at: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/
-          mq: 9.4.0.0
+          mq: 9.4.1.0
           # List of supported Ubuntu versions: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive
           onedrive_ubuntu_version: "24.04"
           # List of supported Ubuntu versions: https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/
@@ -108,7 +114,7 @@ all:
           repo: "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main"
           key_url: "https://packages.microsoft.com/keys/microsoft.asc"
         - name: azure-cli
-          repo: "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ noble main"
+          repo: "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ {{ versions.azure_repo_ubuntu_version }} main"
         - name: google-chrome
           repo: "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main"
           key_url: https://dl.google.com/linux/linux_signing_key.pub
@@ -294,6 +300,14 @@ all:
               nmcli conn modify br0 connection.autoconnect yes
               nmcli conn up br0
             }
+        - name: ubuntu-upgrade-preference
+          desc: To ensure do-release-upgrade command can see non-LTS releases as well
+          become: true
+          command: |
+            [ "$(grep -c 'Prompt=normal' /etc/update-manager/release-upgrades)" -gt 0 ] || {
+              sed -i -E "s/^Prompt=.+$/Prompt=normal/" /etc/update-manager/release-upgrades
+              echo "Non-LTS releases upgrade possibility enabled"
+            }
         - name: vboxuser
           desc: To ensure VirtualBox can see host USB
           become: false
@@ -392,7 +406,7 @@ all:
         - name: ensure-hp-lip
           desc: |
             Ensure the latest hplip is installed from source
-            TODO the latest 3.23.8 cannot be installed on Ubuntu 23.10 out of the box yet: https://bugs.launchpad.net/hplip/+bug/1879353
+            TODO the latest 3.24.4 cannot be installed on Ubuntu 24.10 out of the box yet: https://bugs.launchpad.net/hplip/+bug/1879353
             To install latest HPLIP in advanced mode (without GUI): https://developers.hp.com/hp-linux-imaging-and-printing/KnowledgeBase/InstallHPLIPwithqt5.html
             You need to install the following dependencies
                 PyQt5
@@ -472,8 +486,9 @@ all:
           desc: Ensure ruby local gems are  on path. W/o it it is not possible to install asciidoctor below
           become: false
           command: |
-            [ "$(grep -c './gem/ruby' ~/.bashrc)" -eq 0 ] || {
-              echo 'PATH=${HOME}/.gem/ruby/{{ versions.ruby }}/bin:${PATH}' >> ~/.bashrc
+            [ "$(grep -c '{{ versions.ruby_user_path }}' ~/.bashrc)" -ne 0 ] || {
+              echo 'export PATH={{ versions.ruby_user_path }}:${PATH}' >> ~/.bashrc
+              echo "Added user space Ruby libraries binaries to Bash PATH variable"
             }
         - name: asciidoctor
           become: false
@@ -849,7 +864,7 @@ all:
           become: true
           command: |
             # TODO consider full server version
-            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/9.4.0.0-IBM-MQ-Advanced-for-Developers-LinuxX64.tar.gz
+            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/9.4.1.0-IBM-MQ-Advanced-for-Developers-LinuxX64.tar.gz
             # TODO add detect a new version
             [ -e /opt/mqm ] || {
               rm -rf /tmp/mq && mkdir -p /tmp/mq && cd /tmp/mq
@@ -931,7 +946,7 @@ all:
           desc: To install ibmcloud cli
           command: |
             CURRENT_VERSION="$(curl -sL "https://api.github.com/repos/IBM-Cloud/ibm-cloud-cli-release/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"v([^"]+)".*/\1/')"
-            INSTALLED_VERSION="$(ibmcloud --version 2>/dev/null | sed -E 's/ibmcloud (.+)\+.*T.*/\1/')"
+            INSTALLED_VERSION="$(ibmcloud --version 2>/dev/null | head -n 1 |sed -E 's/ibmcloud (.+[0-9]) .+/\1/')";
             [[ "${INSTALLED_VERSION}" == "${CURRENT_VERSION}"* ]] || {
               curl -fsSL https://clis.cloud.ibm.com/install/linux | sudo sh
               ibmcloud plugin install is -f
@@ -1050,12 +1065,10 @@ all:
           become: false
           command: |
             CURRENT_VERSION="$(curl -sL https://api.github.com/repos/nvm-sh/nvm/releases/latest | jq -r ".tag_name")"
-            INSTALLED_VERSION="v$(~/.nvm/nvm.sh && nvm --version)"
+            INSTALLED_VERSION="v$(bash -ic  "nvm --version")"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${CURRENT_VERSION}/install.sh" | bash
-              ~/.nvm/nvm.sh && \
-                nvm install --lts && \
-                npm i serverless -g
+              bash -ic "nvm install --lts && npm i serverless -g"
             }
         files_config:
         - file: /etc/gai.conf

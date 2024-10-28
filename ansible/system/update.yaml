@@ -5,6 +5,11 @@
   tasks:
   - when: ansible_os_family == "Debian"
     block:
+    - name: Update PPA repositories keys
+      ansible.builtin.shell: |
+        add-apt-repository --refresh-keys
+      register: apt_result
+      changed_when: '"All Launchpad PPA signing keys are up-to-date" not in apt_result.stdout'
     - name: Update packages for Debian based distribution
       ansible.builtin.apt:
         name: "*"

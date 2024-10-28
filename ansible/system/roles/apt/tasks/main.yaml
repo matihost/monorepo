@@ -7,7 +7,7 @@
 - name: Ensure apt key is present
   ansible.builtin.include_tasks: apt_key.yaml
   loop: "{{ apt_repo.key_url if ((apt_repo.key_url is defined) and (apt_repo.key_url | type_debug == 'list'))
-    else [apt_repo.key_url] if ((apt_repo.key_url is defined) and (apt_repo.key_url | type_debug == 'AnsibleUnsafeText')) else [] }}"
+    else [apt_repo.key_url] if ((apt_repo.key_url is defined) and (apt_repo.key_url | type_debug == 'str')) else [] }}"
   loop_control:
     loop_var: apt_key
     extended: true
