@@ -3,6 +3,7 @@
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
+	TG_FLAGS := --terragrunt-debug
 endif
 
 MODE := apply
@@ -22,7 +23,7 @@ init:
 
 
 run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
 
 
 test-site:  ## test S3 site URL
@@ -64,6 +65,7 @@ endif
 	sudo cp -Lr /etc/letsencrypt/live/$(DOMAIN) ~/.tls
 	sudo chown -R $(shell whoami):$(shell whoami) ~/.tls
 	sudo chmod -R go-rwx ~/.tls
+
 
 list-server-certificates: ## show certificates uploaded to AWS
 	aws iam list-server-certificates

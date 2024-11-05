@@ -1,0 +1,115 @@
+---
+# Prerequisites:
+#
+# * terraform/aws/aws-github-oidc - to provide ability to assume AWS role via GitHub Action OIDC provider
+name: CD
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: 'Runner type'
+        required: true
+        default: 'ubuntu-24.04'
+        type: choice
+        options:
+        - ubuntu-24.04
+        - matihost
+      env:
+        description: 'Target environment'
+        required: true
+        default: 'dev'
+        type: environment
+      mode:
+        description: 'Deployment mode'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+        - plan
+        - apply
+        - destroy
+      module:
+        description: 'Module to deploy'
+        required: true
+        default: 'aws/aws-site'
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: aws-${{ github.ref }}-${{ inputs.env || 'dev' }}
+  cancel-in-progress: false
+env:
+  DEPLOY_ENV: ${{ inputs.env || 'dev' }}
+  DEPLOY_MODE: ${{ inputs.mode || 'plan' }}
+jobs:
+  sources:
+    name: Checkout
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    timeout-minutes: 5
+    container:
+      image: quay.io/matihost/cd
+    outputs:
+      GIT_COMMIT_HASH: ${{ steps.git_hash.outputs.GIT_COMMIT_HASH }}
+    steps:
+    - name: Checkout sources
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    # Workaround for https://github.com/actions/runner/issues/2033
+    - name: Set ownership
+      run: |
+        chown -R $(id -u):$(id -g) $PWD
+    - name: Obtain git version
+      id: git_hash
+      run: |
+        echo "GIT_COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+    - name: Cache workspace
+      uses: actions/cache/save@v4
+      with:
+        # avoid using github.workspace in caching?
+        # so how effectivelly share source code between jobs?
+        # https://github.com/actions/cache/blob/main/tips-and-workarounds.md#cross-os-cache
+        # artifacts?
+        # cleaning artifacts after workflow requires custom, non standard action:
+        # https://github.com/marketplace/actions/delete-artifact
+        path: ${{ github.workspace }}
+        key: sources-${{ github.run_id }}-${{ github.run_attempt }}
+        enableCrossOsArchive: true
+  aws:
+    name: AWS deployment mode ${{ inputs.mode || 'plan' }} of ${{ inputs.module || 'aws/aws-site'}} on  ${{ inputs.env || 'dev' }} environment
+    needs: sources
+    environment: ${{ inputs.env || 'dev' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    timeout-minutes: 30
+    container:
+      image: quay.io/matihost/cd
+    steps:
+    - name: Download sources
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ github.workspace }}
+        key: sources-${{ github.run_id }}-${{ github.run_attempt }}
+        fail-on-cache-miss: true
+        enableCrossOsArchive: true
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: us-east-1
+        role-to-assume: ${{ secrets.AWS_OIDC_ASSUMED_ROLE }}
+        role-session-name: gh-${{ inputs.env || 'dev' }}-aws@monorepo@matihost-${{ github.run_id }}-${{ github.run_attempt }}
+    - name: Deployment
+      working-directory: "terraform/${{ inputs.module || 'aws/aws-site'}}"
+      # Copying all secrets hack as env variables so that
+      # it is not necessary to recall which module requires which secrets as env variables
+      # https://github.com/orgs/community/discussions/47165#discussioncomment-10885166
+      env: ${{ secrets }}
+      run: |-
+        make run ENV=${{env.DEPLOY_ENV}} MODE=${{ env.DEPLOY_MODE }}

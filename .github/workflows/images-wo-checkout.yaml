@@ -18,10 +18,10 @@ on:
       runner:
         description: 'Runner type'
         required: true
-        default: 'ubuntu-22.04'
+        default: 'ubuntu-24.04'
         type: choice
         options:
-        - ubuntu-22.04
+        - ubuntu-24.04
         - matihost
 # https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
 permissions:
@@ -34,8 +34,8 @@ env:
   IMAGE_TAG: "${{ github.ref == 'refs/heads/main' && 'latest' || github.sha }}"
 jobs:
   image-build-on-gcp-artifact-registry:
-    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
-    if: ${{ (inputs.runner || 'ubuntu-22.04') != 'ubuntu-22.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    if: ${{ (inputs.runner || 'ubuntu-24.04') != 'ubuntu-24.04' }}
     container:
       image: gcr.io/kaniko-project/executor:debug
     steps:
@@ -55,8 +55,8 @@ jobs:
           --push-retry 2 --image-name-with-digest-file /workspace/image-digest.txt
 
   image-build-generic-registry:
-    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
-    if: ${{ (inputs.runner || 'ubuntu-22.04') == 'ubuntu-22.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    if: ${{ (inputs.runner || 'ubuntu-24.04') == 'ubuntu-24.04' }}
     container:
       image: gcr.io/kaniko-project/executor:debug
     steps:
@@ -81,8 +81,8 @@ jobs:
   # kaniko does not allow to build second image - hence it has to run as separated job
   # https://github.com/GoogleContainerTools/kaniko/issues/1118
   image-build-ghcr:
-    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
-    if: ${{ (inputs.runner || 'ubuntu-22.04') == 'ubuntu-22.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    if: ${{ (inputs.runner || 'ubuntu-24.04') == 'ubuntu-24.04' }}
     container:
       image: gcr.io/kaniko-project/executor:debug
     steps:

@@ -2,9 +2,9 @@ resource "aws_iam_server_certificate" "cert" {
   count = var.enable_tls ? 1 : 0
 
   name_prefix       = "${local.dns_prefix}-cert-"
-  certificate_body  = file("~/.tls/${var.dns}/cert.pem")
-  certificate_chain = file("~/.tls/${var.dns}/chain.pem")
-  private_key       = file("~/.tls/${var.dns}/privkey.pem")
+  certificate_body  = var.tls_crt
+  certificate_chain = var.tls_chain
+  private_key       = var.tls_key
 
   path = "/cloudfront/${replace(var.dns, ".", "")}/"
 

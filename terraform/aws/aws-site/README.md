@@ -85,8 +85,10 @@ Ensure you have working [http://www.mydomain.com](http://www.mydomain.com) site 
     Follow instruction on the screen. Essentially you need to create a file and place it under `.well-known/acme-challenge/` location in the S3 site bucket. This is the proof that you control the site - and hence Let's Encrypt will generate TLS certificate for free for 3 months,
     The make script also copies the generated certficate to `~/.tls` directory so that next Terraform invocation can access it.
 
+    _Warning_: If you intent to run deployment of this module from GitHub Actions `CD` workflow, not from your local environment - you need to place/change these files as GitHub Actions Environment secrets `TLS_CRT`, `TLS_CHAIN`, `TLS_KEY` respectively.
+
 * Change `enable_tls` variable to `true` in your Terragrant config and re run Terragrunt again.
-It will create IAM certifacte and create CloudFront distribution.
+It will create IAM certificate and create CloudFront distribution.
 
     ```bash
     make run ENV=prod
@@ -135,4 +137,9 @@ make run MODE=plan ENV=prod
 
 # when TLS certificate is to be changed and CloudFront distribution - apply
 make run MODE=apply ENV=prod
+
+# or
+#
+# if you run deployment from GitHub Actions CD workflow
+# change GitHub Actions Environment secrets `TLS_CRT`, `TLS_CHAIN`, `TLS_KEY` and re-run CD workflow for that environment
 ```

@@ -1,19 +1,26 @@
 TAG := latest
 JAVA_VERSION := 21
+CURRENT_DIR := $(notdir $(shell pwd))
+NAME := $(CURRENT_DIR)
+REPO := quay.io/matihost
+
+.EXPORT_ALL_VARIABLES:
+BUILDKIT_PROGRESS=plain
+
 build: ## builds docker image
-	DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build --build-arg=JAVA_VERSION=$(JAVA_VERSION) -t quay.io/matihost/gh-gcp-java-kaniko:$(TAG) .
+	docker build --load --build-arg=JAVA_VERSION=$(JAVA_VERSION) -t $(REPO)/$(NAME):$(TAG) .
 
 push: ## push image with tag to quay.io repository (assume docker login quay.io has been perfomed)
-	docker push quay.io/matihost/gh-gcp-java-kaniko:$(TAG)
+	docker push $(REPO)/$(NAME):$(TAG)
 
 tag: ## tag latest image with additional tag
 ifeq ($(TAG),latest)
 	$(error TAG cannot be latest)
 endif
-	docker tag quay.io/matihost/gh-gcp-java-kaniko:latest quay.io/matihost/gh-gcp-java-kaniko:$(TAG)
+	docker tag $(REPO)/$(NAME):latest $(REPO)/$(NAME):$(TAG)
 
 run-bash: ## run image with bash
-	docker run -it --rm --entrypoint sh quay.io/matihost/gh-gcp-java-kaniko:${TAG}
+	docker run -it --rm --entrypoint sh $(REPO)/$(NAME):${TAG}
 
 
 help: ## show usage and tasks (default)

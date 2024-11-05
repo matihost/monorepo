@@ -29,6 +29,28 @@ variable "enable_tls" {
   default     = false
 }
 
+variable "tls_crt" {
+  type        = string
+  description = "TLS certificate"
+  default     = ""
+  sensitive   = true
+}
+
+variable "tls_chain" {
+  type        = string
+  description = "TLS chain"
+  default     = ""
+  sensitive   = true
+}
+
+variable "tls_key" {
+  type        = string
+  description = "TLS key"
+  default     = ""
+  sensitive   = true
+}
+
+
 # Default variables
 
 variable "env" {

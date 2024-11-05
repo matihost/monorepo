@@ -16,10 +16,10 @@ on:
       runner:
         description: 'Runner type'
         required: true
-        default: 'ubuntu-22.04'
+        default: 'ubuntu-24.04'
         type: choice
         options:
-        - ubuntu-22.04
+        - ubuntu-24.04
         - matihost
   schedule:
   - cron: '27 20 * * 0'
@@ -37,7 +37,7 @@ env:
 jobs:
   sources:
     name: Checkout sources
-    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     timeout-minutes: 5
     container:
       image: maven:3-eclipse-temurin-21
@@ -70,7 +70,7 @@ jobs:
         enableCrossOsArchive: true
   java:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     timeout-minutes: 30
     container:
       image: maven:3-eclipse-temurin-21
@@ -116,10 +116,10 @@ jobs:
         enableCrossOsArchive: true
   java-image-mq-app:
     needs: java
-    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     timeout-minutes: 30
     container:
-      image: quay.io/matihost/gh-gcp-java-kaniko
+      image: quay.io/matihost/java-ci
     steps:
     - name: Download java build sources
       uses: actions/cache/restore@v4
@@ -131,7 +131,7 @@ jobs:
     - name: Build Java mq client image
       working-directory: java/apps/mq/client
       env:
-        container: "${{ inputs.runner == 'ubuntu-22.04' && 'docker' || 'kube' }}"
+        container: "${{ inputs.runner == 'ubuntu-24.04' && 'docker' || 'kube' }}"
         REGISTRY: "${{ vars.REGISTRY || 'quay.io' }}"
         REGISTRY_USER: "${{ secrets.REGISTRY_USER }}"
         REGISTRY_PASSWORD: "${{ secrets.REGISTRY_PASSWORD }}"
@@ -144,10 +144,10 @@ jobs:
           --destination="${{ env.REGISTRY }}/matihost/mq/basic-client:${{ env.IMAGE_TAG }}"
   java-image-cmdline:
     needs: java
-    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     timeout-minutes: 30
     container:
-      image: quay.io/matihost/gh-gcp-java-kaniko
+      image: quay.io/matihost/java-ci
     steps:
     - name: Download java build sources
       uses: actions/cache/restore@v4
@@ -159,7 +159,7 @@ jobs:
     - name: Build Java command-line image
       working-directory: java/apps/command-line
       env:
-        container: "${{ inputs.runner == 'ubuntu-22.04' && 'docker' || 'kube' }}"
+        container: "${{ inputs.runner == 'ubuntu-24.04' && 'docker' || 'kube' }}"
         REGISTRY: "${{ vars.REGISTRY || 'quay.io' }}"
         REGISTRY_USER: "${{ secrets.REGISTRY_USER }}"
         REGISTRY_PASSWORD: "${{ secrets.REGISTRY_PASSWORD }}"
@@ -173,7 +173,7 @@ jobs:
           --destination="${{ env.REGISTRY }}/matihost/commandline:${{ env.IMAGE_TAG }}"
   codeql-java:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     timeout-minutes: 30
     container:
       image: maven:3-eclipse-temurin-21
@@ -206,7 +206,7 @@ jobs:
         category: "/language:java"
   codeql-go:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     timeout-minutes: 30
     container: golang:1.22
     env:
@@ -241,7 +241,7 @@ jobs:
         category: "/language:go"
   codeql-python:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     timeout-minutes: 30
     container:
       image: quay.io/matihost/ansible:root
@@ -275,7 +275,7 @@ jobs:
         category: "/language:python"
   ansible:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     timeout-minutes: 30
     container:
       image: quay.io/matihost/ansible:root
@@ -292,7 +292,7 @@ jobs:
       working-directory: ansible/learning
   rust:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     timeout-minutes: 30
     container:
       image: rust
@@ -308,11 +308,11 @@ jobs:
       working-directory: rust/guessing_game
   image-build-on-gcp-artifact-registry:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
-    if: ((inputs.runner || 'ubuntu-22.04') != 'ubuntu-22.04') && vars.GCP_PROJECT
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    if: ((inputs.runner || 'ubuntu-24.04') != 'ubuntu-24.04') && vars.GCP_PROJECT
     timeout-minutes: 30
     container:
-      image: quay.io/matihost/gh-gcp-java-kaniko
+      image: quay.io/matihost/java-ci
     steps:
     - name: Download sources
       uses: actions/cache/restore@v4
@@ -333,11 +333,11 @@ jobs:
           --destination="gcr.io/${{ env.GCP_PROJECT }}/ansible:${{ env.GIT_COMMIT_HASH }}"
   image-build-generic-registry:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     if: vars.REGISTRY
     timeout-minutes: 30
     container:
-      image: quay.io/matihost/gh-gcp-java-kaniko
+      image: quay.io/matihost/java-ci
     steps:
     - name: Download sources
       uses: actions/cache/restore@v4
@@ -360,10 +360,10 @@ jobs:
           --destination="${{ env.REGISTRY }}/matihost/ansible:${{ env.IMAGE_TAG }}"
   image-build-ghcr:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     timeout-minutes: 30
     container:
-      image: quay.io/matihost/gh-gcp-java-kaniko
+      image: quay.io/matihost/java-ci
     steps:
     - name: Download sources
       uses: actions/cache/restore@v4
@@ -375,7 +375,7 @@ jobs:
     - name: Build Ansible image on GH hosted runner with deployment to GH Packages
       working-directory: k8s/images/ansible
       env:
-        container: "${{ inputs.runner == 'ubuntu-22.04' && 'docker' || 'kube' }}"
+        container: "${{ inputs.runner == 'ubuntu-24.04' && 'docker' || 'kube' }}"
       run: |
         mkdir -p /kaniko/.docker
         AUTH=$(echo -n ${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} | base64)

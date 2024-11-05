@@ -14,10 +14,10 @@ on:
       runner:
         description: 'Runner type'
         required: true
-        default: 'ubuntu-22.04'
+        default: 'ubuntu-24.04'
         type: choice
         options:
-        - ubuntu-22.04
+        - ubuntu-24.04
         - matihost
       env:
         description: 'Target environment'
@@ -38,11 +38,11 @@ env:
 jobs:
   gcp:
     name: Run GCP related tasks
-    runs-on: ${{ inputs.runner || 'ubuntu-22.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     environment: ${{ inputs.env || 'dev' }}
     timeout-minutes: 30
     container:
-      image: quay.io/matihost/gh-gcp-java-kaniko
+      image: quay.io/matihost/cd
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -97,7 +97,7 @@ jobs:
           --destination="${GAR_LOCATION}-docker.pkg.dev/${GCP_PROJECT}/${GAR_REPOSITORY}/ansible:${{ env.IMAGE_TAG }}"
     - name: Set up GKE credentials
       uses: google-github-actions/get-gke-credentials@v2
-      if: ((inputs.runner || 'ubuntu-22.04') != 'ubuntu-22.04')
+      if: ((inputs.runner || 'ubuntu-24.04') != 'ubuntu-24.04')
       with:
         cluster_name: ${{ env.GKE_CLUSTER }}
         location: ${{ env.GKE_LOCATION }}
@@ -105,6 +105,6 @@ jobs:
     - name: Run kubectl
       # when run on self-hosted runner within GCP network, otherwise cluster is not accessible from internet
       # TODO consider add https://api.github.com/meta actions servers to authz GKE networks...
-      if: ((inputs.runner || 'ubuntu-22.04') != 'ubuntu-22.04')
+      if: ((inputs.runner || 'ubuntu-24.04') != 'ubuntu-24.04')
       run: |-
         kubectl get svc -A
