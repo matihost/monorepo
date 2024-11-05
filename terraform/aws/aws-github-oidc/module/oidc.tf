@@ -48,3 +48,12 @@ data "aws_iam_policy_document" "oidc_assume_policy" {
     }
   }
 }
+
+
+output "github_oidc_provider_arn" {
+  value = aws_iam_openid_connect_provider.github_actions.arn
+}
+
+output "oidc_role_arn" {
+  value = aws_iam_role.oidc_role.arn
+}

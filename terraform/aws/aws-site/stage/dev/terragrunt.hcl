@@ -17,7 +17,7 @@ terraform {
 inputs = {
   env  = "dev"
   name = "matihost-site"
-  dns  = "matihost.mooo.com"
+  dns  = local.dns
   # use false to expose only HTTP exposure from S3 directly
   # when true, you has to have TLS certificates present in ~/.tls/DNS directory,
   # run to generate one:

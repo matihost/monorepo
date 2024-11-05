@@ -3,7 +3,10 @@
 #
 # * terraform/aws/aws-github-oidc - to provide ability to assume AWS role via GitHub Action OIDC provider
 name: CD
-run-name: "${{ inputs.env || 'dev' }} :: ${{ inputs.mode || 'plan' }} :: ${{ inputs.module || 'aws/aws-site'}} by @${{ github.actor }}"
+run-name: >-
+  ${{ github.workflow }} :: ${{ inputs.env || 'dev' }} :: ${{ inputs.mode || 'plan' }} :: ${{ inputs.module || 'aws/aws-site'}} :: ${{ github.ref_name }}
+  ${{ github.event.workflow_run.head_commit.message && format(' :: {0}', github.event.workflow_run.head_commit.message) || github.event.head_commit.message && format(' :: {0}', github.event.head_commit.message) || ''}}
+  ${{ inputs.runner && inputs.runner != 'ubuntu-24.04' && format(' on {0}', inputs.runner) || '' }}
 
 on:
   workflow_run:

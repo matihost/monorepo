@@ -1,14 +1,19 @@
 ---
-name: 'CI'
+name: CI
+run-name: >-
+  ${{github.workflow }} :: ${{ github.ref_name }}
+  ${{ github.event.workflow_run.head_commit.message && format(' :: {0}', github.event.workflow_run.head_commit.message) || github.event.head_commit.message && format(' :: {0}', github.event.head_commit.message) || ''}}
+  ${{ inputs.runner && inputs.runner != 'ubuntu-24.04' && format(' on {0}', inputs.runner) || '' }}
+
 on:
   push:
     branches:
     - main
     - feature/*
+    - bugfix/*
   pull_request:
     branches:
     - main
-    - feature/*
   workflow_dispatch:
     # Inputs are only available for workflow_dispatch - the default is not available for other type of triggers
     # https://dev.to/mrmike/github-action-handling-input-default-value-5f2g

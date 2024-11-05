@@ -1,5 +1,5 @@
 locals {
-  dns       = "matihost.mooo.com"
+  dns       = "www.matihost.pl"
   tls_crt   = try(file("~/.tls/${local.dns}/cert.pem"), get_env("TLS_CRT", ""))
   tls_chain = try(file("~/.tls/${local.dns}/chain.pem"), get_env("TLS_CHAIN", ""))
   tls_key   = try(file("~/.tls/${local.dns}/privkey.pem"), get_env("TLS_KEY", ""))
@@ -17,7 +17,7 @@ terraform {
 inputs = {
   env  = "prod"
   name = "matihost-site"
-  dns  = "www.matihost.pl"
+  dns  = local.dns
   # use false to expose only HTTP exposure from S3 directly
   # when true, you has to have TLS certificates present in ~/.tls/DNS directory,
   # run to generate one:
