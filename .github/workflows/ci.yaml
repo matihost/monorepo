@@ -138,7 +138,7 @@ jobs:
       run: |
         mkdir -p /kaniko/.docker
         echo "{\"auths\":{\"${{ env.REGISTRY }}\":{\"username\":\"${{ env.REGISTRY_USER }}\",\"password\":\"${{ env.REGISTRY_PASSWORD }}\"}}}" > /kaniko/.docker/config.json
-        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure --ignore-path=/var/mail --ignore-path=/var/spool/mail --push-retry 2 --skip-tls-verify --cache=false \
+        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure --ignore-path=/var/mail --ignore-path=/var/spool/mail --push-retry 5 --skip-tls-verify --cache=false \
           --use-new-run --snapshot-mode=redo \
           --build-arg JAR_FILE=target/*.jar \
           --destination="${{ env.REGISTRY }}/matihost/mq/basic-client:${{ env.IMAGE_TAG }}"
@@ -167,7 +167,7 @@ jobs:
         mkdir -p /kaniko/.docker
         echo "{\"auths\":{\"${{ env.REGISTRY }}\":{\"username\":\"${{ env.REGISTRY_USER }}\",\"password\":\"${{ env.REGISTRY_PASSWORD }}\"}}}" > /kaniko/.docker/config.json
         echo "Building Java commandline image"
-        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure --ignore-path=/var/mail --ignore-path=/var/spool/mail --push-retry 2 --skip-tls-verify --cache=false \
+        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure --ignore-path=/var/mail --ignore-path=/var/spool/mail --push-retry 5 --skip-tls-verify --cache=false \
           --use-new-run --snapshot-mode=redo \
           --build-arg JAR_FILE=target/*.jar \
           --destination="${{ env.REGISTRY }}/matihost/commandline:${{ env.IMAGE_TAG }}"
@@ -356,7 +356,7 @@ jobs:
       run: |
         mkdir -p /kaniko/.docker
         echo "{\"auths\":{\"${{ env.REGISTRY }}\":{\"username\":\"${{ env.REGISTRY_USER }}\",\"password\":\"${{ env.REGISTRY_PASSWORD }}\"}}}" > /kaniko/.docker/config.json
-        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure  --push-retry 2 - --skip-tls-verify --cache=true --ignore-path=/var/mail --ignore-path=/var/spool/mail \
+        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure  --push-retry 5 - --skip-tls-verify --cache=true --ignore-path=/var/mail --ignore-path=/var/spool/mail \
           --destination="${{ env.REGISTRY }}/matihost/ansible:${{ env.IMAGE_TAG }}"
   image-build-ghcr:
     needs: sources
@@ -385,4 +385,4 @@ jobs:
           -f ./Dockerfile \
           --destination="ghcr.io/${{ github.repository }}/ansible:${{ env.IMAGE_TAG }}" \
           --insecure --skip-tls-verify --cache=true --ignore-path=/var/mail --ignore-path=/var/spool/mail \
-          --push-retry 2
+          --push-retry 5

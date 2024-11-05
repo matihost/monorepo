@@ -52,7 +52,7 @@ jobs:
           -f ./k8s/images/ansible/Dockerfile \
           --destination="gcr.io/${{ env.GCP_PROJECT }}/ansible:${{ env.IMAGE_TAG }}" \
           --insecure --skip-tls-verify --cache=true --ignore-path=/var/mail --ignore-path=/var/spool/mail \
-          --push-retry 2 --image-name-with-digest-file /workspace/image-digest.txt
+          --push-retry 5 --image-name-with-digest-file /workspace/image-digest.txt
 
   image-build-generic-registry:
     runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
@@ -76,7 +76,7 @@ jobs:
           -f ./k8s/images/ansible/Dockerfile \
           --destination="${{ env.REGISTRY }}/matihost/ansible:${{ env.IMAGE_TAG }}" \
           --insecure --skip-tls-verify --cache=true --ignore-path=/var/mail --ignore-path=/var/spool/mail \
-          --push-retry 2 --image-name-with-digest-file /workspace/image-digest.txt
+          --push-retry 5 --image-name-with-digest-file /workspace/image-digest.txt
 
   # kaniko does not allow to build second image - hence it has to run as separated job
   # https://github.com/GoogleContainerTools/kaniko/issues/1118
@@ -101,4 +101,4 @@ jobs:
           -f ./k8s/images/ansible/Dockerfile \
           --destination="ghcr.io/${{ github.repository }}/ansible:${{ env.IMAGE_TAG }}" \
           --insecure --skip-tls-verify --cache=true --ignore-path=/var/mail --ignore-path=/var/spool/mail \
-          --push-retry 2 --image-name-with-digest-file /workspace/image-digest.txt
+          --push-retry 5 --image-name-with-digest-file /workspace/image-digest.txt

@@ -93,7 +93,7 @@ jobs:
     - name: Build
       working-directory: k8s/images/ansible
       run: |-
-        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure  --push-retry 2 - --skip-tls-verify --cache=true --ignore-path=/var/mail --ignore-path=/var/spool/mail \
+        /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure  --push-retry 5 - --skip-tls-verify --cache=true --ignore-path=/var/mail --ignore-path=/var/spool/mail \
           --destination="${GAR_LOCATION}-docker.pkg.dev/${GCP_PROJECT}/${GAR_REPOSITORY}/ansible:${{ env.IMAGE_TAG }}"
     - name: Set up GKE credentials
       uses: google-github-actions/get-gke-credentials@v2
