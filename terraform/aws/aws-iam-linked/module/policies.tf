@@ -314,3 +314,22 @@ resource "aws_iam_policy" "tools-access" {
 }
 EOF
 }
+
+
+resource "aws_iam_policy" "iam-cert-full-access" {
+  description = "Provides full access to invoke APIs in IAM Certificates management."
+  name        = "IAMCertificateFullAccess"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "iam:*Certificate",
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}

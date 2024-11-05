@@ -3,6 +3,7 @@
 #
 # * terraform/aws/aws-github-oidc - to provide ability to assume AWS role via GitHub Action OIDC provider
 name: CD
+run-name: "${{ inputs.env || 'dev' }} :: ${{ inputs.mode || 'plan' }} :: ${{ inputs.module || 'aws/aws-site'}} by @${{ github.actor }}"
 
 on:
   workflow_run:
@@ -83,7 +84,7 @@ jobs:
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
         enableCrossOsArchive: true
   aws:
-    name: AWS deployment mode ${{ inputs.mode || 'plan' }} of ${{ inputs.module || 'aws/aws-site'}} on  ${{ inputs.env || 'dev' }} environment
+    name: "AWS :: ${{ inputs.env || 'dev' }} :: ${{ inputs.mode || 'plan' }} :: ${{ inputs.module || 'aws/aws-site'}}"
     needs: sources
     environment: ${{ inputs.env || 'dev' }}
     runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}

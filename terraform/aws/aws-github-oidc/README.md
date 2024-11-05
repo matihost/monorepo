@@ -12,6 +12,8 @@ This setup use AWS resources eliglible to AWS Free Tier __only__.
 
 - Logged to AWS Account
 
+- [aws-iam-linked](../aws-iam-linked) is already deployed - contains custom policies which can be used in OIDC role
+
 ```bash
 aws configure
 ```

@@ -1,3 +1,8 @@
+locals {
+  account = "${run_cmd("--terragrunt-quiet", "aws", "sts", "get-caller-identity", "--query", "\"Account\"", "--output", "text")}"
+}
+
+
 include {
   path = find_in_parent_folders()
 }
@@ -17,6 +22,7 @@ inputs = {
   oidc_role_policies = [
     "arn:aws:iam::aws:policy/AmazonS3FullAccess",
     "arn:aws:iam::aws:policy/CloudFrontFullAccess",
+    "arn:aws:iam::${local.account}:policy/IAMCertificateFullAccess"
   ]
 
 
