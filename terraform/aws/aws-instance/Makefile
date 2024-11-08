@@ -3,6 +3,7 @@
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
+	TG_FLAGS := --terragrunt-debug
 endif
 
 MODE := apply
@@ -18,11 +19,11 @@ endif
 ENV := dev
 
 init: prepare
-	cd stage/$(ENV) && terragrunt init -upgrade=true
+	cd stage/$(ENV) && terragrunt run-all init -upgrade=true
 
 
 run: init ## setup free-tier eliglible Ubuntu instance, usage: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
+	@cd stage/$(ENV) && terragrunt run-all validate && terragrunt run-all $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
 
 ssh: ## ssh to EC2 instance
 	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(shell cd stage/$(ENV) && terragrunt output ec2_dns)

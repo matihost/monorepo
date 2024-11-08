@@ -33,14 +33,14 @@ resource "aws_security_group" "private_access" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["${var.external_access_ip}/32", data.aws_vpc.default.cidr_block]
+    cidr_blocks = [var.external_access_range, data.aws_vpc.default.cidr_block]
   }
   ingress {
     description = "HTTP 8080 from laptop or from within VPC"
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    cidr_blocks = ["${var.external_access_ip}/32", data.aws_vpc.default.cidr_block]
+    cidr_blocks = [var.external_access_range, data.aws_vpc.default.cidr_block]
   }
   ingress {
     description = "SSH from anywhere"
@@ -67,14 +67,14 @@ resource "aws_key_pair" "vm_key" {
 }
 
 
-data "aws_ami" "ubuntu" {
+data "aws_ami" "image" {
   most_recent = true
 
   # possible filter ids from sample image:
   # aws ec2 describe-images --region us-east-1 --image-ids ami-0fc5d935ebf8bc3bc
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd-*/ubuntu-noble-24.04-*-server-*"]
+    values = [var.ec2_ami_name_query]
   }
 
   filter {
@@ -87,12 +87,12 @@ data "aws_ami" "ubuntu" {
     values = [var.ec2_architecture]
   }
 
-  owners = ["099720109477"] # Canonical
+  owners = [var.ec2_ami_account]
 }
 
 
 resource "aws_instance" "vm" {
-  ami                    = data.aws_ami.ubuntu.id
+  ami                    = data.aws_ami.image.id
   instance_type          = var.ec2_instance_type
   key_name               = aws_key_pair.vm_key.key_name
   vpc_security_group_ids = [aws_security_group.private_access.id]
@@ -101,7 +101,7 @@ resource "aws_instance" "vm" {
   iam_instance_profile = var.instance_profile
   # to use cloud-init and bash script
   # use https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/cloudinit_config
-  user_data = templatefile("${path.module}/ec2.cloud-init.tpl", {
+  user_data = templatestring(var.user_data_template, {
     ssh_key = base64encode(var.ssh_key),
     ssh_pub = base64encode(var.ssh_pub_key),
     }
@@ -110,20 +110,20 @@ resource "aws_instance" "vm" {
     Name = "${local.prefix}-${var.region}-${var.name}"
   }
 
-  connection {
-    type        = "ssh"
-    user        = "ubuntu" # Ubuntu AMI has ubuntu user name instead of ec2-user
-    private_key = var.ssh_key
-    host        = self.public_ip
-  }
+  # connection {
+  #   type        = "ssh"
+  #   user        = "ubuntu" # Ubuntu AMI has ubuntu user name instead of ec2-user
+  #   private_key = var.ssh_key
+  #   host        = self.public_ip
+  # }
 
   # demonstrate provisioner usage
   # use user_data and script or cloud-init config instead
-  provisioner "remote-exec" {
-    inline = [
-      "sudo apt -y install plocate",
-    ]
-  }
+  # provisioner "remote-exec" {
+  #   inline = [
+  #     "sudo apt -y install plocate",
+  #   ]
+  # }
 }
 
 

@@ -7,6 +7,7 @@ repo_upgrade: all
 
 packages:
  - nginx
+ - plocate
 
 # cloud-init creates a final script in: /var/lib/cloud/instance/scripts/runcmd
 runcmd:

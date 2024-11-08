@@ -23,11 +23,13 @@ variable "name" {
 variable "ssh_pub_key" {
   type        = string
   description = "The pem encoded SSH pub key for accessing VMs"
+  sensitive   = true
 }
 
 variable "ssh_key" {
   type        = string
   description = "The pem encoded SSH priv key to place on bastion"
+  sensitive   = true
 }
 
 variable "vpc" {
@@ -55,6 +57,25 @@ variable "ec2_architecture" {
   default     = "x86_64"
 }
 
+
+variable "ec2_ami_name_query" {
+  type        = string
+  description = "EC2 AMI name query"
+}
+
+
+variable "ec2_ami_account" {
+  type        = string
+  description = "EC2 AMI AWS account id"
+}
+
+variable "user_data_template" {
+  type        = string
+  description = "EC2 user_data conttent in tftpl format (aka with TF templating)"
+}
+
+
+
 variable "zone" {
   default     = "us-east-1a"
   type        = string
@@ -80,7 +101,8 @@ variable "instance_profile" {
 }
 
 
-variable "external_access_ip" {
+variable "external_access_range" {
+  default     = "0.0.0.0/0"
   type        = string
   description = "The public IP which is allowed to access instance"
 }

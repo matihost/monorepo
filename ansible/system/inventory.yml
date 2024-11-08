@@ -716,6 +716,7 @@ all:
             CURRENT_VERSION="$(curl -sL https://calibre-ebook.com/download_linux |grep 'The latest release of calibre is' | sed -E 's/.*The latest release of calibre is (.+)\..*/\1/')"
             INSTALLED_VERSION="$(calibre --version 2>/dev/null | sed -E 's/.*\(calibre (.*)\)/\1/')"
             [[ -n "${INSTALLED_VERSION}" && ("${CURRENT_VERSION}" == "${INSTALLED_VERSION}"*) ]] || {
+              echo "Installing Calibre ${CURRENT_VERSION} on top of ${INSTALLED_VERSION}..."
               wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo bash
             }
         - name: kubectl plugins
