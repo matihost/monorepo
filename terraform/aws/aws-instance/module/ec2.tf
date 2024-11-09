@@ -49,6 +49,13 @@ resource "aws_security_group" "private_access" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  ingress {
+    description = "RDP from anywhere"
+    from_port   = 3389
+    to_port     = 3389
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   # Terraform removed default egress ALLOW_ALL rule
   # It has to be explicitely added
@@ -87,7 +94,16 @@ data "aws_ami" "image" {
     values = [var.ec2_architecture]
   }
 
-  owners = [var.ec2_ami_account]
+
+  dynamic "filter" {
+    for_each = var.ec2_ami_account_alias != "" ? [1] : []
+    content {
+      name   = "owner-alias"
+      values = [var.ec2_ami_account_alias]
+    }
+  }
+
+  owners = var.ec2_ami_account != "" ? [var.ec2_ami_account] : null
 }
 
 
@@ -97,8 +113,7 @@ resource "aws_instance" "vm" {
   key_name               = aws_key_pair.vm_key.key_name
   vpc_security_group_ids = [aws_security_group.private_access.id]
   subnet_id              = data.aws_subnet.public_zone.id
-
-  iam_instance_profile = var.instance_profile
+  iam_instance_profile   = var.instance_profile
   # to use cloud-init and bash script
   # use https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/cloudinit_config
   user_data = templatestring(var.user_data_template, {
@@ -106,6 +121,7 @@ resource "aws_instance" "vm" {
     ssh_pub = base64encode(var.ssh_pub_key),
     }
   )
+  get_password_data = data.aws_ami.image.platform == "windows"
   tags = {
     Name = "${local.prefix}-${var.region}-${var.name}"
   }
@@ -126,6 +142,15 @@ resource "aws_instance" "vm" {
   # }
 }
 
+
+resource "aws_ssm_parameter" "ec2_windows_password" {
+  count       = data.aws_ami.image.platform == "windows" ? 1 : 0
+  name        = "/ec2/${local.prefix}-${var.region}-${var.name}/admin_password"
+  description = "Windows admin password for ${local.prefix}-${var.region}-${var.name}"
+  type        = "SecureString"
+  # https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_GetPasswordData.html
+  value = rsadecrypt(aws_instance.vm.password_data, var.ssh_key)
+}
 
 output "ec2_id" {
   value = aws_instance.vm.id

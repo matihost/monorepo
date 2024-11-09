@@ -17,7 +17,7 @@ terraform {
 
 inputs = {
   env                   = "dev"
-  name                  = "vm"
+  name                  = "ubuntu"
   vpc                   = "dev-us-east-1" # or default to choose default VPC
   subnet                = "public"
   region                = "us-east-1"
@@ -29,7 +29,7 @@ inputs = {
   ec2_instance_type     = "t4g.small" # or t3.micro
   ec2_architecture      = "arm64"     # or x86_64
   ec2_ami_name_query    = "ubuntu/images/hvm-ssd-*/ubuntu-noble-24.04-*-server-*"
-  ec2_ami_account       = "099720109477" # amazon
+  ec2_ami_account_alias = "amazon"
   user_data_template    = local.user_data_template
   aws_tags = {
     Env    = "dev"

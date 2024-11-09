@@ -65,9 +65,17 @@ variable "ec2_ami_name_query" {
 
 
 variable "ec2_ami_account" {
+  default     = ""
   type        = string
   description = "EC2 AMI AWS account id"
 }
+
+variable "ec2_ami_account_alias" {
+  default     = ""
+  type        = string
+  description = "EC2 AMI AWS account id"
+}
+
 
 variable "user_data_template" {
   type        = string
