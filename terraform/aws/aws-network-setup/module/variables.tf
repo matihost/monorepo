@@ -22,11 +22,11 @@ variable "ssh_key" {
   description = "The pem encoded SSH priv key to place on bastion"
 }
 
-variable "external_access_ip" {
+variable "external_access_range" {
+  default     = "0.0.0.0/0"
   type        = string
   description = "The public IP which is allowed to access instance"
 }
-
 
 variable "create_sample_instance" {
   type        = bool
@@ -39,6 +39,15 @@ variable "create_ssm_private_access_vpc_endpoints" {
   default     = true
   description = "Whether to create VPC endpoints reguired to be able to connect to EC2 instances w/o public IP via System Manager"
 }
+
+
+variable "create_s3_endpoint" {
+  type        = bool
+  default     = false
+  description = "Whether to create S3 endpoint"
+}
+
+
 
 variable "ec2_instance_type" {
   type        = string

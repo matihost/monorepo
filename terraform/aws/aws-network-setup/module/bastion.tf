@@ -27,13 +27,13 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_security_group" "bastion_access" {
-  name        = "${local.prefix}-ssh-from-single-external-ip-only"
+  name        = "${local.prefix}-ssh-from-external-access-range"
   description = "Allow SSH access only from single computer"
 
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "${local.prefix}-ssh-from-single-external-ip-only"
+    Name = "${local.prefix}-ssh-from-external-access-range"
   }
 
   ingress {
@@ -41,7 +41,7 @@ resource "aws_security_group" "bastion_access" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${var.external_access_ip}/32"]
+    cidr_blocks = [var.external_access_range]
   }
 
   # Terraform removed default egress ALLOW_ALL rule

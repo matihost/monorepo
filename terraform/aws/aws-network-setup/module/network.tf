@@ -56,11 +56,11 @@ resource "aws_security_group" "nat" {
   }
 
   ingress {
-    description = "SSH from single external IP only"
+    description = "SSH from single external access IP range only"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${var.external_access_ip}/32"]
+    cidr_blocks = [var.external_access_range]
   }
   ingress {
     description = "SSH from VPC"
@@ -162,14 +162,14 @@ resource "aws_route_table" "nat" {
 }
 
 
-resource "aws_security_group" "http_from_single_computer" {
-  name        = "${local.prefix}-http-from-single-external-ip-only"
-  description = "Allow HTTP access only from single computer"
+resource "aws_security_group" "http_from_external_range" {
+  name        = "${local.prefix}-http-from-external-access-range"
+  description = "Allow HTTP access only external IP access range"
 
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "${local.prefix}-http-from-single-external-ip-only"
+    Name = "${local.prefix}-http-from-external-access-range"
   }
 
   ingress {
@@ -177,7 +177,7 @@ resource "aws_security_group" "http_from_single_computer" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["${var.external_access_ip}/32"]
+    cidr_blocks = [var.external_access_range]
   }
 
   ingress {
@@ -185,7 +185,7 @@ resource "aws_security_group" "http_from_single_computer" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["${var.external_access_ip}/32"]
+    cidr_blocks = [var.external_access_range]
   }
 
   # Terraform removed default egress ALLOW_ALL rule
