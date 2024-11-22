@@ -12,6 +12,8 @@ In particular it creates:
 
 - Latest Terraform or OpenTofu, Terragrunt installed
 
+- jq tool installed
+
 - ROSA CLI installed:
 
 ```bash
@@ -88,10 +90,10 @@ at the aws marketplace
 make run ENV=dev MODE=apply PASS=cluster-admin-password
 
 # show Terraform state
-make show-state
+make show-state ENV=dev
 
-# terminates all AWS resource created with apply task
-make run ENV
+# destroys ROSA HCP along with all AWS resources created with apply task
+make destroy CLUSTER_NAME=dev-us-east-1 ENV=dev
 ```
 
 ## Day 2 Operations
@@ -113,7 +115,6 @@ k9s
 ```
 
 ### Login to Web Console
-
 
 Expose PROXY through bastion:
 

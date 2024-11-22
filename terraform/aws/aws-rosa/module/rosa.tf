@@ -1,15 +1,7 @@
 locals {
   private_subnet_ids = [for subnet in data.aws_subnet.private : subnet.id]
-  installer_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.prefix}-HCP-ROSA-Installer-Role"
-  sts_roles = {
-    role_arn         = local.installer_role_arn,
-    support_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.prefix}-HCP-ROSA-Support-Role",
-    instance_iam_roles = {
-      worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.prefix}-HCP-ROSA-Worker-Role"
-    },
-    operator_role_prefix = local.prefix,
-    oidc_config_id       = rhcs_rosa_oidc_config.oidc_config.id
-  }
+  installer_role_arn = aws_iam_role.account_role[0].arn
+
   cluster_admin_credentials = var.cluster_admin_password == "" ? null : { username = "cluster-admin", password = var.cluster_admin_password }
 }
 
@@ -37,7 +29,13 @@ data "aws_subnet" "private" {
   }
 }
 
-
+# Warning:
+# ROSA does not support removal via Terraform
+# Attempt to remove cluster via terraform ignores depends_on and it deletes account_roles first
+# causing that cluster deletion handgs forever...
+# Also attempt to delete the cluster by deleting cluster nad machine objects leads to error - that it is not possible
+# to delete all machine pools (there must be 2 replicas all the time)
+# The only way to delete cluster and all resources is to remove it via rosa cli and then continue via tf destroy.
 resource "rhcs_cluster_rosa_hcp" "rosa_hcp_cluster" {
   name                         = local.prefix
   domain_prefix                = local.prefix
@@ -53,10 +51,18 @@ resource "rhcs_cluster_rosa_hcp" "rosa_hcp_cluster" {
   cloud_region           = var.region
   aws_account_id         = local.account_id
   aws_billing_account_id = var.billing_account_id == "" ? local.account_id : var.billing_account_id
-  sts                    = local.sts_roles
+  sts = {
+    role_arn         = local.installer_role_arn,
+    support_role_arn = aws_iam_role.account_role[1].arn
+    instance_iam_roles = {
+      worker_role_arn = aws_iam_role.account_role[2].arn
+    },
+    operator_role_prefix = local.prefix,
+    oidc_config_id       = rhcs_rosa_oidc_config.oidc_config.id
+  }
 
   availability_zones       = var.zones
-  replicas                 = var.replicas
+  replicas                 = length(var.zones)
   aws_subnet_ids           = local.private_subnet_ids
   compute_machine_type     = var.machine_instance_type
   create_admin_user        = var.cluster_admin_password != ""
@@ -86,24 +92,26 @@ resource "rhcs_cluster_rosa_hcp" "rosa_hcp_cluster" {
   ]
 
   lifecycle {
-    ignore_changes = [create_admin_user, admin_credentials, replicas]
+    ignore_changes = [create_admin_user, admin_credentials, replicas, compute_machine_type]
   }
 }
 
 
 # TODO add autoscaller
-resource "rhcs_hcp_cluster_autoscaler" "cluster_autoscaler" {
-  count = var.enable_cluster_autoscaler ? 1 : 0
+# As of terraform-redhat/rhcs v1.6.6
+# currently the object is not implemented, enabling it ends with error
+# resource "rhcs_hcp_cluster_autoscaler" "cluster_autoscaler" {
+#   count = var.enable_cluster_autoscaler ? 1 : 0
 
-  cluster                 = rhcs_cluster_rosa_hcp.rosa_hcp_cluster.id
-  max_pod_grace_period    = var.autoscaler_max_pod_grace_period
-  pod_priority_threshold  = var.autoscaler_pod_priority_threshold
-  max_node_provision_time = var.autoscaler_max_node_provision_time
+#   cluster                 = rhcs_cluster_rosa_hcp.rosa_hcp_cluster.id
+#   max_pod_grace_period    = var.autoscaler_max_pod_grace_period
+#   pod_priority_threshold  = var.autoscaler_pod_priority_threshold
+#   max_node_provision_time = var.autoscaler_max_node_provision_time
 
-  resource_limits = {
-    max_nodes_total = var.autoscaler_max_nodes_total
-  }
-}
+#   resource_limits = {
+#     max_nodes_total = var.autoscaler_max_nodes_total
+#   }
+# }
 
 resource "rhcs_hcp_default_ingress" "default_ingress" {
   cluster          = rhcs_cluster_rosa_hcp.rosa_hcp_cluster.id
@@ -116,13 +124,66 @@ resource "rhcs_kubeletconfig" "kubeletconfig" {
   pod_pids_limit = var.pod_limit
 }
 
+# Default machine poools (aka workers-0, workers-1,...) are not editable after initial cluster creation
+# The solution is to add additional machine pools and remove default ones
+resource "rhcs_hcp_machine_pool" "machine_pool" {
+  for_each = var.zones
+
+  cluster = rhcs_cluster_rosa_hcp.rosa_hcp_cluster.id
+  # name is max 15 characters
+  name = "compute-${trimprefix(each.key, var.region)}"
+
+  # it is valid to have replica with 0 nodes, as soon as there are at least 2 replicas in total in the cluster left
+  replicas = var.enable_cluster_autoscaler ? null : var.replicas_per_zone
+  autoscaling = {
+    enabled = var.enable_cluster_autoscaler
+    # must be greater than zero.
+    min_replicas = var.enable_cluster_autoscaler ? 1 : null
+    max_replicas = var.enable_cluster_autoscaler ? var.autoscaler_max_nodes_per_zone : null
+
+  }
+  labels    = var.labels
+  taints    = var.taints
+  subnet_id = data.aws_subnet.private[each.key].id
+  aws_node_pool = {
+    instance_type = var.machine_instance_type
+    tags          = var.aws_tags
+  }
+  auto_repair                  = true
+  version                      = var.openshift_version
+  upgrade_acknowledgements_for = var.max_upgrade_version
+  # tuning_configs               = ...
+  # kubelet_configs              = ...
+  ignore_deletion_error = false
+
+  lifecycle {
+    ignore_changes = [
+      cluster,
+      name,
+    ]
+  }
+}
+
+
+resource "null_resource" "clean_default_machines" {
+  triggers = {
+    always_run = timestamp()
+  }
+  provisioner "local-exec" {
+    command = "${path.module}/delete-machine-pools.sh '${rhcs_cluster_rosa_hcp.rosa_hcp_cluster.id}' 'workers-'"
+  }
+
+  depends_on = [
+    rhcs_cluster_rosa_hcp.rosa_hcp_cluster,
+    rhcs_hcp_machine_pool.machine_pool
+  ]
+}
+
+
 # TODO add own IDP based on Keycloak
+# example with ENtraID: https://docs.redhat.com/en/documentation/red_hat_openshift_service_on_aws/4/html-single/tutorials/index#cloud-experts-entra-id-idp-register-application
 # https://registry.terraform.io/providers/terraform-redhat/rhcs/latest/docs/resources/identity_provider#nested-schema-for-openid
 # https://github.com/terraform-redhat/terraform-rhcs-rosa-hcp/blob/main/modules/idp/main.tf#L127
-
-# TODO add own worker pool and delete default one
-# https://registry.terraform.io/providers/terraform-redhat/rhcs/latest/docs/guides/worker-machine-pool
-# https://github.com/terraform-redhat/terraform-rhcs-rosa-hcp/blob/main/modules/machine-pool/main.tf
 
 # TODO add custom ingress
 # https://access.redhat.com/articles/7028653

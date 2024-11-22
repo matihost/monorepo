@@ -18,4 +18,6 @@ inputs = {
     Region = "us-east1"
   }
   zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  # machine_instance_type     = "c5.2xlarge" # 8 cores, 16 GiB RAM
+  enable_cluster_autoscaler = true
 }

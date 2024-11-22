@@ -28,7 +28,7 @@ all:
           # MQ Version available at: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/
           mq: 9.4.1.0
           # List of supported Ubuntu versions: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive
-          onedrive_ubuntu_version: "24.04"
+          onedrive_ubuntu_version: "24.10"
           # List of supported Ubuntu versions: https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/
           pgadmin_ubuntu_version: "noble"
           # List of supported Ubuntu versions: https://apt.envoyproxy.io/

@@ -25,7 +25,7 @@ variable "zone" {
   description = "Preffered AWS AZ where resources need to placed, has to be compatible with region variable"
 }
 
-# tflint-ignore: terraform_unused_declarations
+
 variable "region" {
   default     = "us-east-1"
   type        = string
@@ -77,16 +77,16 @@ variable "billing_account_id" {
 }
 
 
-variable "replicas" {
+variable "replicas_per_zone" {
   type        = number
-  default     = 3
+  default     = 1
   description = "Number of worker nodes to provision. This attribute is applicable solely when autoscaling is disabled. Single zone clusters need at least 2 nodes, multizone clusters need at least 3 nodes. Hosted clusters require that the number of worker nodes be a multiple of the number of private subnets. (default: 2)"
 }
 
 variable "machine_instance_type" {
   type        = string
   description = "Identifies the Instance type used by the default worker machine pool e.g. `m5.xlarge`"
-  default     = null
+  default     = "m5.xlarge"
 }
 
 
@@ -124,6 +124,22 @@ variable "pod_limit" {
 }
 
 
+variable "taints" {
+  description = "Taints for a machine pool. This list will overwrite any modifications made to node taints on an ongoing basis."
+  type = list(object({
+    key           = string
+    value         = string
+    schedule_type = string
+  }))
+  default = null
+}
+
+variable "labels" {
+  description = "Labels for the machine pool. Format should be a comma-separated list of 'key = value'. This list will overwrite any modifications made to node labels on an ongoing basis."
+  type        = map(string)
+  default     = null
+}
+
 # TODO enable when feature works
 # As of v1.6.6 ends with error: Autoscaler configuration is not available
 variable "enable_cluster_autoscaler" {
@@ -132,26 +148,37 @@ variable "enable_cluster_autoscaler" {
   description = "Whether to create enable cluster autoscaler"
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "autoscaler_max_pod_grace_period" {
   type        = number
   default     = 30
   description = "Gives pods graceful termination time before scaling down."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "autoscaler_pod_priority_threshold" {
   type        = number
   default     = 1
   description = "To allow users to schedule 'best-effort' pods, which shouldn't trigger Cluster Autoscaler actions, but only run when there are spare resources available."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "autoscaler_max_node_provision_time" {
   type        = string
   default     = "10m"
   description = "Maximum time cluster-autoscaler waits for node to be provisioned."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "autoscaler_max_nodes_total" {
   type        = number
   default     = 10
   description = "Maximum number of nodes in all node groups. Cluster autoscaler will not grow the cluster beyond this number."
+}
+
+# tflint-ignore: terraform_unused_declarations
+variable "autoscaler_max_nodes_per_zone" {
+  type        = number
+  default     = 3
+  description = "Maximum number of nodes per machine poll (zonal)"
 }
