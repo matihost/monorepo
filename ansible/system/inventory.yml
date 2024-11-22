@@ -644,7 +644,7 @@ all:
         - name: rosa
           become: true
           command: |
-            [ -x /usr/local/bin/rosa ] || {
+            [ -x /usr/local/bin/rosa -a "$(rosa version |grep -c "There is a newer release")" -eq 0 ] || {
               curl -sSL https://mirror.openshift.com/pub/openshift-v4/clients/rosa/latest/rosa-linux.tar.gz | tar -zx -o rosa
               mv rosa /usr/local/bin/rosa
               rosa version
