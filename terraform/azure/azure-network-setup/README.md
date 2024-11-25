@@ -32,6 +32,6 @@ Setup minimal network resources:
 ## Usage
 
 ```bash
-# setup IAM resources
-make run MODE=apply
+# setup Network resources
+make run MODE=apply ENV=dev-westeurope
 ```

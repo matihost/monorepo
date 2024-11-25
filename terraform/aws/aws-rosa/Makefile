@@ -35,7 +35,10 @@ ifndef CLUSTER_NAME
 	$(error Env CLUSTER_NAME is not defined. Cluster name is required along with DEV variable)
 endif
 	rosa delete cluster -c $(CLUSTER_NAME) -w -y
-	cd stage/$(ENV) && { terragrunt state rm rhcs_hcp_machine_pool.machine_pool; terragrunt --terragrunt-non-interactive destroy -auto-approve $(TG_FLAGS); }
+	cd stage/$(ENV) && { terragrunt state rm rhcs_hcp_machine_pool.machine_pool; \
+		terragrunt state rm rhcs_hcp_default_ingress.default_ingress; \
+		terragrunt --terragrunt-non-interactive destroy -auto-approve $(TG_FLAGS); \
+	}
 
 
 show-state: ## show state

@@ -29,6 +29,29 @@ data "aws_subnet" "private" {
   }
 }
 
+# Workaround for:
+#
+# Can't create cluster with name 'dev-us-east-1': status is 400, identifier
+# is '400', code is 'CLUSTERS-MGMT-400', at '...' and
+# operation identifier is '72....84': Please make
+# sure IAM role
+# 'arn:aws:iam::...:role/dev-us-east-1-HCP-ROSA-Installer-Role'
+# exists, and add
+# 'arn:aws:iam::710019948333:role/RH-Managed-OpenShift-Installer' to the
+# trust policy on IAM role
+# 'arn:aws:iam::...:role/dev-us-east-1-HCP-ROSA-Installer-Role':
+# Failed to assume role: User:
+# arn:aws:sts::710019948333:assumed-role/RH-Managed-OpenShift-Installer/OCM
+# is not authorized to perform: sts:AssumeRole on resource:
+# arn:aws:iam::....:role/dev-us-east-1-HCP-ROSA-Installer-Role
+#
+# Cluster creation can be too fast
+resource "time_sleep" "wait_30_seconds" {
+  depends_on = [aws_iam_role.account_role]
+
+  create_duration = "30s"
+}
+
 # Warning:
 # ROSA does not support removal via Terraform
 # Attempt to remove cluster via terraform ignores depends_on and it deletes account_roles first
@@ -88,7 +111,8 @@ resource "rhcs_cluster_rosa_hcp" "rosa_hcp_cluster" {
 
   depends_on = [
     aws_iam_role.account_role,
-    aws_iam_role.operator_role
+    aws_iam_role.operator_role,
+    time_sleep.wait_30_seconds
   ]
 
   lifecycle {
@@ -184,6 +208,9 @@ resource "null_resource" "clean_default_machines" {
 # example with ENtraID: https://docs.redhat.com/en/documentation/red_hat_openshift_service_on_aws/4/html-single/tutorials/index#cloud-experts-entra-id-idp-register-application
 # https://registry.terraform.io/providers/terraform-redhat/rhcs/latest/docs/resources/identity_provider#nested-schema-for-openid
 # https://github.com/terraform-redhat/terraform-rhcs-rosa-hcp/blob/main/modules/idp/main.tf#L127
+# Cognito as IDP provider:
+# https://access.redhat.com/solutions/7076497?band=se&seSessionId=15d6ad11-b8d0-4da9-92b7-0c695510741c&seSource=Recommendation&seResourceOriginID=e0126705-2202-4c22-9847-6aedfb1274b7
+
 
 # TODO add custom ingress
 # https://access.redhat.com/articles/7028653
