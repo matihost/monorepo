@@ -14,9 +14,8 @@ sudo apt -y install build-essential
 ## Building from code
 
 ```bash
-# to build application
-make
-
-# to remove intermediate build files and compiled application
+# build and run app
+make run
+# remove intermediate build files and compiled application
 make clean
 ```

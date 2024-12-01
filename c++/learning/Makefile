@@ -1,18 +1,32 @@
 CXX = g++
 CXXFLAGS = -g -Wall
-TARGET = main.out
 SRC = $(wildcard *.cpp)
 OBJ = $(SRC:.cpp=.o)
 
-all: $(TARGET)
+ifeq ($(OS),Windows_NT)
+    TARGET = main.exe
+    RM = del /Q
+else
+    TARGET = main.out
+    RM = rm -f
+endif
 
-# Build target
-$(TARGET): $(OBJ)
-	$(CXX) $(CXXFLAGS) $(OBJ) -o $(TARGET)
+build: $(TARGET) ## build app
 
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+run: build ## build and run app
+	@./$(TARGET)
 
-# Clean target
-clean:
-	rm -f $(TARGET) $(OBJ)
+$(TARGET): $(OBJ) ## cbuild app
+	@$(CXX) $(CXXFLAGS) $(OBJ) -o $(TARGET)
+
+%.o: %.cpp ## compile .cpp files
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+clean: ## remove intermediate build files and compiled application
+	@$(RM) $(TARGET) $(OBJ)
+
+
+help: ## show usage and tasks (default)
+	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
+.DEFAULT_GOAL := help
+.PHONY: help run clean build
