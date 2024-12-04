@@ -45,7 +45,7 @@ Various technology deployments, tools & code:
     * aws-site - sample web site exposure via S3 and CloudFront
     * aws-iam-management, aws-iam-linked - setup IAM resources needed on fresh AWS management account (users, roles, groups etc) and subsequent linked AWS accounts
     * aws-network-setup - minimal AWS recommended setup with private subnet
-    * aws-instance - minimal VM setup
+    * aws-instance - VM setup
     * aws-alb - Application Load Balancer usage
     * aws-jenkins - Jenkins deployment as AWS VMs, Packer images for Jenkins Agents
     * aws-lambda - sample AWS Lambda emulating a client hitting EC2 instance with AWS ApiGateway exposure
@@ -58,7 +58,9 @@ Various technology deployments, tools & code:
     * ibm-alb - Application and Network Load Balancer usage
     * ibm-ocp - IBM RedHat OpenShift Kubernetes Service (ROKS) deployment
   * azure - Terragrunt / OpenTofu deployments for Azure
-    * ibm-entraid - setup IAM resource needed on fresh Azure subscription (resource group)
+    * azure-network-setup - minimal Azure recommended network setup
+    * azure-entraid - setup IAM resource needed on fresh Azure subscription (resource group)
+    * azure-instance - VM setup
 * [scripts](scripts) - various bash scripts (tools for TLS handling, K8S etc.)
 * [vagrant](vagrant)  - CentOS VM buildout with Vagrant with various Linux networking tools examples
 * [algorithms](algorithms/project-euler) - Java based project solving various <https://projecteuler.net> problems

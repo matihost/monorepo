@@ -6,6 +6,8 @@ Setup minimal network resources:
 
 * Subnetworks for VM and Containers (opinionated names)
 
+* Bastion Host (along with dedicated subnet)
+
 * Nat Gateway along with PublicIP associated with all subnetworks
 
 * Infrastructure to run CloudShell in VNet and dedicated Storage Class Share for mounting cloud disk.
@@ -28,6 +30,8 @@ Setup minimal network resources:
   ```bash
   make init
   ```
+
+* [../azure-entraid](../azure-entraid - installed for the same stage environment (contains resource group and policies)
 
 ## Usage
 

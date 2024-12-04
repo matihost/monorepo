@@ -27,6 +27,12 @@ variable "subnets" {
   description = "Subnets"
 }
 
+variable "bastion" {
+  type = object({
+    cidr_range = string
+  })
+  description = "Bastion Subnet and bastion resource related configuration"
+}
 
 
 variable "container_instance_id" {

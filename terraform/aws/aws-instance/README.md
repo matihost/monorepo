@@ -11,7 +11,7 @@ Use  AWS resources eliglible to AWS Free Tier __only__.
 
 * Latest Terragrunt, Terraform or OpenTofu installed
 
-* * [../aws-network-setup](../aws-network-setup) - installed for `dev` env, aka installation VM in own VPC. The `default` env deploys instance in the default VPC.
+* [../aws-network-setup](../aws-network-setup) - installed for `dev` env, aka installation VM in own VPC. The `default` env deploys instance in the default VPC.
 
 ## Usage
 

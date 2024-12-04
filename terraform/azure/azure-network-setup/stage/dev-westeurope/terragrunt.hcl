@@ -20,6 +20,9 @@ inputs = {
   region             = local.region
   zone               = local.zone
   vnet_ip_cidr_range = "10.0.0.0/16"
+  bastion = {
+    cidr_range = "10.0.3.0/27"
+  }
   cloudshell = {
     cidr_range           = "10.0.0.0/24"
     storage_account_name = local.storage_account

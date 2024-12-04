@@ -156,6 +156,11 @@ resource "azurerm_storage_account" "cloudshell" {
   account_replication_type = "ZRS"
   account_kind             = "StorageV2" # CloudShell are ok with SMBA, Premium if NFSv4 is needed
 
+  # TODO Azure adds a tag, is it mandatory ?
+  # "ms-resource-usage" = "azure-cloud-shell"
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 # TODO ensure only access is from VNet subnets
