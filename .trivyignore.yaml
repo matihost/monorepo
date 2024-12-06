@@ -10,3 +10,5 @@ misconfigurations:
   - id: AVD-AWS-0054
   # Minimum TLS version, however default for new Azure resources is already new TLS version
   - id: AVD-AZU-0011
+  # Network ACL for Key Vault should be set. https://avd.aquasec.com/misconfig/avd-azu-0013
+  - id: AVD-AZU-0013

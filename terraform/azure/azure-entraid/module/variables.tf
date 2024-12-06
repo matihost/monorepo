@@ -1,11 +1,49 @@
 data "azurerm_subscription" "current" {
 }
 
-locals {
-  # tflint-ignore: terraform_unused_declarations
-  subscription_id = data.azurerm_subscription.current.id
+data "azurerm_client_config" "current" {
 }
 
+
+locals {
+  # tflint-ignore: terraform_unused_declarations
+  subscription_id   = data.azurerm_subscription.current.id
+  tenant_id         = data.azurerm_client_config.current.tenant_id
+  prefix            = "${var.env}-${local.azure_region_abbreviations[var.region]}"
+  subscription_name = data.azurerm_subscription.current.display_name
+  azure_region_abbreviations = {
+    "eastus"             = "eus"
+    "eastus2"            = "eu2"
+    "westus"             = "wus"
+    "westus2"            = "wu2"
+    "centralus"          = "cus"
+    "northeurope"        = "neu"
+    "westeurope"         = "weu"
+    "southeastasia"      = "sea"
+    "eastasia"           = "eas"
+    "australiaeast"      = "aue"
+    "australiasoutheast" = "aus"
+    "japaneast"          = "jpe"
+    "japanwest"          = "jpw"
+    "canadacentral"      = "cac"
+    "canadaeast"         = "cae"
+    "germanywestcentral" = "gwc"
+    "uksouth"            = "uks"
+    "ukwest"             = "ukw"
+    "polandcentral"      = "plc"
+    "brazilsouth"        = "brs"
+    "southafricanorth"   = "san"
+    "southafricasouth"   = "sas"
+    "francecentral"      = "frc"
+    "francesouth"        = "frs"
+    "uaecentral"         = "uae"
+    "uaenorth"           = "uan"
+    "koreacentral"       = "kor"
+    "koreasouth"         = "kos"
+    "switzerlandnorth"   = "chn"
+    "switzerlandwest"    = "chw"
+  }
+}
 
 variable "locations" {
   default     = ["West Europe"]

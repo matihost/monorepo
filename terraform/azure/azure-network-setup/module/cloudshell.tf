@@ -123,7 +123,7 @@ resource "azurerm_private_endpoint" "relay" {
 }
 
 
-# Managed in azuare-entraid module per resource group
+# Managed in azure-entraid module per resource group
 data "azurerm_private_dns_zone" "privatelink" {
   name                = "privatelink.servicebus.windows.net"
   resource_group_name = local.resource_group_name

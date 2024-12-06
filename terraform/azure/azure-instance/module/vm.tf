@@ -21,6 +21,14 @@ resource "azurerm_ssh_public_key" "ssh" {
   public_key          = var.ssh_pub_key
 }
 
+
+resource "azurerm_key_vault_secret" "ssh" {
+  name         = local.vm_name
+  value        = var.ssh_key
+  key_vault_id = data.azurerm_key_vault.key_vault.id
+}
+
+
 resource "azurerm_network_interface" "nic" {
   name                = "${local.vm_name}-nic"
   location            = local.location
