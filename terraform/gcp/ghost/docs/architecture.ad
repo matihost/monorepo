@@ -1,0 +1,44 @@
+= Ghost GCP Deployment : Architecture
+Matihost
+:doctype: book
+:reproducible:
+:source-highlighter: rouge
+:listing-caption: Listing
+:math:
+:data-uri:
+:imagesoutdir: ../target/generated-images
+:stem: latexmath
+:toc: left
+
+
+== Architecture Proposal
+
+The proposed application architecture is mainly based on SAAS GCP services: CloudRun, Global Load Balancer, CloudArmor/WAF and CloudSQL.
+The architecture is a highly scalable and available architecture that can handle a large number of users and requests  while protecting against malicious traffic and attacks.
+
+
+The following diagram shows main components and how they interact with each other:
+[plantuml, target=minecraft-infra, format=png]
+....
+include::diagrams/architecture.puml[]
+....
+
+Here is how the architecture works:
+
+The Ghost blogging application is packaged into a container image and mirrored from DockeHub registry to GCP artifact registry.
+
+A CloudSQL instance is used for Ghost blog backend. CloudSQL in HA mode (3 zones) scales automatically based on the workload, ensuring that there is enough database capacity to handle the data storage and retrieval requirements.
+
+A CloudRun service is created to run Ghost application in at least two distinct regions. That helps with DR and HA in case region or geographical outages. CloudRun also automatically scales the application based on the incoming traffic, ensuring that there is always enough capacity to handle the traffic.
+
+A DNS record is created to direct traffic to the Global Load Balancer (or to WAF in front of GLB).
+
+The Global Load Balancer is set up to distribute traffic to the CloudRun services deployed in different regions. It is configured to monitor the health of the instances and direct traffic to the instances that are closest geographically to the client and are healthy.  CloudArmor is configured to protect the application from DDoS attacks. Optionally client may add other SAAS WAF solution in front of GCP (Imperva?).
+Cloud CDN is enabled for faster images and static content retrieval as well.
+
+Users can access the application by navigating to the DNS record. The Global Load Balancer will distribute the traffic to the appropriate CloudRun instance based on the user's location and the health of the instances. The CloudRun instances will connect to the CloudSQL database to retrieve and store data.
+
+Per client request - CloudFunction is created to clean all posts on demand.
+
+
+Overall, this architecture provides a highly scalable and highly available solution for running containerized applications with a managed database service in the cloud. It offers automatic scaling, redundancy, and reliability, ensuring that the application is always available and responsive to user requests.

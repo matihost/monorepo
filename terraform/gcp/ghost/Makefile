@@ -39,6 +39,22 @@ ifndef CONTENT_KEY
 endif
 	cd stage/$(ENV)/posts-management && terragrunt validate && terragrunt $(MODE_STR)
 
+remove-all-posts: ## delete all posts, usage: make remove-all-posts ENV=dev
+ifndef ENV
+	$(error Environment ENV is not defined. Usage make run ENV=dev [MODE=apply] [DEBUG=true])
+endif
+ifndef ADMIN_KEY
+	$(error Environment ADMIN_KEY is not defined. See https://ghost.org/docs/admin-api/javascript/#authentication how get one. Usage make run ENV=dev ADMIN_KEY=... CONTENT_KEY=... [MODE=apply] [DEBUG=true])
+endif
+ifndef CONTENT_KEY
+	$(error Environment CONTENT_KEY is not defined. See https://ghost.org/docs/admin-api/javascript/#authentication how get one. Usage make run ENV=dev ADMIN_KEY=... CONTENT_KEY=... [MODE=apply] [DEBUG=true])
+endif
+	URL="$$(cd stage/$(ENV)/posts-management && terragrunt output -raw removeAllPostsURL 2>/dev/null)" && \
+	curl -m 70 -X POST "$${URL}" \
+	-H "Authorization: bearer $$(gcloud auth print-identity-token)" \
+	-H "Content-Type: application/json" \
+	-d '{}'
+
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
 	gcloud auth application-default login

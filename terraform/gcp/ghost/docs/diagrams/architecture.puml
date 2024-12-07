@@ -1,0 +1,70 @@
+@startuml
+' configures the library
+!global $LIB_BASE_LOCATION="https://raw.githubusercontent.com/tmorin/plantuml-libs/master/distribution"
+
+' loads the library
+!include $LIB_BASE_LOCATION/bootstrap.puml
+
+' loads the package bootstrap
+include('gcp/bootstrap')
+include('simpleicons-8/bootstrap')
+include('c4model/bootstrap')
+include('fontawesome-6/bootstrap')
+include('material-4/bootstrap')
+
+include('c4model/full')
+include('material-4/Hardware/Laptop')
+include('material-4/Hardware/PhoneAndroid')
+
+include('gcp/full')
+include('simpleicons-8/M/Mailgun')
+include('material-4/Alert/Warning')
+
+Title("Ghost Deployment Architecture")
+skinparam linetype ortho
+
+left to right direction
+
+cloud Internet {
+  Laptop('laptop', '')
+  PhoneAndroid('phone', '')
+  EnterpriseBoundary(ghostgcp, 'Ghost GCP Deployment','Ghost GCP Deployment'){
+    GroupProjectZone('project', 'prod-ghost', 'GCP Project') {
+        CloudArmor('cloudArmor', 'Cloud Armor')
+        CloudCdn('cloudCdn', 'CDN')
+        CloudDns('cloudDns', 'DNS')
+        CloudLoadBalancing('glb','x.x.x.x', 'public IP')
+        CloudRun('cloudRun1', 'Cloud Run', 'us-central1', 'us-docker.pkg.dev\n/prod-ghost/images/ghost:5.x.x')
+        CloudRun('cloudRun2', 'Cloud Run', 'us-west1', 'us-docker.pkg.dev\n/prod-ghost/images/ghost:5.x.x')
+        CloudSql('cloudSql', 'Cloud Sql', 'us-central1', 'MySQL 8.x.x')
+        Warning('clouRunSLO1', 'SLO', 'SLO, Monitoring, ALerting')
+        Warning('clouRunSLO2', 'SLO', 'SLO, Monitoring, ALerting')
+        CloudFunctions('postRemovalFunction', 'Cloud Function', 'post removal function')
+    }
+  }
+  Mailgun('mailgun', 'Mailgun')
+}
+
+laptop --> glb
+phone --> glb
+
+cloudArmor ..> glb : protects
+
+cloudCdn ..> glb
+cloudDns ..> glb
+
+glb --> cloudRun1
+glb --> cloudRun2
+
+clouRunSLO1 ..> cloudRun1 : monitors
+clouRunSLO2 ..> cloudRun2 : monitors
+
+cloudRun1 --> cloudSql
+cloudRun2 --> cloudSql
+
+cloudRun1 --> mailgun
+cloudRun2 --> mailgun
+
+postRemovalFunction --> cloudRun1
+
+@enduml

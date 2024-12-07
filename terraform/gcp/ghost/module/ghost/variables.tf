@@ -26,13 +26,13 @@ variable "ha" {
 
 variable "name" {
   type        = string
-  default     = "droneshuttles"
+  default     = "ghost"
   description = "Name of the service"
 }
 
 variable "url" {
   type        = string
-  description = "Full URL under which site is visible, for example: http://droneshuttles.mooo.com"
+  description = "Full URL under which site is visible, for example: http://ghost.mooo.com"
 }
 
 #  Default inherited variables

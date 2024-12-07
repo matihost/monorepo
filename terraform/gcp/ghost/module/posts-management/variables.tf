@@ -12,7 +12,7 @@ variable "env" {
 
 variable "name" {
   type        = string
-  default     = "droneshuttles"
+  default     = "ghost"
   description = "Name of the service"
 }
 

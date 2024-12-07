@@ -9,10 +9,12 @@ run-name: >-
   ${{ inputs.runner && inputs.runner != 'ubuntu-24.04' && format(' on {0}', inputs.runner) || '' }}
 
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types: [completed]
-    branches: [main]
+  # TODO disable until new module is confirming to work
+  #
+  # workflow_run:
+  #   workflows: ["CI"]
+  #   types: [completed]
+  #   branches: [main]
 
   workflow_dispatch:
     inputs:
@@ -41,7 +43,7 @@ on:
       module:
         description: 'Module to deploy'
         required: true
-        default: 'aws/aws-site'
+        default: 'aws/aws-rds'
 permissions:
   contents: read
   id-token: write
