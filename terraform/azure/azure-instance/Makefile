@@ -25,6 +25,15 @@ init: init-tf-backend prepare
 run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
 	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
 
+ssh-via-bastion: ## connect to instance via Azure Bastion
+	az network bastion ssh \
+		--name $(shell cd stage/$(ENV) && terragrunt output bastion_name)  \
+		--resource-group dev \
+		--target-resource-id $(shell cd stage/$(ENV) && terragrunt output vm_id) \
+		--auth-type ssh-key \
+		--username ubuntu \
+		--ssh-key ~/.ssh/id_rsa.cloud.vm
+
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show
 

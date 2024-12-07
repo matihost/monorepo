@@ -28,4 +28,7 @@ Setup single VM instance with Ngnix server on it.
 ```bash
 # setup VM
 make run MODE=apply ENV=dev-westeurope
+
+# connect to instance via Azure Bastion
+make ssh-via-bastion
 ```

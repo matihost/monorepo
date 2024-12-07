@@ -12,3 +12,6 @@ misconfigurations:
   - id: AVD-AZU-0011
   # Network ACL for Key Vault should be set. https://avd.aquasec.com/misconfig/avd-azu-0013
   - id: AVD-AZU-0013
+  # Internet or * in NSGs
+  - id: AVD-AZU-0051
+  - id: AVD-AZU-0047
