@@ -34,6 +34,33 @@ ssh-via-bastion: ## connect to instance via Azure Bastion
 		--username ubuntu \
 		--ssh-key ~/.ssh/id_rsa.cloud.vm
 
+expose-direct-proxy-locally: ## expose TinyProxy locally to access resource inside VNet - uses az tunnel (limitations, slow)
+	@[ "$(shell sudo ss -antl |grep -c 8888)" -ne 0 ] || az network bastion tunnel \
+  --name $(shell cd stage/$(ENV) && terragrunt output bastion_name)  \
+  --resource-group dev \
+  --target-resource-id $(shell cd stage/$(ENV) && terragrunt output vm_id) \
+  --resource-port 8888 \
+  --port 8888 &
+
+shutdown-local-proxy: ## shutdown tunneled bastion's HTTP proxy
+	@-[ "$(shell sudo ss -antl |grep -c 8888)" -eq 0 ] || sudo kill -9 $(shell sudo lsof -t -i:8888)
+	@-[ "$(shell sudo ss -antl |grep -c 2022)" -eq 0 ] || sudo kill -9 $(shell sudo lsof -t -i:2022)
+
+
+expose-proxy-via-ssh-locally: ## expose TinyProxy locally to access resource inside VNet - uses ssh tunneling (done via az tunnel), needs 2 ports, but more resilient
+	@[ "$(shell sudo ss -antl |grep -c 2022)" -ne 0 ] || az network bastion tunnel \
+  --name $(shell cd stage/$(ENV) && terragrunt output bastion_name)  \
+  --resource-group dev \
+  --target-resource-id $(shell cd stage/$(ENV) && terragrunt output vm_id) \
+  --resource-port 22 \
+  --port 2022 &
+	@sleep 2 # workaround for az tunnel delay when run in background
+	@[ "$(shell sudo ss -antl |grep -c 8888)" -ne 0 ] || ssh -o StrictHostKeyChecking=accept-new -f -N -i ~/.ssh/id_rsa.cloud.vm ubuntu@127.0.0.1 -p 2022 -L 8888:127.0.0.1:8888
+
+
+test: ## test connectivity via proxy to vm ngnix
+	export http_proxy=http://localhost:8888 && export https_proxy=http://localhost:8888 && curl http://dev-weu-vm
+
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show
 

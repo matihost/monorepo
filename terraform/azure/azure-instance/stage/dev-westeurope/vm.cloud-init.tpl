@@ -8,7 +8,9 @@ repo_upgrade: all
 
 packages:
  - nginx
+ - tinyproxy
  - plocate
+ - dnsutils
  - azure-cli
 
 # cloud-init creates a final script in: /var/lib/cloud/instance/scripts/runcmd
@@ -19,3 +21,5 @@ runcmd:
  - cat /home/${admin_username}/.ssh/id_rsa.pub >> /home/${admin_username}/.ssh/authorized_keys
  - 'chown ${admin_username}:${admin_username} /home/${admin_username}/.ssh/id_rsa*'
  - chmod 400 /home/${admin_username}/.ssh/id_rsa
+ - sed -i -E "s/^#Allow 10.0.0.0\/8.*$/Allow 10.0.0.0\/8/" /etc/tinyproxy/tinyproxy.conf
+ - systemctl restart tinyproxy
