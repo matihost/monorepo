@@ -956,6 +956,17 @@ all:
               echo '[default]
             region=us-east-1' > ~/.aws/config
             }
+        - name: eksctl
+          become: true
+          command: |
+            CURRENT_VERSION="$(curl -sL "https://api.github.com/repos/eksctl-io/eksctl/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"v([^"]+)".*/\1/')"
+            INSTALLED_VERSION="$(eksctl version 2</dev/null)";
+            [[ "${INSTALLED_VERSION}" == "${CURRENT_VERSION}"* ]] || {
+              echo "Downloading EKSCTL ${CURRENT_VERSION}..."
+              curl -sSL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz" | tar -zx -o eksctl
+              mv eksctl /usr/local/bin
+              echo "EKSCTL CLI installed"
+            }
         - name: ibmcloud
           become: false
           desc: To install ibmcloud cli

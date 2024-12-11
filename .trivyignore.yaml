@@ -15,3 +15,6 @@ misconfigurations:
   # Internet or * in NSGs
   - id: AVD-AZU-0051
   - id: AVD-AZU-0047
+  # EKS public exposure
+  - id: AVD-AWS-0040
+  - id: AVD-AWS-0041
