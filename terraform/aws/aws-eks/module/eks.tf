@@ -50,8 +50,10 @@ resource "aws_eks_cluster" "cluster" {
   bootstrap_self_managed_addons = false
 
   compute_config {
-    enabled       = true
-    node_pools    = ["system", "general-purpose"]
+    enabled = true
+    # possible values "system", "general-purpose"
+    # deploying only system for system, addons deployment, nodepool for workflows is created via Helm module/cluster-config-chart
+    node_pools    = ["system"]
     node_role_arn = aws_iam_role.node.arn
   }
 
@@ -69,6 +71,9 @@ resource "aws_eks_cluster" "cluster" {
   }
 
   vpc_config {
+    # TODO make own instead,
+    # By default EKS Auto creates SecurityGroup allow access only from same SG and allowing all outbound
+    # security_group_ids = ...
     endpoint_private_access = true
     endpoint_public_access  = true
 
@@ -179,4 +184,20 @@ resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSLoadBalancingPolicy"
 resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSNetworkingPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSNetworkingPolicy"
   role       = aws_iam_role.cluster.name
+}
+
+
+resource "null_resource" "cluster-config" {
+  triggers = {
+    always_run = timestamp()
+  }
+  provisioner "local-exec" {
+    command = "${path.module}/configure-cluster.sh '${aws_eks_cluster.cluster.name}' '${var.region}' '${jsonencode(var.namespaces)}'"
+  }
+
+  depends_on = [
+    aws_iam_role.cluster,
+    aws_eks_access_entry.admin,
+    aws_eks_access_policy_association.admin,
+  ]
 }

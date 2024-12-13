@@ -1,0 +1,20 @@
+# yamllint disable-file
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ebs-gp3
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+  labels:
+    {{- include "cluster-config.labels" . | nindent 4 }}
+provisioner: ebs.csi.eks.amazonaws.com
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Delete
+parameters:
+  type: gp3
+  csi.storage.k8s.io/fstype: xfs
+  #TODO https://docs.aws.amazon.com/eks/latest/userguide/create-storage-class.html
+  # encrypted: "true"
+  # kmsKeyId: <custom-key-arn>
+allowVolumeExpansion: true

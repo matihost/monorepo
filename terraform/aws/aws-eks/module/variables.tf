@@ -78,3 +78,36 @@ variable "cluster_admin_arn" {
   default     = null
   description = "The break glass cluster-admin arn, if none provided, the arn of the creator is chosen"
 }
+
+
+
+variable "namespaces" {
+  type = list(object({
+    name = string
+    quota = object({
+      requests = object({
+        cpu    = string
+        memory = string
+      })
+      limits = object({
+        cpu    = string
+        memory = string
+      })
+    })
+  }))
+
+  description = "EKS namespaces configuration"
+  default = [{
+    name = "test"
+    quota = {
+      limits = {
+        cpu    = "12"
+        memory = "16Gi"
+      }
+      requests = {
+        cpu    = "12"
+        memory = "16Gi"
+      }
+    }
+  }]
+}

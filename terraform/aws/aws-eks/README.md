@@ -1,10 +1,13 @@
 # Terraform :: EKS  deployment
 
-Terraform scripts deploy ROSA
+Terraform scripts deploy EKS
 
 In particular it creates:
 
 - EKS with Auto mode
+- EFS and CSI Snapshots addons
+- Configure storage, ingress, node pool classes
+- Configure app namespaces (quuota, limits, networkpolicies)
 
 ## Prerequisites
 
@@ -12,7 +15,7 @@ In particular it creates:
 
 - Latest Terraform or OpenTofu, Terragrunt installed
 
-- jq tool installed
+- jq, kubectl tools installed
 
 - EKS CTL CLI installed (optionally):
 

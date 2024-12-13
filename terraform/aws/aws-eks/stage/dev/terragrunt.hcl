@@ -18,4 +18,18 @@ inputs = {
     Region = "us-east1"
   }
   zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+
+  namespaces = [{
+    name = "learning"
+    quota = {
+      limits = {
+        cpu    = "12"
+        memory = "16Gi"
+      }
+      requests = {
+        cpu    = "12"
+        memory = "16Gi"
+      }
+    }
+  }]
 }

@@ -1,0 +1,4 @@
+Install cluster EKS configurations:
+- Compute Node Pool
+- Storage  Classe
+- ALB Ingress Classes

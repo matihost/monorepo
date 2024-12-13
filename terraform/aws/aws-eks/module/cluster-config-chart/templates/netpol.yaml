@@ -1,0 +1,11 @@
+# yamllint disable-file
+---
+# Enable AWS VPC CNI driver NetworkPolicies
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: amazon-vpc-cni
+  namespace: kube-system
+data:
+  enable-network-policy-controller: "true"
+# NodePoolClasses then has to contain
