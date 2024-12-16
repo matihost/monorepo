@@ -48,6 +48,7 @@ resource "google_compute_url_map" "keycloak" {
   path_matcher {
     name            = "path-matcher-1"
     default_service = google_compute_backend_service.keycloak.self_link
+
     route_rules {
       match_rules {
         full_path_match = "/"
@@ -59,7 +60,25 @@ resource "google_compute_url_map" "keycloak" {
         strip_query            = true
       }
     }
+
+    # Workaround for the fact that Google Cloud does not allow exposing ACME HTTP verification path.
+    #
+    # # The .well-known/acme-challenge/verification_file needs to placed in the root GS bucket directory.
+    route_rules {
+      match_rules {
+        prefix_match = "/.well-known/acme-challenge/"
+      }
+      priority = 2
+      service  = google_compute_backend_bucket.keycloak.self_link
+
+      route_action {
+        url_rewrite {
+          path_prefix_rewrite = "/"
+        }
+      }
+    }
   }
+
 
   name    = local.name
   project = var.project
@@ -119,4 +138,30 @@ resource "google_compute_backend_service" "keycloak" {
   protocol         = "HTTPS"
   session_affinity = "CLIENT_IP"
   timeout_sec      = "30"
+}
+
+
+#  Http2Https Redirect
+resource "google_compute_global_forwarding_rule" "keycloak-xlb-http" {
+  ip_address            = google_compute_global_address.keycloak.address
+  ip_protocol           = "TCP"
+  load_balancing_scheme = "EXTERNAL_MANAGED"
+  name                  = "${local.name}-http2https-redirect"
+  port_range            = "80-80"
+  target                = google_compute_target_http_proxy.keycloak-xlb-http.self_link
+}
+resource "google_compute_target_http_proxy" "keycloak-xlb-http" {
+  name    = "${local.name}-http2https-redirect"
+  url_map = google_compute_url_map.keycloak-xlb-http2https.self_link
+}
+
+resource "google_compute_url_map" "keycloak-xlb-http2https" {
+  default_url_redirect {
+    https_redirect         = "true"
+    redirect_response_code = "MOVED_PERMANENTLY_DEFAULT"
+    strip_query            = "false"
+  }
+
+  description = "Automatically generated HTTP to HTTPS redirect for the ${local.name}-http2https-redirect forwarding rule"
+  name        = "${local.name}-http2https"
 }

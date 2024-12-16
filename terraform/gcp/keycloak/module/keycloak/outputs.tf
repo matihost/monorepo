@@ -4,3 +4,7 @@ output "keycloak_glb_public_ip" {
 output "db_connection_name" {
   value = google_sql_database_instance.keycloak.connection_name
 }
+
+output "keycloak_gs_bucket" {
+  value = google_storage_bucket.keycloak.name
+}

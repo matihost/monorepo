@@ -14,6 +14,8 @@ else
 	MODE_STR := plan
 endif
 
+
+
 init:
 ifndef ENV
 	$(error Environment ENV is not defined. Usage make run ENV=prod MODE=plan [DEBUG=true])
@@ -62,6 +64,23 @@ image: build-sql-connector ## builds keycloak image with support to PostreSQL GC
 
 run-bash: ## run image with bash
 	docker run -it --entrypoint bash --rm quay.io/matihost/keycloak-postgres-cloudsql:$(TAG)
+
+get-keycloak-gs-bucket: ## get GS bucket
+ifndef ENV
+	$(error Environment ENV is not defined. Usage make get-keycloak-gs-bucket ENV=prod)
+endif
+	@echo -n $(shell cd stage/$(ENV)/keycloak && terragrunt output keycloak_gs_bucket)
+
+
+generate-letsencrypt-cert: ## generate Let's Encrypt TLS certificate, usage make generate-letsencrypt-cert DOMAIN=id.yourdomain.com
+ifndef DOMAIN
+	$(error Env DOMAIN is not defined. Usage make generate-letsencrypt-cert DOMAIN=id.matihost.mooo.com)
+endif
+	mkdir -p ~/.tls
+	sudo certbot certonly --manual -d $(DOMAIN)
+	sudo cp -Lr /etc/letsencrypt/live/$(DOMAIN) ~/.tls
+	sudo chown -R $(shell whoami):$(shell whoami) ~/.tls
+	sudo chmod -R go-rwx ~/.tls
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))

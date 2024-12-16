@@ -15,6 +15,8 @@ Exposed via GLB.
 
 * Ensure you have DNS domain for [stage/dev/keycloak/terragrunt.hcl#input.url](stage/dev/keycloak/terragrunt.hcl). Change input.url parameter to meet DNS domain you wish site will be accessible from internet. I use free DNS subdomains from [https://freedns.afraid.org/](https://freedns.afraid.org/)
 
+* (Optionally) TLS certification for your site. If you don't have one, by default Keycloak uses selfsigned TLS certificate. You may also get one via get Let's Encrypt TLS certification via HTTP ACME verfication method, follow instruction [HTTPS with Let's Encrpyt TLS certificate](#https-with-lets-encrypt-tls-certificate)
+
 * Ensure Google Cloud Docker registry is configured. Run [../gcp-repository/](../gcp-repository/) deployment.
 
 * Authenticate to GCP:
@@ -65,3 +67,58 @@ Exposed via GLB.
 * Login to Keycloak admin console. Use: `/admin` prefix. TODO make super admin user and password env specific and taken from secret store.
 
 * Follow [basic setup](https://www.keycloak.org/docs/latest/server_admin/#configuring-realms) of Keycloak - like SMTP configuration and create realm with name `id`.
+
+## HTTPS with Let's Encrypt TLS Certificate
+
+Keycloak deploymend takes TLS certificate from `~/.tls/id.domain` directory, or from `TLS_CRT`, `TLS_KEY` environment variables.
+If none of these locations contains valid TLS files, the installation scripts creates self-signed certificate and use that for HTTPS exposure.
+
+You can obtains Let's Encrypt with TXT ACME verification method.
+
+If you DNS provider does not provide TXT entries or your prefer ACME HTTP verification method - then you need to :
+
+* Install Keycloak without providing valid certificate. It will use selfsigned certificate.
+
+Keycloak installation allows ACME HTTP verification path for Let's Encrypt verification, because it exposes `.well-known/acme-challenge/`  path as static GS bucket content.
+
+
+* Get name of GS where ACME verification file needs to be placed
+
+  ```bash
+  make get-keycloak-gs-bucket ENV=prod
+  ```
+
+* Generate TLS certificate via Let's Encrypt: (certbot tool required):
+
+  ```bash
+  make generate-letsencrypt-cert DOMAIN=id.mydomain.com
+  ```
+
+* Follow instruction on the screen. Essentially you need to create a file and *place it in above GS root directory*.
+
+This is the proof that you control the site - and hence Let's Encrypt will generate TLS certificate for free for 3 months,
+The make script also copies the generated certficate to `~/.tls` directory so that next Terraform invocation can access it.
+
+_Warning_: If you intent to run deployment of this module from GitHub Actions `CD` workflow, not from your local environment - you need to place/change these files as GitHub Actions Environment secrets `TLS_CRT`, `TLS_KEY` respectively.
+
+### Refresh TLS certificate
+
+Let's Encrypt TLS certificate is valid for 3 months.
+Run these steps before certificate is invalid:
+
+```bash
+# regenerate TLS certificate
+make generate-letsencrypt-cert DOMAIN=id.mydomain.com
+
+# check proposed changes
+make run-keycloak MODE=plan ENV=prod
+
+
+# when TLS certificate is to be changed only
+make run-keycloak MODE=apply ENV=prod
+
+# or
+#
+# if you run deployment from GitHub Actions CD workflow
+# change GitHub Actions Environment secrets `TLS_CRT`, `TLS_KEY` and re-run CD workflow for that environment
+```
