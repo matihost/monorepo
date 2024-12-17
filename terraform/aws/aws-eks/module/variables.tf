@@ -83,7 +83,8 @@ variable "cluster_admin_arn" {
 
 variable "namespaces" {
   type = list(object({
-    name = string
+    name    = string
+    fargate = bool
     quota = object({
       requests = object({
         cpu    = string
@@ -98,7 +99,8 @@ variable "namespaces" {
 
   description = "EKS namespaces configuration"
   default = [{
-    name = "test"
+    name    = "test"
+    fargate = false
     quota = {
       limits = {
         cpu    = "12"
@@ -110,4 +112,54 @@ variable "namespaces" {
       }
     }
   }]
+}
+
+
+variable "oidc" {
+  type = object({
+    issuer_url     = string
+    client_id      = string
+    username_claim = string
+    groups_claim   = string
+  })
+
+  default = null
+
+  description = "EKS OIDC provider configuration"
+
+  # Sample Keycloak config:
+  #
+  # default = {
+  #   issuer = "https://id.matihost.mooo.com/realms/id"
+  #   client_id = "eks"
+  #   username_claim = "email"
+  #   groups_claim = "groups"
+  # }
+  #
+  # Sample token:
+  #
+  # {
+  # "exp": 1734443783,
+  # "iat": 1734443483,
+  # "auth_time": 1734442743,
+  # "jti": "936ace3f-181c-40ca-8bc6-7c7d7093ead8",
+  # "iss": "https://id.matihost.mooo.com/realms/id",
+  # "aud": "eks",
+  # "sub": "f76a1839-abdd-4e1c-9869-b73fa8ed64e8",
+  # "typ": "ID",
+  # "azp": "eks",
+  # "nonce": "ccBdcKskRQZC3LJVfpU-R7pC2mQ03Oz2FQwMxO4C-XY",
+  # "sid": "ceb826f0-eed3-4666-8d76-9a95610fa15c",
+  # "at_hash": "Djmh28ZTxRYW_bnhO4TIlA",
+  # "acr": "0",
+  # "email_verified": true,
+  # "name": "Name Surname",
+  # "groups": [
+  #   "/cluster-admins"
+  # ],
+  # "preferred_username": "name@email.com",
+  # "given_name": "Name",
+  # "family_name": "Surname",
+  # "email": "name@email.com"
+  # }
 }

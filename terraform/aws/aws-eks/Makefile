@@ -29,6 +29,22 @@ run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
 kubeconfig: ## generate kubeconfig entry for EKS cluster
 	aws eks --region $(shell cd stage/$(ENV) && terragrunt output -raw region) update-kubeconfig --name $(shell cd stage/$(ENV) && terragrunt output -raw cluster_name)
 
+kubeconfig-oidc: ## test OIDC setup and provide instruction to work
+ifndef ISSUER_URL
+	$(error Environment ISSUER_URL is not defined. For keycloak it would some some: https://id.yourdomain.com/realms/NAME_OF_REALM)
+endif
+ifndef CLIENT_ID
+	$(error Environment CLIENT_ID is not defined. For keycloak it would be realm oidc Client ID, for example: eks)
+endif
+ifndef CLIENT_SECRET
+	$(error Environment CLIENT_SECRET is not defined. For keycloak it would be realm oidc Client ID credentials secret)
+endif
+	kubectl oidc-login setup \
+		--oidc-issuer-url=$(ISSUER_URL) \
+		--oidc-client-id=$(CLIENT_ID) \
+		--oidc-client-secret=$(CLIENT_SECRET)
+
+
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show
 

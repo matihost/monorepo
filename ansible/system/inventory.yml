@@ -607,7 +607,7 @@ all:
               tar zxvf krew-linux_amd64.tar.gz &&
               KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" &&
               "$KREW" install krew &&
-              "$KREW" install change-ns ctx whoami cilium unused-volumes apparmor-manager advise-psp np-viewer view-webhook &&
+              "$KREW" install change-ns ctx whoami cilium unused-volumes apparmor-manager advise-psp np-viewer view-webhook oidc-login &&
               "$KREW" update &&
               "$KREW" upgrade
             }

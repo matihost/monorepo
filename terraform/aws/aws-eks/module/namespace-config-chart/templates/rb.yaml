@@ -1,0 +1,33 @@
+# yamllint disable-file
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: edit
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "namespace-config.labels" . | nindent 4 }}
+subjects:
+- kind: Group
+  name: {{ .Values.namespace }}-edit
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: view
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "namespace-config.labels" . | nindent 4 }}
+subjects:
+- kind: Group
+  name: {{ .Values.namespace }}-view
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
