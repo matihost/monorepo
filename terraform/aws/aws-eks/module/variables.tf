@@ -10,7 +10,6 @@ data "aws_iam_session_context" "current" {
 
 
 locals {
-  # tflint-ignore: terraform_unused_declarations
   account_id = data.aws_caller_identity.current.account_id
   prefix     = "${var.name != "" ? "${var.name}-" : ""}${var.env}-${var.region}"
 }
@@ -83,8 +82,10 @@ variable "cluster_admin_arn" {
 
 variable "namespaces" {
   type = list(object({
-    name    = string
-    fargate = bool
+    name              = string
+    pod_identity_role = optional(string)
+    irsa_policy       = optional(string)
+    fargate           = optional(bool, false)
     quota = object({
       requests = object({
         cpu    = string
@@ -99,8 +100,7 @@ variable "namespaces" {
 
   description = "EKS namespaces configuration"
   default = [{
-    name    = "test"
-    fargate = false
+    name = "test"
     quota = {
       limits = {
         cpu    = "12"

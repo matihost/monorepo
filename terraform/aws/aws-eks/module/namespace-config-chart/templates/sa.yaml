@@ -28,3 +28,19 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
   {{- include "namespace-config.labels" . | nindent 4 }}
+{{- if .Values.irsaRole }}
+---
+apiVersion: v1
+{{- if .Values.dockerconfigjson }}
+imagePullSecrets:
+- name: {{ .Values.dockerreponame }}
+{{- end }}
+kind: ServiceAccount
+metadata:
+  name: app-irsa
+  namespace: {{ .Values.namespace }}
+  labels:
+  {{- include "namespace-config.labels" . | nindent 4 }}
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::{{ .Values.aws.accountId }}:role/{{ .Values.irsaRole}}
+{{- end }}

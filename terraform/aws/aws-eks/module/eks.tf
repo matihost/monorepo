@@ -132,15 +132,46 @@ resource "aws_iam_role" "node" {
   })
 }
 
+
+# To collect AmazonEBS Volume IDs in Logs via EKS CloudWatch Addon
+# https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/install-CloudWatch-Observability-EKS-addon.html
+resource "aws_iam_role_policy" "node_ReadEBSVolumeIDs" {
+  name = "CollectEBSvolumeIDs"
+  role = aws_iam_role.node.id
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "ec2:DescribeVolumes"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        }
+    ]
+}
+EOF
+}
+
 resource "aws_iam_role_policy_attachment" "node_AmazonEKSWorkerNodeMinimalPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodeMinimalPolicy"
   role       = aws_iam_role.node.name
 }
 
+# to download images from this account ECR
 resource "aws_iam_role_policy_attachment" "node_AmazonEC2ContainerRegistryPullOnly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPullOnly"
   role       = aws_iam_role.node.name
 }
+
+# To be able to install Cloud Watch EKS Addons with access to all metrics
+resource "aws_iam_role_policy_attachment" "node_CloudWatchAgentServerPolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  role       = aws_iam_role.node.name
+}
+
 
 resource "aws_iam_role" "cluster" {
   name = "${local.prefix}-eks-cluster"
@@ -192,7 +223,7 @@ resource "null_resource" "cluster-config" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = "${path.module}/configure-cluster.sh '${aws_eks_cluster.cluster.name}' '${var.region}' '${jsonencode(var.namespaces)}'"
+    command = "${path.module}/configure-cluster.sh '${local.account_id}' '${aws_eks_cluster.cluster.name}' '${var.region}' '${jsonencode(var.namespaces)}'"
   }
 
   depends_on = [

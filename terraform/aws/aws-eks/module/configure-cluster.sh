@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-CLUSTER_NAME="${1:?CLUSTER_NAME is required}"
-REGION="${2:?REGION is required}"
-NAMESPACES="${3:?NAMESPACES is required}"
+ACCOUNT_ID="${1:?CLUSTER_NAME is required}"
+CLUSTER_NAME="${2:?CLUSTER_NAME is required}"
+REGION="${3:?REGION is required}"
+NAMESPACES="${4:?NAMESPACES is required}"
 
 set -e
 set -x
@@ -21,10 +22,18 @@ for NAMESPACE in $(echo "${NAMESPACES}" | jq -cr '.[]'); do
   NS="$(echo "${NAMESPACE}" | jq -r ".name")"
   QUOTA="$(echo "${NAMESPACE}" | jq -r ".quota")"
 
+  IRSA_ROLE=""
+  IRSA_POLICY="$(echo "${NAMESPACE}" | jq -r ".irsa_policy")"
+  [[ -n "${IRSA_POLICY}" && "${IRSA_POLICY}" != "null" ]] && {
+    IRSA_ROLE="${CLUSTER_NAME}-${NS}-irsa"
+  }
+
   [ -n "$(kubectl get ns "${NS}" --no-headers --ignore-not-found)" ] || {
     kubectl create ns "${NS}"
   }
   helm upgrade --install "ns-${NS}-config" -n cluster-config --create-namespace "${DIRNAME}/namespace-config-chart" \
     --set namespace="${NS}" \
+    --set aws.accountId="${ACCOUNT_ID}" \
+    --set irsaRole="${IRSA_ROLE}" \
     --set-json quota="$(echo "${QUOTA}" | jq -r)"
 done

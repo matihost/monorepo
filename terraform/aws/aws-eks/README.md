@@ -4,13 +4,17 @@ Terraform scripts deploy EKS
 
 In particular it creates:
 
-- EKS with Auto mode
-- EFS and CSI Snapshots addons
+- EKS with Auto mode - with two NodePools:
+  - `system` - buildin for critical workflows
+  - custom `compute-spot-arm64` - for as cheap as possible workflows based on ARM64 and Spot instances
+- Cloud Watch, EFS and CSI Snapshots addons
 - Configure storage, ingress, node pool classes
-- Configure app namespaces (quuota, limits, networkpolicies)
+- Configure app namespaces (quota, limits, networkpolicies)
+  - For each managed namespace creates `edit` and `view` rolebinding for Groups `NSNAME-edit` and `NSNAME-view`
+  - Assign optionally `EKS Pod Identity Role` to namespace `app` Service Account.
+  - Assign optionally `IRSA` to namespace `app-irsa` Service Account.
 - Configure OIDC authen & authz (Keycloak tested) with Group
   - Add ClusterRoleBinding allowing `cluster-admin` for Group: `cluster-admins`
-  - For each managed namespace creates `edit` and `view` rolebinding for Groups `NSNAME-edit` and `NSNAME-view`
 
 ## Prerequisites
 
@@ -63,11 +67,14 @@ make show-state ENV=dev
 make kubeconfig
 
 
-# test OIDC integration and provide instruction how to make kubeconfig using oidc
+# test OIDC setup and provide instructions to update ~/.kube/config to use it
  export CLIENT_SECRET=...clientid_secret_from_keycloak....
-make oidc-setup-test ISSUER_URL=https://id.yoursite.com/realms/yourrealm CLIENT_ID=eks
+make oidc-test ISSUER_URL=https://id.yoursite.com/realms/yourrealm CLIENT_ID=eks
 
+# when all is ok, JWT token contains valid claims (especially groups) then
 
+# create ~/.kube/config entry for EKS access (using public API endpoint) with user authentication via OIDC
+make kubeconfig-oidc ISSUER_URL=https://id.yoursite.com/realms/yourrealm CLIENT_ID=eks
 ```
 
 ## Day 2 Operations

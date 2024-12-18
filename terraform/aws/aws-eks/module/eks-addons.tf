@@ -81,38 +81,30 @@ resource "aws_iam_role_policy_attachment" "efs-addon_AmazonEFSCSIDriverPolicy" {
   role       = aws_iam_role.efs-addon.name
 }
 
-# TODO CloudWatch addons does not supoport  Pod Identifies yet, only IRSA
+# CloudWatch addons does not support Pod Identifies yet, only IRSA or node level role
+# TODO evaluate more configuration options
+# https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/install-CloudWatch-Observability-EKS-addon.html
+# https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/metrics-collected-by-CloudWatch-agent.html
+resource "aws_eks_addon" "cloudwatch" {
+  cluster_name = aws_eks_cluster.cluster.name
+  addon_name   = "amazon-cloudwatch-observability"
+  # addon_version               = "v2.1.0-eksbuild.1"
+  resolve_conflicts_on_create = "OVERWRITE"
 
-# # https://docs.aws.amazon.com/eks/latest/userguide/workloads-add-ons-available-eks.html#add-ons-aws-efs-csi-driver
-# resource "aws_eks_addon" "cloudwatch" {
-#   cluster_name = aws_eks_cluster.cluster.name
-#   addon_name   = "amazon-cloudwatch-observability"
-#   # addon_version               = "v2.1.0-eksbuild.1"
-#   resolve_conflicts_on_create = "OVERWRITE"
 
-#   pod_identity_association {
-#     role_arn        = aws_iam_role.efs-addon.arn
-#     service_account = "efs-csi-controller-sa"
-#   }
-
-#   configuration_values = jsonencode(
-#     {
-#       "controller" : {
-#         "nodeSelector" : {
-#           "karpenter.sh/nodepool" : "system"
-#         },
-#         "tolerations" : [
-#           {
-#             "key" : "CriticalAddonsOnly",
-#             "operator" : "Exists"
-#           },
-#           {
-#             "effect" : "NoExecute",
-#             "operator" : "Exists",
-#             "tolerationSeconds" : 300
-#           }
-#         ]
-#       }
-#     }
-#   )
-# }
+  configuration_values = jsonencode(
+    { "containerLogs" : { "enabled" : true },
+      "tolerations" : [
+        {
+          "key" : "CriticalAddonsOnly",
+          "operator" : "Exists"
+        },
+        {
+          "effect" : "NoExecute",
+          "operator" : "Exists",
+          "tolerationSeconds" : 300
+        }
+      ]
+    }
+  )
+}

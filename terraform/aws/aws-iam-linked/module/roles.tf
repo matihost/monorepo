@@ -12,6 +12,16 @@ resource "aws_iam_role" "s3all" {
           "Service": "ec2.amazonaws.com"
         },
         "Action": "sts:AssumeRole"
+      },
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "pods.eks.amazonaws.com"
+        },
+        "Action": [
+          "sts:AssumeRole",
+          "sts:TagSession"
+        ]
       }
     ]
   }

@@ -20,16 +20,17 @@ inputs = {
   zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
 
   # Uncomment to integrated cluster authen/authz with OIDC
-  # oidc = {
-  #   issuer_url     = "https://id.yourdomain.com/realms/yourrealm"
-  #   client_id      = "eks"
-  #   username_claim = "email"
-  #   groups_claim   = "groups"
-  # }
+  oidc = {
+    issuer_url     = "https://id.matihost.mooo.com/realms/id"
+    client_id      = "eks"
+    username_claim = "email"
+    groups_claim   = "groups"
+  }
 
   namespaces = [{
-    name    = "learning"
-    fargate = false
+    name              = "learning"
+    pod_identity_role = "s3all"
+    irsa_policy       = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
     quota = {
       limits = {
         cpu    = "12"

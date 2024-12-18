@@ -1,6 +1,9 @@
 namespace: namespace-name
 # dockerconfigjson: base64encodedvalue
 # dockerreponame: quay
+aws:
+  accountId: ""
+# irsaRole: "..."
 quota:
   requests:
     cpu: "16"

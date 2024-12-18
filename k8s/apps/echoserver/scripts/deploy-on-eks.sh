@@ -13,8 +13,8 @@ kubectl config use-context minikube || echo "Minikube not present in kube contex
     --set ingress.tls.crt="$(base64 -w 0 /tmp/${CN}.crt)" \
     --set ingress.tls.key="$(base64 -w 0 /tmp/${CN}.key)" \
     --set ingress.host="${CN}" \
-    --set ingress.class=nginx \
-    --set networkPolicy.enabled=true
+    --set ingress.class=external-alb \
+    --set networkPolicy.enabled=false
 
   # while [ -z "$(kubectl get ingress echoserver -n learning -o jsonpath="{.status..ip}" | xargs)" ]; do
   #   sleep 1
