@@ -64,6 +64,10 @@ endif
 			--exec-arg=--oidc-client-secret=$(CLIENT_SECRET)
 	kubectl config set-context --current --user=oidc
 
+
+test: ## install basic test application
+	kubectl apply -f test -n learning
+
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show
 
@@ -77,4 +81,4 @@ upgrade-providers-version: init
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help run clean
+.PHONY: help run clean test

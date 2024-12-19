@@ -19,6 +19,8 @@ resource "aws_iam_role_policy_attachment" "fargate-AmazonEKSFargatePodExecutionR
 }
 
 resource "aws_eks_fargate_profile" "fargate" {
+  count = anytrue([for namespace in var.namespaces : namespace.fargate]) ? "1" : "0"
+
   cluster_name           = aws_eks_cluster.cluster.name
   fargate_profile_name   = "${local.prefix}-fargate"
   pod_execution_role_arn = aws_iam_role.fargate.arn

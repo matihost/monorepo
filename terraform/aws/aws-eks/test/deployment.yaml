@@ -1,7 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: learning
   name: deployment-2048
 spec:
   selector:
@@ -22,3 +21,7 @@ spec:
           resources:
             requests:
               cpu: "0.5"
+              memory: 1024Mi
+            limits:
+              cpu: "0.5"
+              memory: 1024Mi

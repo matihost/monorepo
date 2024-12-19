@@ -6,8 +6,9 @@ In particular it creates:
 
 - EKS with Auto mode - with two NodePools:
   - `system` - buildin for critical workflows
-  - custom `compute-spot-arm64` - for as cheap as possible workflows based on ARM64 and Spot instances
+  - custom `compute` for workflows
 - Cloud Watch, EFS and CSI Snapshots addons
+- K8S metrics server on `system` nodepool
 - Configure storage, ingress, node pool classes
 - Configure app namespaces (quota, limits, networkpolicies)
   - For each managed namespace creates `edit` and `view` rolebinding for Groups `NSNAME-edit` and `NSNAME-view`

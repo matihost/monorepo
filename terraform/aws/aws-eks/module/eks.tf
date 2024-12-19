@@ -80,7 +80,7 @@ resource "aws_eks_cluster" "cluster" {
     subnet_ids = local.private_subnet_ids
   }
 
-  # TODO add encryption,
+  # TODO add encryption for Secrets
   #
   # encryption_config {
   #   provider {

@@ -40,20 +40,20 @@ inputs = {
         cpu    = "12"
         memory = "16Gi"
       }
-    }
     },
-    {
-      name    = "learning-fargate"
-      fargate = true
-      quota = {
-        limits = {
-          cpu    = "8"
-          memory = "16Gi"
-        }
-        requests = {
-          cpu    = "8"
-          memory = "16Gi"
-        }
-      }
+    #TODO bring back after testing
+    # {
+    #   name = "learning-fargate"
+    #   fargate = true
+    #   quota = {
+    #     limits = {
+    #       cpu    = "8"
+    #       memory = "16Gi"
+    #     }
+    #     requests = {
+    #       cpu    = "8"
+    #       memory = "16Gi"
+    #     }
+    #   }
   }]
 }
