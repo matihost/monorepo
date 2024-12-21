@@ -37,9 +37,15 @@ resource "google_cloud_run_service" "keycloak" {
           name  = "KEYCLOAK_ADMIN"
           value = google_sql_user.user.name
         }
+        # Initial password - for admin Keycloak
         env {
-          name  = "KEYCLOAK_ADMIN_PASSWORD"
-          value = google_sql_user.user.password
+          name = "KEYCLOAK_ADMIN_PASSWORD"
+          value_from {
+            secret_key_ref {
+              name = google_secret_manager_secret.pass.secret_id
+              key  = "latest"
+            }
+          }
         }
         env {
           name  = "KC_DB_URL"
@@ -50,13 +56,35 @@ resource "google_cloud_run_service" "keycloak" {
           value = google_sql_user.user.name
         }
         env {
-          name  = "KC_DB_PASSWORD"
-          value = google_sql_user.user.password
+          name = "KC_DB_PASSWORD"
+          value_from {
+            secret_key_ref {
+              name = google_secret_manager_secret.pass.secret_id
+              key  = "latest"
+            }
+          }
         }
         env {
           name  = "url"
           value = var.url
         }
+
+        # To expose Keycloak via HTTP and GLB
+        # Use option:
+        # If your reverse proxy correctly sets the Forwarded header, and you don't want to hardcode the hostname,
+        # Keycloak can accommodate this:
+        # https://www.keycloak.org/server/hostname
+        # https://www.keycloak.org/server/all-config
+        env {
+          name  = "KC_PROXY_HEADERS"
+          value = "forwarded"
+        }
+
+        env {
+          name  = "KC_HOSTNAME_STRICT"
+          value = "false"
+        }
+
         resources {
           limits = {
             cpu    = "2"
@@ -64,10 +92,10 @@ resource "google_cloud_run_service" "keycloak" {
           }
         }
         startup_probe {
-          initial_delay_seconds = 20
+          initial_delay_seconds = 5
           timeout_seconds       = 2
           period_seconds        = 5
-          failure_threshold     = 10
+          failure_threshold     = 25
           http_get {
             path = "/realms/master"
           }
@@ -75,8 +103,8 @@ resource "google_cloud_run_service" "keycloak" {
         liveness_probe {
           initial_delay_seconds = 10
           timeout_seconds       = 2
-          period_seconds        = 10
-          failure_threshold     = 3
+          period_seconds        = 5
+          failure_threshold     = 5
           http_get {
             path = "/realms/master"
           }

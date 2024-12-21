@@ -1,7 +1,10 @@
 TAG := lts
 
+.EXPORT_ALL_VARIABLES:
+BUILDKIT_PROGRESS=plain
+
 build: ## builds docker image
-	DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build -t quay.io/matihost/jenkins:$(TAG) .
+	docker build --load -t quay.io/matihost/jenkins:$(TAG) .
 
 push: ## push image with tag to quay.io repository (assume docker login quay.io has been perfomed)
 	docker push quay.io/matihost/jenkins:$(TAG)

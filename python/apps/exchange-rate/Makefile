@@ -1,5 +1,8 @@
 TAG := latest
 
+.EXPORT_ALL_VARIABLES:
+BUILDKIT_PROGRESS=plain
+
 init: ## install poetry dependencies, required to be run once
 	poetry install
 
@@ -46,10 +49,10 @@ clean: ## clean
 
 
 build-image: ## builds docker image
-	DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build -t quay.io/matihost/exchange-rate:$(TAG) .
+	docker build --load -t quay.io/matihost/exchange-rate:$(TAG) .
 
 build-image-with-venv: ## builds docker image with venv
-	DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build -f Dockerfile.venv -t quay.io/matihost/exchange-rate:$(TAG) .
+	docker build --load -f Dockerfile.venv -t quay.io/matihost/exchange-rate:$(TAG) .
 
 push-image: ## push image with tag to quay.io repository (assume docker login quay.io has been perfomed)
 	docker push quay.io/matihost/exchange-rate:$(TAG)

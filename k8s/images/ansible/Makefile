@@ -5,9 +5,12 @@ else
 	ROOT_TAG := $(TAG)-root
 endif
 
+.EXPORT_ALL_VARIABLES:
+BUILDKIT_PROGRESS=plain
+
 build: ## builds docker image
-	DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build -t quay.io/matihost/ansible:$(TAG) .
-	DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build -f Dockerfile.root -t quay.io/matihost/ansible:$(ROOT_TAG) .
+	docker build --load -t quay.io/matihost/ansible:$(TAG) .
+	docker build --load -f Dockerfile.root -t quay.io/matihost/ansible:$(ROOT_TAG) .
 
 push: ## push image with tag to quay.io repository (assume docker login quay.io has been perfomed)
 	docker push quay.io/matihost/ansible:$(TAG)

@@ -10,3 +10,13 @@ resource "google_project_iam_member" "keycloak-rolebinding" {
   role   = "roles/editor"
   member = "serviceAccount:${google_service_account.keycloak.email}"
 }
+
+
+# Grant Access to Secret
+resource "google_secret_manager_secret_iam_member" "pass" {
+  secret_id = google_secret_manager_secret.pass.id
+  role      = "roles/secretmanager.secretAccessor"
+
+  member     = "serviceAccount:${google_service_account.keycloak.email}"
+  depends_on = [google_secret_manager_secret.pass]
+}

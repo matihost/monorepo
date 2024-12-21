@@ -11,7 +11,7 @@ Exposed via GLB.
 
 * (Optionally, but recommended) Enable remaining required GCP APIs. Deployments ensure that particular API is enabled first, but Google often claims that API is enabled, but later on deployment claims it is not yet, and several minutes waiting is really required that API is truly enabled on GCP side.
 
-  The list of required APIs: [Cloud Run](https://console.cloud.google.com/apis/library/run.googleapis.com), [SQL Component](https://console.cloud.google.com/apis/library/sql-component.googleapis.com), [SQL Admin](https://console.cloud.google.com/apis/library/sqladmin.googleapis.com), [Binary Authz](https://console.cloud.google.com/apis/library/binaryauthorization.googleapis.com), [CloudFunctions](https://console.cloud.google.com/apis/library/cloudfunctions.googleapis.com), [ArtifactRegistry](https://console.cloud.google.com/apis/library/artifactregistry.googleapis.com), [CloudBuild](https://console.cloud.google.com/apis/library/cloudbuild.googleapis.com)
+  The list of required APIs: [Cloud Run](https://console.cloud.google.com/apis/library/run.googleapis.com), [Secret Manager](https://console.cloud.google.com/apis/library/secretmanager.googleapis.com), [SQL Component](https://console.cloud.google.com/apis/library/sql-component.googleapis.com), [SQL Admin](https://console.cloud.google.com/apis/library/sqladmin.googleapis.com), [Binary Authz](https://console.cloud.google.com/apis/library/binaryauthorization.googleapis.com), [CloudFunctions](https://console.cloud.google.com/apis/library/cloudfunctions.googleapis.com), [ArtifactRegistry](https://console.cloud.google.com/apis/library/artifactregistry.googleapis.com), [CloudBuild](https://console.cloud.google.com/apis/library/cloudbuild.googleapis.com)
 
 * Ensure you have DNS domain for [stage/dev/keycloak/terragrunt.hcl#input.url](stage/dev/keycloak/terragrunt.hcl). Change input.url parameter to meet DNS domain you wish site will be accessible from internet. I use free DNS subdomains from [https://freedns.afraid.org/](https://freedns.afraid.org/)
 
@@ -91,13 +91,22 @@ Keycloak installation allows ACME HTTP verification path for Let's Encrypt verif
 * Generate TLS certificate via Let's Encrypt: (certbot tool required):
 
   ```bash
+  # to use ACME HTTP method
   make generate-letsencrypt-cert DOMAIN=id.mydomain.com
+
+  # to use ACME TXT method (when you can edit TXT record for your domain)
+  make generate-letsencrypt-cert DOMAIN=id.mydomain.com TLS_MODE=TXT
   ```
 
-* Follow instruction on the screen. Essentially you need to create a file and *place it in above GS root directory*.
+* Follow instruction on the screen.
+In case of HTTP mode of ACME authentication :
 
-This is the proof that you control the site - and hence Let's Encrypt will generate TLS certificate for free for 3 months,
-The make script also copies the generated certficate to `~/.tls` directory so that next Terraform invocation can access it.
+  * You need to create a file and *place it in above GS root directory*. This is the proof that you control the site.
+
+  * In case you've chosen TXT mode - you need to create TXT record in your DNS provider and ensure it is broadcasted globally.
+  For example via: `nslookup -type=TXT _acme-challenge.id.mydomain.com`.
+
+The make script also copies the generated certficate to `~/.tls` directory so that next Terraform invocation can access it. Let's Encrypt will generate TLS certificate for free for 3 months.
 
 _Warning_: If you intent to run deployment of this module from GitHub Actions `CD` workflow, not from your local environment - you need to place/change these files as GitHub Actions Environment secrets `TLS_CRT`, `TLS_KEY` respectively.
 
@@ -108,7 +117,7 @@ Run these steps before certificate is invalid:
 
 ```bash
 # regenerate TLS certificate
-make generate-letsencrypt-cert DOMAIN=id.mydomain.com
+make generate-letsencrypt-cert DOMAIN=id.mydomain.com TLS_MODE=TXT
 
 # check proposed changes
 make run-keycloak MODE=plan ENV=prod

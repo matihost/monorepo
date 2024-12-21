@@ -6,6 +6,9 @@ DIR := $(shell pwd )
 
 GO_PACKAGE := $(PROJECT)/$(REPOSITORY)
 
+.EXPORT_ALL_VARIABLES:
+BUILDKIT_PROGRESS=plain
+
 build: ## build all
 	go build -mod=mod -o .  ./...
 
@@ -22,7 +25,7 @@ clean: ## removes compiled application and vendor directory
 	@rm -rf ${CMD_PACKAGE_NAME} http-server grpc-client grpc-server go.sum vendor
 
 build-image: ## builds docker image
-	@DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build -t $(GO_PACKAGE)/cmd/language:latest .
+	docker build --load -t $(GO_PACKAGE)/cmd/language:latest .
 
 run-container: ## run docker image
 	@docker run -it --rm $(GO_PACKAGE)/cmd/language:latest

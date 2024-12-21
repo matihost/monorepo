@@ -1,8 +1,10 @@
 .EXPORT_ALL_VARIABLES:
 
+BUILDKIT_PROGRESS=plain
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
+	TG_FLAGS := --terragrunt-debug
 endif
 
 MODE := apply
@@ -26,7 +28,7 @@ run-keycloak: init ## usage: Usage make run-keycloak ENV=prod MODE=plan [DEBUG=t
 ifndef ENV
 	$(error Environment ENV is not defined. Usage make run ENV=dev [MODE=apply] [DEBUG=true])
 endif
-	cd stage/$(ENV)/keycloak && terragrunt validate && terragrunt $(MODE_STR)
+	cd stage/$(ENV)/keycloak && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
 
 
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
@@ -39,8 +41,8 @@ clean: ## clean Terraform cached plugins and data
 	find . -name "node_modules" -exec rm -rf {} +
 
 TAG := latest
-POSTGRESQL_JDBC_VERSION := 1.19.0
-KEYCLOAK_METRICS_SPI_VERSION := 5.0.0
+POSTGRESQL_JDBC_VERSION := 1.21.2
+KEYCLOAK_METRICS_SPI_VERSION := 7.0.0
 CURRENT_PROJECT := $(shell gcloud config get-value project)
 
 configure-docker-registry:
@@ -57,7 +59,7 @@ build-sql-connector: # build https://github.com/GoogleCloudPlatform/cloud-sql-jd
 
 image: build-sql-connector ## builds keycloak image with support to PostreSQL GC ClouSQL
 	curl -sL https://github.com/aerogear/keycloak-metrics-spi/releases/download/$(KEYCLOAK_METRICS_SPI_VERSION)/keycloak-metrics-spi-$(KEYCLOAK_METRICS_SPI_VERSION).jar -o target/keycloak-metrics-spi.jar
-	DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build -t quay.io/matihost/keycloak-postgres-cloudsql:$(TAG) .
+	docker build --load -t quay.io/matihost/keycloak-postgres-cloudsql:$(TAG) .
 	docker push quay.io/matihost/keycloak-postgres-cloudsql:$(TAG)
 	docker tag quay.io/matihost/keycloak-postgres-cloudsql:$(TAG) us-central1-docker.pkg.dev/$(CURRENT_PROJECT)/docker/keycloak-postgres-cloudsql:$(TAG)
 	docker push us-central1-docker.pkg.dev/$(CURRENT_PROJECT)/docker/keycloak-postgres-cloudsql:$(TAG)
@@ -72,12 +74,17 @@ endif
 	@echo -n $(shell cd stage/$(ENV)/keycloak && terragrunt output keycloak_gs_bucket)
 
 
-generate-letsencrypt-cert: ## generate Let's Encrypt TLS certificate, usage make generate-letsencrypt-cert DOMAIN=id.yourdomain.com
+TLS_MODE := HTTP
+ifeq ($(strip $(TLS_MODE)),TXT)
+	TLS_AUTHZ_MODE_TXT := --preferred-challenges=dns
+endif
+
+generate-letsencrypt-cert: ## generate Let's Encrypt TLS certificate, usage make generate-letsencrypt-cert DOMAIN=id.yourdomain.com [TLS_MODE=TXT]
 ifndef DOMAIN
 	$(error Env DOMAIN is not defined. Usage make generate-letsencrypt-cert DOMAIN=id.matihost.mooo.com)
 endif
 	mkdir -p ~/.tls
-	sudo certbot certonly --manual -d $(DOMAIN)
+	sudo certbot certonly --manual $(TLS_AUTHZ_MODE_TXT) -d $(DOMAIN)
 	sudo cp -Lr /etc/letsencrypt/live/$(DOMAIN) ~/.tls
 	sudo chown -R $(shell whoami):$(shell whoami) ~/.tls
 	sudo chmod -R go-rwx ~/.tls
@@ -85,4 +92,4 @@ endif
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help apply destroy
+.PHONY: help run clean

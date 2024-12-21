@@ -2,7 +2,7 @@
 # TODO handle user management and password taken from GCP Secret
 
 resource "google_sql_database_instance" "keycloak" {
-  database_version = "POSTGRES_16"
+  database_version = "POSTGRES_17"
   instance_type    = "CLOUD_SQL_INSTANCE"
   name             = local.regional_name
   project          = var.project
@@ -62,9 +62,30 @@ resource "google_sql_database" "keycloak" {
   project         = var.project
 }
 
+
+resource "random_string" "pass" {
+  length  = 16
+  special = false
+}
+
+
+resource "google_secret_manager_secret" "pass" {
+  secret_id = "db-${local.regional_name}-keycloak-pass"
+  replication {
+    auto {
+    }
+  }
+}
+
+resource "google_secret_manager_secret_version" "pass_secret_version" {
+  secret      = google_secret_manager_secret.pass.id
+  secret_data = random_string.pass.result
+}
+
+
 resource "google_sql_user" "user" {
   name     = "keycloak"
   instance = google_sql_database_instance.keycloak.name
   type     = "BUILT_IN"
-  password = "keycloak"
+  password = random_string.pass.result
 }

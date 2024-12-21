@@ -18,6 +18,11 @@ ifeq ($(strip $(JMX)),true)
 endif
 
 CURRENCY := USD
+
+.EXPORT_ALL_VARIABLES:
+BUILDKIT_PROGRESS=plain
+
+
 run-jar: ## run built jar; usage: make run-jar [CURRENCY=USD] [DEBUG=false] [JMX=false]
 	java -XshowSettings:* -XX:+PrintFlagsFinal -XX:NativeMemoryTracking=summary -Xlog:async -Xlog:gc*=debug,gc+ergo*=trace,gc+age*=trace,safepoint*:file=/tmp/command-line.gc.log:level,tags,utctime,uptime,pid:filecount=5,filesize=100m \
 		$(JMX_FLAG) $(DEBUG_FLAG)\
@@ -28,7 +33,7 @@ run-jar: ## run built jar; usage: make run-jar [CURRENCY=USD] [DEBUG=false] [JMX
 		-jar target/command-line-*.jar --currency=$(CURRENCY)
 
 build-image: build ## build docker image
-	DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build --build-arg JAR_FILE=target/*.jar -t $(BASE):$(TAG) .
+	docker build --load --build-arg JAR_FILE=target/*.jar -t $(BASE):$(TAG) .
 
 run-container: ## run app from docker
 	docker run -it --rm $(BASE):${TAG}

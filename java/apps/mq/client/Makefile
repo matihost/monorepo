@@ -1,4 +1,5 @@
 .EXPORT_ALL_VARIABLES:
+BUILDKIT_PROGRESS=plain
 
 APP_NAME := basic-client
 BASE := quay.io/matihost/mq/$(APP_NAME)
@@ -55,7 +56,7 @@ sendAndReceive-with-tls-cddt: setup-keystore ## put message on Minikube hosted M
 
 
 build-image: build ## build docker image
-	DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build --build-arg JAR_FILE=target/*.jar -t $(BASE):$(TAG) .
+	docker build --load --build-arg JAR_FILE=target/*.jar -t $(BASE):$(TAG) .
 
 put-container: ## put message on Minikube hosted MQ; usage: make put-container [DEBUG=false MQ_NAME=dev1 MQ_PORT=1414 MQ_CHANNEL=APPA.SVRCONN MQ_QUEUE=APPA.RQ.APPB]
 	docker run -it -e MQ_QMNAME -e MQ_PORT -e MQ_CHANNEL -e MQ_QUEUE --rm $(BASE):${TAG} --mode=put --mq.host="$(shell kubectl get svc $(MQ_NAME)-mq -n learning -o jsonpath='{.status..ip}')" --message='alafromcontainer-$(shell date -Is)' --mq.security.username='app'  --mq.security.password='app'

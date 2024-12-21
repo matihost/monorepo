@@ -13,6 +13,9 @@ deploy-gke-httproute: ## deploys echoserver on gke with httproute (requires curr
 deploy-anthos: ## deploys echoserver on Anthos (requires current context on Anthos config cluster)
 	scripts/deploy-on-anthos.sh
 
+deploy-eks: ## deploys echoserver on EKS via Helm
+	scripts/deploy-on-eks.sh
+
 undeploy: ## undeply echoserver
 	helm uninstall echoserver -n learning
 

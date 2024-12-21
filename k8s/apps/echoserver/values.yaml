@@ -50,6 +50,7 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   host: echoserver.learning.minikube.testing
   tls:
+    enabled: true
     key: ""
     crt: ""
 

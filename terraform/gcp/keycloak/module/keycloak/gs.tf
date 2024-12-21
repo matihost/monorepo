@@ -1,5 +1,5 @@
 resource "google_storage_bucket" "keycloak" {
-  name          = local.name
+  name          = "${var.project}-${local.regional_name}"
   force_destroy = true
   # GCP free tier GS is free only with regional class in some US regions
   location                    = var.region
