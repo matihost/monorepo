@@ -1,5 +1,5 @@
 locals {
-  required-apis = ["run", "sql-component", "binaryauthorization", "sqladmin"]
+  required-apis = ["run", "sql-component", "binaryauthorization", "sqladmin", "secretmanager"]
 }
 
 resource "google_project_service" "required" {
