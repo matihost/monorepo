@@ -34,11 +34,13 @@ resource "aws_eks_addon" "efs" {
     service_account = "efs-csi-controller-sa"
   }
 
+  # efs-csi is only amd64, arm64 is not supported
   configuration_values = jsonencode(
     {
       "controller" : {
         "nodeSelector" : {
-          "karpenter.sh/nodepool" : "system"
+          "karpenter.sh/nodepool" : "system",
+          "kubernetes.io/arch" : "amd64"
         },
         "tolerations" : [
           {

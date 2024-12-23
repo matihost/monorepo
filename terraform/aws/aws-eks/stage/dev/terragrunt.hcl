@@ -1,5 +1,5 @@
-include {
-  path = find_in_parent_folders()
+include "root" {
+  path = find_in_parent_folders("root.hcl")
 }
 
 terraform {
@@ -21,39 +21,40 @@ inputs = {
 
   # Uncomment to integrated cluster authen/authz with OIDC
   oidc = {
-    issuer_url     = "https://id.matihost.mooo.com/realms/id"
+    issuer_url     = "https://id.matihost.pl/realms/id"
     client_id      = "eks"
     username_claim = "email"
     groups_claim   = "groups"
   }
 
-  namespaces = [{
-    name              = "learning"
-    pod_identity_role = "s3all"
-    irsa_policy       = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-    quota = {
-      limits = {
-        cpu    = "12"
-        memory = "16Gi"
-      }
-      requests = {
-        cpu    = "12"
-        memory = "16Gi"
+  namespaces = [
+    {
+      name              = "learning"
+      pod_identity_role = "s3all"
+      irsa_policy       = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+      quota = {
+        limits = {
+          cpu    = "12"
+          memory = "16Gi"
+        }
+        requests = {
+          cpu    = "12"
+          memory = "16Gi"
+        }
       }
     },
-    #TODO bring back after testing
-    # {
-    #   name = "learning-fargate"
-    #   fargate = true
-    #   quota = {
-    #     limits = {
-    #       cpu    = "8"
-    #       memory = "16Gi"
-    #     }
-    #     requests = {
-    #       cpu    = "8"
-    #       memory = "16Gi"
-    #     }
-    #   }
+    {
+      name    = "learning-fargate"
+      fargate = true
+      quota = {
+        limits = {
+          cpu    = "8"
+          memory = "16Gi"
+        }
+        requests = {
+          cpu    = "8"
+          memory = "16Gi"
+        }
+      }
   }]
 }

@@ -18,3 +18,11 @@ parameters:
   # encrypted: "true"
   # kmsKeyId: <custom-key-arn>
 allowVolumeExpansion: true
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: efs
+provisioner: efs.csi.aws.com
+reclaimPolicy: Delete
+volumeBindingMode: Immediate

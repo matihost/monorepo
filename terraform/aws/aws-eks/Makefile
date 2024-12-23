@@ -9,10 +9,13 @@ endif
 MODE := apply
 ifeq ($(strip $(MODE)),apply)
 	MODE_STR := apply -auto-approve
+	K8S_MODE_STR := apply
 else ifeq ($(strip $(MODE)),destroy)
 	MODE_STR := destroy -auto-approve
+	K8S_MODE_STR := delete
 else
 	MODE_STR := plan
+	K8S_MODE_STR := get
 endif
 
 
@@ -65,8 +68,11 @@ endif
 	kubectl config set-context --current --user=oidc
 
 
-test: ## install basic test application
-	kubectl apply -f test -n learning
+APP := alb # or efs
+K8S_NS := $(if $(filter true,$(strip $(FARGATE))),learning-fargate,learning)
+test: ## install test application,  make test [MODE=apply] [FARGATE=true] [APP=alb/efs]
+	kubectl $(K8S_MODE_STR) -f test/${APP} -n $(K8S_NS)
+
 
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show

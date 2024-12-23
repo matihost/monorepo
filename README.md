@@ -50,6 +50,7 @@ Various technology deployments, tools & code:
     * aws-jenkins - Jenkins deployment as AWS VMs, Packer images for Jenkins Agents
     * aws-lambda - sample AWS Lambda emulating a client hitting EC2 instance with AWS ApiGateway exposure
     * aws-glue - sample AWS Glue / Apache Spark job wih PCI credit card removal in S3 bucket
+    * aws-efs - sample EFS deployment
     * aws-ecs - sample AWS ECS Services deployment
     * aws-eks - sample AWS EKS deployment
     * aws-rds - sample AWS RDS Aurora Serverless v2 PosrgreSQL setup

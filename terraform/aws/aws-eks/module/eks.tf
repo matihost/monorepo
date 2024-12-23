@@ -52,7 +52,10 @@ resource "aws_eks_cluster" "cluster" {
   compute_config {
     enabled = true
     # possible values "system", "general-purpose"
-    # deploying only system for system, addons deployment, nodepool for workflows is created via Helm module/cluster-config-chart
+    # nodepool are created via Helm module/cluster-config-chart
+    # default allows arm64 deployment while some EKS addons (like EFS) attempy to install amd64 images resulting
+    # in: 'exec format error' error
+    # system also allows arm64, but it has to be specified otherwise:  When Compute Config nodeRoleArn is not null or empty, nodePool value(s) must be provided
     node_pools    = ["system"]
     node_role_arn = aws_iam_role.node.arn
   }

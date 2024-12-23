@@ -27,7 +27,7 @@ In particular it creates:
   - exposed to the internet
   - wit Valid redirect URIs containing: `http://localhost:8000/*`
   - OIDC instead of SAML as client id with Client authentication enabled (standard flow) with client_id/secret authentication
-  - with Client Scope / dedicated eks-dedicated added custom mapper with type: Group Membership (with Full group path option disabled)
+  - with Client Scope / dedicated eks-dedicated added custom mapper with `Mapper type`: `Group Membership` with `Full group path` option disabled and `Token Claim Name` and `Name` equal to `groups`)
 
   You can also spin Keycloak deployment directly. For example deploy: [../../gcp/keycloak/](../../gcp/keycloak/).
 

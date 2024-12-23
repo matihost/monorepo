@@ -200,6 +200,34 @@ resource "aws_security_group" "http_from_external_range" {
   }
 }
 
+
+resource "aws_security_group" "internal" {
+  name        = "${local.prefix}-internal-vpc"
+  description = "Allow internal VPC traffic"
+
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "${local.prefix}-internal"
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = [aws_vpc.main.cidr_block]
+  }
+
+  # Terraform removed default egress ALLOW_ALL rule
+  # It has to be explicitely added
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 output "nat_id" {
   value = aws_instance.nat.id
 }

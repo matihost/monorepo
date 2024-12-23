@@ -1,0 +1,34 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-efs
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: test-efs
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: test-efs
+    spec:
+      containers:
+      - name: app1
+        image: busybox
+        command: ["/bin/sh"]
+        args: ["-c", "while true; do echo $(date -u) >> /data/out1.txt; sleep 5; done"]
+        volumeMounts:
+        - name: persistent-storage
+          mountPath: /data
+        resources:
+          requests:
+            cpu: "0.5"
+            memory: 256Mi
+          limits:
+            cpu: "0.5"
+            memory: 256Mi
+      volumes:
+      - name: persistent-storage
+        persistentVolumeClaim:
+          claimName: efs-claim
