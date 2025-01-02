@@ -16,22 +16,25 @@ Use  AWS resources eliglible to AWS Free Tier __only__.
 ## Usage
 
 ```bash
-
-# setup free-tier eliglible Ubuntu instance
+# setup all instance for particular env
 make run [ENV=dev] [MODE=apply]
 
+# deploy single instance
+make run-one ENV=dev INSTANCE=windows
+
+# deploy Ubuntu instance with Instana host Agent
+export INSTANA_AGENT_TOKEN="....token for agent..."
+make run-one ENV=dev INSTANCE=instana-ubuntu
+
 # connects to EC2 intance Nginx
-make test
+make test ENV=default INSTANCE=ubuntu
 
 # ssh to EC2 instance
-make ssh
+make ssh INSTANCE=ubuntu ENV=default
 
 # ssh to EC2 instance over SSM SSH
 make ssm-ssh
 
 # show Terraform state along with current EC2 instance user_date startup script
 make show-state
-
-# terminates all AWS resource created with apply task
-make destroy
 ```

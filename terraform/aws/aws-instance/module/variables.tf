@@ -79,7 +79,13 @@ variable "ec2_ami_account_alias" {
 
 variable "user_data_template" {
   type        = string
-  description = "EC2 user_data conttent in tftpl format (aka with TF templating)"
+  description = "EC2 user_data content in tftpl format (aka with TF templating)"
+}
+
+variable "user_data_vars" {
+  default     = []
+  type        = list(string)
+  description = "Variables passed as vars variable in cloud init templating"
 }
 
 

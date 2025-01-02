@@ -119,6 +119,7 @@ resource "aws_instance" "vm" {
   user_data = templatestring(var.user_data_template, {
     ssh_key = base64encode(var.ssh_key),
     ssh_pub = base64encode(var.ssh_pub_key),
+    vars    = var.user_data_vars,
     }
   )
   get_password_data = data.aws_ami.image.platform == "windows"

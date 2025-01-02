@@ -5,8 +5,8 @@ locals {
   user_data_template = file("ec2.launch.yaml.tpl")
 }
 
-include {
-  path = find_in_parent_folders()
+include "root" {
+  path = find_in_parent_folders("root.hcl")
 }
 
 terraform {

@@ -26,7 +26,7 @@ all:
           # TODO change to {{ ansible_distribution_release }} when noble/24.04 is supported Ubuntu LTS
           cri_dockerd_ubuntu_version: "jammy"
           # MQ Version available at: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/
-          mq: 9.4.1.0
+          mq: 9.4.1.1
           # List of supported Ubuntu versions: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive
           onedrive_ubuntu_version: "24.10"
           # List of supported Ubuntu versions: https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/
@@ -77,6 +77,10 @@ all:
           ms-toolsai.vscode-jupyter-cell-tags
           ms-toolsai.vscode-jupyter-slideshow
           ms-vscode-remote.remote-containers
+          ms-vscode.cmake-tools
+          ms-vscode.cpptools
+          ms-vscode.cpptools-extension-pack
+          ms-vscode.cpptools-themes
           ms-vscode.makefile-tools
           njpwerner.autodocstring
           redhat.fabric8-analytics
@@ -89,6 +93,7 @@ all:
           streetsidesoftware.code-spell-checker-polish
           techer.open-in-browser
           tomoki1207.pdf
+          twxs.cmake
           visualstudioexptteam.intellicode-api-usage-examples
           visualstudioexptteam.vscodeintellicode
           vmware.vscode-spring-boot
@@ -874,7 +879,7 @@ all:
           become: true
           command: |
             # TODO consider full server version
-            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/9.4.1.0-IBM-MQ-Advanced-for-Developers-LinuxX64.tar.gz
+            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/9.4.1.1-IBM-MQ-Advanced-for-Developers-LinuxX64.tar.gz
             # TODO add detect a new version
             [ -e /opt/mqm ] || {
               rm -rf /tmp/mq && mkdir -p /tmp/mq && cd /tmp/mq

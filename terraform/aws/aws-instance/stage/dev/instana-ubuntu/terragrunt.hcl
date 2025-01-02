@@ -5,8 +5,8 @@ locals {
   user_data_template = file("ec2.cloud-init.tpl")
 }
 
-include {
-  path = find_in_parent_folders()
+include "root" {
+  path = find_in_parent_folders("root.hcl")
 }
 
 terraform {
@@ -31,6 +31,7 @@ inputs = {
   ec2_ami_name_query    = "ubuntu/images/hvm-ssd-*/ubuntu-noble-24.04-*-server-*"
   ec2_ami_account_alias = "amazon"
   user_data_template    = local.user_data_template
+  user_data_vars        = [get_env("INSTANA_AGENT_TOKEN"), get_env("INSTANA_AGENT_BACKEND", "ingress-green-saas.instana.io:443")]
   aws_tags = {
     Env    = "dev"
     Region = "us-east1"
