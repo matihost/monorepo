@@ -29,7 +29,7 @@ resource "aws_lambda_function" "thumbnail" {
   # source_code_hash =
 
   handler = "CreateThumbnail.handler"
-  runtime = "python3.11"
+  runtime = "python3.12"
 
   role = aws_iam_role.lambdarole.arn
 
@@ -69,7 +69,7 @@ resource "aws_lambda_function" "mobile" {
   filename = data.local_file.lambda-package.filename
 
   handler = "CreateMobileImage.handler"
-  runtime = "python3.11"
+  runtime = "python3.12"
 
   role = aws_iam_role.lambdarole.arn
 
@@ -109,7 +109,7 @@ resource "aws_lambda_function" "web" {
   filename = data.local_file.lambda-package.filename
 
   handler = "CreateWebImage.handler"
-  runtime = "python3.11"
+  runtime = "python3.12"
 
   role = aws_iam_role.lambdarole.arn
 

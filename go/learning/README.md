@@ -12,7 +12,7 @@ However it supports GOPATH style of building as well though [Dep](https://golang
 
 ## Prerequisites
 
-Go lang 1.21.x+
+Go lang 1.23.x+
 
 ## Installing
 

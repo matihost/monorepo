@@ -7,7 +7,7 @@ Exposed via GLB.
 
 * [Compute Engine API enabled](https://console.cloud.google.com/apis/library/compute.googleapis.com) - needed to configure gcloud command fully, deployment does not use VM at all
 
-* terragrunt, open tofu, make, zip, gcloud - present on your machine, tested on Ubuntu 23.10
+* terragrunt, open tofu, make, zip, gcloud - present on your machine
 
 * (Optionally, but recommended) Enable remaining required GCP APIs. Deployments ensure that particular API is enabled first, but Google often claims that API is enabled, but later on deployment claims it is not yet, and several minutes waiting is really required that API is truly enabled on GCP side.
 

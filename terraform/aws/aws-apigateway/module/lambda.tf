@@ -87,7 +87,7 @@ resource "aws_lambda_function" "synthetic-ec2-tester" {
 
   source_code_hash = filebase64sha256("${path.module}/sli-synthetic-client.py")
   handler          = "sli-synthetic-client.lambda_handler"
-  runtime          = "python3.11"
+  runtime          = "python3.12"
 
   role = aws_iam_role.synthetic-ec2-tester-lambda.arn
 

@@ -34,7 +34,7 @@ jobs:
     before_script: cd rust/guessing_game
     cache: cargo
   - language: go
-    go: "1.22" # Travis does not support go 1.21, neither 1.22 yet'
+    go: "1.23"
     before_install: cd go/learning
     script:
     - go build -mod=mod -o .  ./...

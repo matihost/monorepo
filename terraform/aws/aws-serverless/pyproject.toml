@@ -9,14 +9,14 @@ packages = [{include = "website", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.12"
-fastapi = {extras = ["standard"], version = "^0.115.0"}
+fastapi = {extras = ["standard"], version = "^0.115.6"}
 mangum = "^0.19.0"
 
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.6.9"
-mypy = "^1.13.0"
-pytest = "^8.3.3"
+mypy = "^1.14.1"
+pytest = "^8.3.4"
 
 [build-system]
 requires = ["poetry-core"]

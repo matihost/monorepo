@@ -40,14 +40,17 @@ tests: ## unit tests
 	poetry run pytest
 
 update: ## update dependencies
-	poetry update
+	ncu -u
+	npm update
+	poetry update && echo "Run 'poetry show' to show current versions in poetry.lock and update dependency ranges in pyproject.toml"
+
 
 lint: # run ruff on all files
 	poetry run ruff check  --fix --force-exclude
 	poetry run ruff format --force-exclude
 
 clean: ## clean
-	rm -rf .venv dist .pytest_cache .ruff_cache
+	rm -rf .venv dist .pytest_cache .ruff_cache .serverless node_modules
 	@echo "Cleaning up byte compiled python stuff"
 	@find . -type f -regex ".*\.py[co]$$" -delete
 	@find . -type d -name "__pycache__" -delete
@@ -56,9 +59,9 @@ clean: ## clean
 	@rm -rf .pytest_cache
 	@rm -rf logs/
 	@rm -rf .cache/
-	@rm -f tests/units/.coverage*
+	@rm -ff tests/units/.coverage*
 	@rm -rf tests/results/*/*
-	@find tests/ -type f -name '*.retry' -delete
+	@-find tests/ -type f -name '*.retry' -delete 2>/dev/null
 
 
 help: ## show usage and tasks (default)

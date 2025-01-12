@@ -91,7 +91,7 @@ resource "google_cloudfunctions2_function" "minecraft-lifecycle-executor" {
   # https://cloud.google.com/functions/docs/concepts/execution-environment#runtimes
 
   build_config {
-    runtime           = "go122"
+    runtime           = "go123"
     entry_point       = "Handle"
     docker_repository = data.google_artifact_registry_repository.repository.id
 

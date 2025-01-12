@@ -21,7 +21,7 @@ tests: ## unit tests
 	poetry run pytest
 
 update: ## update dependencies
-	poetry update
+	poetry update && echo "Run 'poetry show' to show current versions in poetry.lock and update dependency ranges in pyproject.toml"
 
 lint: # run ruff on all files
 	poetry run ruff check  --fix --force-exclude

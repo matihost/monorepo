@@ -15,7 +15,7 @@ This Git repository is structured as follows:
 
 * Free Tier GCP Project
 * [Compute Engine API enabled](https://console.cloud.google.com/apis/library/compute.googleapis.com) - needed to configure gcloud command fully, deployment does not use VM at all
-* terragrunt, terraform, make, zip, gcloud - present on your machine, tested on Ubuntu 22.10
+* terragrunt, terraform, make, zip, gcloud - present on your machine
 * (Optionally, but recommended) Enable remaining required GCP APIs. Deployments ensure that particular API is enabled first, but Google often claims that API is enabled, but later on deployment claims it is not yet, and several minutes waiting is really required that API is truly enabled on GCP side.
 The list of required APIs: [Cloud Run](https://console.cloud.google.com/apis/library/run.googleapis.com), [SQL Component](https://console.cloud.google.com/apis/library/sql-component.googleapis.com), [SQL Admin](https://console.cloud.google.com/apis/library/sqladmin.googleapis.com), [Binary Authz](https://console.cloud.google.com/apis/library/binaryauthorization.googleapis.com), [CloudFunctions](https://console.cloud.google.com/apis/library/cloudfunctions.googleapis.com), [ArtifactRegistry](https://console.cloud.google.com/apis/library/artifactregistry.googleapis.com), [CloudBuild](https://console.cloud.google.com/apis/library/cloudbuild.googleapis.com)
 * Ensure you have DNS domain for [stage/dev/ghost/terragrunt.hcl#input.url](stage/dev/ghost/terragrunt.hcl). Change input.url parameter to meet DNS domain you wish site will be accessible from internet. I use free DNS subdomains from [https://freedns.afraid.org/](https://freedns.afraid.org/)

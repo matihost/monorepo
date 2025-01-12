@@ -213,7 +213,7 @@ jobs:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     timeout-minutes: 30
-    container: golang:1.22
+    container: golang:1.23
     env:
       GO_CACHE: /go
     steps:

@@ -42,7 +42,9 @@ resource "google_cloudfunctions2_function" "removeAllPosts" {
   description = "Function to remove all posts"
 
   build_config {
-    runtime     = "nodejs18"
+    # supported runtimes versions:
+    # https://cloud.google.com/functions/docs/concepts/execution-environment#runtimes
+    runtime     = "nodejs22"
     entry_point = "removeAllPosts"
     source {
       storage_source {

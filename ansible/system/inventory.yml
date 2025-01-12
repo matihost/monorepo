@@ -1091,16 +1091,26 @@ all:
               # ensure poetry will create virtualenv in project directory
               poetry config virtualenvs.in-project true
             )
-        - name: nvm
-          desc: Node.js swithing engine + global tools - Serverless
+        - name: nvm_node_npm
+          desc: Node.js swithing engine, NodeJS LTS install/update plus global tools - Serverless, ncu installation
           become: false
           command: |
+            GLOBAL_PACKAGES="npm-check-updates serverless"
             CURRENT_VERSION="$(curl -sL https://api.github.com/repos/nvm-sh/nvm/releases/latest | jq -r ".tag_name")"
             INSTALLED_VERSION="v$(bash -ic  "nvm --version")"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${CURRENT_VERSION}/install.sh" | bash
-              bash -ic "nvm install --lts && npm i serverless -g"
+              bash -ic "nvm install --lts --latest-npm && npm i ${GLOBAL_PACKAGES} -g"
             }
+            INSTALLED_VERSION="$(bash -ic "nvm version")"
+            CURRENT_VERSION="$(bash -ic "nvm version-remote --lts")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              echo "Installing NodeJS: ${CURRENT_VERSION}..."
+              bash -ic "nvm install --lts --latest-npm && npm i ${GLOBAL_PACKAGES} -g"
+              echo "Uninstalling NodeJS: ${INSTALLED_VERSION}..."
+              bash -ic "nvm uninstall ${INSTALLED_VERSION}"
+            }
+            ncu -g -u
         files_config:
         - file: /etc/gai.conf
           content: |

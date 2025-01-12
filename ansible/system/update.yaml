@@ -95,7 +95,7 @@
   - become: false
     block:
     - name: Check whether ibmcloud is present on the machine
-      ansible.builtin.shell: which vagrant
+      ansible.builtin.shell: which ibmcloud
       ignore_errors: true
       changed_when: false
       register: ibmcloud_presence
@@ -109,7 +109,7 @@
   - become: false
     block:
     - name: Check whether poetry is present on the machine
-      ansible.builtin.shell: which vagrant
+      ansible.builtin.shell: which poetry
       ignore_errors: true
       changed_when: false
       register: poetry_presence

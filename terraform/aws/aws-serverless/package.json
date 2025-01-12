@@ -7,8 +7,8 @@
   },
   "devDependencies": {
     "serverless": "^4",
-    "serverless-domain-manager": "^7.4.0",
-    "serverless-offline": "^14.3.2",
+    "serverless-domain-manager": "^8.0.0",
+    "serverless-offline": "^14.4.0",
     "serverless-offline-ssm": "^6.2.0",
     "serverless-plugin-conditional-functions": "^1.0.8",
     "serverless-plugin-resource-tagging": "^1.2.0",
