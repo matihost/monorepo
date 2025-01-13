@@ -1,6 +1,6 @@
 # Keycloak
 
-Installs Keycloak as CloudRun applications connected to PostgreSQL CloudSQL database.
+Installs and configures Keycloak as CloudRun applications connected to PostgreSQL CloudSQL database.
 Exposed via GLB.
 
 ## Prerequisites
@@ -60,7 +60,18 @@ Exposed via GLB.
   sudo resolvectl flush-caches
   ```
 
-## Post installation steps
+## Post installation steps (Automatic)
+
+Install realm and configure it:
+
+```bash
+
+# credentials for admin user in master realm
+ export KEYCLOAK_PASSWORD=keycload_admin_user_password
+make run-keycloak-config ENV=dev MODE=plan KEYCLOAK_USER=keycload_admin_user_name
+```
+
+## Post installation steps (Manual)
 
 * Default page redirects to realm `id` user console. As fresh Keycloak has only `master` realm - fresh install will redirect to a page with 404. You need to have realm with `id`. Read on.
 
