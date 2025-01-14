@@ -5,6 +5,7 @@ IC_API_KEY := $(shell cat $(HOME)/.ibmcloud/apikey.json | jq -r .apikey)
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
+	TG_FLAGS := --terragrunt-debug
 endif
 
 MODE := apply
@@ -23,10 +24,10 @@ init:
 	cd stage/$(ENV) && terragrunt init -upgrade=true
 
 run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
 
 ibm-authentication: ## authenticate ibmcloud CLI and create API key if needed
-	ibmcloud login -a https://cloud.ibm.com --sso
+	ibmcloud login -a https://cloud.ibm.com --sso -r eu-de
 	[ -e "$(HOME)/.ibmcloud/apikey.json" ] || { mkdir -p $(HOME)/.ibmcloud; ibmcloud iam api-key-create default --file $(HOME)/.ibmcloud/apikey.json; }
 
 whoami: ## show current user IAM ID
@@ -39,13 +40,11 @@ getaccountid: ## show current IBM Account ID
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show
 
-
 clean: ## clean cached plugins and data
 	find . -name ".terra*" -exec rm -rf {} +
 	find . -name "target" -exec rm -rf {} +
 
 upgrade-providers-version: init
-
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))

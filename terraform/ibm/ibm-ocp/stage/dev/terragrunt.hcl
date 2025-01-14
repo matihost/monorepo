@@ -4,8 +4,8 @@ locals {
   resource_group_id = "${run_cmd("--terragrunt-quiet", "sh", "-c", "ibmcloud resource group dev --output json | jq -r .[0].id")}"
 }
 
-include {
-  path = find_in_parent_folders()
+include "root" {
+  path = find_in_parent_folders("root.hcl")
 }
 
 terraform {

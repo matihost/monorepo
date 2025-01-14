@@ -6,10 +6,8 @@ locals {
   region  = "europe-central2"
 }
 
-
-# include does not import locals...
-include {
-  path = find_in_parent_folders()
+include "root" {
+  path = find_in_parent_folders("root.hcl")
 }
 
 remote_state {

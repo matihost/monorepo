@@ -4,8 +4,8 @@ locals {
   content_key = get_env("CONTENT_KEY")
 }
 
-include {
-  path = find_in_parent_folders()
+include "root" {
+  path = find_in_parent_folders("root.hcl")
 }
 
 terraform {

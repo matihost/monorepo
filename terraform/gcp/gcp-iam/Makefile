@@ -3,6 +3,7 @@
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
+	TG_FLAGS := --terragrunt-debug
 endif
 
 MODE := apply
@@ -18,10 +19,10 @@ endif
 init: prepare
 	cd stage/current && terragrunt init -upgrade=true
 
-run: init ## usage: Usage make run MODE=plan [DEBUG=true])
-	cd stage/current && terragrunt validate && terragrunt $(MODE_STR)
+run: init ## usage: make run MODE=plan [DEBUG=true])
+	cd stage/current && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
 
-CURRENT_PROJECT := $(shell gcloud config get-value project)
+CURRENT_PROJECT := $(shell gcloud config get-value project 2>/dev/null)
 use-editor-sa: ## create new gcloud configuration with editor Google Service Account
 	@-cd stage/current && terragrunt output -raw sa-editor-key > /tmp/editor.json
 	@-gcloud config configurations create $(CURRENT_PROJECT)-editor-sa 2>/dev/null
@@ -45,11 +46,11 @@ google-authentication: prepare ## authenticate to GCP and prepare Application De
 	gcloud init
 	gcloud auth application-default login
 
-clean: ## clean Terraform cached plugins and data
+clean: ## clean cached plugins and data
 	find . -name ".terra*" -exec rm -rf {} +
 	find . -name "target" -exec rm -rf {} +
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help apply destroy
+.PHONY: help run clean

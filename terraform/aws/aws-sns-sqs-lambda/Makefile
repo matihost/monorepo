@@ -3,6 +3,7 @@
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
+	TG_FLAGS := --terragrunt-debug
 endif
 
 MODE := apply
@@ -19,8 +20,8 @@ ENV := dev
 init:
 	cd stage/$(ENV) && terragrunt init -upgrade=true
 
-run: init   ## deploy FanOut example (SNS, SQS, Lambda) : make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
+run: init ## deploy FanOut example (SNS, SQS, Lambda) : make run [ENV=dev] [MODE=apply]
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
 
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show
@@ -30,7 +31,6 @@ clean: ## clean cached plugins and data
 	find . -name "target" -exec rm -rf {} +
 
 upgrade-providers-version: init
-
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))

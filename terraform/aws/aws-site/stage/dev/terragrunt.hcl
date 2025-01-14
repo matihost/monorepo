@@ -4,8 +4,9 @@ locals {
   tls_chain = try(file("~/.tls/${local.dns}/chain.pem"), get_env("TLS_CHAIN", ""))
   tls_key   = try(file("~/.tls/${local.dns}/privkey.pem"), get_env("TLS_KEY", ""))
 }
-include {
-  path = find_in_parent_folders()
+
+include "root" {
+  path = find_in_parent_folders("root.hcl")
 }
 
 terraform {

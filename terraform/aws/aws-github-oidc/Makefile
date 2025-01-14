@@ -33,7 +33,9 @@ clean: ## clean cached plugins and data
 	find . -name ".terra*" -exec rm -rf {} +
 	find . -name "target" -exec rm -rf {} +
 
+upgrade-providers-version: init
+
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help apply destro
+.PHONY: help run clean

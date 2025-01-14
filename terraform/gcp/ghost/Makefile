@@ -3,6 +3,7 @@
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
+	TG_FLAGS := --terragrunt-debug
 endif
 
 MODE := apply
@@ -24,7 +25,7 @@ run-ghost: init ## usage: Usage make run-ghost ENV=prod MODE=plan [DEBUG=true])
 ifndef ENV
 	$(error Environment ENV is not defined. Usage make run ENV=dev [MODE=apply] [DEBUG=true])
 endif
-	cd stage/$(ENV)/ghost && terragrunt validate && terragrunt $(MODE_STR)
+	cd stage/$(ENV)/ghost && terragrunt validate && terragrunt $(MODE_STR)) --terragrunt-non-interactive $(TG_FLAGS)
 
 
 run-posts-management: init ## usage: Usage make run-ghost ENV=prod MODE=plan [DEBUG=true])
@@ -37,7 +38,7 @@ endif
 ifndef CONTENT_KEY
 	$(error Environment CONTENT_KEY is not defined. See https://ghost.org/docs/admin-api/javascript/#authentication how get one. Usage make run ENV=dev ADMIN_KEY=... CONTENT_KEY=... [MODE=apply] [DEBUG=true])
 endif
-	cd stage/$(ENV)/posts-management && terragrunt validate && terragrunt $(MODE_STR)
+	cd stage/$(ENV)/posts-management && terragrunt validate && terragrunt $(MODE_STR)) --terragrunt-non-interactive $(TG_FLAGS)
 
 remove-all-posts: ## delete all posts, usage: make remove-all-posts ENV=dev
 ifndef ENV
@@ -59,12 +60,13 @@ google-authentication: prepare ## authenticate to GCP and prepare Application De
 	gcloud init
 	gcloud auth application-default login
 
-clean: ## clean Terraform cached plugins and data
+clean: ## clean cached plugins and data
 	find . -name ".terra*" -exec rm -rf {} +
 	find . -name "target" -exec rm -rf {} +
 	find . -name "node_modules" -exec rm -rf {} +
 
+upgrade-providers-version: init
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help apply destroy
+.PHONY: help run clean

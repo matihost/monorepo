@@ -3,6 +3,7 @@
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
+	TG_FLAGS := --terragrunt-debug
 endif
 
 MODE := apply
@@ -31,7 +32,7 @@ endif
 ifndef OP_USER
 	$(error Env OP_USER is not defined. Minecraft operator/admin user is required. Usage make apply PASS=pass_for_minecraft_rcon OP_USER=minecraftusername)
 endif
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) -var='server_rcon_pass=$(PASS)' -var='server_op_user=$(OP_USER)'
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS) -var='server_rcon_pass=$(PASS)' -var='server_op_user=$(OP_USER)'
 
 
 ssh: ## ssh to Minecraft Server instance
@@ -49,7 +50,7 @@ google-authentication: ## authenticate to GCP and prepare Application Default Cr
 	gcloud auth application-default login
 
 
-clean: ## clean Terraform cached plugins and data
+clean: ## clean cached plugins and data
 	find . -name ".terra*" -exec rm -rf {} +
 	find . -name "target" -exec rm -rf {} +
 
@@ -72,4 +73,4 @@ docs: prepare ## generate html/pdf from *.ad in target directory
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help apply destroy
+.PHONY: help run clean

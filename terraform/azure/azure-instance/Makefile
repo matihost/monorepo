@@ -70,7 +70,6 @@ clean: ## clean cached plugins and data
 
 upgrade-providers-version: init
 
-
 init-tf-backend:
 	cd stage && ./init_azurerm_tf_backend.sh
 
@@ -82,7 +81,6 @@ login: ## login to Azure Subscription
 
 prepare:
 	@[ -e "$(HOME)/.ssh/id_rsa.cloud.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.cloud.vm; }
-
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))

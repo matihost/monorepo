@@ -3,6 +3,7 @@
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
+	TG_FLAGS := --terragrunt-debug
 endif
 
 MODE := apply
@@ -22,7 +23,7 @@ init:
 
 
 run: init ## setup RDSs : make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
 
 get-postgres-pass: ## get postgress password for RDS clusters
 	@cd stage/$(ENV) && terragrunt output -json postgres-password
@@ -38,7 +39,6 @@ clean: ## clean cached plugins and data
 	find . -name "target" -exec rm -rf {} +
 
 upgrade-providers-version: init
-
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))

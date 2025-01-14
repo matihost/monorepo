@@ -7,6 +7,7 @@ JENKISN_AGENT_AMI := jenkins-java-agent
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
+	TG_FLAGS := --terragrunt-debug
 endif
 
 MODE := apply
@@ -27,7 +28,7 @@ init: prepare
 
 
 run: init check-master-ami check-agent-ami ## setup Jenkins Master EC2 instance group, usage: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
 
 
 JENKINS_INSTANCE_PUBLIC_IP = $(shell aws ec2 describe-instances --filters 'Name=tag:Name,Values=$(ENV)-$(REGION)-jenkins-master' --output json --region $(REGION) | jq -r '.Reservations[].Instances[] | select(.State.Name == "running") | .PublicIpAddress')
@@ -56,7 +57,6 @@ clean: ## clean cached plugins and data
 	find . -name ".terra*" -exec rm -rf {} +
 	find . -name "target" -exec rm -rf {} +
 
-
 JENKINS_AGENTS=$(shell aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --region $(REGION) --filters "Name=tag:Name,Values=$(ENV)-$(REGION)-jenkins-agent" --output text 2>/dev/null)
 destroy-jenkins-agents: ## destroy leftover Jenkins Agents
 ifneq ($(JENKINS_AGENTS),)
@@ -73,7 +73,9 @@ check-master-ami:
 check-agent-ami:
 	@[ -n "`aws ec2 describe-images --region $(REGION)  --owners self --filters "Name=name,Values=$(JENKINS_AGENT_AMI)*" --query 'sort_by(Images, &CreationDate)[].ImageId'`" ] || { echo "Missing Jenkins Master AMI in current AWS account: $(JENKINS_AGENT_AMI), run prerequisites/amis/$(JENKINS_AGENT_AMI) to build AMI first"; exit 1;}
 
+upgrade-providers-version: init
+
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help apply destroy
+.PHONY: help run clean

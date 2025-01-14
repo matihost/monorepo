@@ -21,10 +21,8 @@ ENV := dev
 init:
 	cd stage/$(ENV) && terragrunt init -upgrade=true
 
-
 run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
 	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
-
 
 test-site:  ## test S3 site URL
 	curl -sL $(shell cd stage/$(ENV) && terragrunt output s3_site_url)
@@ -55,7 +53,6 @@ clean: ## clean cached plugins and data
 
 upgrade-providers-version: init
 
-
 generate-letsencrypt-cert: ## generate Let's Encrypt TLS certificate, usage make generate-letsencrypt-cert DOMAIN=matihost.mooo.com
 ifndef DOMAIN
 	$(error Env DOMAIN is not defined. Usage make generate-letsencrypt-cert DOMAIN=matihost.mooo.com)
@@ -69,9 +66,6 @@ endif
 
 list-server-certificates: ## show certificates uploaded to AWS
 	aws iam list-server-certificates
-
-
-
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))

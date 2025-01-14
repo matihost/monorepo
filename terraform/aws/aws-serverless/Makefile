@@ -1,9 +1,7 @@
 ENV := dev
 
-
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
-	TF_LOG := DEBUG
 	SLS_DEBUG_OPTS := --debug
 endif
 

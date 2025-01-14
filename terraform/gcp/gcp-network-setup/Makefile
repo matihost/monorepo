@@ -3,6 +3,7 @@
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
+	TG_FLAGS := --terragrunt-debug
 endif
 
 MODE := apply
@@ -22,7 +23,7 @@ init:
 
 
 run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
 
 ssh: ## ssh to VPC bastion host
 	eval $(shell cd stage/dev && terragrunt output bastion_instance_ssh_cmd)
@@ -39,7 +40,7 @@ google-authentication: ## authenticate to GCP and prepare Application Default Cr
 	gcloud auth application-default login
 
 
-clean: ## clean Terraform cached plugins and data
+clean: ## clean cached plugins and data
 	find . -name ".terra*" -exec rm -rf {} +
 	find . -name "target" -exec rm -rf {} +
 
@@ -49,4 +50,4 @@ upgrade-providers-version: init
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help apply destroy
+.PHONY: help run clean

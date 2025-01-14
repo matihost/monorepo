@@ -34,7 +34,6 @@ clean: ## clean cached plugins and data
 
 upgrade-providers-version: init
 
-
 init-tf-backend:
 	cd stage && ./init_azurerm_tf_backend.sh
 

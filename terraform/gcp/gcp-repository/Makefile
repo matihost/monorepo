@@ -15,7 +15,6 @@ else
 	MODE_STR := plan
 endif
 
-
 init:
 	cd stage/current && terragrunt init -upgrade=true
 
@@ -30,7 +29,7 @@ google-authentication: prepare ## authenticate to GCP and prepare Application De
 	gcloud init
 	gcloud auth application-default login
 
-clean: ## clean Terraform cached plugins and data
+clean: ## clean cached plugins and data
 	find . -name ".terra*" -exec rm -rf {} +
 	find . -name "target" -exec rm -rf {} +
 
