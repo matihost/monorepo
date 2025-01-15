@@ -34,16 +34,19 @@ Limitations:
 
 ```bash
 # deploy ApigeeX, usage: make apply EXTERNAL_DNS=api.some.com [DEBUG=true APPROVE=false]
-make apply EXTERNAL_DNS=api.some.com
+make run ENV=dev MODE=apply
 
 # deploys sample application being targetServers for Api proxies in proxies directory
 make deploy-exchanges-provider
 make deploy-echoserver
 
 # deploy all API proxies from proxies directory (sample exchanges and echoserver) on Apigee
-make deploy-api-proxies
+make deploy-api-proxies ENV=dev
 
 # test API over Apigee
 make test-echoserver DNS=api.some.com
 make test-exchangerate DNS=api.some.com
+
+
+
 ```

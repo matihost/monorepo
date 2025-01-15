@@ -2,7 +2,7 @@ locals {
   regions = toset([
     var.region
   ])
-  envs = toset(var.envs)
+  envs = toset(var.apigee_envs)
 }
 
 data "google_kms_key_ring" "keyring" {
@@ -76,7 +76,7 @@ resource "google_apigee_instance_attachment" "intance-env-attachment" {
 }
 
 resource "google_dns_record_set" "instance-dns" {
-  name = "api.${data.google_dns_managed_zone.main-zone.dns_name}"
+  name = "${var.internal_cn_prefix}.${data.google_dns_managed_zone.main-zone.dns_name}"
   type = "A"
   ttl  = 300
 

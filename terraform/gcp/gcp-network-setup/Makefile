@@ -15,12 +15,10 @@ else
 	MODE_STR := plan
 endif
 
-
 ENV := dev
 
 init:
 	cd stage/$(ENV) && terragrunt init -upgrade=true
-
 
 run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
 	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
@@ -38,7 +36,6 @@ show-state: ## show state
 google-authentication: ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
 	gcloud auth application-default login
-
 
 clean: ## clean cached plugins and data
 	find . -name ".terra*" -exec rm -rf {} +

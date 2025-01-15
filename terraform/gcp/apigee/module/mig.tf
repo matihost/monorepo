@@ -2,6 +2,8 @@
 resource "google_compute_region_instance_group_manager" "apigee-mig-group-manager" {
   provider = google-beta
 
+  project = var.project
+
   name = "mig-${var.env}-${google_apigee_organization.org.name}-${var.region}"
 
   version {

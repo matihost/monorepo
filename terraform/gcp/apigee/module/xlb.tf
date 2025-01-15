@@ -22,8 +22,8 @@ resource "google_compute_target_https_proxy" "apigee-xlb-https" {
 
 resource "google_compute_ssl_certificate" "apigee-xlb" {
   name_prefix = "${local.external_dns_name}-"
-  private_key = file("${path.module}/${local.external_tls_key_filename}")
-  certificate = file("${path.module}/${local.external_tls_crt_filename}")
+  private_key = var.tls_key
+  certificate = var.tls_crt
 
   lifecycle {
     create_before_destroy = true
