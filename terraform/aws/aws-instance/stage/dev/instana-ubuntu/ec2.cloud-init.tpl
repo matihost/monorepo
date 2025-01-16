@@ -16,7 +16,7 @@ write_files:
       ln -sf /etc/nginx/sites-available/default-instana /etc/nginx/sites-enabled/default
       systemctl restart nginx
       # install Instana Agent
-%{ if length(vars) > 0 }
+%{ if length(vars) > 0 && vars[0] != "" }
       INSTANA_TOKEN="${vars[0]}"
       INSTANA_ENDPOINT="${vars[1]}"
       curl -o setup_agent.sh https://setup.instana.io/agent \

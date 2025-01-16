@@ -21,13 +21,13 @@ ENV := dev
 init: prepare
 	cd stage/$(ENV) && terragrunt run-all init -upgrade=true
 
-run-one: prepare
+run-one: prepare ## setup one EC2 instance from environment, usage: make run-one INSTANCE=instance-ubuntu [ENV=dev] [MODE=apply]
 ifndef INSTANCE
 	$(error Env INSTANCE is not defined. Usage make run-one ENV=dev INSTANCE=ubuntu)
 endif
 	cd stage/$(ENV)/${INSTANCE} && terragrunt init -upgrade=true && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
 
-run: init ## setup free-tier eliglible Ubuntu instance, usage: make run [ENV=dev] [MODE=apply]
+run: init ## setup EC2 instances for environment, usage: make run [ENV=dev] [MODE=apply]
 	@cd stage/$(ENV) && terragrunt run-all validate && terragrunt run-all $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
 
 ssh: ## ssh to EC2 instance

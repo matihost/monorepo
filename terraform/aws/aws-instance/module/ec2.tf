@@ -6,7 +6,7 @@ data "aws_vpc" "default" {
   }
 }
 
-data "aws_subnet" "public_zone" {
+data "aws_subnet" "subnet" {
   vpc_id            = data.aws_vpc.default.id
   availability_zone = var.zone
 
@@ -112,7 +112,7 @@ resource "aws_instance" "vm" {
   instance_type          = var.ec2_instance_type
   key_name               = aws_key_pair.vm_key.key_name
   vpc_security_group_ids = [aws_security_group.private_access.id]
-  subnet_id              = data.aws_subnet.public_zone.id
+  subnet_id              = data.aws_subnet.subnet.id
   iam_instance_profile   = var.instance_profile
   # to use cloud-init and bash script
   # use https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/cloudinit_config
