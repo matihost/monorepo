@@ -1,48 +1,27 @@
-provider "google" {
-  region  = var.region
-  zone    = local.zone
-  project = var.project
-}
-
 # tflint-ignore: terraform_unused_declarations
 data "google_client_config" "current" {}
 data "google_project" "current" {
 }
+
 data "google_compute_network" "default" {
   name = "default"
 }
 
+
 data "google_compute_network" "private-gke" {
-  name = "private-vpc"
+  name = "${var.env}-vpc"
 }
 
 data "google_compute_subnetwork" "private-gke" {
-  name   = "private-subnet-${var.region}"
+  name   = "${var.env}-${var.region}-subnet"
   region = var.region
 }
 
 locals {
-  zone     = "${var.region}-${var.zone_letter}"
   gke_name = "${var.cluster_name}-${var.env}"
-  location = var.regional_cluster ? var.region : local.zone
+  location = var.regional_cluster ? var.region : var.zone
 }
 
-variable "region" {
-  type        = string
-  default     = "us-central1"
-  description = "GCP Region For Deployment"
-}
-
-variable "zone_letter" {
-  type        = string
-  default     = "a"
-  description = "GCP Region For Deployment"
-}
-
-variable "project" {
-  type        = string
-  description = "GCP Project For Deployment"
-}
 
 variable "cluster_name" {
   type        = string
@@ -56,11 +35,6 @@ variable "secondary_ip_range_number" {
   description = "secondary_ip_range for pod and svc, assumption there are two ip ragnes for both pods and svc per region, second GKE cluster in region should use other subnets"
 }
 
-variable "env" {
-  type        = string
-  default     = "dev"
-  description = "Environment"
-}
 
 variable "regional_cluster" {
   type        = bool
@@ -121,4 +95,27 @@ variable "bigquery_metering" {
   default     = false
   description = "Whether to export usage metering to BigQuery, requires prerequisites/bigquery-dataset to be run once"
   type        = bool
+}
+
+
+# Default inherited variables
+variable "env" {
+  type        = string
+  description = "Environment, also VPC name"
+}
+
+variable "project" {
+  type        = string
+  description = "GCP Project For Deployment"
+}
+
+variable "region" {
+  type        = string
+  description = "GCP Region For Deployment"
+}
+
+# tflint-ignore: terraform_unused_declarations
+variable "zone" {
+  type        = string
+  description = "GCP Zone For Deployment"
 }

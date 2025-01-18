@@ -4,7 +4,7 @@ data "google_container_engine_versions" "versions" {
   # run: gcloud container get-server-config
   # to see available versions
   location       = local.location
-  version_prefix = "1.27."
+  version_prefix = "1.31."
 
   project = var.project
 }
@@ -471,5 +471,10 @@ output "gke_master_endpoint" {
 
 
 output "gke_connect_cmd" {
-  value = format("gcloud container clusters get-credentials %s --zone %s --internal-ip", google_container_cluster.gke.name, local.zone)
+  value = format("gcloud container clusters get-credentials %s --zone %s --internal-ip", google_container_cluster.gke.name, local.location)
+}
+
+
+output "location" {
+  value = local.location
 }

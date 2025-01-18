@@ -1110,7 +1110,9 @@ all:
               echo "Uninstalling NodeJS: ${INSTALLED_VERSION}..."
               bash -ic "nvm uninstall ${INSTALLED_VERSION}"
             }
-            ncu -g -u
+            [[ "$(ncu -g 2>/dev/null)" == *"All global packages are up-to-date"* ]] || {
+              npm i ${GLOBAL_PACKAGES} -g
+            }
         files_config:
         - file: /etc/gai.conf
           content: |
