@@ -85,6 +85,14 @@ resource "aws_security_group" "nat" {
     cidr_blocks = [aws_vpc.main.cidr_block]
   }
 
+  ingress {
+    description = "OTEL from VPC"
+    from_port   = 4317
+    to_port     = 4318
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.main.cidr_block]
+  }
+
   # Terraform removed default egress ALLOW_ALL rule
   # It has to be explicitely added
   egress {
@@ -102,6 +110,14 @@ resource "aws_security_group" "nat" {
   egress {
     from_port   = 443
     to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "OTEL traffic"
+    from_port   = 4317
+    to_port     = 4318
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

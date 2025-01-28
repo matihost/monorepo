@@ -1081,6 +1081,20 @@ all:
               curl -s -L -o "/tmp/discord.deb" "${DOWNLOAD_URL}"
               apt -y install /tmp/discord.deb
             }
+        - name: otel
+          become: true
+          desc: Ensure latest version of Open Telemetry (otel/  opentelemetry-collector contrib) is installed.
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(otelcol-contrib --version 2>&1| sed -E "s/otelcol-contrib version (.*)/v\1/g")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases/latest  | jq -r ".assets[] |
+                select(.name | (endswith(\"linux_$(dpkg --print-architecture).deb\")) and startswith(\"otelcol-contrib\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/otelcol-contrib.deb"
+              apt -y install /tmp/otelcol-contrib.deb
+              # so that otelcol-contrib user which runs systemctl service can access journal logs
+              usermod -a -G adm otelcol-contrib
+            }
         - name: poetry
           desc: Dependency management for Python
           become: false
