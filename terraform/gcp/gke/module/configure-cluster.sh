@@ -29,8 +29,14 @@ function ensure-cluster-config() {
 }
 
 function ensure-external-dns() {
+
+  # Istio CRD are required to be present
+  # otherwise External DNS crashes
+  # https://github.com/kubernetes-sigs/external-dns/issues/4901#issuecomment-2553221038
+  helm repo add istio https://istio-release.storage.googleapis.com/charts
   helm repo add bitnami https://charts.bitnami.com/bitnami
   helm repo update
+  helm upgrade --install istio-base -n istio-system --create-namespace istio/base
   helm upgrade --install external-dns -n external-dns --create-namespace bitnami/external-dns -f "${DIRNAME}/external-dns.yaml" \
     --set google.project="${PROJECT}" \
     --set 'serviceAccount.annotations.iam\.gke\.io\/gcp-service-account'="${GCP_GSA}@${PROJECT}.iam.gserviceaccount.com"

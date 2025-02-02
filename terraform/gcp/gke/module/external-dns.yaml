@@ -4,20 +4,22 @@
 # helm show values bitnami/external-dns > new-external-dns.values.yaml
 # and compare with this file
 
-# To support Gateway API
-# https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/gateway-api.md
-# To support Istio
-# https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/istio.md
+
+# WARNING:
+# CRD for Gateway or Istio has to be present otherwise external-dns pod crashes with:
+# {"level":"fatal","msg":"failed to sync *v1alpha3.Gateway: context deadline exceeded"
+# https://github.com/kubernetes-sigs/external-dns/issues/4901#issuecomment-2553221038
 sources:
   - gateway-httproute
   # GKE Gateway Addon is missing TLSRoute, TCPRoute and UDPRoute CDRs
   # - gateway-tlsroute
   # - gateway-tcproute
   # - gateway-udproute
-  - istio-gateway
-  - istio-virtualservice
   - service
   - ingress
+  # Istio CRD are required to be present as well
+  - istio-gateway
+  - istio-virtualservice
 
 provider: google
 
