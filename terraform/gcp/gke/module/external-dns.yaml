@@ -21,8 +21,8 @@ sources:
 
 provider: google
 
-google:
-  project: '${GCP_PROJECT}'
+# google:
+#   project: '${GCP_PROJECT}'
 
 
 domainFilters: []
@@ -45,9 +45,9 @@ serviceAccount:
   create: true
   name: external-dns
   ## Annotations for the Service Account - Needed for WorflowIdentityToWork
-  annotations: {
-    iam.gke.io/gcp-service-account: '${GCP_GSA}@${GCP_PROJECT}.iam.gserviceaccount.com'
-  }
+  # annotations: {
+  #   iam.gke.io/gcp-service-account: '${GCP_GSA}@${GCP_PROJECT}.iam.gserviceaccount.com'
+  # }
 
 rbac:
   create: true

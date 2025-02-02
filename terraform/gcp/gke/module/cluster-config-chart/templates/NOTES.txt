@@ -1,0 +1,6 @@
+Install cluster GKE configurations
+
+Requires import:
+*  NetworkLogging default
+*  OperatorConfig config -n gmp-public
+objects to be migrated to Helm first via cluster-config.sh script.

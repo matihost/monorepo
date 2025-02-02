@@ -1,0 +1,4 @@
+clusterName: shared1
+env: dev
+location: us-central1-a
+project: superproject

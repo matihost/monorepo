@@ -72,6 +72,15 @@ variable "external_dns_k8s_sa_name" {
   description = "ExternalDNS  K8S ServiceAccount"
 }
 
+variable "external_gateway" {
+  type = object({
+    cn      = string
+    tls_key = string
+    tls_crt = string
+  })
+  sensitive   = true
+  description = "GKE External Gateway configuration"
+}
 
 variable "autoscalling" {
   type        = bool

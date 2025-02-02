@@ -1,5 +1,0 @@
-Install cluster GKE configurations:
-- PSP restricted
-- NetworkPolicy Logging configuration
-
-Requires import NetworkLogging default object migrated to Helm first via cluster-config.sh script.

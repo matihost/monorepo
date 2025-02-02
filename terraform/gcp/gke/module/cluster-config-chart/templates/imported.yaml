@@ -1,0 +1,57 @@
+# yamllint disable-file
+# Requires importing to Helm first
+kind: NetworkLogging
+apiVersion: networking.gke.io/v1alpha1
+metadata:
+  name: default
+  annotations:
+    helm.sh/resource-policy: keep
+  labels:
+    {{- include "cluster-config.labels" . | nindent 4 }}
+spec:
+  cluster:
+    allow:
+      delegate: false
+      log: false
+    deny:
+      log: true
+      # denied connections are only logged if the Pod where the connection was denied is in a namespace
+      # with the annotation policy.network.gke.io/enable-deny-logging: "true"
+      delegate: true
+---
+# Scrape kubelet metrics once per minute and limit costly metrics
+# https://cloud.google.com/stackdriver/docs/managed-prometheus/exporters/kubelet-cadvisor
+kind: OperatorConfig
+apiVersion: monitoring.googleapis.com/v1
+metadata:
+  name: config
+  namespace: gmp-public
+  annotations:
+    helm.sh/resource-policy: keep
+  labels:
+    {{- include "cluster-config.labels" . | nindent 4 }}
+collection:
+  externalLabels:
+    cluster: {{ .Values.clusterName }}-{{ .Values.env }}
+    location: {{ .Values.location }}
+    project_id: {{ .Values.project }}
+  filter:
+    matchOneOf:
+    - '{__name__!~"container_memory.*|container_network.*|container_blkio.*"}'
+  kubeletScraping:
+    interval: 60s
+features:
+  config: {}
+  targetStatus: {}
+managedAlertmanager:
+  configSecret:
+    key: alertmanager.yaml
+    name: alertmanager
+rules:
+  alerting: {}
+  externalLabels:
+    cluster: {{ .Values.clusterName }}-{{ .Values.env }}
+    location: {{ .Values.location }}
+    project_id: {{ .Values.project }}
+scaling:
+  vpa: {}

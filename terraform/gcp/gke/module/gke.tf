@@ -30,6 +30,7 @@ resource "google_container_cluster" "gke" {
   remove_default_node_pool = true
   initial_node_count       = 1
 
+  deletion_protection = false
   # TODO consider parametrizing
   # enable_tpu = false
 
@@ -120,6 +121,10 @@ resource "google_container_cluster" "gke" {
     # or resource availability (BALANCED) when deciding to remove nodes from a cluster
     autoscaling_profile = "OPTIMIZE_UTILIZATION"
     auto_provisioning_defaults {
+      disk_size  = random_id.gke_node_pool_id.keepers.disk_size_gb
+      disk_type  = random_id.gke_node_pool_id.keepers.disk_type
+      image_type = "COS_CONTAINERD"
+
       oauth_scopes = [
         "https://www.googleapis.com/auth/cloud-platform"
       ]
@@ -163,7 +168,7 @@ resource "google_container_cluster" "gke" {
   }
 
   master_authorized_networks_config {
-    gcp_public_cidrs_access_enabled = false
+    gcp_public_cidrs_access_enabled = true
     cidr_blocks {
       cidr_block   = data.google_compute_subnetwork.private-gke.ip_cidr_range
       display_name = "from GKE nodes subnetwork"
@@ -208,6 +213,11 @@ resource "google_container_cluster" "gke" {
     master_ipv4_cidr_block  = var.master_cidr
     master_global_access_config {
       enabled = true
+    }
+  }
+  control_plane_endpoints_config {
+    dns_endpoint_config {
+      allow_external_traffic = true
     }
   }
 
