@@ -20,12 +20,22 @@ function login-to-gke() {
   gcloud container clusters get-credentials "${CLUSTER_NAME_FULL}" --zone "${LOCATION}"
 }
 
+function ensure-cluster-is-running() {
+  [[ "$(gcloud container clusters describe "${CLUSTER_NAME_FULL}" --zone "${LOCATION}" --format="value(status)")" == 'RUNNING' ]]
+  kubectl wait --for=condition=available --timeout=300s deployment/gmp-operator -n gmp-system
+  kubectl wait --for=condition=Ready pod -l component=gke-metrics-agent -n kube-system --timeout=300s
+  kubectl wait --for=condition=Ready pod -l k8s-app=netd -n kube-system --timeout=300s
+}
+
 function ensure-cluster-config() {
+  # has to be with --force - otherwise imported resources - are not updated with Helm
+  # https://github.com/helm/helm/issues/11040#issuecomment-1154702487
   helm upgrade --install cluster-config -n cluster-config --create-namespace "${DIRNAME}/cluster-config-chart" \
     --set project="${PROJECT}" \
     --set clusterName="${CLUSTER_NAME_PREFIX}" \
     --set env="${ENV}" \
-    --set location="${LOCATION}"
+    --set location="${LOCATION}" \
+    --force
 }
 
 function ensure-external-dns() {
@@ -61,6 +71,7 @@ function disable_default_storageclass() {
 
 # Main
 login-to-gke
+ensure-cluster-is-running
 import_existing_object_to_helm nl default cluster-config cluster-config
 import_existing_ns_object_to_helm operatorconfig config gmp-public cluster-config cluster-config
 ensure-cluster-config
