@@ -61,8 +61,9 @@ terraform {
 }
 
 inputs = {
-  account             = local.account
-  instana_token       = local.instana_api_token
-  instana_endpoint    = local.instana_endpoint
-  instana_agent_token = local.instana_agent_token
+  account               = local.account
+  instana_token         = local.instana_api_token
+  instana_endpoint      = local.instana_endpoint
+  instana_agent_token   = local.instana_agent_token
+  instana_agent_backend = local.instana_agent_backend
 }

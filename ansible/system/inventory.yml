@@ -1088,7 +1088,7 @@ all:
             CURRENT_VERSION="$(curl -sL https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases/latest | jq -r ".tag_name")"
             INSTALLED_VERSION="$(otelcol-contrib --version 2>&1| sed -E "s/otelcol-contrib version (.*)/v\1/g")"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
-              curl -sL https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases/latest  | jq -r ".assets[] |
+              curl -sL https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases  | jq -r ".[0].assets[] |
                 select(.name | (endswith(\"linux_$(dpkg --print-architecture).deb\")) and startswith(\"otelcol-contrib\")) | .browser_download_url" |
                   xargs curl -s -L -o "/tmp/otelcol-contrib.deb"
               apt -y install /tmp/otelcol-contrib.deb

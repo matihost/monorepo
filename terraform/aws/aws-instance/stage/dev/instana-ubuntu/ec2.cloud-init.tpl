@@ -21,8 +21,8 @@ write_files:
       INSTANA_ENDPOINT="${vars[1]}"
 
       # install otel agent
-      curl -sL https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases/latest  | \
-        jq -r ".assets[] | select(.name | (endswith(\"linux_$(dpkg --print-architecture).deb\")) and startswith(\"otelcol-contrib\")) | .browser_download_url" | \
+      curl -sL https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases | \
+        jq -r ".[0].assets[] | select(.name | (endswith(\"linux_$(dpkg --print-architecture).deb\")) and startswith(\"otelcol-contrib\")) | .browser_download_url" | \
         xargs curl -s -L -o "/tmp/otelcol-contrib.deb"
       apt -y install /tmp/otelcol-contrib.deb
       systemctl stop otelcol-contrib
