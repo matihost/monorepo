@@ -5,6 +5,7 @@ locals {
   instana_endpoint      = get_env("INSTANA_ENDPOINT")
   instana_agent_token   = get_env("INSTANA_AGENT_TOKEN")
   instana_agent_backend = get_env("INSTANA_AGENT_BACKEND")
+  instana_admin_email   = get_env("INSTANA_ADMIN_EMAIL")
 }
 
 remote_state {
@@ -66,4 +67,5 @@ inputs = {
   instana_endpoint      = local.instana_endpoint
   instana_agent_token   = local.instana_agent_token
   instana_agent_backend = local.instana_agent_backend
+  instana_admin_email   = local.instana_admin_email
 }

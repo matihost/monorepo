@@ -177,7 +177,7 @@ resource "azurerm_storage_account" "cloudshell" {
 resource "azurerm_storage_share" "cloudshell" {
   for_each = toset(var.cloudshell.shares)
 
-  name                 = each.key
-  storage_account_name = azurerm_storage_account.cloudshell.name
-  quota                = 6 # GB
+  name               = each.key
+  storage_account_id = azurerm_storage_account.cloudshell.id
+  quota              = 6 # GB
 }

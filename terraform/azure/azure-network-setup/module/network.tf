@@ -12,7 +12,7 @@ resource "azurerm_subnet" "subnet" {
   name                 = "${azurerm_virtual_network.vnet.name}-${each.key}"
   resource_group_name  = local.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  service_endpoints    = ["Microsoft.Sql", "Microsoft.Storage"]
+  service_endpoints    = ["Microsoft.Sql", "Microsoft.Storage", "Microsoft.ContainerRegistry"]
 
   default_outbound_access_enabled = false
 }

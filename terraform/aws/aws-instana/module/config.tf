@@ -70,3 +70,12 @@ resource "instana_custom_dashboard" "environment_dashboard" {
     relation_type = "GLOBAL"
   }
 }
+
+
+resource "instana_alerting_channel" "email" {
+  name = "email"
+
+  email {
+    emails = [var.instana_admin_email]
+  }
+}

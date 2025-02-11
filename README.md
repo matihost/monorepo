@@ -45,7 +45,7 @@ Various technology deployments, tools & code:
     * aws-site - sample web site exposure via S3 and CloudFront
     * aws-iam-management, aws-iam-linked - setup IAM resources needed on fresh AWS management account (users, roles, groups etc) and subsequent linked AWS accounts
     * aws-network-setup - minimal AWS recommended setup with private subnet
-    * aws-instance - sample Linux and Windws VM setup, also sample setup with Instana host agent deployment
+    * aws-instance - sample Linux and Windws VM setup, also sample setup with Instana host and OpenTelemetry (OTEL) deployment
     * aws-instana - Instana setup for AWS resources monitoring
     * aws-alb - Application Load Balancer usage
     * aws-jenkins - Jenkins deployment as AWS VMs, Packer images for Jenkins Agents
@@ -61,6 +61,7 @@ Various technology deployments, tools & code:
     * ibm-alb - Application and Network Load Balancer usage
     * ibm-ocp - IBM RedHat OpenShift Kubernetes Service (ROKS) deployment
   * azure - Terragrunt / OpenTofu deployments for Azure
+    * aro - Azure RedHat OpenShift (ARO) deployment
     * azure-network-setup - minimal Azure recommended network setup
     * azure-entraid - setup IAM resource needed on fresh Azure subscription (resource group)
     * azure-instance - VM setup

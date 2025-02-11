@@ -50,6 +50,12 @@ inputs = {
     cidr_range = "10.1.2.0/24"
   }
   subnets = {
+    "aro-shared1-master-nodes" = {
+      cidr_range = "10.1.3.32/27"
+    }
+    "aro-shared1-worker-nodes" = {
+      cidr_range = "10.1.4.0/24"
+    }
     "vms" = {
       cidr_range = "10.1.32.0/19"
     },

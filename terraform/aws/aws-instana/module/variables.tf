@@ -52,6 +52,11 @@ variable "instana_agent_backend" {
 }
 
 
+variable "instana_admin_email" {
+  type        = string
+  description = "Email of the person for main email notification channel"
+}
+
 variable "name" {
   type        = string
   description = "Name of the instana app"

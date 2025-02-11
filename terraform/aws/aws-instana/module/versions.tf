@@ -11,6 +11,7 @@ terraform {
       # Created ticket to OpenTofu Registry: https://github.com/opentofu/registry/issues/1412
       source  = "instana/instana"
       version = "~> 3"
+      # version = "3.1.0"
       # source = "gessnerfl/instana"
       # version = "2.4.3"
     }
