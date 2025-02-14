@@ -24,7 +24,7 @@ init:
 	cd stage/$(ENV) && terragrunt init -upgrade=true
 
 run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 ibm-authentication: ## authenticate ibmcloud CLI and create API key if needed
 	ibmcloud login -a https://cloud.ibm.com --sso -r eu-de

@@ -20,7 +20,7 @@ init: prepare
 	cd stage/current && terragrunt init -upgrade=true
 
 run: init ## usage: make run MODE=plan [DEBUG=true])
-	cd stage/current && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
+	cd stage/current && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 CURRENT_PROJECT := $(shell gcloud config get-value project 2>/dev/null)
 use-editor-sa: ## create new gcloud configuration with editor Google Service Account

@@ -19,7 +19,7 @@ init:
 	cd stage/current && terragrunt init -upgrade=true
 
 run: init ## usage: Usage make run MODE=plan [DEBUG=true])
-	cd stage/current && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
+	cd stage/current && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 show-state: ## show state
 	cd stage/current && terragrunt state list && terragrunt show

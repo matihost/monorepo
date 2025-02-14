@@ -21,7 +21,7 @@ init:
 	cd stage/$(ENV) && terragrunt init -upgrade=true
 
 run: init ## deploy FanOut example (SNS, SQS, Lambda) : make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show

@@ -21,7 +21,7 @@ init:
 	cd stage/$(ENV) && terragrunt init -upgrade=true
 
 run: init ## deploy API Gateway exposing Lambda, usage: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 test: ## invoke Lambda programmatically
 	aws lambda invoke --function-name=$(ENV)-synthetic-ec2-tester response.json && cat response.json

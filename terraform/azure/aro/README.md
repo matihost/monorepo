@@ -5,7 +5,7 @@ Setup Azure RedHat OpenShift (ARO)
 ## Prerequisites
 
 * Latest Terragrunt/OpenTofu installed
-*
+
 * [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux?pivots=apt)
 
 * Azure Subscription.
@@ -24,7 +24,24 @@ Setup Azure RedHat OpenShift (ARO)
 
 * [../azure-entraid](../azure-entraid) - installed for the same stage environment (contains resource group and policies)
 
-* [../azure-network-setup](../azure-network-setup) - installed for the same stage environment (contains resource group and policies)
+
+
+* Ensure networking is setup for evn and region: [../azure-network-setup](../azure-network-setup) - installed for the same stage environment and region(contains VNet and Subnets for ARO), if you create new ARO environment, you need also create this repo new environment first for the same env and region.
+Not all regions are compatible with ARO or contains desired VM sizes. To select machinig region run following commands:
+```bash
+
+# select your desired region
+REGION=northeurope
+
+# check whether ARO is supported in the region
+# and what version can be used for initial ARO cluster deployment
+az aro get-versions --location "${REGION}"
+
+
+# to check whether your region and subscription supports ARO supperted VM sizes
+az vm list-skus --location "${REGION}" --size Standard_D --all --output table
+
+```
 
 * Obtain RedHat Pull Secret for ARO. Go to: [ARO Redhat Hybrid Console](https://console.redhat.com/openshift/install/azure/aro-provisioned). It is needed to be placed as RH_PULL_SECRET environment variable. It contains authentication for RedHat image registries:
 
@@ -79,6 +96,8 @@ Follow
 
 ### Changing Worker Nodes Size
 
+WARNING : Upgrading or modifying VM sizes for worker nodes is supported in ARO.. However, please be aware that this action is not applicable to the master nodes.
+
 Follow [Upgrading Infrastructure and Worker Node VM Sizes in ARO](https://access.redhat.com/solutions/7022857) procedure.
 
 ### Refresh Machines
@@ -107,6 +126,34 @@ oc get po -A -o wide | grep <new_node_name>
 ```
 
 Repeat for the next machine as needed.
+
+### Scale cluster worker nodes down to 0
+
+```bash
+# backup machine set, for later bringing them back, ensure it is stored in persistent, safe location
+# it is needed to bring machinesets back
+oc get machineset -l machine.openshift.io/cluster-api-machine-role=worker -A -o yaml > worker-machinesets.yaml
+oc delete -f worker-machinesets.yaml
+# sleep 10 minutes
+sleep $((10*60))
+# check whether any node is left
+oc get no -l node-role.kubernetes.io/worker
+oc delete no -l node-role.kubernetes.io/worker
+```
+
+WARNING: Ensure your `worker-machinesets.yaml`is stored in some persistent storage - available later for retrieval for procedure [Scale cluster worker nodes back](#scale-cluster-worker-nodes-back).
+
+### Scale cluster worker nodes back
+
+```bash
+# creates machinesets from backup
+oc apply -f machinesets.yaml
+
+# aro-machinehealthcheck may scale initial machineset to 2, resulting in 4 nodes in total
+# see https://access.redhat.com/solutions/7030551 for details
+# ensure there are only 3 nodes (1 per zone) in the cluster
+oc scale machineset -n openshift-machine-api -l machine.openshift.io/cluster-api-machine-role=worker --replicas=1
+```
 
 ### Cluster Upgrade
 

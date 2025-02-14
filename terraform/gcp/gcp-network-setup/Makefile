@@ -21,7 +21,7 @@ init:
 	cd stage/$(ENV) && terragrunt init -upgrade=true
 
 run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 ssh: ## ssh to VPC bastion host
 	eval $(shell cd stage/dev && terragrunt output bastion_instance_ssh_cmd)

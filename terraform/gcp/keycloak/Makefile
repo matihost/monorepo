@@ -28,7 +28,7 @@ run-keycloak: init ## usage: Usage make run-keycloak ENV=prod MODE=plan [DEBUG=t
 ifndef ENV
 	$(error Environment ENV is not defined. Usage make run ENV=dev [MODE=apply] [DEBUG=true])
 endif
-	cd stage/$(ENV)/keycloak && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
+	cd stage/$(ENV)/keycloak && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 
 google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
@@ -94,7 +94,7 @@ run-keycloak-config: ## configure Keycloak instance; usage: make run-keycloak-co
 ifndef ENV
 	$(error Environment ENV is not defined. Usage make run ENV=prod MODE=plan [DEBUG=true])
 endif
-	cd stage/$(ENV)/keycloak-config && terragrunt init -upgrade=true && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS) && terragrunt output -json
+	cd stage/$(ENV)/keycloak-config && terragrunt init -upgrade=true && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS) && terragrunt output -json
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))

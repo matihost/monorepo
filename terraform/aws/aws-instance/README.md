@@ -22,10 +22,6 @@ make run [ENV=dev] [MODE=apply]
 # deploy single instance
 make run-one ENV=dev INSTANCE=windows
 
-# deploy Ubuntu instance with Instana host Agent
-export INSTANA_AGENT_TOKEN="....token for agent..."
-make run-one ENV=dev INSTANCE=instana-ubuntu
-
 # connects to EC2 intance Nginx
 make test ENV=default INSTANCE=ubuntu
 
@@ -33,8 +29,27 @@ make test ENV=default INSTANCE=ubuntu
 make ssh INSTANCE=ubuntu ENV=default
 
 # ssh to EC2 instance over SSM SSH
-make ssm-ssh
+make ssm-ssh INSTANCE=ubuntu ENV=default
 
 # show Terraform state along with current EC2 instance user_date startup script
 make show-state
+```
+
+## EC2 with Instana Agent
+
+```bash
+# deploy Ubuntu instance with Instana host Agent and OTEL agent forwarding logs to Instana
+export INSTANA_AGENT_TOKEN="....token for agent..."
+export INSTANA_AGENT_BACKEND="ingress-red-saas.instana.io:443"
+export INSTANA_OTEL_BACKEND="https://otlp-red-saas.instana.io:4317"
+make run-one INSTANCE=instana-ubuntu ENV=dev MODE=apply
+
+# login to
+make ssm-ssh INSTANCE=instana-ubuntu
+
+# generate info logs
+((i=0)); while true; do ((i++)); (( $i % 1000 == 0 )) && sleep 1; logger -p user.info "info sample $i"; done
+
+# generate error logs
+((i=0)); while true; do ((i++)); (( $i % 1000 == 0 )) && sleep 1; logger -p user.err "error sample $i"; done
 ```

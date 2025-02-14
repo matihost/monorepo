@@ -21,7 +21,7 @@ init-terraform:
 	cd stage/instance && terragrunt init -upgrade=true
 
 run: init-terraform prepare ## setup free-tier eliglible Ubuntu instance, make run [MODE=apply]
-	cd stage/instance && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
+	cd stage/instance && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 ssh: ## ssh to VM instance using ssh client via ssh key added to OS login
 	PUBLIC_IP="$$(cd stage/instance && terragrunt output -raw public_ip)" && ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=accept-new $(CURRENT_ACCOUNT_SSH_USER)@$${PUBLIC_IP}

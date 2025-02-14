@@ -21,7 +21,7 @@ init:
 	cd stage/$(CLUSTER_NAME) && terragrunt init -upgrade=true
 
 run: init ## setup GKE cluster: make run [CLUSTER_NAME=shared1-dev] [MODE=apply]
-	@cd stage/$(CLUSTER_NAME) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
+	@cd stage/$(CLUSTER_NAME) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 show-state: ## show state
 	cd stage/$(CLUSTER_NAME) && terragrunt state list && terragrunt show

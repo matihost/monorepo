@@ -28,7 +28,7 @@ init: prepare
 
 
 run: init check-master-ami check-agent-ami ## setup Jenkins Master EC2 instance group, usage: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 
 JENKINS_INSTANCE_PUBLIC_IP = $(shell aws ec2 describe-instances --filters 'Name=tag:Name,Values=$(ENV)-$(REGION)-jenkins-master' --output json --region $(REGION) | jq -r '.Reservations[].Instances[] | select(.State.Name == "running") | .PublicIpAddress')

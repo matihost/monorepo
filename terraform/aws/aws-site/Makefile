@@ -22,7 +22,7 @@ init:
 	cd stage/$(ENV) && terragrunt init -upgrade=true
 
 run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 test-site:  ## test S3 site URL
 	curl -sL $(shell cd stage/$(ENV) && terragrunt output s3_site_url)

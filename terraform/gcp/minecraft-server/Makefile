@@ -32,7 +32,7 @@ endif
 ifndef OP_USER
 	$(error Env OP_USER is not defined. Minecraft operator/admin user is required. Usage make apply PASS=pass_for_minecraft_rcon OP_USER=minecraftusername)
 endif
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS) -var='server_rcon_pass=$(PASS)' -var='server_op_user=$(OP_USER)'
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS) -var='server_rcon_pass=$(PASS)' -var='server_op_user=$(OP_USER)'
 
 
 ssh: ## ssh to Minecraft Server instance

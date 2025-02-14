@@ -28,7 +28,7 @@ run: init ## setup ROSA : make run [ENV=dev] [MODE=apply]
 ifndef PASS
 	$(error Env PASS is not defined. Cluster-admin break glass password is needed.)
 endif
-	cd stage/$(ENV) && { export CLUSTER_ADMIN_PASS=$(PASS);  terragrunt validate && terragrunt --terragrunt-non-interactive $(MODE_STR) $(TG_FLAGS); }
+	cd stage/$(ENV) && { export CLUSTER_ADMIN_PASS=$(PASS);  terragrunt validate && terragrunt --non-interactive $(MODE_STR) $(TG_FLAGS); }
 
 destroy: # destroy cluster, usage: make destroy CLUSTER_NAME=dev-us-east-1 [ENV=dev]
 ifndef CLUSTER_NAME
@@ -37,7 +37,7 @@ endif
 	rosa delete cluster -c $(CLUSTER_NAME) -w -y
 	cd stage/$(ENV) && { terragrunt state rm rhcs_hcp_machine_pool.machine_pool; \
 		terragrunt state rm rhcs_hcp_default_ingress.default_ingress; \
-		terragrunt --terragrunt-non-interactive destroy -auto-approve $(TG_FLAGS); \
+		terragrunt --non-interactive destroy -auto-approve $(TG_FLAGS); \
 	}
 
 

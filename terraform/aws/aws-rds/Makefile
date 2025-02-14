@@ -23,7 +23,7 @@ init:
 
 
 run: init ## setup RDSs : make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 get-postgres-pass: ## get postgress password for RDS clusters
 	@cd stage/$(ENV) && terragrunt output -json postgres-password

@@ -35,7 +35,7 @@ getaccountid: ## show current IBM Account ID
 	@ibmcloud account show --output json | jq -r .account_id
 
 run: init ## setup webservers and LBs: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --terragrunt-non-interactive $(TG_FLAGS)
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show
