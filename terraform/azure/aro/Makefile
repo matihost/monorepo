@@ -30,7 +30,7 @@ CLUSTER_RG = "$(shell cd stage/$(ENV) && terragrunt output -raw cluster_rg 2>/de
 CLUSTER_NAME = "$(shell cd stage/$(ENV) && terragrunt output -raw cluster_name 2>/dev/null)"
 
 kubeconfig: ## configure kubeconfig with break-glass credentials (kubeadmin)
-	oc login -u kubeadmin -p "$(shell az aro list-credentials --name "$(CLUSTER_NAME)" --resource-group "$(CLUSTER_RG)" 2>/dev/null | jq -r ".kubeadminPassword")" "$(shell cd stage/$(ENV) && terragrunt output -raw api_url)"
+	oc login --insecure-skip-tls-verify=true -u kubeadmin -p "$(shell az aro list-credentials --name "$(CLUSTER_NAME)" --resource-group "$(CLUSTER_RG)" 2>/dev/null | jq -r ".kubeadminPassword")" "$(shell cd stage/$(ENV) && terragrunt output -raw api_url)"
 
 
 get-break-glass-credentials: ## retrieve the break glass credentials for ARO (kubeadmin)
@@ -61,6 +61,27 @@ init-tf-backend:
 
 whoami: ## show current logon (tenant, subsription, user)
 	@az account show
+
+ROLENAME := Application Developer
+DURATION_HOURS := 8
+JUSTIFICATION := work
+
+pim-activate-role: ## activate P
+	@echo "Fetching role definition ID..."
+	SCOPE="/subscriptions/$$(az account show --query id -o tsv)" && \
+	ROLE_DEFINITION_ID=$$(az role definition list --name $(ROLENAME) --scope $${SCOPE} --query [0].id -o tsv) && \
+	PRINCIPAL_ID=$$(az ad signed-in-user show -o tsv --query id) && \
+	echo "Fetching eligibility schedule ID..." && \
+	ELIGIBILITY_SCHEDULE_ID=$$(az rest \
+	  --uri "https://management.azure.com$(SCOPE)/providers/Microsoft.Authorization/roleEligibilitySchedules?api-version=2020-10-01" \
+	  --uri-parameters "\$$filter=assignedTo('$$PRINCIPAL_ID') and atScope() and roleDefinitionId eq '$$ROLE_DEFINITION_ID'" \
+	  --query value[0].id \
+	  -o tsv) && \
+	echo "Activating role..." && \
+	az rest \
+	    --method PUT \
+	    --uri "https://management.azure.com$(SCOPE)/providers/Microsoft.Authorization/roleAssignmentScheduleRequests/$$(uuid)?api-version=2020-10-01" \
+	    --body "{ \"properties\": { \"principalId\": \"$$PRINCIPAL_ID\", \"roleDefinitionId\": \"$$ROLE_DEFINITION_ID\", \"requestType\": \"SelfActivate\", \"linkedRoleEligibilityScheduleId\": \"$$ELIGIBILITY_SCHEDULE_ID\", \"justification\": \"$(JUSTIFICATION)\", \"scheduleInfo\": { \"expiration\": { \"type\": \"AfterDuration\", \"duration\": \"PT$(DURATION_HOURS)H\" } } } }"
 
 login: ## login to Azure Subscription
 	az login

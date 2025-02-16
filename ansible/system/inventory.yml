@@ -168,6 +168,7 @@ all:
           key_url: "https://dbeaver.io/debs/dbeaver.gpg.key"
         packages:
         - neofetch
+        - eyed3
         - mc
         - lm-sensors
         - psensor

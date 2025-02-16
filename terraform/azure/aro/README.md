@@ -24,12 +24,10 @@ Setup Azure RedHat OpenShift (ARO)
 
 * [../azure-entraid](../azure-entraid) - installed for the same stage environment (contains resource group and policies)
 
-
-
 * Ensure networking is setup for evn and region: [../azure-network-setup](../azure-network-setup) - installed for the same stage environment and region(contains VNet and Subnets for ARO), if you create new ARO environment, you need also create this repo new environment first for the same env and region.
 Not all regions are compatible with ARO or contains desired VM sizes. To select machinig region run following commands:
-```bash
 
+```bash
 # select your desired region
 REGION=northeurope
 
@@ -40,7 +38,6 @@ az aro get-versions --location "${REGION}"
 
 # to check whether your region and subscription supports ARO supperted VM sizes
 az vm list-skus --location "${REGION}" --size Standard_D --all --output table
-
 ```
 
 * Obtain RedHat Pull Secret for ARO. Go to: [ARO Redhat Hybrid Console](https://console.redhat.com/openshift/install/azure/aro-provisioned). It is needed to be placed as RH_PULL_SECRET environment variable. It contains authentication for RedHat image registries:
@@ -50,11 +47,21 @@ az vm list-skus --location "${REGION}" --size Standard_D --all --output table
 export RH_PULL_SECRET='{"auths":{"cloud.openshift.com":{"auth":"...","email":"x.y@z.com"},"quay.io":{"auth":"...","email":"x.y@z.com"},"registry.connect.redhat.com":{"auth":"...","email":"x.y@z.com"},"registry.redhat.io":{"auth":"...","email":"x.y@z.com"}}}'
 ```
 
+When OIDC is configured to be deployed, obtain OIDC provider secret in the form of environment variable:
+
+```bash
+# Client Secret for OIDC client provider
+export OIDC_CLIENT_SECRET="...."
+```
+
 ## Usage
 
 ```bash
 # ensure you obtained Pull Secret for RH Registries from RH Hybrid Console, see Prerequisites
 export RH_PULL_SECRET='....'
+
+# Client Secret for OIDC client provider (when defined)
+export OIDC_CLIENT_SECRET="...."
 
 # setup ARO
 make run MODE=apply [ENV=dev-northeurope-shared1]
@@ -75,8 +82,16 @@ make open-webconsole [ENV=dev-northeurope-shared1]
 ### Add / Update Pull Secret
 
 RH pull secret should be obtained with [Prerequisites](#prerequisites) step and provided as part of cluster buildout.
+If Pull Secret is not provided during cluster creation - pull secret contains credentials only for
+_arosvc.azurecr.io_ and _quay.io_  container images registries.
 
-This procedure is to update the pull secret or add other cluster wide Docker Container Registry access:
+To check current pull secret:
+
+```bash
+oc exec -n openshift-apiserver $(oc get pod -n openshift-apiserver -o jsonpath="{.items[0].metadata.name}") -- cat /var/lib/kubelet/config.json
+```
+
+To update the pull secret or add other cluster wide Docker Container Registry access, follow:
 [How to add or update pull secrets](https://learn.microsoft.com/en-us/azure/openshift/howto-add-update-pull-secret)
 
 ### Service Principal Credentials Auto Rotation

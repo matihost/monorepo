@@ -20,12 +20,12 @@ inputs = {
   zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
 
   # Uncomment to integrated cluster authen/authz with OIDC
-  oidc = {
-    issuer_url     = "https://id.matihost.pl/realms/id"
-    client_id      = "eks"
-    username_claim = "email"
-    groups_claim   = "groups"
-  }
+  # oidc = {
+  #   issuer_url     = "https://ServerID/realms/REALM_NAME"
+  #   client_id      = "eks"
+  #   username_claim = "email"
+  #   groups_claim   = "groups"
+  # }
 
   namespaces = [
     {

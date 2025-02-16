@@ -85,6 +85,93 @@ variable "rh_pull_secret" {
 }
 
 
+variable "namespaces" {
+  type = list(object({
+    name = string
+    quota = object({
+      requests = object({
+        cpu    = string
+        memory = string
+      })
+      limits = object({
+        cpu    = string
+        memory = string
+      })
+    })
+  }))
+
+  description = "EKS namespaces configuration"
+  default = [{
+    name = "test"
+    quota = {
+      limits = {
+        cpu    = "12"
+        memory = "16Gi"
+      }
+      requests = {
+        cpu    = "12"
+        memory = "16Gi"
+      }
+    }
+  }]
+}
+
+
+variable "oidc" {
+  type = object({
+    oidc_name      = string
+    issuer_url     = string
+    client_id      = string
+    client_secret  = string
+    username_claim = optional(string, "preferred_username")
+    groups_claim   = optional(string, "groups")
+  })
+
+  default = null
+
+  sensitive = true
+
+  description = "ARO OIDC provider configuration"
+
+  # Sample Keycloak config:
+  #
+  # default = {
+  #   issuer = "https://id.matihost.mooo.com/realms/id"
+  #   client_id = "aro"
+  #   username_claim = "email"
+  #   groups_claim = "groups"
+  # }
+  #
+  # Sample token:
+  #
+  # {
+  # "exp": 1734443783,
+  # "iat": 1734443483,
+  # "auth_time": 1734442743,
+  # "jti": "936ace3f-181c-40ca-8bc6-7c7d7093ead8",
+  # "iss": "https://id.matihost.mooo.com/realms/id",
+  # "aud": "eks",
+  # "sub": "f76a1839-abdd-4e1c-9869-b73fa8ed64e8",
+  # "typ": "ID",
+  # "azp": "eks",
+  # "nonce": "ccBdcKskRQZC3LJVfpU-R7pC2mQ03Oz2FQwMxO4C-XY",
+  # "sid": "ceb826f0-eed3-4666-8d76-9a95610fa15c",
+  # "at_hash": "Djmh28ZTxRYW_bnhO4TIlA",
+  # "acr": "0",
+  # "email_verified": true,
+  # "name": "Name Surname",
+  # "groups": [
+  #   "/cluster-admins"
+  # ],
+  # "preferred_username": "name@email.com",
+  # "given_name": "Name",
+  # "family_name": "Surname",
+  # "email": "name@email.com"
+  # }
+}
+
+
+
 
 # tflint-ignore: terraform_unused_declarations
 variable "zone" {

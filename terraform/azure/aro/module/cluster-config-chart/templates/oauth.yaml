@@ -1,0 +1,61 @@
+# yamllint disable-file
+# https://cloud.redhat.com/experts/idp/azuread-red-hat-sso/
+
+# oidc:
+#   oidc_name: id
+#   issuer_url: "https://KEYCLOAK_SERVER/realms/REALM_NAME"
+#   client_id: "aro"
+#   client_secret: "..."
+#   username_claim: "preferred_username"
+#   groups_claim:  "groups"
+{{- if .Values.oidc.client_secret }}
+apiVersion: v1
+data:
+  clientSecret: {{ .Values.oidc.client_secret | b64enc }}
+kind: Secret
+metadata:
+  name: {{ .Values.oidc.oidc_name | }}-oidc-client-secret
+  namespace: openshift-config
+  annotations:
+    helm.sh/resource-policy: keep
+  labels:
+    {{- include "cluster-config.labels" . | nindent 4 }}
+type: Opaque
+---
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  annotations:
+    include.release.openshift.io/ibm-cloud-managed: 'true'
+    include.release.openshift.io/self-managed-high-availability: 'true'
+    include.release.openshift.io/single-node-developer: 'true'
+    release.openshift.io/create-only: 'true'
+    helm.sh/resource-policy: keep
+  labels:
+    {{- include "cluster-config.labels" . | nindent 4 }}
+  name: cluster
+spec:
+  identityProviders:
+    - mappingMethod: claim
+      name: {{ .Values.oidc.oidc_name | quote }}
+      openID:
+        claims:
+          email:
+            - email
+          name:
+            - name
+          preferredUsername:
+            - {{ .Values.oidc.username_claim | default "preferred_username" | quote }}
+        clientID: {{ .Values.oidc.client_id | quote }}
+        clientSecret:
+          name: {{ .Values.oidc.oidc_name | }}-oidc-client-secret
+        extraAuthorizeParameters:
+          include_granted_scopes: "true"
+        extraScopes:
+          - email
+          - profile
+        groups:
+          - groups
+        issuer: {{ .Values.oidc.issuer_url | quote }}
+      type: OpenID
+{{- end }}

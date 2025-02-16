@@ -1,0 +1,3 @@
+Install cluster ARO configurations:
+- OCP Groups, RBACs
+- Storage  Classes

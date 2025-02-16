@@ -94,7 +94,20 @@ resource "azurerm_redhat_openshift_cluster" "aro" {
       worker_profile[0].vm_size
     ]
   }
+}
 
+
+resource "null_resource" "cluster-config" {
+  triggers = {
+    always_run = timestamp()
+  }
+  provisioner "local-exec" {
+    command = "${path.module}/configure-cluster.sh '${azurerm_redhat_openshift_cluster.aro.resource_group_name}' '${azurerm_redhat_openshift_cluster.aro.name}' '${azurerm_redhat_openshift_cluster.aro.api_server_profile[0].url}' '${var.region}' '${jsonencode(var.oidc)}' '${jsonencode(var.namespaces)}'"
+  }
+
+  depends_on = [
+    azurerm_redhat_openshift_cluster.aro,
+  ]
 }
 
 output "cluster_name" {
