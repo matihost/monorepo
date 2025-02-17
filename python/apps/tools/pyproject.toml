@@ -10,7 +10,7 @@ packages = [{include = "tools", from = "src"}]
 [tool.poetry.dependencies]
 python = "^3.12"
 jinja2 = "^3.1.5"
-markupsafe = "^2.1.5"
+markupsafe = "^3.0.2"
 
 [tool.poetry.scripts]
 automount-cifs = 'tools.cli.automount_cifs:main'
@@ -19,7 +19,7 @@ setup-opendns = 'tools.cli.setup_opendns:main'
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.6.9"
-mypy = "^1.14.1"
+mypy = "^1.15.0"
 pytest = "^8.3.4"
 
 [build-system]

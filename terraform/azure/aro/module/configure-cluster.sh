@@ -75,3 +75,17 @@ ensure-cluster-config
 configure-namespaces
 
 # TODO install ARO ExternalDNS
+
+# TODO configure
+# https://learn.microsoft.com/en-us/azure/openshift/configure-azure-ad-cli
+
+# TODO configure Backup
+# https://learn.microsoft.com/en-us/azure/openshift/howto-create-a-backup
+
+# TODO configure Service Mesh
+
+# TODO configure
+#  https://learn.microsoft.com/en-us/azure/openshift/howto-secure-openshift-with-front-door
+
+# Azure monitoring:
+# https://learn.microsoft.com/en-us/azure/azure-monitor/containers/kubernetes-monitoring-enable?tabs=cli
