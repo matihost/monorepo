@@ -2,7 +2,7 @@ locals {
   cn                 = get_env("EXTERNAL_DNS", "api.dev.matihost.mooo.com")
   internal_cn_prefix = "api" # so for dev main internal zone, it will be: "api.dev.gcp.testing" in result
   tls_crt            = try(file("~/.tls/${local.cn}/fullchain.pem"), try(get_env("TLS_CRT"), run_cmd("--terragrunt-quiet", find_in_parent_folders("create-selfsigned-tls.sh"), local.cn)))
-  tls_key            = try(file("~/.tls/${local.cn}/privkey.pem"), try(get_env("TLS_KEY"), find_in_parent_folders("target/${local.cn}.key")))
+  tls_key            = try(file("~/.tls/${local.cn}/privkey.pem"), try(get_env("TLS_KEY"), file(find_in_parent_folders("target/${local.cn}.key"))))
 }
 
 include "root" {

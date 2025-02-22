@@ -14,10 +14,14 @@ Supports:
 
 TODOs/Limitations:
 
-* update VPN client machine DNS setting to use Cloud DNS nameserver for Cloud hosted private zones. That requires using DNS nameserver on client which forward queries for particular zone to other nameserver.
+* To resolve GCP PriveDNS you need to update VPN client machine DNS setting to use Cloud DNS nameserver for Cloud hosted private zones. That requires using DNS nameserver on client which forward queries for particular zone to other nameserver.
 
   * For GCP it requires creating [Cloud DNS inbound policy](https://cloud.google.com/dns/docs/policies#list-in-entrypoints) which exposes DNS nameserver IP in each subnetwork.
-  The possible IP which VPN can use as DNS servers are: `gcloud compute addresses list --filter='purpose = "DNS_RESOLVER"' --format='csv(address, region, subnetwork)'`.
+  The possible IP which VPN can use as DNS servers are:
+
+  ```bash
+  gcloud compute addresses list --filter='purpose = "DNS_RESOLVER"' --format='csv(address, region, subnetwork)'
+  ```
 
   Then configure DNS server on VPN client side forward queries to CloudDNS proxy DNS server. For Bind add the following zone with valid IP address to /etc/bind/named.conf.local:
 
@@ -39,19 +43,49 @@ TODOs/Limitations:
 
 ## Prerequisites
 
-* Terraform `../gcp-network-setup` has been deployed
+* Terraform [../gcp-network-setup](../gcp-network-setup) has been deployed
 
 ## Usage
 
 ```bash
 # deploy OpenVPN Gateway in GCP VPC
-make run
+make run [ENV=dev] [MODE=apply]
+# depending on machine size the initialization of OpenVPN service may take several minutes
 
-# setup Open VPN and forwards DNS in GCP to client VPN network DNS nameserver
-make apply-with-dns-forwarding ZONE=vpnclient.zone.com IP=10.8.0.2
+# create target/client.ovpn file needed to connect to VPN
+# mode is either all (default), aka all trafic goes via VPN
+# or private - when only GCP VPC traffic routed via VPN
+make get-client-ovpn [VPN_MODE=all]
 
 # connect to to VPN, press Ctrl+C to disconnect
-make connect-to-vpn
-# or
-./connect-to-vpn.sh
+# mode is either all (default), aka all trafic goes via VPN
+# or private - when only GCP VPC traffic routed via VPN
+make connect-to-vpn [VPN_MODE=all]
+
+# Troubleshooting:
+# ssh to the machine
+make ssh
+sudo journalctl --follow
+sudo systemctl status openvpn-server@server.service
+ls -l /etc/openvpn/server
+
+# check Systemd openvpn-server@server.service status on OpenVPN instance
+make check-vpn-service-status
 ```
+
+## OpenVPN Client
+
+Get client.ovpn file:
+
+```bash
+# create target/client.ovpn file needed to connect to VPN
+# mode is either all (default), aka all trafic goes via VPN
+# or private - when only GCP VPC traffic routed via VPN
+make get-client-ovpn [VPN_MODE=all]
+```
+
+For Windows and Mac - download and install [OpenVPN Connect](https://openvpn.net/client/)
+
+On Linux: go to Setting / Network / VPN
+
+and import target/client.ovpn file.

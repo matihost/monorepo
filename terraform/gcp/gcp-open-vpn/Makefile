@@ -1,14 +1,9 @@
 .EXPORT_ALL_VARIABLES:
 
-CURRENT_PROJECT := $(shell gcloud config get-value project)
-WHOAMI := $(shell dig +short myip.opendns.com @resolver1.opendns.com)
-
-TF_VAR_project := $(CURRENT_PROJECT)
-TF_VAR_external_access_cidrs := ["$(WHOAMI)/32"]
-
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
+	TG_FLAGS := --terragrunt-debug
 endif
 
 MODE := apply
@@ -20,39 +15,48 @@ else
 	MODE_STR := plan
 endif
 
-init-terraform:
-	terraform init -upgrade=true
+ENV := dev
 
-run: init-terraform prepare ## setup Open VPN usage: make run [MODE=apply]
-	@terraform validate && \
-	terraform $(MODE_STR)
+init: prepare
+	cd stage/$(ENV) && terragrunt init -upgrade=true
 
-IP := 10.8.0.2
-# sample: make run-with-dns-forwarding ZONE=matihost IP=10.8.0.2
-run-with-dns-forwarding: init-terraform prepare ## usage: make apply-with-dns-forwarding ZONE=vpnclient.zone.com IP=onpremise_dns_server_ip;  setup Open VPN and forwards DNS to client VPN network DNS nameserver
-	@terraform validate && \
-	terraform $(MODE_STR) -var='onpremise_dns_zone_forward={"zone":"$(ZONE)","dns_ip":"$(IP)"}'
+run: init ## setup OpenVPN server: make run [ENV=dev] [MODE=apply]
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
+VPN_MODE := all # or vpc
+get-client-ovpn:
+	mkdir -p target
+	cd stage/$(ENV) && terragrunt output -raw client-ovpn-$(VPN_MODE) 2>/dev/null > ../../target/client.ovpn
 
-connect-to-vpn: ## connect to Open VPN peer
-	./connect-to-vpn.sh
+connect-to-vpn: get-client-ovpn ## connect to Open VPN peer
+	@echo "OpenVPN client with mode: $(VPN_MODE) will start 'tun' interface and connect to VPN. To stop press Ctrl + C" && \
+	sudo openvpn "target/client.ovpn"
+
+destroy-vpn: ## destroys VPN gateway instance
+	gcloud compute instances delete "$(shell cd stage/$(ENV) && terragrunt output -raw vpn-vm-name 2>/dev/null)" --zone="$(shell cd stage/$(ENV) && terragrunt output -raw vpn-vm-zone 2>/dev/null)" --quiet
 
 ssh: ## ssh to OpenVPN instance (via External IP since VPN Gateway has to be exposed via public IP)
-	ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=no ubuntu@$(shell terraform output vpn_gateway_external_ip)
+	ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=no ubuntu@$(shell cd stage/$(ENV) && terragrunt output -raw vpn_gateway_external_ip 2>/dev/null)
+
+check-vpn-service-status: ## check Systemd openvpn-server@server.service status on OpenVPN instance
+	ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=no ubuntu@$(shell cd stage/$(ENV) && terragrunt output -raw vpn_gateway_external_ip 2>/dev/null) sudo systemctl status openvpn-server@server.service
 
 show-clouddns-resolvers: ## show CloudDNS resolvers
 	gcloud compute addresses list --filter='purpose = "DNS_RESOLVER"' --format='csv(address, region, subnetwork)'
 
-show-state: ## show terraform.state
-	terraform state list
-	terraform show
+show-state: ## show state
+	cd stage/$(ENV) && terragrunt state list && terragrunt show
 
-clean: ## clean Terraform cached plugins and data
-	rm -rf target .terraform* terraform.tfstate*
-
-google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
+google-authentication: ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
 	gcloud auth application-default login
+
+clean: ## clean cached plugins and data
+	rm -rf target
+	find . -name ".terra*" -exec rm -rf {} +
+	find . -name "target" -exec rm -rf {} +
+
+upgrade-providers-version: init
 
 prepare:
 	@[ -e "$(HOME)/.ssh/id_rsa.cloud.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.cloud.vm; }
@@ -60,4 +64,4 @@ prepare:
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help run destroy
+.PHONY: help run clean

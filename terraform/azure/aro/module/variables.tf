@@ -129,8 +129,6 @@ variable "oidc" {
 
   default = null
 
-  sensitive = true
-
   description = "ARO OIDC provider configuration"
 
   # Sample Keycloak config:

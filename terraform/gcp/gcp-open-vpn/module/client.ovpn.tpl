@@ -79,9 +79,19 @@ persist-tun
 # a separate .crt/.key file pair
 # for each client.  A single ca
 # file can be used for all clients.
-ca ca.crt
-cert client.crt
-key client.key
+# ca ca.crt
+<ca>
+${ca_crt}
+</ca>
+
+# cert client.crt
+<cert>
+${client_crt}
+</cert>
+# key client.key
+<key>
+${client_key}
+</key>
 
 # Verify server certificate by checking that the
 # certicate has the correct key usage set.
@@ -99,7 +109,13 @@ remote-cert-tls server
 
 # If a tls-auth key is used on the server
 # then every client must also have the key.
-tls-auth ta.key 1
+#tls-auth ta.key 1
+# or inline
+key-direction 1
+<tls-auth>
+${ta_key}
+</tls-auth>
+
 
 # Select a cryptographic cipher.
 # If the cipher option is used on the server
@@ -126,3 +142,10 @@ verb 3
 # to load balance between the servers.
 ;remote my-server-1 1194
 ;remote my-server-2 1194
+
+# If you still to override server setting, and force all traffic
+# via OpenVPN server
+;route-nopull
+;redirect-gateway def1 bypass-dhcp
+remote ${vpn_ip} 1194
+${vpn_additional_config}
