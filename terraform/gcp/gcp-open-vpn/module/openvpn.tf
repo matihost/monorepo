@@ -125,7 +125,9 @@ resource "google_compute_firewall" "vpn" {
   }
   allow {
     protocol = "tcp"
-    ports    = ["22", "53"]
+    # 22 port is not open to the internet
+    # you can ssh via IAP
+    ports = ["53"]
   }
   allow {
     protocol = "udp"

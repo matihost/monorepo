@@ -35,11 +35,14 @@ connect-to-vpn: get-client-ovpn ## connect to Open VPN peer
 destroy-vpn: ## destroys VPN gateway instance
 	gcloud compute instances delete "$(shell cd stage/$(ENV) && terragrunt output -raw vpn-vm-name 2>/dev/null)" --zone="$(shell cd stage/$(ENV) && terragrunt output -raw vpn-vm-zone 2>/dev/null)" --quiet
 
-ssh: ## ssh to OpenVPN instance (via External IP since VPN Gateway has to be exposed via public IP)
+ssh: ## ssh to OpenVPN instance via IAP
+	gcloud compute ssh "$(shell cd stage/$(ENV) && terragrunt output -raw vpn-vm-name 2>/dev/null)" --tunnel-through-iap --zone="$(shell cd stage/$(ENV) && terragrunt output -raw vpn-vm-zone 2>/dev/null)"
+
+ssh-over-public-ip: ## ssh to OpenVPN instance via External IP (requires - explicit opening ssh port on VPN firewall)
 	ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=no ubuntu@$(shell cd stage/$(ENV) && terragrunt output -raw vpn_gateway_external_ip 2>/dev/null)
 
 check-vpn-service-status: ## check Systemd openvpn-server@server.service status on OpenVPN instance
-	ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=no ubuntu@$(shell cd stage/$(ENV) && terragrunt output -raw vpn_gateway_external_ip 2>/dev/null) sudo systemctl status openvpn-server@server.service
+	gcloud compute ssh "$(shell cd stage/$(ENV) && terragrunt output -raw vpn-vm-name 2>/dev/null)" --tunnel-through-iap --zone="$(shell cd stage/$(ENV) && terragrunt output -raw vpn-vm-zone 2>/dev/null)" -- sudo systemctl status openvpn-server@server.service
 
 show-clouddns-resolvers: ## show CloudDNS resolvers
 	gcloud compute addresses list --filter='purpose = "DNS_RESOLVER"' --format='csv(address, region, subnetwork)'
