@@ -83,5 +83,7 @@ Various technology deployments, tools & code:
   * tools
     * automount-cifs - to setup Linux automount svc with home SAMBA NFS
     * setup-opendns  - to setup regular update of OpenDNS with home public ip
+* [nodejs](nodejs)
+  * learning/react - sample React application with OIDC authentication
 * [rust](rust) - sample Rust example
 * [github actions](.github), [jenkins](Jenkinsfile), [travis](.travis.yml), [gcp cloudbuild](cloudbuild.yaml) - various Continous Integration toolset integration

@@ -6,7 +6,7 @@ resource "keycloak_realm" "id" {
   admin_theme   = "keycloak.v2"
   # TODO add attributes, like tags
   # attributes                               = {}
-  display_name_html        = "ID"
+  display_name_html        = "<div class=\"kc-logo-text\"><span>${var.realm_name}</span></div>"
   duplicate_emails_allowed = false
   edit_username_allowed    = false
   email_theme              = "keycloak"

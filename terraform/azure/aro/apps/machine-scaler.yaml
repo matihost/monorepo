@@ -1,0 +1,173 @@
+apiVersion: project.openshift.io/v1
+kind: Project
+metadata:
+  name: machine-scaler
+  displayName: "Machine Scaler"
+  description: "Project to manage MachineSet scaling"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: machine-scaler
+  namespace: machine-scaler
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: machine-scaler-clusterrole
+rules:
+  - apiGroups: ["machine.openshift.io"]
+    resources: ["machinesets", "machinesets/scale"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["machine.openshift.io"]
+    resources: ["machines"]
+    verbs: ["get", "list", "patch", "update", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: machine-scaler-binding
+subjects:
+  - kind: ServiceAccount
+    name: machine-scaler
+    namespace: machine-scaler
+roleRef:
+  kind: ClusterRole
+  name: machine-scaler-clusterrole
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: machine-scaler
+  namespace: machine-scaler
+data:
+  scale_down_desired_vm_size: Standard_D4s_v5
+  scale_up_desired_vm_size: Standard_D8s_v5
+  namespaces: |
+    test
+    learning
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: scale-down-machines
+  namespace: machine-scaler
+spec:
+  schedule: "0 18 * * 5"
+  successfulJobsHistoryLimit: 4 # keep history of 4 jobs and 2 failed jobs
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 0  # No retries if job fails
+      template:
+        spec:
+          serviceAccountName: machine-scaler
+          # RH does not support running anything on master nodes - even when they are present and are suitable for such scripts.
+          #
+          # However this script is safe to done on worker node - unless the last step is to delete machines (so that machine on which)
+          #
+          # nodeSelector:
+          #   node-role.kubernetes.io/master: ""  # Ensure it runs on Control Plane nodes
+          # tolerations:
+          #   - key: "node-role.kubernetes.io/master"
+          #     operator: "Exists"
+          #     effect: "NoSchedule"
+          #   - key: "node-role.kubernetes.io/control-plane"
+          #     operator: "Exists"
+          #     effect: "NoSchedule"
+          restartPolicy: Never
+          containers:
+            - name: scale-machineset
+              image: registry.redhat.io/openshift4/ose-cli:latest
+              env:
+                - name: NAMESPACES
+                  valueFrom:
+                    configMapKeyRef:
+                      name: machine-scaler
+                      key: namespaces
+                - name: VM_SIZE
+                  valueFrom:
+                    configMapKeyRef:
+                      name: machine-scaler
+                      key: scale_down_desired_vm_size
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  # set -x
+                  echo "Scaling Deployments to 0 in specified namespaces..."
+                  for NS in ${NAMESPACES}; do
+                    echo "Scaling Deployments in namespace $NS to 0..."
+                    oc scale deployments --replicas=0 -n $NS --all
+                  done
+                  echo "Changing MachineSet instance type to ${VM_SIZE}..."
+                  MACHINES=$(oc get machineset -n openshift-machine-api -l machine.openshift.io/cluster-api-machine-role=worker -o jsonpath='{.items[*].metadata.name}')
+                  for MS in $MACHINES; do
+                    echo "Patching MachineSet $MS to change instance type to ${VM_SIZE}..."
+                    oc patch machineset $MS -n openshift-machine-api --type='merge' -p "{\"spec\":{\"template\":{\"spec\":{\"providerSpec\":{\"value\":{\"vmSize\": \"${VM_SIZE}\"}}}}}}"
+                  done
+                  echo "Scaling down one MachineSet to 0"
+                  MACHINESET=$(oc get machineset -n openshift-machine-api -l machine.openshift.io/cluster-api-machine-role=worker -o jsonpath='{.items[0].metadata.name}')
+                  if [ -n "$MACHINESET" ]; then
+                    echo "Scaling $MACHINESET to 0..."
+                    oc scale machineset $MACHINESET -n openshift-machine-api --replicas=0
+                  else
+                    echo "No matching MachineSet found"
+                  fi
+                  echo Delete remaining worker Machines to force new Machine with new type recreation
+                  oc delete machine -l machine.openshift.io/cluster-api-machine-role=worker -A --wait=false
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: scale-up-machines
+  namespace: machine-scaler
+spec:
+  schedule: "0 5 * * 1"
+  successfulJobsHistoryLimit: 4
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          serviceAccountName: machine-scaler
+          restartPolicy: Never
+          containers:
+            - name: scale-machineset
+              image: registry.redhat.io/openshift4/ose-cli:latest
+              env:
+                - name: NAMESPACES
+                  valueFrom:
+                    configMapKeyRef:
+                      name: machine-scaler
+                      key: namespaces
+                - name: VM_SIZE
+                  valueFrom:
+                    configMapKeyRef:
+                      name: machine-scaler
+                      key: scale_up_desired_vm_size
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  # set -x
+                  echo "Changing MachineSet instance type to ${VM_SIZE}..."
+                  MACHINES=$(oc get machineset -n openshift-machine-api -l machine.openshift.io/cluster-api-machine-role=worker -o jsonpath='{.items[*].metadata.name}')
+                  for MS in $MACHINES; do
+                    echo "Patching MachineSet $MS to change instance type to ${VM_SIZE}..."
+                    oc patch machineset $MS -n openshift-machine-api --type='merge' -p "{\"spec\":{\"template\":{\"spec\":{\"providerSpec\":{\"value\":{\"vmSize\": \"${VM_SIZE}\"}}}}}}"
+                  done
+                  echo Delete remaining Machines to force new Machine with new type recreation
+                  oc delete machine -l machine.openshift.io/cluster-api-machine-role=worker -A --wait=false
+                  echo "Ensure all MachineSet are scaled to 1"
+                  oc scale machineset -n openshift-machine-api -l machine.openshift.io/cluster-api-machine-role=worker --replicas=1
+                  echo "Scaling Deployments to 3 in specified namespaces..."
+                  for NS in ${NAMESPACES}; do
+                    echo "Scaling Deployments in namespace $NS to 0..."
+                    oc scale deployments --replicas=3 -n $NS --all
+                  done

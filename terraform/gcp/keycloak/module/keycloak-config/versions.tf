@@ -6,7 +6,7 @@ terraform {
     }
     keycloak = {
       source  = "keycloak/keycloak"
-      version = "~> 4"
+      version = "~> 5"
     }
     random = {
       source  = "hashicorp/random"

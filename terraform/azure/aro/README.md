@@ -144,6 +144,8 @@ Repeat for the next machine as needed.
 
 ### Scale cluster worker nodes down to 0
 
+This procedure is tested and working but not supported on ARO.
+
 ```bash
 # backup machine set, for later bringing them back, ensure it is stored in persistent, safe location
 # it is needed to bring machinesets back

@@ -1,0 +1,333 @@
+apiVersion: v1
+items:
+- apiVersion: machine.openshift.io/v1beta1
+  kind: Machine
+  metadata:
+    annotations:
+      machine.openshift.io/instance-state: Running
+    creationTimestamp: "2025-02-27T11:01:26Z"
+    finalizers:
+    - machine.machine.openshift.io
+    generateName: dev-neu-shared1-gkdfl-worker-northeurope1-
+    generation: 2
+    labels:
+      machine.openshift.io/cluster-api-cluster: dev-neu-shared1-gkdfl
+      machine.openshift.io/cluster-api-machine-role: worker
+      machine.openshift.io/cluster-api-machine-type: worker
+      machine.openshift.io/cluster-api-machineset: dev-neu-shared1-gkdfl-worker-northeurope1
+      machine.openshift.io/instance-type: Standard_D4s_v5
+      machine.openshift.io/interruptible-instance: ""
+      machine.openshift.io/region: northeurope
+      machine.openshift.io/zone: "1"
+    name: dev-neu-shared1-gkdfl-worker-northeurope1-jlmpx
+    namespace: openshift-machine-api
+    ownerReferences:
+    - apiVersion: machine.openshift.io/v1beta1
+      blockOwnerDeletion: true
+      controller: true
+      kind: MachineSet
+      name: dev-neu-shared1-gkdfl-worker-northeurope1
+      uid: ae86ad94-4d43-4686-b20d-930652b726a2
+    resourceVersion: "87855"
+    uid: 057f405c-8659-4ca2-8f03-e6b76fe2f40b
+  spec:
+    lifecycleHooks: {}
+    metadata:
+      labels:
+        machine.openshift.io/interruptible-instance: ""
+    providerID: azure:///subscriptions/a8fb8150-6d1e-4275-9d58-b5e7bd8ab2c4/resourceGroups/aro-dev-neu-shared1/providers/Microsoft.Compute/virtualMachines/dev-neu-shared1-gkdfl-worker-northeurope1-jlmpx
+    providerSpec:
+      value:
+        acceleratedNetworking: true
+        apiVersion: machine.openshift.io/v1beta1
+        credentialsSecret:
+          name: azure-cloud-credentials
+          namespace: openshift-machine-api
+        diagnostics: {}
+        image:
+          offer: aro4
+          publisher: azureopenshift
+          resourceID: ""
+          sku: aro_415
+          type: MarketplaceNoPlan
+          version: 415.92.20240220
+        kind: AzureMachineProviderSpec
+        location: northeurope
+        metadata:
+          creationTimestamp: null
+        networkResourceGroup: dev
+        osDisk:
+          diskSettings: {}
+          diskSizeGB: 128
+          managedDisk:
+            securityProfile:
+              diskEncryptionSet: {}
+            storageAccountType: Premium_LRS
+          osType: Linux
+        publicIP: false
+        publicLoadBalancer: dev-neu-shared1-gkdfl
+        resourceGroup: aro-dev-neu-shared1
+        securityProfile:
+          settings: {}
+        spotVMOptions: {}
+        subnet: dev-neu-vnet-aro-shared1-worker-nodes
+        userDataSecret:
+          name: worker-user-data
+        vmSize: Standard_D4s_v5
+        vnet: dev-neu-vnet
+        zone: "1"
+  status:
+    addresses:
+    - address: dev-neu-shared1-gkdfl-worker-northeurope1-jlmpx
+      type: Hostname
+    - address: dev-neu-shared1-gkdfl-worker-northeurope1-jlmpx
+      type: InternalDNS
+    - address: dev-neu-shared1-gkdfl-worker-northeurope1-jlmpx.d2fzocumk1tepi5ozycwdbvh3d.fx.internal.cloudapp.net
+      type: InternalDNS
+    - address: 10.2.4.7
+      type: InternalIP
+    conditions:
+    - lastTransitionTime: "2025-02-27T11:01:27Z"
+      status: "True"
+      type: Drainable
+    - lastTransitionTime: "2025-02-27T11:01:37Z"
+      status: "True"
+      type: InstanceExists
+    - lastTransitionTime: "2025-02-27T11:01:27Z"
+      status: "True"
+      type: Terminable
+    lastUpdated: "2025-02-27T11:05:29Z"
+    nodeRef:
+      kind: Node
+      name: dev-neu-shared1-gkdfl-worker-northeurope1-jlmpx
+      uid: 0edba94b-052d-4853-b153-4d5b7bc1e8a7
+    phase: Running
+    providerStatus:
+      conditions:
+      - lastTransitionTime: "2025-02-27T11:01:36Z"
+        message: machine successfully created
+        reason: MachineCreationSucceeded
+        status: "True"
+        type: MachineCreated
+      metadata: {}
+      vmId: /subscriptions/a8fb8150-6d1e-4275-9d58-b5e7bd8ab2c4/resourceGroups/aro-dev-neu-shared1/providers/Microsoft.Compute/virtualMachines/dev-neu-shared1-gkdfl-worker-northeurope1-jlmpx
+      vmState: Running
+- apiVersion: machine.openshift.io/v1beta1
+  kind: Machine
+  metadata:
+    annotations:
+      machine.openshift.io/instance-state: Running
+    creationTimestamp: "2025-02-27T08:49:26Z"
+    finalizers:
+    - machine.machine.openshift.io
+    generateName: dev-neu-shared1-gkdfl-worker-northeurope2-
+    generation: 2
+    labels:
+      machine.openshift.io/cluster-api-cluster: dev-neu-shared1-gkdfl
+      machine.openshift.io/cluster-api-machine-role: worker
+      machine.openshift.io/cluster-api-machine-type: worker
+      machine.openshift.io/cluster-api-machineset: dev-neu-shared1-gkdfl-worker-northeurope2
+      machine.openshift.io/instance-type: Standard_D4s_v5
+      machine.openshift.io/region: northeurope
+      machine.openshift.io/zone: "2"
+    name: dev-neu-shared1-gkdfl-worker-northeurope2-cbjls
+    namespace: openshift-machine-api
+    ownerReferences:
+    - apiVersion: machine.openshift.io/v1beta1
+      blockOwnerDeletion: true
+      controller: true
+      kind: MachineSet
+      name: dev-neu-shared1-gkdfl-worker-northeurope2
+      uid: 0fffe838-4b38-451e-94ca-413271c0c3e5
+    resourceVersion: "41837"
+    uid: 471308f2-b942-49fb-b366-2b640fc5f5a1
+  spec:
+    lifecycleHooks: {}
+    metadata: {}
+    providerID: azure:///subscriptions/a8fb8150-6d1e-4275-9d58-b5e7bd8ab2c4/resourceGroups/aro-dev-neu-shared1/providers/Microsoft.Compute/virtualMachines/dev-neu-shared1-gkdfl-worker-northeurope2-cbjls
+    providerSpec:
+      value:
+        acceleratedNetworking: true
+        apiVersion: machine.openshift.io/v1beta1
+        credentialsSecret:
+          name: azure-cloud-credentials
+          namespace: openshift-machine-api
+        diagnostics: {}
+        image:
+          offer: aro4
+          publisher: azureopenshift
+          resourceID: ""
+          sku: aro_415
+          type: MarketplaceNoPlan
+          version: 415.92.20240220
+        kind: AzureMachineProviderSpec
+        location: northeurope
+        metadata:
+          creationTimestamp: null
+        networkResourceGroup: dev
+        osDisk:
+          diskSettings: {}
+          diskSizeGB: 128
+          managedDisk:
+            securityProfile:
+              diskEncryptionSet: {}
+            storageAccountType: Premium_LRS
+          osType: Linux
+        publicIP: false
+        publicLoadBalancer: dev-neu-shared1-gkdfl
+        resourceGroup: aro-dev-neu-shared1
+        securityProfile:
+          settings: {}
+        subnet: dev-neu-vnet-aro-shared1-worker-nodes
+        userDataSecret:
+          name: worker-user-data
+        vmSize: Standard_D4s_v5
+        vnet: dev-neu-vnet
+        zone: "2"
+  status:
+    addresses:
+    - address: dev-neu-shared1-gkdfl-worker-northeurope2-cbjls
+      type: Hostname
+    - address: dev-neu-shared1-gkdfl-worker-northeurope2-cbjls
+      type: InternalDNS
+    - address: dev-neu-shared1-gkdfl-worker-northeurope2-cbjls.d2fzocumk1tepi5ozycwdbvh3d.fx.internal.cloudapp.net
+      type: InternalDNS
+    - address: 10.2.4.5
+      type: InternalIP
+    conditions:
+    - lastTransitionTime: "2025-02-27T08:49:47Z"
+      status: "True"
+      type: Drainable
+    - lastTransitionTime: "2025-02-27T08:50:30Z"
+      status: "True"
+      type: InstanceExists
+    - lastTransitionTime: "2025-02-27T08:49:47Z"
+      status: "True"
+      type: Terminable
+    lastUpdated: "2025-02-27T09:13:52Z"
+    nodeRef:
+      kind: Node
+      name: dev-neu-shared1-gkdfl-worker-northeurope2-cbjls
+      uid: 1e8aaf4c-fd23-4d89-833c-04f253d0751e
+    phase: Running
+    providerStatus:
+      conditions:
+      - lastTransitionTime: "2025-02-27T08:49:58Z"
+        message: machine successfully created
+        reason: MachineCreationSucceeded
+        status: "True"
+        type: MachineCreated
+      metadata: {}
+      vmId: /subscriptions/a8fb8150-6d1e-4275-9d58-b5e7bd8ab2c4/resourceGroups/aro-dev-neu-shared1/providers/Microsoft.Compute/virtualMachines/dev-neu-shared1-gkdfl-worker-northeurope2-cbjls
+      vmState: Running
+- apiVersion: machine.openshift.io/v1beta1
+  kind: Machine
+  metadata:
+    annotations:
+      machine.openshift.io/instance-state: Running
+    creationTimestamp: "2025-02-27T08:49:26Z"
+    finalizers:
+    - machine.machine.openshift.io
+    generateName: dev-neu-shared1-gkdfl-worker-northeurope3-
+    generation: 2
+    labels:
+      machine.openshift.io/cluster-api-cluster: dev-neu-shared1-gkdfl
+      machine.openshift.io/cluster-api-machine-role: worker
+      machine.openshift.io/cluster-api-machine-type: worker
+      machine.openshift.io/cluster-api-machineset: dev-neu-shared1-gkdfl-worker-northeurope3
+      machine.openshift.io/instance-type: Standard_D4s_v5
+      machine.openshift.io/region: northeurope
+      machine.openshift.io/zone: "3"
+    name: dev-neu-shared1-gkdfl-worker-northeurope3-9pbnf
+    namespace: openshift-machine-api
+    ownerReferences:
+    - apiVersion: machine.openshift.io/v1beta1
+      blockOwnerDeletion: true
+      controller: true
+      kind: MachineSet
+      name: dev-neu-shared1-gkdfl-worker-northeurope3
+      uid: bb33eb06-6017-45d0-b9f7-1fc5e4a48bcb
+    resourceVersion: "43454"
+    uid: 0c5975b5-33a1-4f5c-89b8-3a396e86013f
+  spec:
+    lifecycleHooks: {}
+    metadata: {}
+    providerID: azure:///subscriptions/a8fb8150-6d1e-4275-9d58-b5e7bd8ab2c4/resourceGroups/aro-dev-neu-shared1/providers/Microsoft.Compute/virtualMachines/dev-neu-shared1-gkdfl-worker-northeurope3-9pbnf
+    providerSpec:
+      value:
+        acceleratedNetworking: true
+        apiVersion: machine.openshift.io/v1beta1
+        credentialsSecret:
+          name: azure-cloud-credentials
+          namespace: openshift-machine-api
+        diagnostics: {}
+        image:
+          offer: aro4
+          publisher: azureopenshift
+          resourceID: ""
+          sku: aro_415
+          type: MarketplaceNoPlan
+          version: 415.92.20240220
+        kind: AzureMachineProviderSpec
+        location: northeurope
+        metadata:
+          creationTimestamp: null
+        networkResourceGroup: dev
+        osDisk:
+          diskSettings: {}
+          diskSizeGB: 128
+          managedDisk:
+            securityProfile:
+              diskEncryptionSet: {}
+            storageAccountType: Premium_LRS
+          osType: Linux
+        publicIP: false
+        publicLoadBalancer: dev-neu-shared1-gkdfl
+        resourceGroup: aro-dev-neu-shared1
+        securityProfile:
+          settings: {}
+        subnet: dev-neu-vnet-aro-shared1-worker-nodes
+        userDataSecret:
+          name: worker-user-data
+        vmSize: Standard_D4s_v5
+        vnet: dev-neu-vnet
+        zone: "3"
+  status:
+    addresses:
+    - address: dev-neu-shared1-gkdfl-worker-northeurope3-9pbnf
+      type: Hostname
+    - address: dev-neu-shared1-gkdfl-worker-northeurope3-9pbnf
+      type: InternalDNS
+    - address: dev-neu-shared1-gkdfl-worker-northeurope3-9pbnf.d2fzocumk1tepi5ozycwdbvh3d.fx.internal.cloudapp.net
+      type: InternalDNS
+    - address: 10.2.4.4
+      type: InternalIP
+    conditions:
+    - lastTransitionTime: "2025-02-27T08:49:48Z"
+      status: "True"
+      type: Drainable
+    - lastTransitionTime: "2025-02-27T08:50:30Z"
+      status: "True"
+      type: InstanceExists
+    - lastTransitionTime: "2025-02-27T08:49:48Z"
+      status: "True"
+      type: Terminable
+    lastUpdated: "2025-02-27T09:15:08Z"
+    nodeRef:
+      kind: Node
+      name: dev-neu-shared1-gkdfl-worker-northeurope3-9pbnf
+      uid: 2a0076b1-ceb5-4c4b-938e-6fe10b72b46d
+    phase: Running
+    providerStatus:
+      conditions:
+      - lastTransitionTime: "2025-02-27T08:50:09Z"
+        message: machine successfully created
+        reason: MachineCreationSucceeded
+        status: "True"
+        type: MachineCreated
+      metadata: {}
+      vmId: /subscriptions/a8fb8150-6d1e-4275-9d58-b5e7bd8ab2c4/resourceGroups/aro-dev-neu-shared1/providers/Microsoft.Compute/virtualMachines/dev-neu-shared1-gkdfl-worker-northeurope3-9pbnf
+      vmState: Running
+kind: List
+metadata:
+  resourceVersion: ""
