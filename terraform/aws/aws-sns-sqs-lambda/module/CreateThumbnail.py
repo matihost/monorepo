@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Resize image."""
+
 import boto3
 import uuid
 from PIL import Image

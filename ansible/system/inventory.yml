@@ -291,6 +291,7 @@ all:
         - awsume
         - aws-sso-util
         - ansible-lint
+        - cpplint
         clis:
         - name: virtual-network-interface
           desc: To ensure there is a virtual interface with stable IP

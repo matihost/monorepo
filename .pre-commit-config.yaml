@@ -95,6 +95,14 @@ repos:
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.9.9
   hooks:
-  - id: ruff # linter
+  - id: ruff # python linter
     args: [ --fix ]
-  - id: ruff-format # formatter
+  - id: ruff-format # python formatter
+- repo: https://github.com/gitleaks/gitleaks
+  rev: v8.24.0
+  hooks:
+  - id: gitleaks
+# - repo: https://github.com/pocc/pre-commit-hooks
+#   rev: v1.3.5
+#   hooks:
+#   - id: cpplint
