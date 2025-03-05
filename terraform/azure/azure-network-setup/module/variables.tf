@@ -62,10 +62,11 @@ variable "subnets" {
   description = "Subnets"
 }
 
-variable "bastion" {
+variable "managed_bastion" {
   type = object({
     cidr_range = string
   })
+  default     = null
   description = "Bastion Subnet and bastion resource related configuration"
 }
 

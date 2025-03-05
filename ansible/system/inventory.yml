@@ -1118,15 +1118,14 @@ all:
               curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${CURRENT_VERSION}/install.sh" | bash
               bash -ic "nvm install --lts --latest-npm && npm i ${GLOBAL_PACKAGES} -g"
             }
-            INSTALLED_VERSION="$(bash -ic "nvm version")"
+            INSTALLED_VERSION="$(bash -ic "nvm use --lts >/dev/null 2>&1 && nvm version")"
             CURRENT_VERSION="$(bash -ic "nvm version-remote --lts")"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
-              echo "Installing NodeJS: ${CURRENT_VERSION}..."
-              bash -ic "nvm install --lts --latest-npm && npm i ${GLOBAL_PACKAGES} -g"
-              echo "Uninstalling NodeJS: ${INSTALLED_VERSION}..."
-              bash -ic "nvm uninstall ${INSTALLED_VERSION}"
+              echo "Installing NodeJS: ${CURRENT_VERSION} and uninstalling: ${INSTALLED_VERSION}"
+              bash -ic "nvm install --lts --latest-npm && nvm use --lts && npm i ${GLOBAL_PACKAGES} -g && nvm uninstall ${INSTALLED_VERSION}"
             }
-            [[ "$(ncu -g 2>/dev/null)" == *"All global packages are up-to-date"* ]] || {
+            [[ "$(bash -ic "nvm use --lts >/dev/null 2>&1 && ncu -g 2>/dev/null")" == *"All global packages are up-to-date"* ]] || {
+              bash -ic "nvm use --lts >/dev/null 2>&1 && eval \"$(nvm use --lts >/dev/null 2>&1 && ncu -g 2>/dev/null| grep 'npm -g install')\""
               npm i ${GLOBAL_PACKAGES} -g
             }
         files_config:

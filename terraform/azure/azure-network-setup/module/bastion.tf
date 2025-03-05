@@ -1,4 +1,6 @@
 resource "azurerm_public_ip" "bastion" {
+  count = var.managed_bastion != null ? 1 : 0
+
   name                = "${local.prefix}-bastion"
   location            = local.location
   resource_group_name = local.resource_group_name
@@ -8,16 +10,20 @@ resource "azurerm_public_ip" "bastion" {
 
 
 resource "azurerm_subnet" "bastion" {
+  count = var.managed_bastion != null ? 1 : 0
+
   # Mandatory name for subnet where bastion resides
   name                 = "AzureBastionSubnet"
   resource_group_name  = local.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = [var.bastion.cidr_range]
+  address_prefixes     = [var.managed_bastion.cidr_range]
 }
 
 
 
 resource "azurerm_network_security_group" "bastion" {
+  count = var.managed_bastion != null ? 1 : 0
+
   name                = "${local.prefix}-bastion"
   location            = local.location
   resource_group_name = local.resource_group_name
@@ -122,11 +128,15 @@ resource "azurerm_network_security_group" "bastion" {
 
 
 resource "azurerm_subnet_network_security_group_association" "bastion" {
-  subnet_id                 = azurerm_subnet.bastion.id
-  network_security_group_id = azurerm_network_security_group.bastion.id
+  count = var.managed_bastion != null ? 1 : 0
+
+  subnet_id                 = azurerm_subnet.bastion[0].id
+  network_security_group_id = azurerm_network_security_group.bastion[0].id
 }
 
 resource "azurerm_bastion_host" "bastion" {
+  count = var.managed_bastion != null ? 1 : 0
+
   name                = "${local.prefix}-bastion"
   location            = local.location
   resource_group_name = local.resource_group_name
@@ -143,7 +153,7 @@ resource "azurerm_bastion_host" "bastion" {
 
   ip_configuration {
     name                 = "configuration"
-    subnet_id            = azurerm_subnet.bastion.id
-    public_ip_address_id = azurerm_public_ip.bastion.id
+    subnet_id            = azurerm_subnet.bastion[0].id
+    public_ip_address_id = azurerm_public_ip.bastion[0].id
   }
 }
