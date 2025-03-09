@@ -26,7 +26,7 @@ all:
           # TODO change to {{ ansible_distribution_release }} when noble/24.04 is supported Ubuntu LTS
           cri_dockerd_ubuntu_version: "jammy"
           # MQ Version available at: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/
-          mq: 9.4.1.1
+          mq: 9.4.2.0
           # List of supported Ubuntu versions: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive
           onedrive_ubuntu_version: "24.10"
           # List of supported Ubuntu versions: https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/

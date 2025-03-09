@@ -45,7 +45,7 @@
     <maven.test.skip>false</maven.test.skip>
 
     <!-- Spring Boot -->
-    <spring.boot.version>3.4.2</spring.boot.version>
+    <spring.boot.version>3.4.3</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -69,7 +69,7 @@
     <scala2.version>2.13.16</scala2.version>
 
     <!-- IBM MQ client -->
-    <mq.version>9.4.1.1</mq.version>
+    <mq.version>9.4.2.0</mq.version>
   </properties>
 
   <profiles>
@@ -381,7 +381,7 @@
                  * [CVE-2024-57699] CWE-674: Uncontrolled Recursion (8.7); https://ossindex.sonatype.org/vulnerability/CVE-2024-57699?component-type=maven&component-name=net.minidev%2Fjson-smart&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
 
               -->
-              <exclude>CVE-2024-57699</exclude>
+              <!-- <exclude>CVE-2024-57699</exclude> -->
             </excludeVulnerabilityIds>
             <reportFile>${project.build.directory}/audit-report.json</reportFile>
           </configuration>
