@@ -1,0 +1,53 @@
+{
+  "name": "vue",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "engineStrict": true,
+  "scripts": {
+    "serve": "vite --port 3000",
+    "build": "vite build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@auth0/auth0-vue": "^2.4.0",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/vue-fontawesome": "^3.0.8",
+    "@highlightjs/vue-plugin": "^2.1.0",
+    "express": "^4.21.2",
+    "highlight.js": "^11.11.1",
+    "morgan": "^1.10.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/compiler-sfc": "^3.5.13",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.1"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5"
+  },
+  "browserslist": {
+    "production": [
+      "> 0.5%",
+      "last 2 versions",
+      "not dead"
+    ],
+    "development": [
+      "last 1 Chrome version",
+      "last 1 Firefox version",
+      "last 1 Safari version"
+    ]
+  }
+}

@@ -53,12 +53,17 @@ clean: ## clean cached plugins and data
 
 upgrade-providers-version: init
 
-generate-letsencrypt-cert: ## generate Let's Encrypt TLS certificate, usage make generate-letsencrypt-cert DOMAIN=matihost.mooo.com
+TLS_MODE := HTTP
+ifeq ($(strip $(TLS_MODE)),TXT)
+	TLS_AUTHZ_MODE_TXT := --preferred-challenges=dns
+endif
+
+generate-letsencrypt-cert: ## generate Let's Encrypt TLS certificate, usage make generate-letsencrypt-cert DOMAIN=domain.mooo.com [TLS_MODE=HTTP]
 ifndef DOMAIN
-	$(error Env DOMAIN is not defined. Usage make generate-letsencrypt-cert DOMAIN=matihost.mooo.com)
+	$(error Env DOMAIN is not defined. Usage make generate-letsencrypt-cert DOMAIN=domain.mooo.com)
 endif
 	mkdir -p ~/.tls
-	sudo certbot certonly --manual -d $(DOMAIN)
+	sudo certbot certonly --manual $(TLS_AUTHZ_MODE_TXT) -d $(DOMAIN)
 	sudo cp -Lr /etc/letsencrypt/live/$(DOMAIN) ~/.tls
 	sudo chown -R $(shell whoami):$(shell whoami) ~/.tls
 	sudo chmod -R go-rwx ~/.tls

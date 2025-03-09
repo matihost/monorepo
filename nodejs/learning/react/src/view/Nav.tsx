@@ -1,4 +1,4 @@
-import { NavLink } from "react-router";
+import { NavLink } from 'react-router'
 
 export function Nav() {
   return (
@@ -11,5 +11,5 @@ export function Nav() {
       </NavLink>
       <NavLink to="/auth">Page with optional logon via OIDC</NavLink>
     </nav>
-  );
+  )
 }

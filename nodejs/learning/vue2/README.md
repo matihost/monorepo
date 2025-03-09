@@ -15,7 +15,7 @@ The following addons were installed:
 - [@auth0/auth0-spa-js](https://www.npmjs.com/package/@auth0/auth0-spa-js) - Auth0 authentication.
   Requires:
   Auth0 configuration. Follow [instruction](https://www.npmjs.com/package/@auth0/auth0-spa-js#configure-auth0).
-  Application requires the following env variables to configure Auth0 to start:
+  Application requires the following env variables to configure Auth0 to start/build:
 
   ```bash
   export VUE_APP_AUTH0_DOMAIN="xxx-yyy.us.auth0.com"
