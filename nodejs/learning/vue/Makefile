@@ -26,7 +26,7 @@ ifndef VITE_AUTH0_CLIENT_ID
 endif
 	npm run serve
 
-build: ## produce production package in build directory
+build: format ## produce production package in build directory
 # ifneq ($(strip $(ENV)),prod)
 # 	$(error Env ENV has to be prod for build task)
 # endif
@@ -38,12 +38,14 @@ ifndef VITE_AUTH0_CLIENT_ID
 endif
 	npm run build
 
+format: ## run Prettier to format the code
+	npm run format
+
 serve: ## run NodeJS server and expose statically dist directory content
 ifeq ($(wildcard dist),)
 	$(error Directory 'dist' does not exist, ensure make build has be run)
 endif
 	node web-server.js
-
 
 build-image: ## builds container image, assumes make build with desired env and other parameters are set
 ifeq ($(wildcard dist),)

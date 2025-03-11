@@ -46,10 +46,17 @@
     "rules": {}
   },
   "prettier": {
-    "semi": false,
-    "singleQuote": true,
+    "arrowParens": "always",
+    "singleQuote": false,
+    "semi": true,
+    "bracketSameLine": true,
+    "bracketSpacing": true,
+    "vueIndentScriptAndStyle": true,
+    "trailingComma": "all",
+    "singleAttributePerLine": true,
     "tabWidth": 2,
-    "trailingComma": "es5"
+    "useTabs": false,
+    "printWidth": 120
   },
   "browserslist": {
     "production": [

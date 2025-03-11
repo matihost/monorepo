@@ -21,7 +21,7 @@ ifndef VUE_APP_AUTH0_CLIENT_ID
 endif
 	npm run serve
 
-build: ## produce production package in build directory
+build: format ## produce production package in build directory
 # ifneq ($(strip $(ENV)),prod)
 # 	$(error Env ENV has to be prod for build task)
 # endif
@@ -32,6 +32,9 @@ ifndef VUE_APP_AUTH0_CLIENT_ID
 	$(error Env VUE_APP_AUTH0_CLIENT_ID is not defined. Usage make run [ENV=dev])
 endif
 	npm run build
+
+format: ## run Prettier to format the code
+	npm run format
 
 serve: ## run serve NodeJS server and expose statically dist directory content
 	serve -s dist

@@ -1,11 +1,11 @@
-import React from 'react'
+import React from "react";
 
 interface ButtonProps {
-  buttonName: string
+  buttonName: string;
 }
 
 interface MyButtonProps {
-  button: ButtonProps
+  button: ButtonProps;
 }
 
 // function MyButton({button}: MyButtonProps) {
@@ -27,7 +27,7 @@ interface MyButtonProps {
 // };
 
 const MyButton: React.FC<MyButtonProps> = (x) => {
-  return <button>{x.button.buttonName}</button>
-}
+  return <button>{x.button.buttonName}</button>;
+};
 
-export default MyButton
+export default MyButton;

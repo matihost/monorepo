@@ -21,7 +21,7 @@ ifndef REACT_APP_OIDC_CLIENT_ID
 endif
 	npm start
 
-build: ## produce production package in build directory
+build: format ## produce production package in build directory
 # ifneq ($(strip $(ENV)),prod)
 # 	$(error Env ENV has to be prod for build task)
 # endif
@@ -32,6 +32,9 @@ ifndef REACT_APP_OIDC_CLIENT_ID
 	$(error Env REACT_APP_OIDC_CLIENT_ID is not defined.)
 endif
 	npm run build
+
+format: ## run Prettier to format the code
+	npm run format
 
 serve: ## run serve NodeJS server and expose statically build directory content
 	serve -s build

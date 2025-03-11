@@ -1,5 +1,7 @@
 <template>
-  <div id="app" class="d-flex flex-column h-100">
+  <div
+    id="app"
+    class="d-flex flex-column h-100">
     <nav-bar />
     <div class="container flex-grow-1">
       <error />
@@ -18,13 +20,13 @@
 </template>
 
 <script lang="ts">
-import NavBar from './components/NavBar.vue'
-import Error from './components/Error.vue'
+  import NavBar from "./components/NavBar.vue";
+  import Error from "./components/Error.vue";
 
-export default {
-  components: {
-    NavBar,
-    Error,
-  },
-}
+  export default {
+    components: {
+      NavBar,
+      Error,
+    },
+  };
 </script>
