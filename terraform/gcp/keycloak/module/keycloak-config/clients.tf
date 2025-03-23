@@ -15,6 +15,7 @@ resource "keycloak_openid_client" "eks" {
   direct_access_grants_enabled = true
   service_accounts_enabled     = false
   frontchannel_logout_enabled  = true
+  use_refresh_tokens           = false
   # frontchannel_logout_url                    = null
 
   #  Allow to include all roles mappings in the access token.

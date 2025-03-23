@@ -4,6 +4,7 @@ resource "google_secret_manager_secret" "ca-crt" {
     auto {
     }
   }
+  depends_on = [google_project_service.apis]
 }
 
 resource "google_secret_manager_secret_version" "ca-crt-data" {
@@ -17,6 +18,8 @@ resource "google_secret_manager_secret" "client-crt" {
     auto {
     }
   }
+
+  depends_on = [google_project_service.apis]
 }
 
 resource "google_secret_manager_secret_version" "client-crt-data" {
@@ -31,6 +34,8 @@ resource "google_secret_manager_secret" "server-crt" {
     auto {
     }
   }
+
+  depends_on = [google_project_service.apis]
 }
 
 resource "google_secret_manager_secret_version" "server-crt-data" {
@@ -44,6 +49,8 @@ resource "google_secret_manager_secret" "ca-key" {
     auto {
     }
   }
+
+  depends_on = [google_project_service.apis]
 }
 
 resource "google_secret_manager_secret_version" "ca-key-data" {
@@ -57,6 +64,8 @@ resource "google_secret_manager_secret" "server-key" {
     auto {
     }
   }
+
+  depends_on = [google_project_service.apis]
 }
 
 resource "google_secret_manager_secret_version" "server-key-data" {
@@ -70,6 +79,7 @@ resource "google_secret_manager_secret" "client-key" {
     auto {
     }
   }
+  depends_on = [google_project_service.apis]
 }
 
 resource "google_secret_manager_secret_version" "client-key-data" {
@@ -84,6 +94,7 @@ resource "google_secret_manager_secret" "ta-key" {
     auto {
     }
   }
+  depends_on = [google_project_service.apis]
 }
 
 resource "google_secret_manager_secret_version" "ta-key-data" {
@@ -97,6 +108,7 @@ resource "google_secret_manager_secret" "dh" {
     auto {
     }
   }
+  depends_on = [google_project_service.apis]
 }
 
 resource "google_secret_manager_secret_version" "dh-data" {

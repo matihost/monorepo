@@ -24,7 +24,7 @@ run: init ## setup OpenVPN server: make run [ENV=dev] [MODE=apply]
 	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 VPN_MODE := all # or vpc
-get-client-ovpn:
+get-client-ovpn: ## create target/client.ovpn file needed to connect to VPN
 	mkdir -p target
 	cd stage/$(ENV) && terragrunt output -raw client-ovpn-$(VPN_MODE) 2>/dev/null > ../../target/client.ovpn
 

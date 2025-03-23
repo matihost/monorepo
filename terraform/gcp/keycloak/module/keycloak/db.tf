@@ -44,7 +44,8 @@ resource "google_sql_database_instance" "keycloak" {
       hour = "22"
     }
 
-    tier = "db-f1-micro"
+    tier    = "db-f1-micro"
+    edition = "ENTERPRISE"
   }
 
   depends_on = [

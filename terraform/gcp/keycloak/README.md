@@ -60,13 +60,30 @@ Exposed via GLB.
   sudo resolvectl flush-caches
   ```
 
+  * Create own, dedicated "break-glass" admin user and disable temporal one
+
+  Retrieve initial/temporal admin user credentials
+
+  ```bash
+  make get-initial-admin-username ENV=dev
+  make get-initial-admin-pass ENV=dev
+  ```
+
+  Login to Keycloak admin dashboard:
+  [https://id.keycloack.my.dns/admin](https://id.keycloack.my.dns/admin) with temporal admin credentials.
+  (Warning: Do not user default page as it redirects to realm `id` user console - which does not exist yet. As fresh Keycloak has only `master` realm - fresh install will redirect to a page with 404. You need to have realm with `id`. Read on.)
+
+  Go to Users tab and create new "break-glass" user, apply password, and add Realm `admin_role` role.
+
+  Relogin with new credentials and disable/delete initial/temporal admin user.
+
 ## Post installation steps (Automatic)
 
-Install realm and configure it:
+Install new `id` realm and configure it:
 
 ```bash
 
-# credentials for admin user in master realm
+# credentials for user in master realm witn Realm admin_role attached
  export KEYCLOAK_PASSWORD=keycload_admin_user_password
 make run-keycloak-config ENV=dev MODE=plan KEYCLOAK_USER=keycload_admin_user_name
 ```
@@ -75,7 +92,7 @@ make run-keycloak-config ENV=dev MODE=plan KEYCLOAK_USER=keycload_admin_user_nam
 
 * Default page redirects to realm `id` user console. As fresh Keycloak has only `master` realm - fresh install will redirect to a page with 404. You need to have realm with `id`. Read on.
 
-* Login to Keycloak admin console. Use: `/admin` prefix. TODO make super admin user and password env specific and taken from secret store.
+* Login to Keycloak admin console. Use: `/admin` prefix.
 
 * Follow [basic setup](https://www.keycloak.org/docs/latest/server_admin/#configuring-realms) of Keycloak - like SMTP configuration and create realm with name `id`.
 

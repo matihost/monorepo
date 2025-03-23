@@ -41,7 +41,7 @@ clean: ## clean Terraform cached plugins and data
 	find . -name "node_modules" -exec rm -rf {} +
 
 TAG := latest
-POSTGRESQL_JDBC_VERSION := 1.21.2
+POSTGRESQL_JDBC_VERSION := 1.24.0
 KEYCLOAK_METRICS_SPI_VERSION := 7.0.0
 CURRENT_PROJECT := $(shell gcloud config get-value project 2>/dev/null)
 
@@ -88,6 +88,19 @@ endif
 	sudo cp -Lr /etc/letsencrypt/live/$(DOMAIN) ~/.tls
 	sudo chown -R $(shell whoami):$(shell whoami) ~/.tls
 	sudo chmod -R go-rwx ~/.tls
+
+
+get-initial-admin-username: ## get initial admin user name
+ifndef ENV
+	$(error Environment ENV is not defined. Usage make run ENV=prod MODE=plan [DEBUG=true])
+endif
+	@cd stage/$(ENV)/keycloak && terragrunt output -raw keycloak_initial_admin_username
+
+get-initial-admin-pass: ## get initial admin user password
+ifndef ENV
+	$(error Environment ENV is not defined. Usage make run ENV=prod MODE=plan [DEBUG=true])
+endif
+	@cd stage/$(ENV)/keycloak && terragrunt output -raw keycloak_initial_admin_password
 
 
 run-keycloak-config: ## configure Keycloak instance; usage: make run-keycloak-config ENV=prod MODE=plan [DEBUG=true] [KEYCLOAK_USER=... KEYCLOAK_PASSWORD=...] [KEYCLOAK_CLIENT_ID=cd KEYCLOAK_CLIENT_SECRET=....]

@@ -107,7 +107,7 @@ terraform.rc
 
 # Terragrunt
 **/.terragrunt-cache/*
-
+terragrunt-debug.tfvars.json
 
 # Terraformer
 **/generated/*

@@ -43,6 +43,16 @@ resource "google_compute_instance" "vm" {
     email  = google_service_account.vpn.email
     scopes = ["https://www.googleapis.com/auth/cloud-platform"]
   }
+
+  depends_on = [google_secret_manager_secret_version.ca-crt-data,
+    google_secret_manager_secret_version.ca-key-data,
+    google_secret_manager_secret_version.server-key-data,
+    google_secret_manager_secret_version.server-crt-data,
+    google_secret_manager_secret_version.client-key-data,
+    google_secret_manager_secret_version.client-crt-data,
+    google_secret_manager_secret_version.ta-key-data,
+    google_secret_manager_secret_version.dh-data,
+  ]
 }
 
 
