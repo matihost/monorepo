@@ -55,17 +55,15 @@ make show-state
 
 ### Debug in VSCode
 
-To debug under VS Code:
+```bash
+# Ensure you are not under custom Virtual Env (poetry detects its and use this VEnv instead creating one within application directory .venv)
 
-* Configure Python in VS Code to use VEnv ~~/.venv/user/bin/python Python interpreter:
+echo $VIRTUAL_ENV
+python -m site
+# and lack of deactivate script
+```
 
-  * Ctrl+Shift+P 'Python: Select interpreter'
-  * Select at workspace level
-  * Select project ".venv/bin/python"
-
-* Select Run and Debug on the left pane, click Settings
-
-* Add [Run and Debug configuration](https://code.visualstudio.com/docs/python/debugging):
+* Select Run and Debug on the left pane, if you haven't have *Python: Remote Attach* option available, click Settings and add [Run and Debug configuration](https://code.visualstudio.com/docs/python/debugging):
 
   ```json
   {
@@ -73,14 +71,30 @@ To debug under VS Code:
     "configurations": [
       {
         "name": "Python: Remote Attach",
-        "type": "python",
+        "type": "debugpy",
         "request": "attach",
         "connect": {
           "host": "localhost",
           "port": 5678
         },
-        "justMyCode": true
+        "justMyCode": false
       }
     ]
   }
   ```
+
+* Select Python in VS Code to use VEnv .venv/bin/python Python interpreter:
+
+  * Ctrl+Shift+P 'Python: Select interpreter'
+  * Select at workspace level
+  * Select project ".venv/bin/python" from your project directory
+
+* Run app in debug mode
+
+  ```bash
+  make debug
+  ```
+
+* Select breakpoint in the code
+
+* Select Run and Debug on the left pane and run Python debugger.

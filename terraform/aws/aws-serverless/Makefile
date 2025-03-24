@@ -8,7 +8,7 @@ endif
 
 init: ## init Poetry build system, init Serverless Framework tooling (single time)
 	. ${HOME}/.nvm/nvm.sh && nvm use && \
-	  poetry install && \
+		poetry config virtualenvs.in-project true && poetry install && \
 	  npm install
 
 run-locally: ## run Fast API app locally (pure Python)
@@ -16,6 +16,9 @@ run-locally: ## run Fast API app locally (pure Python)
 
 dev-locally: ## run app with autoreloading upon code changes (pure Python)
 	poetry run fastapi dev src/website/api/api.py
+
+debug: ## debug app (pure Python)
+	PYTHONPATH=src poetry run python3 -m debugpy --wait-for-client --listen 5678 -m website.api.api
 
 run-sls-offline: ## run Serverless Framework in offline aka local mode
 	poetry run node_modules/serverless/run.js offline --stage offline

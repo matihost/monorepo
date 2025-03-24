@@ -4,6 +4,7 @@ TAG := latest
 BUILDKIT_PROGRESS=plain
 
 init: ## install poetry dependencies, required to be run once
+	poetry config virtualenvs.in-project true
 	poetry install
 
 run: run-exchange-rate ## run exchange-rate from poetry
@@ -13,6 +14,9 @@ run-exchange-rate: ## run exchange-rate from poetry
 
 run-exchange-rate-web:
 	poetry run exchange-rate-web
+
+debug: ## debug exchange-rate from poetry
+	PYTHONPATH=src poetry run python3 -m debugpy --wait-for-client --listen 5678 -m exchange_rate.cli.exchange_rate USD
 
 build: ## build
 	poetry build

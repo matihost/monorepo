@@ -1,4 +1,5 @@
 init: ## install poetry dependencies, required to be run once
+	poetry config virtualenvs.in-project true
 	poetry install
 
 run-automount-cifs: ## run application ensuring all deps are in place
@@ -6,6 +7,12 @@ run-automount-cifs: ## run application ensuring all deps are in place
 
 run-setup-open-dns: ## run application ensuring all deps are in place
 	poetry run setup-opendns
+
+debug-automount-cifs: ## debug automouunt-cifs from poetry
+	PYTHONPATH=src poetry run python3 -m debugpy --wait-for-client --listen 5678 -m tools.cli.automount_cifs
+
+debug-setup-open-dns: ## debug setup_opendns from poetry
+	PYTHONPATH=src poetry run python3 -m debugpy --wait-for-client --listen 5678 -m tools.cli.setup_opendns
 
 build: ## build
 	poetry build

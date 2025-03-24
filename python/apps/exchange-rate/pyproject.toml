@@ -23,6 +23,7 @@ exchange-rate-web = 'exchange_rate.cli.exchange_rate_web:main'
 ruff = "^0.6.9"
 mypy = "^1.15.0"
 pytest = "^8.3.5"
+debugpy = "^1.8.13"
 
 [build-system]
 requires = ["poetry-core"]

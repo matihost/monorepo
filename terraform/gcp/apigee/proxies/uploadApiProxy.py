@@ -10,7 +10,7 @@ To debug under VS Code:
 Add Run and Debug configuration (https://code.visualstudio.com/docs/python/debugging):
 {
   "name": "Python: Attach",
-  "type": "python",
+  "type": "debugpy",
   "request": "attach",
   "connect": {
     "host": "localhost",
