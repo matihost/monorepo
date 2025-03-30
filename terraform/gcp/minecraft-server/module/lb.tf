@@ -33,7 +33,7 @@ resource "google_compute_region_backend_service" "minecraft-region-backend" {
     group           = google_compute_instance_group_manager.minecraft_group_manager.instance_group
   }
 
-  connection_draining_timeout_sec = "300"
+  connection_draining_timeout_sec = "30" # default 300 seconds
   enable_cdn                      = "false"
   health_checks                   = [google_compute_region_health_check.minecraft-lb-health.id]
   load_balancing_scheme           = "EXTERNAL"

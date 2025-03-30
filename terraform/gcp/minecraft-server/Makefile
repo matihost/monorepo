@@ -19,7 +19,7 @@ endif
 ENV := prod-01
 
 init:
-	cd stage/$(ENV) && terragrunt init -upgrade=true
+	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap
 
 
 run: init prepare ## setup Minecraft Server VM, usage make run [MODE=plan/apply/destroy] [ENV=prod-01] PASS=pass_for_minecraft_rcon OP_USER=minecraftusername
@@ -32,14 +32,23 @@ endif
 ifndef OP_USER
 	$(error Env OP_USER is not defined. Minecraft operator/admin user is required. Usage make apply PASS=pass_for_minecraft_rcon OP_USER=minecraftusername)
 endif
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS) -var='server_rcon_pass=$(PASS)' -var='server_op_user=$(OP_USER)'
+	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive --backend-bootstrap $(TG_FLAGS) -var='server_rcon_pass=$(PASS)' -var='server_op_user=$(OP_USER)'
 
 
 ssh: ## ssh to Minecraft Server instance
 ifndef ENV
 	$(error Environment ENV is not defined. Usage make ssh ENV=prod-02
 endif
-	gcloud compute ssh --strict-host-key-checking=no --zone europe-central2-a `gcloud compute instances list --filter="name~'.*$(ENV)-minecraft-server-.*$$'" --format=json | jq -rc .[0].name`
+	gcloud compute ssh --strict-host-key-checking=no --zone "$(shell cd stage/$(ENV) && terragrunt output --backend-bootstrap minecraft_server_zone)" `gcloud compute instances list --filter="name~'.*$(ENV)-minecraft-server-.*$$'" --format=json | jq -rc .[0].name`
+
+scp: ## scp a file to server instance
+ifndef ENV
+	$(error Environment ENV is not defined. Usage make scp ENV=prod-02 FILE=backup.tar
+endif
+ifndef FILE
+	$(error Environment FILE is not defined. Usage make scp ENV=prod-02
+endif
+	gcloud compute scp $(FILE) `gcloud compute instances list --filter="name~'.*$(ENV)-minecraft-server-.*$$'" --format=json | jq -rc .[0].name`:/tmp/ --zone "$(shell cd stage/$(ENV) && terragrunt output minecraft_server_zone)"
 
 show-state: ## show terragrunt.state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show
@@ -58,10 +67,10 @@ upgrade-providers-version: init
 
 
 shutdown: ## resize instance group to zero
-	gcloud compute instance-groups managed resize $(ENV)-minecraft-server --zone=europe-central2-a --size=0
+	gcloud compute instance-groups managed resize $(ENV)-minecraft-server --zone="$(shell cd stage/$(ENV) && terragrunt output minecraft_server_zone)" --size=0
 
 bring-up: ## resize instance group to one
-	gcloud compute instance-groups managed resize $(ENV)-minecraft-server --zone=europe-central2-a --size=1
+	gcloud compute instance-groups managed resize $(ENV)-minecraft-server --zone="$(shell cd stage/$(ENV) && terragrunt output minecraft_server_zone)" --size=1
 
 prepare:
 	@[ -e "$(HOME)/.ssh/id_rsa.cloud.vm" ] || { cd ~/.ssh && ssh-keygen -m PEM -t rsa -N '' -f id_rsa.cloud.vm; }

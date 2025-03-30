@@ -87,6 +87,12 @@ resource "google_compute_instance_group_manager" "minecraft_group_manager" {
     max_unavailable_fixed = 1
     replacement_method    = "RECREATE"
   }
+
+  lifecycle {
+    ignore_changes = [
+      target_size
+    ]
+  }
 }
 
 data "google_compute_image" "ubuntu-latest" {
