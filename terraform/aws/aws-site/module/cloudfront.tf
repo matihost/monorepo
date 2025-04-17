@@ -27,7 +27,7 @@ resource "aws_cloudfront_distribution" "distro" {
 
   enabled         = true
   staging         = false
-  aliases         = [var.dns]
+  aliases         = toset(concat([var.dns], tolist(var.dns_alternative_names)))
   price_class     = "PriceClass_100"
   http_version    = "http2"
   is_ipv6_enabled = true

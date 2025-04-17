@@ -58,15 +58,19 @@ ifeq ($(strip $(TLS_MODE)),TXT)
 	TLS_AUTHZ_MODE_TXT := --preferred-challenges=dns
 endif
 
-generate-letsencrypt-cert: ## generate Let's Encrypt TLS certificate, usage make generate-letsencrypt-cert DOMAIN=domain.mooo.com [TLS_MODE=HTTP]
-ifndef DOMAIN
-	$(error Env DOMAIN is not defined. Usage make generate-letsencrypt-cert DOMAIN=domain.mooo.com)
+generate-letsencrypt-cert: ## generate Let's Encrypt TLS certificate, usage make generate-letsencrypt-cert DOMAIN=domain.mooo.com [ALTERNATIVE_DOMAINS=some.domain.mooo.com,another.mooo.com] [TLS_MODE=HTTP]
+ifndef DOMAINS
+	$(error Env DOMAINS is not defined. Usage make generate-letsencrypt-cert DOMAIN=domain.mooo.com)
+endif
+ifndef MAIN_DOMAIN
+	$(error Env MAIN_DOMAIN is not defined. Usage make generate-letsencrypt-cert MAIN_DOMAIN=domain.mooo.com DOMAINS=domain.mooo.com,domain2.mooo.com)
 endif
 	mkdir -p ~/.tls
-	sudo certbot certonly --manual $(TLS_AUTHZ_MODE_TXT) -d $(DOMAIN)
-	sudo cp -Lr /etc/letsencrypt/live/$(DOMAIN) ~/.tls
+	sudo certbot certonly --manual $(TLS_AUTHZ_MODE_TXT) -d $(DOMAINS)
+	sudo cp -Lr /etc/letsencrypt/live/$(MAIN_DOMAIN) ~/.tls
 	sudo chown -R $(shell whoami):$(shell whoami) ~/.tls
 	sudo chmod -R go-rwx ~/.tls
+
 
 
 list-server-certificates: ## show certificates uploaded to AWS

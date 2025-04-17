@@ -35,7 +35,7 @@ repos:
   - id: terragrunt-hclfmt
   - id: tflint
 - repo: https://github.com/antonbabenko/pre-commit-terraform
-  rev: v1.97.4
+  rev: v1.99.0
   hooks:
   - id: terraform_trivy
     args:
@@ -93,13 +93,13 @@ repos:
     additional_dependencies:
     - .[community,yamllint]
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.11.2
+  rev: v0.11.6
   hooks:
   - id: ruff # python linter
     args: [ --fix ]
   - id: ruff-format # python formatter
 - repo: https://github.com/gitleaks/gitleaks
-  rev: v8.24.2
+  rev: v8.24.3
   hooks:
   - id: gitleaks
 # - repo: https://github.com/pocc/pre-commit-hooks

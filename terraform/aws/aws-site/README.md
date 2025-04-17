@@ -79,7 +79,7 @@ Ensure you have working [http://www.mydomain.com](http://www.mydomain.com) site 
 * Generate TLS certificate via Let's Encrypt: (certbot tool required):
 
     ```bash
-    make generate-letsencrypt-cert DOMAIN=www.mydomain.com
+    make generate-letsencrypt-cert MAIN_DOMAIN=www.mydomain.com DOMAINS=www.mydomain.com,mydomain.com
     ```
 
     Follow instruction on the screen. Essentially you need to create a file and place it under `.well-known/acme-challenge/` location in the S3 site bucket. This is the proof that you control the site - and hence Let's Encrypt will generate TLS certificate for free for 3 months,
@@ -97,7 +97,7 @@ It will create IAM certificate and create CloudFront distribution.
 * Get CloudFront distribution domain:
 
     ```bash
-    make get-cname-target-forcloudfront ENV=prod
+    make get-cname-target-for-cloudfront ENV=prod
     ```
 
 * Edit your subdomain to point it as CNAME to CloudFront distribution:
@@ -129,7 +129,7 @@ Run these steps before certificate is invalid:
 
 ```bash
 # regenerate TLS certificate
-make generate-letsencrypt-cert DOMAIN=www.mydomain.com
+make generate-letsencrypt-cert MAIN_DOMAIN=www.mydomain.com DOMAINS=www.mydomain.com,mydomain.com
 
 # check proposed changes
 make run MODE=plan ENV=prod

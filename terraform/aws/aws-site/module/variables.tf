@@ -22,6 +22,12 @@ variable "dns" {
   description = "DNS of the site"
 }
 
+variable "dns_alternative_names" {
+  type        = set(string)
+  description = "DNS alternative names of the site"
+  default     = []
+}
+
 
 variable "enable_tls" {
   type        = bool
