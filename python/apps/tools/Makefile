@@ -37,7 +37,7 @@ uninstall: ## uninstall locally
 	sudo pip3 uninstall -y tools --break-system-packages
 
 uninstall-user: ensure-custom-user-venv ## uninstall locally
-	$(HOME)/.venv/user/bin/pip3 uninstall -y exchange-rate
+	$(HOME)/.venv/user/bin/pip3 uninstall -y tools
 
 clean: ## clean
 	rm -rf .venv dist .pytest_cache .ruff_cache

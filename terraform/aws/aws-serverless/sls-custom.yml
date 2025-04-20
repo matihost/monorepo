@@ -25,7 +25,7 @@ pythonRequirements:
   noDeploy:
   - boto3
   # https://docs.aws.amazon.com/lambda/latest/dg/python-package.html#python-package-native-libraries
-  pipCmdExtraArgs: ['--platform manylinux2014_aarch64', '--implementation cp', '--python-version 3.12', '--only-binary=:all:']
+  pipCmdExtraArgs: ['--platform manylinux2014_aarch64', '--implementation cp', '--python-version 3.13', '--only-binary=:all:']
 
 serverless-offline:
   httpPort: 3001

@@ -4,7 +4,7 @@ Expose API via AWS Lambda deployed via Serverless Framework.
 
 ## Prerequisites
 
-* Python 3.12
+* Python 3.13
 
 * Poetry
 

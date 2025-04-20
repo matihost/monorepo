@@ -50,7 +50,7 @@ resource "aws_cloudfront_distribution" "distro" {
     allowed_methods        = ["GET", "HEAD"] // "OPTIONS", "PUT", "POST", "PATCH", "DELETE"
     cached_methods         = ["GET", "HEAD"] // "OPTIONS"
     target_origin_id       = local.origin_id
-    viewer_protocol_policy = "allow-all"
+    viewer_protocol_policy = "redirect-to-https"
     compress               = true
   }
   restrictions {

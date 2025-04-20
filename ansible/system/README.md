@@ -2,7 +2,7 @@
 
 Various playbooks for Ubuntu machine management.
 
-Supported Ubuntu distribution: **24.10 (oracular)**
+Supported Ubuntu distribution: **25.04 (plucky)**
 
 ## Prerequisites
 

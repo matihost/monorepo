@@ -13,7 +13,7 @@
     "serverless-plugin-conditional-functions": "^1.0.8",
     "serverless-plugin-resource-tagging": "^1.2.0",
     "serverless-python-requirements": "^6.1.2",
-    "esbuild": "^0.25.1"
+    "esbuild": "^0.25.2"
   },
   "scripts": {
     "offline": "sls offline --stage offline"

@@ -1,4 +1,4 @@
-FROM python:3.12
+FROM python:3.13
 # TODO remove -o Acquire::AllowInsecureRepositories=true -o Acquire::AllowDowngradeToInsecureRepositories=true and --allow-unauthenticated when
 #
 # Kaniko started showing errors, Kaniko is adding own /etc/apt/ sources as well if image is based on Ubuntu

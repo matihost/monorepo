@@ -7,7 +7,7 @@ service: website-api
 
 provider:
   name: aws
-  runtime: python3.12
+  runtime: python3.13
   deploymentMethod: direct
   # deploymentPrefix: ???
   region: us-east-1

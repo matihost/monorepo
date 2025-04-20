@@ -17,7 +17,7 @@ exchange-rate CHF
 
 ## Prerequisites
 
-* Python 3.12
+* Python 3.13
 
 * Poetry
 
