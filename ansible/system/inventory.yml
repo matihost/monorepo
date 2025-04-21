@@ -46,6 +46,7 @@ all:
           batisteo.vscode-django
           charliermarsh.ruff
           davidanson.vscode-markdownlint
+          docker.docker
           donjayamanne.githistory
           donjayamanne.python-environment-manager
           donjayamanne.python-extension-pack

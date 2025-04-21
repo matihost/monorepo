@@ -63,12 +63,13 @@ resource "aws_organizations_policy_attachment" "free-tier-ec2-only" {
 
 
 # https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html
-# https://github.com/aws-samples/data-perimeter-policy-examples/tree/main/resource_control_policies/resource_based_policies
+# https://aws.amazon.com/blogs/security/establishing-a-data-perimeter-on-aws-allow-only-trusted-identities-to-access-company-data/
+# https://github.com/aws-samples/data-perimeter-policy-examples/blob/main/resource_control_policies/identity_perimeter_rcp.json
 data "aws_iam_policy_document" "confused-deputy-protection" {
   statement {
     effect = "Deny"
 
-    sid = "EnforceIdentityPerimeter"
+    sid = "EnforceOrgIdentities"
 
     # RCP does not support * for actions
     # You need to explicitly list
@@ -78,7 +79,13 @@ data "aws_iam_policy_document" "confused-deputy-protection" {
       "sqs:*",
       "kms:*",
       "secretsmanager:*",
-      "sts:*"
+      "sts:AssumeRole",
+      "sts:DecodeAuthorizationMessage",
+      "sts:GetAccessKeyInfo",
+      "sts:GetFederationToken",
+      "sts:GetServiceBearerToken",
+      "sts:GetSessionToken",
+      "sts:SetContext"
     ]
 
     resources = ["*"]
@@ -95,8 +102,26 @@ data "aws_iam_policy_document" "confused-deputy-protection" {
       values = [
         aws_organizations_organization.org.id
       ]
+
     }
 
+    condition {
+      test     = "StringNotEqualsIfExists"
+      variable = "aws:ResourceTag/dp:exclude:identity"
+      values   = ["true"]
+    }
+
+    # Uncomment to unblock access from trusted AWS Accounts
+    # condition {
+    #   test     = "StringNotEqualsIfExists"
+    #   variable = "aws:PrincipalAccount"
+    #   values = [
+    #     "111111111111", # <load-balancing-account-id>
+    #     "222222222222", # <fin-space-account-id>
+    #     "333333333333", # <third-party-account-a>
+    #     "444444444444"  # <third-party-account-b>
+    #   ]
+    # }
 
     condition {
       test     = "BoolIfExists"
@@ -134,6 +159,24 @@ data "aws_iam_policy_document" "confused-deputy-protection" {
       values = [
         aws_organizations_organization.org.id
       ]
+    }
+
+    # Uncomment to unblock access from trusted AWS Accounts
+    # condition {
+    #   test     = "StringNotEqualsIfExists"
+    #   variable = "aws:SourceAccount"
+    #   values = [
+    #     "111111111111", # <load-balancing-account-id>
+    #     "222222222222", # <fin-space-account-id>
+    #     "333333333333", # <third-party-account-a>
+    #     "444444444444"  # <third-party-account-b>
+    #   ]
+    # }
+
+    condition {
+      test     = "StringNotEqualsIfExists"
+      variable = "aws:ResourceTag/dp:exclude:identity"
+      values   = ["true"]
     }
 
     condition {
