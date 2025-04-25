@@ -275,3 +275,114 @@ resource "aws_iam_role_policy_attachment" "ssm-ec2" {
   role       = aws_iam_role.ssm-ec2.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
+
+
+resource "aws_iam_policy" "iam-permissions-boundary" {
+  description = "Permission boundary policy to prevent priviledge escalation"
+  name        = "IAMFullAccessPermissionsBoundary"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "IAMAccess",
+            "Effect": "Allow",
+            "Action": "iam:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "DenyPermBoundaryIAMPolicyAlteration",
+            "Effect": "Deny",
+            "Action": [
+                "iam:DeletePolicy",
+                "iam:DeletePolicyVersion",
+                "iam:CreatePolicyVersion",
+                "iam:SetDefaultPolicyVersion"
+            ],
+            "Resource": [
+                "arn:aws:iam::${local.account_id}:policy/IAMFullAccessPermissionsBoundary"
+            ]
+        },
+        {
+            "Sid": "DenyRemovalOfPermBoundaryFromAnyUserOrRole",
+            "Effect": "Deny",
+            "Action": [
+                "iam:DeleteUserPermissionsBoundary",
+                "iam:DeleteRolePermissionsBoundary"
+            ],
+            "Resource": [
+                "arn:aws:iam::${local.account_id}:user/*",
+                "arn:aws:iam::${local.account_id}:role/*"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "iam:PermissionsBoundary": "arn:aws:iam::${local.account_id}:policy/IAMFullAccessPermissionsBoundary"
+                }
+            }
+        },
+        {
+            "Sid": "DenyAccessIfRequiredPermBoundaryIsNotBeingApplied",
+            "Effect": "Deny",
+            "Action": [
+                "iam:PutUserPermissionsBoundary",
+                "iam:PutRolePermissionsBoundary"
+            ],
+            "Resource": [
+                "arn:aws:iam::${local.account_id}:user/*",
+                "arn:aws:iam::${local.account_id}:role/*"
+            ],
+            "Condition": {
+                "StringNotEquals": {
+                    "iam:PermissionsBoundary": "arn:aws:iam::${local.account_id}:policy/IAMFullAccessPermissionsBoundary"
+                }
+            }
+        },
+        {
+            "Sid": "DenyUserAndRoleCreationWithOutPermBoundary",
+            "Effect": "Deny",
+            "Action": [
+                "iam:CreateUser",
+                "iam:CreateRole"
+            ],
+            "Resource": [
+                "arn:aws:iam::${local.account_id}:user/*",
+                "arn:aws:iam::${local.account_id}:role/*"
+            ],
+            "Condition": {
+                "StringNotEquals": {
+                    "iam:PermissionsBoundary": "arn:aws:iam::${local.account_id}:policy/IAMFullAccessPermissionsBoundary"
+                }
+            }
+        }
+    ]
+}
+EOF
+}
+
+
+resource "aws_iam_role" "iam-admin" {
+  name = "IAMAdminAccess"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "${local.account_id}"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EOF
+
+  permissions_boundary = aws_iam_policy.iam-permissions-boundary.arn
+}
+
+resource "aws_iam_role_policy_attachment" "iam-admin-fullaccess" {
+  role       = aws_iam_role.iam-admin.name
+  policy_arn = "arn:aws:iam::aws:policy/IAMFullAccess"
+}
