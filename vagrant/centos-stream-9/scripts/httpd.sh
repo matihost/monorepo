@@ -39,7 +39,7 @@ echo "default welcomes" >/var/www/html/index.html
 
 chown -R apache:apache /usr/local/www /var/www/html/index.html
 # ensure SELinux context is set on files so that HTTPD can access them
-# set httpd_sys_content_t type context on /usr/local/www files so that httpd_t can acces them
+# set httpd_sys_content_t type context on /usr/local/www files so that httpd_t can access them
 semanage fcontext -a -t httpd_sys_content_t '/usr/local/www(/.*)?'
 restorecon -R /usr/local/www
 
@@ -85,6 +85,11 @@ chmod 644 /etc/pki/ca-trust/source/anchors/magic.centos.pem
 update-ca-trust
 # rehash system certificates /etc/pki/tls/certs (needed by software retrieving certs via their hashes)
 c_rehash
+
+# ensure SELinux context is set on files so that HTTPD can access them
+# set httpd_sys_content_t type context on /usr/local/www files so that httpd_t can access them
+semanage fcontext -a -t httpd_sys_content_t '/etc/pki/tls/certs/magic.centos.crt'
+restorecon -R /etc/pki/tls
 
 echo '<VirtualHost 172.30.250.3:443>
     DocumentRoot "/usr/local/www/magic/html"

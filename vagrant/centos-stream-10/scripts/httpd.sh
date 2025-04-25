@@ -47,13 +47,13 @@ systemctl enable --now httpd
 
 # testing from other machine
 # # testomg - default VirtualHost
-# curl -H "Host: centos"  -v http://172.30.250.3
-# curl -H "Host: whatever"  -v http://172.30.250.3
-# curl -v http://172.30.250.3
+# curl -H "Host: centos"  -v http://172.30.250.4
+# curl -H "Host: whatever"  -v http://172.30.250.4
+# curl -v http://172.30.250.4
 #
 # # testing - magic.centos VirtualHost
-# curl -H "Host: magic.centos"  -v http://172.30.250.3
-# curl -H "Host: magic"  -v http://172.30.250.3
+# curl -H "Host: magic.centos"  -v http://172.30.250.4
+# curl -H "Host: magic"  -v http://172.30.250.4
 
 ## define https VirtualHost for "magic.centos"
 
@@ -91,7 +91,7 @@ c_rehash
 semanage fcontext -a -t httpd_sys_content_t '/etc/pki/tls/certs/magic.centos.crt'
 restorecon -R /etc/pki/tls
 
-echo '<VirtualHost 172.30.250.3:443>
+echo '<VirtualHost 172.30.250.4:443>
     DocumentRoot "/usr/local/www/magic/html"
     ServerName magic.centos
     ServerAlias magic
@@ -108,7 +108,7 @@ systemctl reload --now httpd
 # bare curl should work locally as self signed certificate is added to this system CA certificates
 # curl https://magic.centos
 # from other box:
-# curl -k -H "Host: magic.centos"  https://172.30.250.3
+# curl -k -H "Host: magic.centos"  https://172.30.250.4
 
 ## adding additional port 1180 on which Apache/httpd listens
 
