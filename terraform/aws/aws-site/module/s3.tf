@@ -40,6 +40,9 @@ resource "aws_s3_bucket_policy" "public_policy" {
   policy = data.aws_iam_policy_document.public_policy.json
 }
 
+# WARNING:
+# Access to S3 is blocked by RCP ConfusedDeputyProtection which allow only Authenticated access from current Organization
+# If you wish that S3 content is exposed via HTTP directly from S3 Website Exposure - ensure RCP does not prevent it.
 data "aws_iam_policy_document" "public_policy" {
   statement {
     principals {
@@ -50,7 +53,8 @@ data "aws_iam_policy_document" "public_policy" {
     actions = [
       "s3:GetObject",
       "s3:GetObjectVersion",
-      # "s3:ListBucket",
+      # s3:ListBucket is to return 404 instead of 403 in case S3 is exposed directly via CloudFront
+      "s3:ListBucket",
     ]
 
     resources = [

@@ -1,4 +1,6 @@
 resource "aws_s3_bucket_website_configuration" "website" {
+  count = var.enable_tls ? 0 : 1
+
   bucket = aws_s3_bucket.bucket.id
 
   index_document {
@@ -48,5 +50,5 @@ resource "aws_s3_object" "acme-challenge" {
 
 
 output "s3_site_url" {
-  value = "http://${aws_s3_bucket_website_configuration.website.website_endpoint}"
+  value = var.enable_tls ? "[N/A]" : "http://${aws_s3_bucket_website_configuration.website[0].website_endpoint}"
 }

@@ -30,6 +30,11 @@ You may run  [../aws-iam-linked](../aws-iam-linked) module - which is opinionate
 
 * Ensure `enable_tls` variable is `false` (which is default when not provided).
 
+* WARNING: Ensure you do not have deployed Resource Control Policy (RCP) `EnforceConfusedDeputyProtection` in the account as it block all unauthenticated access to S3.
+
+Access to S3 is blocked by RCP ConfusedDeputyProtection which allow only Authenticated access from current Organization
+If you wish that S3 content is exposed via HTTP directly from S3 Website Exposure - ensure RCP does not prevent it.
+
 ```bash
 # show expected changes tp the infrastructure,
 # variable MODEs: plan, apply, destroy,  optional ENV a directory under stage directory
@@ -73,25 +78,35 @@ HTTPs exposure requires additional steps.
 
 * Decide about subdomain for the site (for example: [www.mydomain.com](www.mydomain.com) when you own [mydomain.com](mydomain.com))
 
-* First follow [deployment for HTTP](#deployment-with-http-only) with  `enable_tls` being `false` (which is default).
+* If you want to use Let's Encrypt HTTP method of verification - first follow [deployment for HTTP](#deployment-with-http-only) with  `enable_tls` being `false` (which is default) to deploy HTTP only.
 Ensure you have working [http://www.mydomain.com](http://www.mydomain.com) site point to S3 site url as CNAME
+This method requires - you do not have enabled RCP on S3 on the account - as it block all unathenticated access to S3.
 
-* Generate TLS certificate via Let's Encrypt: (certbot tool required):
+Generate TLS certificate via Let's Encrypt: (certbot tool required):
+
+```bash
+make generate-letsencrypt-cert MAIN_DOMAIN=www.mydomain.com DOMAINS=www.mydomain.com,mydomain.com
+```
+
+Follow instruction on the screen. Essentially you need to create a file and place it under `.well-known/acme-challenge/` location in the S3 site bucket. This is the proof that you control the site - and hence Let's Encrypt will generate TLS certificate for free for 3 months,
+The make script also copies the generated certificate to `~/.tls` directory so that next Terraform invocation can access it.
+
+_Warning_: If you intent to run deployment of this module from GitHub Actions `CD` workflow, not from your local environment - you need to place/change these files as GitHub Actions Environment secrets `TLS_CRT`, `TLS_CHAIN`, `TLS_KEY` respectively.
+
+* If you want to use Let's Encrypt TXT method of verification - you can deploy your version at once
+
+```bash
+make generate-letsencrypt-cert MAIN_DOMAIN=www.mydomain.com DOMAINS=www.mydomain.com,mydomain.com TLS_MODE=TXT
+```
+
+Follow instructions on the screen (aka edit your DNS TXT entry).
+
+* Change `enable_tls` variable to `true` in your Terragrant config.
+It will create IAM certificate and create CloudFront distribution as well point to your S3 (not to S3 HTTP Website).
+Since it is CloudFront pointing to S3 - RCP preventing unauthenticated/confused deputy access can stay.
 
     ```bash
-    make generate-letsencrypt-cert MAIN_DOMAIN=www.mydomain.com DOMAINS=www.mydomain.com,mydomain.com
-    ```
-
-    Follow instruction on the screen. Essentially you need to create a file and place it under `.well-known/acme-challenge/` location in the S3 site bucket. This is the proof that you control the site - and hence Let's Encrypt will generate TLS certificate for free for 3 months,
-    The make script also copies the generated certficate to `~/.tls` directory so that next Terraform invocation can access it.
-
-    _Warning_: If you intent to run deployment of this module from GitHub Actions `CD` workflow, not from your local environment - you need to place/change these files as GitHub Actions Environment secrets `TLS_CRT`, `TLS_CHAIN`, `TLS_KEY` respectively.
-
-* Change `enable_tls` variable to `true` in your Terragrant config and re run Terragrunt again.
-It will create IAM certificate and create CloudFront distribution.
-
-    ```bash
-    make run ENV=prod
+    make run ENV=prod MODE=apply
     ```
 
 * Get CloudFront distribution domain:
