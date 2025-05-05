@@ -32,6 +32,10 @@ CLUSTER_NAME = "$(shell cd stage/$(ENV) && terragrunt output -raw cluster_name 2
 kubeconfig: ## configure kubeconfig with break-glass credentials (kubeadmin)
 	oc login --insecure-skip-tls-verify=true -u kubeadmin -p "$(shell az aro list-credentials --name "$(CLUSTER_NAME)" --resource-group "$(CLUSTER_RG)" 2>/dev/null | jq -r ".kubeadminPassword")" "$(shell cd stage/$(ENV) && terragrunt output -raw api_url)"
 
+# https://learn.microsoft.com/en-us/azure/openshift/howto-kubeconfig
+systemadmin-kubeconfig: ## configure kubeconfig with break-glass credentials (system:admin)
+	@rm $(HOME)/.kube/config
+	az aro get-admin-kubeconfig -f $(HOME)/.kube/config --resource-group "$(CLUSTER_RG)" --name "$(CLUSTER_NAME)"
 
 get-break-glass-credentials: ## retrieve the break glass credentials for ARO (kubeadmin)
 	az aro list-credentials --name "$(CLUSTER_NAME)" --resource-group "$(CLUSTER_RG)" 2>/dev/null

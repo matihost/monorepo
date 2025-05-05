@@ -278,7 +278,7 @@ resource "aws_iam_role_policy_attachment" "ssm-ec2" {
 
 
 resource "aws_iam_policy" "iam-permissions-boundary" {
-  description = "Permission boundary policy to prevent priviledge escalation"
+  description = "Permission boundary policy to prevent privilege escalation"
   name        = "IAMFullAccessPermissionsBoundary"
 
   policy = <<EOF

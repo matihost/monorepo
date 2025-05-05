@@ -275,6 +275,7 @@ all:
         - apt-transport-https
         - azure-cli
         - dbeaver-ce
+        - cloud-utils
         snaps:
         - mc-installer
         - notepad-plus-plus
