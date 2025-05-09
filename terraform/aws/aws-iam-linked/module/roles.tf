@@ -246,11 +246,20 @@ resource "aws_iam_role_policy_attachment" "default_host_management" {
 
 
 # To connect/ssh to EC2 via SSM
-# ECM2 has to be either:
+# EC2 has to be either:
 # public facing (be in public subnet)
 # or
-# it can be private only but it has to have assigned
-# instance profile containing minimally AmazonSSMManagedInstanceCore policy
+# it can be private only but
+# DefaultHostManagement is configured in the region (defined in aws-network-setup module)
+# (so that instance profile attached to EC2 instance automatically has necessary permission to use SSM
+# or explicitely add instance profile to EC2 containing minimally AmazonSSMManagedInstanceCore policy (like tihs SSM-EC2 role)
+#
+# WARNING:
+# Depending on SSM settings:
+# https://us-east-1.console.aws.amazon.com/systems-manager/session-manager/preferences?region=us-east-1#
+# whether SSM populates logs to CloudWatch or encrypted S3
+# then more IAM privileges needed to be applied on either DefaultHostManagement role or instance profile attached to EC2:
+# https://repost.aws/knowledge-center/ssm-session-manager-failures
 resource "aws_iam_role" "ssm-ec2" {
   name               = "SSM-EC2"
   assume_role_policy = <<EOF

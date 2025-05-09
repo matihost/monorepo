@@ -33,7 +33,10 @@ repos:
   # - id: terraform-fmt
   # - id: terraform-validate
   - id: terragrunt-hclfmt
-  - id: tflint
+  # OpenTofu is not supported by tflint
+  # https://github.com/terraform-linters/tflint/issues/2194
+  # Incompatibility between OpenTofu like OpenTofu support for_each for providers
+  # - id: tflint
 - repo: https://github.com/antonbabenko/pre-commit-terraform
   rev: v1.99.0
   hooks:

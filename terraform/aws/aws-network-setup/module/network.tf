@@ -5,7 +5,7 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
 
   tags = {
-    Name = "${local.prefix}-${var.region}"
+    Name = "${local.prefix}"
   }
 }
 
@@ -13,14 +13,15 @@ resource "aws_vpc" "main" {
 resource "aws_default_route_table" "main" {
   default_route_table_id = aws_vpc.main.default_route_table_id
 
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw.id
-  }
-
   tags = {
-    Name = "${local.prefix}-${var.region}-default"
+    Name = "${local.prefix}-default"
   }
+}
+
+resource "aws_route" "main-igw" {
+  route_table_id         = aws_vpc.main.default_route_table_id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.igw.id
 }
 
 
@@ -28,7 +29,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "${local.prefix}-${var.region}-igw"
+    Name = "${local.prefix}-igw"
   }
 }
 
@@ -39,7 +40,7 @@ resource "aws_subnet" "public" {
   availability_zone       = each.key
   map_public_ip_on_launch = true
   tags = {
-    Name                     = "${local.prefix}-${var.region}-public-${each.key}"
+    Name                     = "${local.prefix}-public-${each.key}"
     Tier                     = "public"
     "kubernetes.io/role/elb" = 1
   }
@@ -139,7 +140,7 @@ resource "aws_instance" "nat" {
   )
 
   tags = {
-    Name = "${local.prefix}-${var.region}-nat"
+    Name = "${local.prefix}-nat"
   }
 
   depends_on = [aws_default_route_table.main]
@@ -153,7 +154,7 @@ resource "aws_subnet" "private" {
   availability_zone       = each.key
   map_public_ip_on_launch = false
   tags = {
-    Name                              = "${local.prefix}-${var.region}-private-${each.key}"
+    Name                              = "${local.prefix}-private-${each.key}"
     Tier                              = "private"
     "kubernetes.io/role/internal-elb" = 1
   }
@@ -169,16 +170,17 @@ resource "aws_route_table" "nat" {
   vpc_id = aws_vpc.main.id
 
   # default route, mapping the VPC's CIDR block to "local", is created implicitly and cannot be specified.
-  route {
-    cidr_block           = "0.0.0.0/0"
-    network_interface_id = aws_instance.nat.primary_network_interface_id
-  }
 
   tags = {
-    Name = "${local.prefix}-${var.region}-nat"
+    Name = "${local.prefix}-nat"
   }
 }
 
+resource "aws_route" "nat-nat" {
+  route_table_id         = aws_route_table.nat.id
+  destination_cidr_block = "0.0.0.0/0"
+  network_interface_id   = aws_instance.nat.primary_network_interface_id
+}
 
 resource "aws_security_group" "http_from_external_range" {
   name        = "${local.prefix}-http-from-external-access-range"
@@ -218,8 +220,8 @@ resource "aws_security_group" "http_from_external_range" {
 
 
 resource "aws_security_group" "internal" {
-  name        = "${local.prefix}-internal-vpc"
-  description = "Allow internal VPC traffic"
+  name        = "${local.prefix}-internal"
+  description = "Allow internal traffic"
 
   vpc_id = aws_vpc.main.id
 
@@ -231,7 +233,7 @@ resource "aws_security_group" "internal" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = [aws_vpc.main.cidr_block]
+    cidr_blocks = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
   }
 
   # Terraform removed default egress ALLOW_ALL rule

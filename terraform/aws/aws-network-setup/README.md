@@ -58,3 +58,25 @@ make show-state
 # terminates all AWS resource created with apply task
 make destroy
 ```
+
+## Setup VPC peering
+
+In order to setup VPC peering between all VPC within environment (within single AWS account only),
+you need to:
+
+```bash
+# deploy all VPC w/o peering first
+make run ENV=dev MODE=apply
+
+# change stage/dev/us-east-1/terragrunt.hcl by uncommenting vpc_peering_regions
+# then
+make run-one ENV=dev REGION=us-east-1 MODE=apply
+
+# change stage/dev/us-central-1/terragrunt.hcl by uncommenting   vpc_peering_acceptance_regions
+# then
+make run-one ENV=dev REGION=us-central-1 MODE=apply
+
+# change stage/dev/us-east-1/terragrunt.hcl by uncommenting finish_peering
+# then
+make run-one ENV=dev REGION=us-east-1 MODE=apply
+```

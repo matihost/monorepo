@@ -1,5 +1,5 @@
 resource "aws_key_pair" "vm_key" {
-  key_name   = "${local.prefix}-${var.region}-bastion-ssh"
+  key_name   = "${local.prefix}-bastion-ssh"
   public_key = var.ssh_pub_key
 }
 
@@ -55,8 +55,8 @@ resource "aws_security_group" "bastion_access" {
 }
 
 resource "aws_security_group" "internal_access" {
-  name        = "${local.prefix}-ssh-http-from-vpc"
-  description = "Allow HTTP(s) & SSH access from internal VPC only"
+  name        = "${local.prefix}-ssh-http-from-internal"
+  description = "Allow HTTP(s) & SSH access from internal only"
 
   vpc_id = aws_vpc.main.id
 
@@ -65,25 +65,25 @@ resource "aws_security_group" "internal_access" {
   }
 
   ingress {
-    description = "HTTP from default VPC"
+    description = "HTTP from internal"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.main.cidr_block]
+    cidr_blocks = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
   }
   ingress {
-    description = "HTTPS from default VPC"
+    description = "HTTPS from internal"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.main.cidr_block]
+    cidr_blocks = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
   }
   ingress {
-    description = "SSH from default VPC"
+    description = "SSH from internal"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.main.cidr_block]
+    cidr_blocks = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
   }
 
   # Terraform removed default egress ALLOW_ALL rule
@@ -109,7 +109,7 @@ resource "aws_instance" "bastion_vm" {
     }
   )
   tags = {
-    Name = "${local.prefix}-${var.region}-bastion"
+    Name = "${local.prefix}-bastion"
   }
 
   depends_on = [aws_default_route_table.main]

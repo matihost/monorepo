@@ -4,7 +4,7 @@ locals {
   # tflint-ignore: terraform_unused_declarations
   account_id = data.aws_caller_identity.current.account_id
 
-  prefix = var.env
+  prefix = "${var.env}-${var.region}"
 }
 
 variable "env" {
@@ -86,4 +86,22 @@ variable "zones" {
     private_ip_cidr_range = string
   }))
   description = "AWS zones for VPC Subnetworks Deployment"
+}
+
+variable "vpc_peering_regions" {
+  type        = list(string)
+  description = "AWS regions for each VPC peering connection will be created/requested"
+  default     = []
+}
+
+variable "finish_peering" {
+  type        = bool
+  description = "Finish requester VPC peering initialization"
+  default     = false
+}
+
+variable "vpc_peering_acceptance_regions" {
+  type        = list(string)
+  description = "AWS regions for each VPC peering connection request will be accepted"
+  default     = []
 }

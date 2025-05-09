@@ -17,22 +17,26 @@ endif
 
 
 ENV := dev
+REGION := us-east-1
 
 init: prepare
-	cd stage/$(ENV) && terragrunt init -upgrade=true
+	cd stage/$(ENV) && terragrunt init --all -upgrade=true
+
+run-one: prepare ## ## setup VPC in one region: make run [ENV=dev] [REGION=us-east-1] [MODE=apply]
+	cd stage/$(ENV)/$(REGION) && terragrunt init -upgrade=true && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 
 run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
+	@cd stage/$(ENV) && terragrunt validate --all && terragrunt $(MODE_STR) --all --non-interactive $(TG_FLAGS)
 
 ssh: ## ssh to VPC bastion host
-	eval $(shell cd stage/$(ENV) && terragrunt output bastion_ssh)
+	eval $(shell cd stage/$(ENV)/$(REGION) && terragrunt output bastion_ssh)
 
 nat-ssh: ## ssh to NAT instance
-	eval "$(shell cd stage/$(ENV) && terragrunt output nat_ssh)"
+	eval "$(shell cd stage/$(ENV)/$(REGION) && terragrunt output nat_ssh)"
 
 webserver-ssm-ssh: ## ssh to webserver instance over SSM
-	aws ssm start-session --target "$(shell cd stage/$(ENV) && terragrunt output webserver_id)"
+	aws ssm start-session --target "$(shell cd stage/$(ENV)/$(REGION) && terragrunt output webserver_id)"
 
 expose_bastion_proxy_locally: ## expose bastion's HTTP proxy locally
 	@[ "$(shell sudo ss -antl |grep -c 8888)" -ne 0 ] || eval "$(shell cd stage/$(ENV) && terragrunt output expose_bastion_proxy_locally)"

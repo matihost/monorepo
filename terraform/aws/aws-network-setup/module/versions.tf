@@ -9,5 +9,6 @@ terraform {
       version = "~> 3"
     }
   }
-  required_version = ">= 1.6"
+  # Only OpenTofu is supported as Terraform does not support
+  required_version = ">= 1.9"
 }
