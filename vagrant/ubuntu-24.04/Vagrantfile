@@ -1,0 +1,63 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-24.04"
+
+  config.vm.network "private_network", ip: "172.28.128.5", netmask: "255.255.255.0", type: "dhcp"
+  config.vm.network "private_network", ip: "172.30.250.5", netmask: "255.255.255.0", auto_config: false
+
+  config.vm.hostname = "ubuntu-noble"
+
+  (0..4).each do |i|
+    config.vm.disk :disk, size: "5GB", name: "disk-#{i}"
+  end
+
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "ubuntu-noble"
+    vb.cpus = 8
+    vb.memory = 5 * 1024
+    vb.default_nic_type = "virtio"
+
+    if "#{ENV['GUI']}" == "true"
+      vb.gui = true
+      # vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
+      vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
+      vb.customize ["modifyvm", :id, "--vram", "128"]
+    end
+
+    vb.customize ["modifyvm", :id, "--clipboard-mode", "bidirectional"]
+    vb.customize ["modifyvm", :id, "--draganddrop", "bidirectional"]
+  end
+
+
+  # Update each time VM is started
+  config.vm.provision "shell", run: "always", inline: <<-SHELL
+    apt -y update >/dev/null 2>&1
+    #  Updating kernel may end with
+    # Failed to open terminal.debconf: whiptail output the above errors, giving up!
+    # apt -y upgrade > /dev/null 2>&1
+  SHELL
+
+  # # Install software once (with run: "once" as default provisioner option)
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   # install basic edit tools
+  #   yum -y install epel-release bash-completion man-pages vim
+  # SHELL
+
+  config.vm.provision "shell", run: "once", path: "scripts/system.sh"
+  config.vm.provision "shell", run: "once", path: "scripts/networking.sh"
+  config.vm.provision "shell", run: "once", path: "scripts/storage.sh"
+  # config.vm.provision "shell", run: "once", path: "scripts/nfs.sh"
+  # config.vm.provision "shell", run: "once", path: "scripts/httpd.sh"
+  # config.vm.provision "shell", run: "once", path: "scripts/containers.sh"
+  # if "#{ENV['GUI']}" == "true"
+  #   config.vm.provision "shell", run: "once", path: "scripts/gui.sh"
+  # end
+  # config.vm.provision "shell", run: "once", path: "scripts/user-container-service.sh", privileged: false
+  # config.vm.provision "shell", run: "once", path: "scripts/guest-additions.sh", reboot: true
+
+  # # Run script after boot completed
+  # config.trigger.after [:up] do |trigger|
+  #   trigger.info = "Running scripts/host-ssh.sh locally..."
+  #   trigger.run = {path: "scripts/host-ssh.sh"}
+  # end
+end

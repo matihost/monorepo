@@ -1,7 +1,9 @@
-# CentOS 10 Stream Vagrant VM
+# Ubuntu 22.04 Vagrant VM
 
-Provisions locally CentOS 10 Stream via VirtualBox/Vagrant.
-Creates SSH keys automatically on the host for connecting to vagrant via ssh
+Provisions locally Ubuntu 22.04 via VirtualBox/Vagrant.
+Creates SSH keys automatically on the host for connecting to vagrant via ssh.
+
+Relies on bento/ubuntu-24.04 build as since Hashicorp changes licence model for vagrant Canonical stopped providing own Vagrant images.
 
 ## Prerequisites
 
@@ -15,19 +17,10 @@ Creates SSH keys automatically on the host for connecting to vagrant via ssh
   * 0.0.0.0/0 ::/0
   ```
 
-* Download base OS image:
-
-  ```bash
-  # download Vagrant image
-  make ensure-latest-base-vm
-  ```
 
 ## Usage
 
 ```bash
-# download Vagrant image
-make ensure-latest-base-vm
-
 # run VM
 man run
 
@@ -50,9 +43,6 @@ make stop
 
 # remove VM from disk
 make destroy
-
-# cleans base box so that if Vagrant file contains newer base box it will be downloaded
-make ensure-latest-base-vm
 
 # show usage and tasks (default)
 make help

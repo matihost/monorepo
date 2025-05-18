@@ -1,6 +1,8 @@
 resource "aws_vpc" "main" {
-  cidr_block           = var.vpc_ip_cidr_range
-  instance_tenancy     = "default"
+  cidr_block       = var.vpc_ip_cidr_range
+  instance_tenancy = "default"
+
+  # In order to associate with Route53 private hosted zone
   enable_dns_support   = true
   enable_dns_hostnames = true
 

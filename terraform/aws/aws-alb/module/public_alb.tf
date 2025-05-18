@@ -21,8 +21,28 @@ resource "aws_lb" "webserver" {
   load_balancer_type = "application"
   security_groups    = [data.aws_security_group.public_lb_security_group.id]
 
-  # TODO replace with subnet mapping to reserver EIP
   subnets = local.public_subnet_ids
+
+  # Unable to use subnet mapping as ALB does not support EIP
+  # They are managed by AWS and use AWS-owned public IPs, not Elastic IPs from your account.
+  # The ALB is fronted by AWS's internal scaling infrastructure, which dynamically allocates IPs from an AWS pool.
+  # Alternatives to inability to set fixed IP for ALB:
+  #
+  # Use a static DNS name
+  #     ALBs come with a DNS name like:
+  #     my-alb-1234567890.us-east-1.elb.amazonaws.com
+  #     You can create a CNAME (e.g. app.example.com) that points to this.
+  #     This is the recommended approach - no need for static IPs in most cases.
+  # Use AWS Global Accelerator
+  #     If you really need fixed IP addresses for an ALB:
+  #         Create an AWS Global Accelerator
+  #         Point the accelerator to your ALB as an endpoint.
+  #         You`ll get two static IPs (one per edge location) that front the ALB
+  #     Supported for ALB, NLB, EC2, and more.
+  # Use NLB + ALB combo (advanced pattern)
+  #     Use a Network Load Balancer with EIPs
+  #     Route traffic from the NLB to ALB behind it (via TCP forwarding)
+  #     This is complex and often overkill unless you're tightly constrained by firewall or IP whitelisting needs
 }
 
 resource "aws_lb_listener" "webserver" {
@@ -47,6 +67,8 @@ resource "aws_lb_target_group" "webserver" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.default.id
+
+  target_type = "instance" # ALB supports instance, ip, lambda
 
   health_check {
     enabled             = "true"

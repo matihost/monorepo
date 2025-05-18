@@ -8,8 +8,17 @@ resource "aws_lb" "private-web" {
   # switching to
   enable_cross_zone_load_balancing = "true"
   name                             = "${local.prefix}-private"
-  security_groups                  = [data.aws_security_group.webserver.id]
 
+  # Only selected NLB supports Security Groups:
+  # The NLB must be internal (not internet-facing).
+  # It must have cross-zone load balancing enabled.
+  # The NLB must be operating in VPCs that support this feature (most modern VPCs do).
+
+  security_groups = [data.aws_security_group.webserver.id]
+
+  # Subnet mapping associate random IP per AZ.
+  # NLB can be associated with concrete statics IPs (for internal) or Elastic IP (EIP) for public facing NLB.
+  # TODO replace with subnet mapping to static IP
   subnets = local.private_subnet_ids
 }
 
@@ -21,7 +30,7 @@ resource "aws_lb_listener" "private-web" {
 
   load_balancer_arn = aws_lb.private-web.arn
   port              = "80"
-  protocol          = "TCP"
+  protocol          = "TCP" # suppported: TCP, TLS, UDP, TCP_UDP
 }
 
 
@@ -54,7 +63,7 @@ resource "aws_lb_target_group" "tcp-webserver" {
     type            = "source_ip"
   }
 
-  target_type = "instance"
+  target_type = "instance" # NLB support instance, ip or alb (when target is ALB), target ip cannot be publicly routable ip addresses
   vpc_id      = data.aws_vpc.default.id
 }
 

@@ -21,9 +21,9 @@ inputs = {
   ssh_pub_key = local.pub_ssh
   ssh_key     = local.ssh_key
   # external_access_range                   = "${local.current_ip}/32"
-  create_sample_instance                  = true
-  create_ssm_private_access_vpc_endpoints = true # WARNING: switch to true to be able to SSM to private EC2 instances
-  create_s3_endpoint                      = true
+  create_sample_instance                  = false
+  create_ssm_private_access_vpc_endpoints = false # WARNING: switch to true to be able to SSM to private EC2 instances
+  create_s3_endpoint                      = false
   ec2_instance_type                       = "t4g.small" # or t3.micro
   ec2_architecture                        = "arm64"     # or x86_64
   aws_tags = {
@@ -47,9 +47,9 @@ inputs = {
   },
 
   # To which VPC/regions to send peering connection request
-  # vpc_peering_regions = ["eu-central-1"]
+  vpc_peering_regions = ["eu-central-1"]
   # change finish_peering to true for requestor side - when acceptor side accepted peering
-  # finish_peering = true
+  finish_peering = true
 
   # From which VPC/regions to accept peering connection request
   # vpc_peering_acceptance_regions = [ "us-east-1"]
