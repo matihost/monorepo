@@ -27,7 +27,7 @@ repos:
   - id: detect-private-key
   - id: check-executables-have-shebangs
 - repo: https://github.com/gruntwork-io/pre-commit
-  rev: v0.1.28
+  rev: v0.1.29
   hooks:
   # TODO enabled when tofu is supported
   # - id: terraform-fmt
@@ -38,7 +38,7 @@ repos:
   # Incompatibility between OpenTofu like OpenTofu support for_each for providers
   # - id: tflint
 - repo: https://github.com/antonbabenko/pre-commit-terraform
-  rev: v1.99.0
+  rev: v1.99.3
   hooks:
   - id: terraform_trivy
     args:
@@ -66,7 +66,7 @@ repos:
   - id: shellcheck
   - id: shfmt
 - repo: https://github.com/adrienverge/yamllint.git
-  rev: v1.37.0
+  rev: v1.37.1
   hooks:
   - id: yamllint
     entry: yamllint --strict
@@ -96,13 +96,13 @@ repos:
     additional_dependencies:
     - .[community,yamllint]
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.11.6
+  rev: v0.11.13
   hooks:
   - id: ruff # python linter
     args: [ --fix ]
   - id: ruff-format # python formatter
 - repo: https://github.com/gitleaks/gitleaks
-  rev: v8.24.3
+  rev: v8.27.2
   hooks:
   - id: gitleaks
 # - repo: https://github.com/pocc/pre-commit-hooks

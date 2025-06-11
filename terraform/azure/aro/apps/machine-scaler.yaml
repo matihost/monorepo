@@ -60,11 +60,13 @@ spec:
   schedule: "0 18 * * 5"
   successfulJobsHistoryLimit: 4 # keep history of 4 jobs and 2 failed jobs
   failedJobsHistoryLimit: 2
+  concurrencyPolicy: "Forbid"      # max 1 job at a time, skip next if running
   jobTemplate:
     spec:
       backoffLimit: 0  # No retries if job fails
       template:
         spec:
+          restartPolicy: Never # recommended with backoffLimit=0
           serviceAccountName: machine-scaler
           # RH does not support running anything on master nodes - even when they are present and are suitable for such scripts.
           #
@@ -79,7 +81,6 @@ spec:
           #   - key: "node-role.kubernetes.io/control-plane"
           #     operator: "Exists"
           #     effect: "NoSchedule"
-          restartPolicy: Never
           containers:
             - name: scale-machineset
               image: registry.redhat.io/openshift4/ose-cli:latest

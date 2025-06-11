@@ -16,6 +16,9 @@ deploy-anthos: ## deploys echoserver on Anthos (requires current context on Anth
 deploy-eks: ## deploys echoserver on EKS via Helm
 	scripts/deploy-on-eks.sh
 
+deploy-aro: ## deploys echoserver on ARO (requires current context on ARO config cluster)
+	scripts/deploy-on-aro.sh
+
 undeploy: ## undeply echoserver
 	helm uninstall echoserver -n learning
 
@@ -24,6 +27,9 @@ test-minikube: ## smoke test echoserver app deployment on minikube
 
 test-gke: ## smoke test echoserver app deployment on gke
 	curl -x http://localhost:8888 -ksSL https://echoserver.learning.internal.gke.shared1.dev.gcp.testing
+
+test-aro: ## smoke echoserver pp deployed on aro
+	curl -kv https://echo.learning.apps.devshared1.northeurope.aroapp.io
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
