@@ -73,7 +73,7 @@ Exposed via GLB.
   [https://id.keycloack.my.dns/admin](https://id.keycloack.my.dns/admin) with temporal admin credentials.
   (Warning: Do not user default page as it redirects to realm `id` user console - which does not exist yet. As fresh Keycloak has only `master` realm - fresh install will redirect to a page with 404. You need to have realm with `id`. Read on.)
 
-  Go to Users tab and create new "break-glass" user, apply password, and add Realm `admin_role` role.
+  Go to Users tab and create new "break-glass" user, apply password, and add Realm `admin_role` role (Assign Role -> Filter by Realm Roles -> select `admin_role`).
 
   Relogin with new credentials and disable/delete initial/temporal admin user.
 

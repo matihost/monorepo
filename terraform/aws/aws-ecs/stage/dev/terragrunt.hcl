@@ -61,6 +61,21 @@ inputs = {
     #         "value": "true"
     #       },
     #   ],
+    #
+    ## TODO migrate DD checks/integration with format for Datadog Agent v7.36+:
+    ## Example on Redis check:
+    ##
+    ## labels:
+    ##   com.datadoghq.ad.checks: '{"redisdb": {"instances": [{"host": "%%host%%","port":"6379","password":"%%env_REDIS_PASSWORD%%"}], "logs": [{"type": "file", "path": "/var/log/redis_6379.log", "source": "redis", "service": "redis_service"}]}}'
+    ##
+    ## For earlier Agent versions it was formatted like:
+    ##
+    ## labels:
+    ##   com.datadoghq.ad.check_names: '["redisdb"]'
+    ##   com.datadoghq.ad.init_configs: '[{}]'
+    ##   com.datadoghq.ad.instances: '[{"host": "%%host%%","port":"6379","password":"%%env_REDIS_PASSWORD%%"}]'
+    ##   com.datadoghq.ad.logs: '[{"type": "file", "path": "/var/log/redis_6379.log", "source": "redis", "service": "redis_service"}]'
+    #
     #   docker_labels = {
     #     "com.datadoghq.ad.check_names": "[\"postgres\"]",
     #     "com.datadoghq.ad.init_configs": "[{}]",

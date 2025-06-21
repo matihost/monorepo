@@ -31,7 +31,7 @@ endif
 	cd stage/$(ENV)/keycloak && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 
-google-authentication: prepare ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
+google-authentication: ## authenticate to GCP and prepare Application Default Credentials token  (~/.config/gcloud/application_default_credentials.json) for Terraform usage
 	gcloud init
 	gcloud auth application-default login
 
@@ -41,11 +41,11 @@ clean: ## clean Terraform cached plugins and data
 	find . -name "node_modules" -exec rm -rf {} +
 
 TAG := latest
-POSTGRESQL_JDBC_VERSION := 1.24.0
+POSTGRESQL_JDBC_VERSION := 1.25.1
 KEYCLOAK_METRICS_SPI_VERSION := 7.0.0
 CURRENT_PROJECT := $(shell gcloud config get-value project 2>/dev/null)
 
-configure-docker-registry:
+configure-docker-registry: ## ensure docker con use docker registry
 	gcloud auth configure-docker us-central1-docker.pkg.dev
 
 build-sql-connector: # build https://github.com/GoogleCloudPlatform/cloud-sql-jdbc-socket-factory a dependency for Keycloak
@@ -92,13 +92,13 @@ endif
 
 get-initial-admin-username: ## get initial admin user name
 ifndef ENV
-	$(error Environment ENV is not defined. Usage make run ENV=prod MODE=plan [DEBUG=true])
+	$(error Environment ENV is not defined. Usage make get-initial-admin-username ENV=prod)
 endif
 	@cd stage/$(ENV)/keycloak && terragrunt output -raw keycloak_initial_admin_username
 
 get-initial-admin-pass: ## get initial admin user password
 ifndef ENV
-	$(error Environment ENV is not defined. Usage make run ENV=prod MODE=plan [DEBUG=true])
+	$(error Environment ENV is not defined. Usage make get-initial-admin-pass ENV=prod)
 endif
 	@cd stage/$(ENV)/keycloak && terragrunt output -raw keycloak_initial_admin_password
 
