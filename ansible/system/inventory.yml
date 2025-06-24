@@ -66,6 +66,7 @@ all:
           kevinrose.vsc-python-indent
           magicstack.magicpython
           moshfeu.compare-folders
+          ms-azuretools.vscode-containers
           ms-azuretools.vscode-docker
           ms-kubernetes-tools.vscode-kubernetes-tools
           ms-python.debugpy
@@ -387,7 +388,7 @@ all:
           desc: To ensure Ansible galaxy collection community.kubernetes with k8s, helm modules is present
           become: false
           command: |
-            [ -n "$(ansible-galaxy collection list community.kubernetes --format json |jq -r '(try ..)|.version' |grep -v null)" ] || {
+            [ -n "$(ansible-galaxy collection list community.kubernetes --format json |jq -r '(try ..)|objects|.version? //empty')" ] || {
               ansible-galaxy collection install community.kubernetes
               echo "Ansible collection community.kubernetes has been installed"
             }
@@ -1054,6 +1055,39 @@ all:
                 select(.name | test(\".deb\")) | .browser_download_url" |
                   xargs curl -s -L -o "/tmp/caprine.deb"
               apt -y install /tmp/caprine.deb
+            }
+        - name: datadog
+          become: true
+          desc: |
+            Ensure latest version of Datadog agent is installed
+            Datadog Agent is installed only when DD_API_KEY environment variable is set (for example via ~/.bashrc export)
+            To uninstall Datadog run: datadog-installer purge
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/DataDog/datadog-agent/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(datadog-agent version 2>/dev/null| sed -E "s/Agent (.*) - Commit: .*/\1/g")"
+            DD_API_KEY="{{ lookup('env', 'DD_API_KEY') }}"
+            [ -n "${DD_API_KEY}" -a "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              DD_API_KEY="${DD_API_KEY}" \
+              DD_SITE="datadoghq.eu" \
+              DD_APM_INSTRUMENTATION_ENABLED=host \
+              DD_REMOTE_UPDATES=true \
+              DD_ENV="home" \
+              DD_LOGS_ENABLED=true \
+              DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true \
+              DD_PROCESS_AGENT_PROCESS_COLLECTION_ENABLED=true \
+              DD_APM_ENABLED=true \
+              DD_APM_NON_LOCAL_TRAFFIC=true \
+              DD_APM_INSTRUMENTATION_LIBRARIES=java:1,python:3,js:5,php:1,dotnet:3 \
+              bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)"
+              usermod -a -G docker dd-agent
+              sudo -u dd-agent install -m 0640 /etc/datadog-agent/system-probe.yaml.example /etc/datadog-agent/system-probe.yaml
+              echo "network_config:
+                enabled: true" > /etc/datadog-agent/system-probe.yaml
+              sudo -u dd-agent install -m 0640 /etc/datadog-agent/conf.d/journald.d/conf.yaml.example /etc/datadog-agent/conf.d/journald.d/conf.yaml
+              echo "logs:
+              - type: journald
+                container_mode: true" > /etc/datadog-agent/conf.d/journald.d/conf.yaml
+              systemctl restart datadog-agent
             }
         - name: cri-dockerd
           become: true
