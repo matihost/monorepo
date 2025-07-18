@@ -57,11 +57,11 @@ variable "zones" {
 
 variable "cluster_version" {
   type        = string
-  default     = "1.31"
+  default     = "1.33"
   description = "Version of EKS"
   validation {
     condition     = can(regex("^[0-9]*[0-9]+.[0-9]*[0-9]+$", var.cluster_version))
-    error_message = "openshift_version must be with structure <major>.<minor> (for example 1.31)."
+    error_message = "cluster_version must be with structure <major>.<minor> (for example 1.33)."
   }
 }
 

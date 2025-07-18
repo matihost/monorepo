@@ -200,6 +200,7 @@ all:
         - guake
         - mono-complete
         - jq
+        - yq
         - curl
         - keepass2
         - code
@@ -251,6 +252,7 @@ all:
         # Skipped packages:
         # OpenVPN 3 is supported only on Ubuntu LTS: https://openvpn.net/cloud-docs/openvpn-3-client-for-linux/
         # - openvpn3
+        - openvpn-systemd-resolved
         - gh
         - npm
         - tox
@@ -802,7 +804,7 @@ all:
               required_providers {
                 aws = {
                   source  = "hashicorp/aws"
-                  version = "~> 5"
+                  version = "~> 6"
                 }
               }
               required_version = ">= 1.0"
@@ -1065,8 +1067,9 @@ all:
           command: |
             CURRENT_VERSION="$(curl -sL https://api.github.com/repos/DataDog/datadog-agent/releases/latest | jq -r ".tag_name")"
             INSTALLED_VERSION="$(datadog-agent version 2>/dev/null| sed -E "s/Agent (.*) - Commit: .*/\1/g")"
+            CURRENT_DD_API_KEY="$(yq -r ".api_key" /etc/datadog-agent/datadog.yaml 2>/dev/null)"
             DD_API_KEY="{{ lookup('env', 'DD_API_KEY') }}"
-            [ -n "${DD_API_KEY}" -a "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+            ! [ -z "${DD_API_KEY}" -o "${CURRENT_VERSION}" != "${INSTALLED_VERSION}" -o "${CURRENT_DD_API_KEY}" != "${DD_API_KEY}" ] || {
               DD_API_KEY="${DD_API_KEY}" \
               DD_SITE="datadoghq.eu" \
               DD_APM_INSTRUMENTATION_ENABLED=host \
@@ -1087,6 +1090,7 @@ all:
               echo "logs:
               - type: journald
                 container_mode: true" > /etc/datadog-agent/conf.d/journald.d/conf.yaml
+              datadog-installer apm instrument
               systemctl restart datadog-agent
             }
         - name: cri-dockerd
