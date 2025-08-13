@@ -19,9 +19,9 @@ setup-opendns = 'tools.cli.setup_opendns:main'
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.6.9"
-mypy = "^1.15.0"
-pytest = "^8.3.5"
-debugpy = "^1.8.14"
+mypy = "^1.17.1"
+pytest = "^8.4.1"
+debugpy = "^1.8.16"
 
 [build-system]
 requires = ["poetry-core"]

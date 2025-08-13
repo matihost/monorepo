@@ -2,11 +2,11 @@ apiVersion: v2
 name: mq
 description: A Helm chart for IBM MQ deployment
 type: application
-version: 0.3.5
+version: 0.3.6
 # To update MQ container version:
 # * Go to https://github.com/ibm-messaging/mq-container and check latest git tag name
 # or
 # * Download and inspect real version from docker image:
 #   docker pull icr.io/ibm-messaging/mq:latest && docker inspect icr.io/ibm-messaging/mq:latest | jq -r '..|.run? | strings' | sed -E 's/^.*:(.*)\.[0-9]{9}.*/\1/'
 #
-appVersion: 9.4.2.0-r1
+appVersion: 9.4.3.0-r2

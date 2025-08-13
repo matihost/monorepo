@@ -45,6 +45,7 @@ Various technology deployments, tools & code:
     * aws-site - sample web site exposure via S3 and CloudFront
     * aws-iam-management, aws-iam-linked - setup IAM resources needed on fresh AWS management account (users, roles, groups etc) and subsequent linked AWS accounts
     * aws-network-setup - minimal AWS recommended setup with private subnet
+    * aws-client-vpn - setup AWS Client VPN
     * aws-instance - sample Linux and Windws VM setup, also sample setup with Instana host and OpenTelemetry (OTEL) deployment
     * aws-instana - Instana setup for AWS resources monitoring
     * aws-alb - Application Load Balancer usage

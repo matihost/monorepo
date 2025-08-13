@@ -9,8 +9,8 @@ packages = [{include = "exchange_rate", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.13"
-requests = "^2.32.3"
-Flask = "^3.1.0"
+requests = "^2.32.4"
+Flask = "^3.1.1"
 waitress = "^3.0.2"
 babel = "^2.17.0"
 
@@ -21,9 +21,9 @@ exchange-rate-web = 'exchange_rate.cli.exchange_rate_web:main'
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.6.9"
-mypy = "^1.15.0"
-pytest = "^8.3.5"
-debugpy = "^1.8.14"
+mypy = "^1.17.1"
+pytest = "^8.4.1"
+debugpy = "^1.8.16"
 
 [build-system]
 requires = ["poetry-core"]

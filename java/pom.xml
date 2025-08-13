@@ -45,7 +45,7 @@
     <maven.test.skip>false</maven.test.skip>
 
     <!-- Spring Boot -->
-    <spring.boot.version>3.4.5</spring.boot.version>
+    <spring.boot.version>3.5.4</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -61,15 +61,15 @@
 
     <!-- Scala 3-->
     <scala.compat.version>3</scala.compat.version>
-    <scala.version>${scala.compat.version}.7.0</scala.version>
-    <scala.spec2.version>5.6.3</scala.spec2.version>
+    <scala.version>${scala.compat.version}.7.2</scala.version>
+    <scala.spec2.version>5.6.4</scala.spec2.version>
     <scala.test.version>3.2.19</scala.test.version>
     <scala.test.plus.version>3.2.19.1</scala.test.plus.version>
     <!-- Scala 3 still depends on Scala 2 for backward compatibility -->
     <scala2.version>2.13.17-M1</scala2.version>
 
     <!-- IBM MQ client -->
-    <mq.version>9.4.2.1</mq.version>
+    <mq.version>9.4.3.0</mq.version>
   </properties>
 
   <profiles>
@@ -330,7 +330,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
-          <version>3.5.0</version>
+          <version>3.6.1</version>
           <executions>
             <execution>
               <id>enforce-maven</id>
@@ -377,10 +377,10 @@
           <configuration>
             <excludeVulnerabilityIds>
               <!--
-              org.springframework:spring-context:jar:6.2.6:compile; https://ossindex.sonatype.org/component/pkg:maven/org.springframework/spring-context@6.2.6?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
-               * [CVE-2025-22233] CWE-20: Improper Input Validation (3.1); https://ossindex.sonatype.org/vulnerability/CVE-2025-22233?component-type=maven&component-name=org.springframework%2Fspring-context&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+              org.apache.commons:commons-lang3:jar:3.17.0:compile; https://ossindex.sonatype.org/component/pkg:maven/org.apache.commons/commons-lang3@3.17.0?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+                * [CVE-2025-48924] CWE-674: Uncontrolled Recursion (6.9); https://ossindex.sonatype.org/vulnerability/CVE-2025-48924?component-type=maven&component-name=org.apache.commonsutm_content=1.8.1
               -->
-              <exclude>CVE-2025-22233</exclude>
+              <exclude>CVE-2025-48924</exclude>
             </excludeVulnerabilityIds>
             <reportFile>${project.build.directory}/audit-report.json</reportFile>
           </configuration>
@@ -416,7 +416,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>3.4.1</version>
+          <version>3.5.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>
