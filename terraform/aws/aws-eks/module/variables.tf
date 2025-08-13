@@ -10,8 +10,9 @@ data "aws_iam_session_context" "current" {
 
 
 locals {
-  account_id = data.aws_caller_identity.current.account_id
-  prefix     = "${var.name != "" ? "${var.name}-" : ""}${var.env}-${var.region}"
+  account_id       = data.aws_caller_identity.current.account_id
+  prefix           = "${var.name != "" ? "${var.name}-" : ""}${var.env}-${var.region}"
+  cluster_dns_zone = "${var.name != "" ? "${var.name}." : ""}${var.region}.${var.env}.${var.base_dns_zone}"
 }
 
 
@@ -49,6 +50,13 @@ variable "vpc_name" {
 }
 
 
+variable "base_dns_zone" {
+  default     = "aws.testing"
+  type        = string
+  description = "Base DNS zone for services exposed from the cluster. Resulting DNS zone is like: name.region.env.aws.testing"
+}
+
+
 variable "zones" {
   type        = set(string)
   description = "AWS zones for VPC Subnetworks Deployment"
@@ -79,6 +87,11 @@ variable "cluster_admin_arn" {
 }
 
 
+variable "install_nginx" {
+  type        = bool
+  default     = false
+  description = "Whether to install NXGIN ingress controller"
+}
 
 variable "namespaces" {
   type = list(object({

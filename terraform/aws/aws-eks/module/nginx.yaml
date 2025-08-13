@@ -1,8 +1,10 @@
+# https://kubernetes.github.io/ingress-nginx/deploy/
+# Possible annotations: https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.13/guide/service/annotations/
 controller:
   service:
     type: LoadBalancer
     annotations:
-      service.beta.kubernetes.io/aws-load-balancer-name: apps-ingress
+      # service.beta.kubernetes.io/aws-load-balancer-name: apps-ingress
       service.beta.kubernetes.io/aws-load-balancer-type: nlb-ip
       service.beta.kubernetes.io/aws-load-balancer-scheme: internal
       service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip

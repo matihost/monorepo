@@ -23,3 +23,4 @@ runcmd:
  - chmod 400 /home/${admin_username}/.ssh/id_rsa
  - sed -i -E "s/^#Allow 10.0.0.0\/8.*$/Allow 10.0.0.0\/8/" /etc/tinyproxy/tinyproxy.conf
  - systemctl restart tinyproxy
+ - az aks install-cli

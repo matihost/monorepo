@@ -1,0 +1,8 @@
+auth:
+  usernames:
+  - boomerang
+  passwords: []
+  databases:
+  - boomerang
+arbiter:
+  enabled: false

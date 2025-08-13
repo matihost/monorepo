@@ -226,12 +226,13 @@ resource "null_resource" "cluster-config" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = "${path.module}/configure-cluster.sh '${local.account_id}' '${aws_eks_cluster.cluster.name}' '${var.region}' '${jsonencode(var.namespaces)}'"
+    command = "${path.module}/configure-cluster.sh '${local.account_id}' '${aws_eks_cluster.cluster.name}' '${var.region}' '${jsonencode(var.namespaces)}' '${var.install_nginx}'"
   }
 
   depends_on = [
     aws_iam_role.cluster,
     aws_eks_access_entry.admin,
     aws_eks_access_policy_association.admin,
+    aws_eks_pod_identity_association.externaldns,
   ]
 }

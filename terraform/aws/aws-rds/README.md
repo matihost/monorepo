@@ -1,6 +1,6 @@
 # Terraform :: RDS deployment
 
-Terraform scripts deploy Aurora Serverless v2 Postgress database
+Terraform scripts deploy Aurora Serverless v2 PostgreSQL database
 
 In particular it creates:
 
@@ -10,6 +10,7 @@ In particular it creates:
 
 - (TODO) add option to add read instance
 
+The RDS is accessible from within provided VPC.
 
 This setup use AWS resources eligible to AWS Free Tier __only__ when possible.
 

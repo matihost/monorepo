@@ -4,6 +4,7 @@ ACCOUNT_ID="${1:?CLUSTER_NAME is required}"
 CLUSTER_NAME="${2:?CLUSTER_NAME is required}"
 REGION="${3:?REGION is required}"
 NAMESPACES="${4:?NAMESPACES is required}"
+INSTALL_NGINX="${5:-false}"
 
 set -e
 set -x
@@ -82,14 +83,30 @@ function configure-namespaces() {
   done
 }
 
+function ensure-nginx() {
+  [ "${INSTALL_NGINX}" == "true" ] && {
+    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+    helm repo update
+    helm upgrade --install ingress-nginx -n kube-system ingress-nginx/ingress-nginx -f "${DIRNAME}/nginx.yaml" \
+      --set controller.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-name="${CLUSTER_NAME}-nginx-ingress"
+  }
+}
+
+function ensure-externaldns() {
+  helm repo add external-dns https://kubernetes-sigs.github.io/external-dns
+  helm repo update
+  helm upgrade --install external-dns -n kube-system external-dns/external-dns -f "${DIRNAME}/external-dns.yaml" \
+    --set env[0].name="AWS_DEFAULT_REGION" \
+    --set env[0].value="${REGION}"
+}
+
 # Main
 login-to-eks
 ensure-cluster-config
 ensure-metrics-server
 configure-namespaces
+ensure-nginx
+ensure-externaldns
 
 # TODO install SecretManager integration
 # https://github.com/aws/secrets-store-csi-driver-provider-aws
-
-# TODO install EKS ExternalDNS
-# https://www.stacksimplify.com/aws-eks/aws-alb-ingress/learn-to-master-updating-aws-route53-recordsets-from-kubernetes-using-externaldns/

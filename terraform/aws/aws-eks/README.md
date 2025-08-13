@@ -9,6 +9,8 @@ In particular it creates:
   - custom `compute` for workflows
 - Cloud Watch, EFS and CSI Snapshots addons
 - K8S metrics server on `system` nodepool
+- ExternalDNS
+- Private DNS Route53 zone
 - Configure storage, ingress, node pool classes
 - Configure app namespaces (quota, limits, networkpolicies)
   - For each managed namespace creates `edit` and `view` rolebinding for Groups `NSNAME-edit` and `NSNAME-view`
@@ -16,6 +18,7 @@ In particular it creates:
   - Assign optionally `IRSA` to namespace `app-irsa` Service Account.
 - Configure OIDC authen & authz (Keycloak tested) with Group
   - Add ClusterRoleBinding allowing `cluster-admin` for Group: `cluster-admins`
+- (Optional) NGNIX ingress controller backed by internal NLB
 
 ## Prerequisites
 

@@ -16,6 +16,9 @@ deploy-anthos: ## deploys echoserver on Anthos (requires current context on Anth
 deploy-eks: ## deploys echoserver on EKS via Helm
 	scripts/deploy-on-eks.sh
 
+deploy-eks-nginx: ## deploys echoserver on EKS via Helm exposed via NGINX ingress
+	scripts/deploy-on-eks-ingress.sh
+
 deploy-aro: ## deploys echoserver on ARO (requires current context on ARO config cluster)
 	scripts/deploy-on-aro.sh
 

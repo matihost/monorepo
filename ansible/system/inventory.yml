@@ -548,6 +548,10 @@ all:
             image-endpoint: unix:///var/run/containerd/containerd.sock' > /etc/crictl.yaml
             }
         - name: helm
+          desc: |
+            Helm deployment along with various Helm repositories
+            To search chart:
+            helm search repo
           become: false
           command: |
             CURRENT_VERSION="$(curl -Ls https://github.com/helm/helm/releases | grep 'href="/helm/helm/releases/tag/v3.[0-9]*.[0-9]*\"' | \
@@ -563,6 +567,8 @@ all:
               helm repo add jetstack https://charts.jetstack.io
               helm repo add istio https://istio-release.storage.googleapis.com/charts
               helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
+              helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+              helm repo add external-dns https://kubernetes-sigs.github.io/external-dns
               helm repo update
               [ "$(helm plugin list |grep -c diff)" -eq 1 ] || {
                 helm plugin install https://github.com/databus23/helm-diff

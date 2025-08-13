@@ -1,4 +1,4 @@
-# The following addons are preinstaled and managed by EKS Auto Mode automatically:
+# The following addons are preinstalled and managed by EKS Auto Mode automatically:
 # https://docs.aws.amazon.com/eks/latest/userguide/eks-add-ons.html#addon-consider-auto
 # CoreDNS
 # KubeProxy
@@ -6,11 +6,15 @@
 # Karpenter
 # AWS EBS CSI Driver
 # EKS Pod Identity Agent https://docs.aws.amazon.com/eks/latest/userguide/pod-id-association.html
+#
+# Since addons are added automatically - there is different way to configure them:
+# https://docs.aws.amazon.com/eks/latest/userguide/settings-auto.html
+# for example to define tags for LoadBalancers.
 
 resource "aws_eks_addon" "snapshot-controller" {
   cluster_name = aws_eks_cluster.cluster.name
   addon_name   = "snapshot-controller"
-  # addon_version               = "v8.1.0-eksbuild.2"
+  # addon_version               = "v8.2.0-eksbuild.2"
   resolve_conflicts_on_create = "OVERWRITE"
 
   configuration_values = jsonencode(
@@ -26,7 +30,7 @@ resource "aws_eks_addon" "snapshot-controller" {
 resource "aws_eks_addon" "efs" {
   cluster_name = aws_eks_cluster.cluster.name
   addon_name   = "aws-efs-csi-driver"
-  # addon_version               = "v2.1.0-eksbuild.1"
+  # addon_version               = "v2.1.9-eksbuild.1"
   resolve_conflicts_on_create = "OVERWRITE"
 
   pod_identity_association {
@@ -90,7 +94,7 @@ resource "aws_iam_role_policy_attachment" "efs-addon_AmazonEFSCSIDriverPolicy" {
 resource "aws_eks_addon" "cloudwatch" {
   cluster_name = aws_eks_cluster.cluster.name
   addon_name   = "amazon-cloudwatch-observability"
-  # addon_version               = "v2.1.0-eksbuild.1"
+  # addon_version               = "v4.3.0-eksbuild.1"
   resolve_conflicts_on_create = "OVERWRITE"
 
 

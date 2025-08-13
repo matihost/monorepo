@@ -1,0 +1,81 @@
+# To get new version of default values:
+# helm show values external-dns/external-dns > external-dns.yaml
+
+
+# -- [Resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for the `external-dns` container.
+resources:
+  limits:
+    cpu: 50m
+    memory: 50Mi
+  requests:
+    memory: 50Mi
+    cpu: 10m
+
+# Ensure External-DNS is placed on system node pool
+# -- Node labels to match for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
+nodeSelector:
+  "karpenter.sh/nodepool": "system"
+  "kubernetes.io/arch": "amd64"
+
+# -- Node taints which will be tolerated for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
+tolerations: [
+  {
+    "key": "CriticalAddonsOnly",
+    "operator": "Exists"
+  },
+  {
+    "effect": "NoExecute",
+    "operator": "Exists",
+    "tolerationSeconds": 300
+  }
+]
+
+# -- If `true`, create a `ServiceMonitor` resource to support the _Prometheus Operator_.
+# serviceMonitor:
+#   enabled: false
+
+# -- Log level.
+logLevel: info  # @schema enum:[panic, debug, info, warning, error, fatal]; type:string; default: "info"
+
+## Adjust the interval for DNS updates
+interval: '1m'
+logFormat: json
+
+## Modify how DNS records are synchronized between sources and providers (options: sync, upsert-only)
+policy: sync
+
+# -- Specify the registry for storing ownership and labels.
+# Valid values are `txt`, `aws-sd`, `dynamodb` & `noop`.
+registry: txt
+# -- (string) Specify an identifier for this instance of _ExternalDNS_ when using a registry other than `noop`.
+# txtOwnerId: my-identifier # @schema type:[string, null]; default: null
+
+
+# -- _Kubernetes_ resources to monitor for DNS entries.
+# WARNING:
+# CRD for Gateway or Istio has to be present otherwise external-dns pod crashes with:
+# {"level":"fatal","msg":"failed to sync *v1alpha3.Gateway: context deadline exceeded"
+# https://github.com/kubernetes-sigs/external-dns/issues/4901#issuecomment-2553221038
+sources:
+  - service
+  - ingress
+  # Istio CRD are required to be present
+  # - istio-gateway
+  # - istio-virtualservice
+
+# --- In case IRSA is used, if Pod Identity Association is used, it is not needed
+# serviceAccount:
+#   annotations:
+#     eks.amazonaws.com/role-arn: arn:aws:iam::${ACCOUNT_ID}:role/${EXTERNALDNS_ROLE_NAME:-"external-dns"}
+
+provider:
+  name: aws
+# env:
+#   - name: AWS_DEFAULT_REGION
+#     value: us-east-1 # change to region where EKS is installed
+
+# -- Limit possible target zones by domain suffixes.
+domainFilters: []
+
+# -- Intentionally exclude domains from being managed.
+excludeDomains: []
