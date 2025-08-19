@@ -676,15 +676,6 @@ all:
             Categories=Java;Profiling;" > ~/.local/share/applications/visualvm.desktop
               echo "VisualVM (visualvm)"
             }
-        - name: calibre
-          become: true
-          command: |
-            CURRENT_VERSION="$(curl -sL https://calibre-ebook.com/download_linux |grep 'The latest release of calibre is' | sed -E 's/.*The latest release of calibre is (.+)\..*/\1/')"
-            INSTALLED_VERSION="$(calibre --version 2>/dev/null | sed -E 's/.*\(calibre (.*)\)/\1/')"
-            [[ -n "${INSTALLED_VERSION}" && ("${CURRENT_VERSION}" == "${INSTALLED_VERSION}"*) ]] || {
-              echo "Installing Calibre ${CURRENT_VERSION} on top of ${INSTALLED_VERSION}..."
-              wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo bash
-            }
         - name: kubectl plugins
           become: true
           command: |
@@ -905,7 +896,7 @@ all:
               echo "AWC Session Manager Plugin Installed"
             }
             [ -e /etc/bash_completion.d/aws_bash_completer ] || {
-              sudo echo 'complete -C aws_completer aws' > /etc/bash_completion.d/aws_bash_completer
+              sudo sh -c "echo 'complete -C aws_completer aws' > /etc/bash_completion.d/aws_bash_completer"
               echo "AWC CLI Bash completion Enabled"
             }
             [ -e "$HOME/.aws/config" ] || {

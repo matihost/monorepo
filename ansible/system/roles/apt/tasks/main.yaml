@@ -34,4 +34,4 @@
     update_cache: false
     mode: "0644"
     filename: "{{ apt_repo.name }}"
-  when: apt_repo.repo is defined and apt_repo.repo
+  when: apt_repo.repo is defined and apt_repo.repo | length > 0

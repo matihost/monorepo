@@ -7,6 +7,14 @@ Supported Ubuntu distributions:
 
 * For Windows Linux Subsystem (WSL) - does not include Gnome applications and virtualizations (like virt or vbox): **24.04 (noble)**
 
+WARNING:
+Scripts uses GitHub API, many repeats of invocation may lead to throttling - leading to fail some task (mainly cli installing tools from GitHub.
+To check current remaining limit and when throttling will be reset call:
+
+```bash
+make get-github-quota
+```
+
 ## Prerequisites (Windows)
 
 In case your intent to manage Linux on WSL:
