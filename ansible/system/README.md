@@ -15,7 +15,7 @@ In case your intent to manage Linux on WSL:
 
 From Windows `cmd` shell:
 
-```cmd
+```bat
 # to install latest LTS version of Ubuntu
 wsl --install
 
@@ -28,6 +28,27 @@ wsl --list
 # to terminate and unregister/uninstall particular distribution name
 wsl -t DistributionName
 wsl --unregister DistributionName
+```
+
+Install VS Code on Windows and Remote Development plugin.
+VS Code under WSL distibution works in remote development way, that `code` cli from Windows uses WSL as remote development.
+In other words `code` cannot be part of linux installed packages.
+
+From Windows CMD terminal:
+
+```bat
+# install VS Code (or use other method to install VS Code under Windows)
+winget install -e --id Microsoft.VisualStudioCode
+
+# install Remote Development plugin
+code --install-extension ms-vscode-remote.vscode-remote-extensionpack
+```
+
+Open WSL Ubuntu distribution:
+
+```bash
+# open code from WSL Ubuntu distibution terminal, that will open code in Windows connected to WSL
+code
 ```
 
 ## Prerequisites

@@ -10,6 +10,9 @@
         add-apt-repository --refresh-keys
       register: apt_result
       changed_when: '"All Launchpad PPA signing keys are up-to-date" not in apt_result.stdout'
+      when:
+      - ansible_distribution == 'Ubuntu'
+      - ansible_distribution_version is version('24.10', '>')
     - name: Update packages for Debian based distribution
       ansible.builtin.apt:
         name: "*"
@@ -34,18 +37,18 @@
   - when: ansible_os_family == "RedHat"
     block:
     - name: Update packages for RHEL based distribution
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: "*"
         update_cache: yes
         state: latest
     - name: Remove dependencies that are no longer required from RHEL based system
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         autoremove: yes
     - name: Remove useless packages from the cache from RHEL based system
       ansible.builtin.shell:
-        yum clean all
-      register: yum_result
-      changed_when: '"0 files removed" not in yum_result.stdout'
+        dnf clean all
+      register: dnf_result
+      changed_when: '"0 files removed" not in dnf_result.stdout'
 
   - name: Check whether snap is present on the machine
     ansible.builtin.shell: which snap
