@@ -2,7 +2,33 @@
 
 Various playbooks for Ubuntu machine management.
 
-Supported Ubuntu distribution: **25.04 (plucky)**
+Supported Ubuntu distributions:
+* For regular Ubuntu workstation - includes Gnome applications: **25.04 (plucky)**
+
+* For Windows Linux Subsystem (WSL) - does not include Gnome applications and virtualizations (like virt or vbox): **24.04 (noble)**
+
+## Prerequisites (Windows)
+
+In case your intent to manage Linux on WSL:
+
+* Ensure you have installed WSL on your Windows: [https://documentation.ubuntu.com/wsl/latest/howto/install-ubuntu-wsl2/](https://documentation.ubuntu.com/wsl/latest/howto/install-ubuntu-wsl2/)
+
+From Windows `cmd` shell:
+
+```cmd
+# to install latest LTS version of Ubuntu
+wsl --install
+
+# to install WSL with Ubuntu 24.04
+wsl --install Ubuntu-24.04
+
+# to list currently installed distributions
+wsl --list
+
+# to terminate and unregister/uninstall particular distribution name
+wsl -t DistributionName
+wsl --unregister DistributionName
+```
 
 ## Prerequisites
 
@@ -28,13 +54,15 @@ Supported Ubuntu distribution: **25.04 (plucky)**
 
   ```bash
   # install Python3, GitHub CLI and Git
+  sudo apt -y update
+  sudo apt -y upgrade
   sudo apt install -y build-essential libssl-dev libffi-dev python3-dev python3-pip gh git
 
-  # make sure Ansible is installed
-  sudo apt install -y python3-ansible-runner
-
-  # you cannot install it from pip3 anymore in user space
+  # For up to Ubuntu 22.04 you need to install it from pip3 in user space to have most modern Ansible version:
   # pip3 install ansible --user
+
+  # For Ubuntu 24.04++ make sure Ansible is installed from apt package manager
+  sudo apt install -y python3-ansible-runner
 
   # ensure user Python apps can be run
   echo 'PATH="$HOME/.local/bin:$HOME/bin:$PATH"' >> ~/.bashrc
@@ -62,6 +90,13 @@ Supported Ubuntu distribution: **25.04 (plucky)**
 ## Running
 
 ```bash
+
+# run all management playbooks for most modern Ubuntu version
+make all
+
+# run all management playbooks for WSL Ubuntu Linux distribution
+make wsl
+
 # install various software for Ubuntu desktop environment
 make ubuntu-setup.yaml
 
@@ -74,7 +109,7 @@ make clean.yaml
 
 ## Post Setup
 
-### Onedrive
+### Onedrive (Optional)
 
 ```bash
 # to setup OAuth with Microsoft
@@ -84,7 +119,3 @@ onedrive
 systemctl enable --now  --user onedrive.service
 journalctl --user -u onedrive --follow
 ```
-
-## Ubuntu upgrade instructions
-
-* Check

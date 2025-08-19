@@ -381,6 +381,11 @@
                 * [CVE-2025-48924] CWE-674: Uncontrolled Recursion (6.9); https://ossindex.sonatype.org/vulnerability/CVE-2025-48924?component-type=maven&component-name=org.apache.commonsutm_content=1.8.1
               -->
               <exclude>CVE-2025-48924</exclude>
+              <!--
+              org.springframework:spring-core:jar:6.2.9:compile; https://ossindex.sonatype.org/component/pkg:maven/org.springframework/spring-core@6.2.9?utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+                * [CVE-2025-41242] CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal') (8.2); https://ossindex.sonatype.org/vulnerability/CVE-2025-41242?component-type=maven&component-name=org.springframework%2Fspring-core&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.1
+              -->
+              <exclude>CVE-2025-41242</exclude>
             </excludeVulnerabilityIds>
             <reportFile>${project.build.directory}/audit-report.json</reportFile>
           </configuration>

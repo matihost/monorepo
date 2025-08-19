@@ -19,18 +19,18 @@ all:
           # OpenVPN3 repo Supports only LTSs versions
           # List of supported Ubuntu versions:
           # https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos#DebianUbuntu:UsingOpenVPNaptrepositories
-          openvpn_repo_ubuntu_version: "oracular"
+          openvpn_repo_ubuntu_version: "noble"
           # List of supported Ubuntu versions: https://www.hashicorp.com/official-packaging-guide?product_intent=terraform
-          terraform_ubuntu_version: "oracular"
-          virtualbox_ubuntu_version: "oracular"
+          terraform_ubuntu_version: "noble"
+          virtualbox_ubuntu_version: "noble"
           # TODO change to {{ ansible_distribution_release }} when current is supported Ubuntu LTS
           cri_dockerd_ubuntu_version: "jammy"
           # MQ Version available at: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/
           mq: 9.4.2.0
           # List of supported Ubuntu versions: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive
-          onedrive_ubuntu_version: "24.10"
+          onedrive_ubuntu_version: "24.04"
           # List of supported Ubuntu versions: https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/
-          pgadmin_ubuntu_version: "oracular"
+          pgadmin_ubuntu_version: "noble"
           # List of supported Ubuntu versions: https://apt.envoyproxy.io/
           envoy_ubuntu_version: "jammy"
         virtual_interface_ip: 192.168.10.1
@@ -169,24 +169,13 @@ all:
           repo: "deb [arch=amd64] https://dbeaver.io/debs/dbeaver-ce /"
           key_url: "https://dbeaver.io/debs/dbeaver.gpg.key"
         packages:
-        - network-manager
         - neofetch
-        - eyed3
         - mc
-        - lm-sensors
-        - psensor
-        - inotify-tools
-        - brasero
         - autofs
         - bind9
         - cifs-utils
         - dlocate
         - plocate
-        - ubuntu-restricted-extras
-        - gnome-shell-extensions
-        - gnome-tweaks
-        - hplip
-        - hplip-gui
         - ddclient
         - golang-go
         - golang-golang-x-tools
@@ -198,35 +187,18 @@ all:
         - openjdk-21-jdk
         - openjdk-21-source
         - dos2unix
-        - guake
-        - mono-complete
         - jq
         - yq
         - curl
-        - keepass2
         - code
         - onedrive
-        - nautilus-dropbox
         - ffmpeg
         - openssh-server
         - iftop
-        - dosbox
-        #- libva-x11-2 # it is steam app dependency
-        - virt-manager
         - docker.io
         - docker-buildx
         - conntrack
         - fuse-overlayfs
-        # When SecureBoot is enabled - VirtualBox vboxdrv module needs to be signed:
-        # https://askubuntu.com/a/1199583
-        # in order for VirtualBox to run you need to recompile kernel module
-        # and sign for UEFI Secure Boot:
-        # Run:
-        # sudo /sbin/vboxconfig
-        #
-        # TODO use when plucky is supported by Oracle, VirtualBox 7.1 from 24.10/oracular repo does not work on 25.04/plucky
-        # - virtualbox-7.1 # Virtual Box from Oracle repo,
-        - virtualbox # Ubuntu packaged VirtualBox
         - containernetworking-plugins
         - kubelet
         - kubeadm
@@ -239,9 +211,7 @@ all:
         - packer
         - vagrant
         - sshpass
-        - notepadqq
         - certbot
-        - google-chrome-stable
         - google-cloud-sdk
         - google-cloud-sdk-gke-gcloud-auth-plugin
         - google-cloud-sdk-cloud-build-local
@@ -274,16 +244,11 @@ all:
         - python3-pytest
         - pipenv
         - yamllint
-        - youtubedl-gui
-        - libxcb-cursor0 # calibre dependency
         - apt-transport-https
         - azure-cli
-        - dbeaver-ce
         - cloud-utils
-        snaps:
-        - mc-installer
-        - notepad-plus-plus
-        - steam
+        # snaps:
+        # - mc-installer
         # - skype
         # Uncomment to use snap packages for gcloud sdk
         # classic_snaps:
@@ -322,11 +287,6 @@ all:
               sed -i -E "s/^Prompt=.+$/Prompt=normal/" /etc/update-manager/release-upgrades
               echo "Non-LTS releases upgrade possibility enabled"
             }
-        - name: vboxuser
-          desc: To ensure VirtualBox can see host USB
-          become: false
-          command: |
-            [ "$(groups |grep -c vboxusers)" -ne 0 ] || sudo usermod -aG vboxusers ${USER}
         - name: python3-user-venv
           desc: |
             From Ubuntu 23.04+ user site packages are forbidden in favor of custom venv
@@ -408,32 +368,6 @@ all:
             ([ -n "$(git config --global user.name)" ] && [ -n "$(git config --global user.email)" ]) || {
               echo "Git user.name and user.email MUST be set"
               exit 1
-            }
-        - name: ensure-hp-lip
-          desc: |
-            Ensure the latest hplip is installed from source
-            TODO the latest 3.25.2 cannot be installed on Ubuntu 25.04 out of the box yet: https://bugs.launchpad.net/hplip/+bug/1879353
-            To install latest HPLIP in advanced mode (without GUI): https://developers.hp.com/hp-linux-imaging-and-printing/KnowledgeBase/InstallHPLIPwithqt5.html
-            You need to install the following dependencies
-                PyQt5
-                python-qt5-dbus
-            Go to source of hplip. By default its in ~/Downloads.
-            Run the following commands
-                ./configure --prefix=/usr --enable-qt5 --disable-qt4
-                make
-                "make install" as root user
-          become: false
-          command: |
-            [ -e /etc/hp/hplip.conf ] &&  {
-              # hplip systray does not work in Ubuntu GNOME
-              [ -e /etc/xdg/autostart/hplip-systray.desktop ] && sudo rm -f /etc/xdg/autostart/hplip-systray.desktop
-              HP_LIP_VERSION=$(grep version /etc/hp/hplip.conf | sed -E "s/version=(.+)/\1/")
-              CURRENT_LATEST_HP_LIP_VERSION=$(curl -sL https://developers.hp.com/hp-linux-imaging-and-printing/release_notes |grep -m 1 'HPLIP 3.' | \
-                sed -E "s/.+HPLIP (3.+) -.+/\1/")
-              [ "${HP_LIP_VERSION}" = "${CURRENT_LATEST_HP_LIP_VERSION}" ] || {
-                echo -e "Installed hp-lip is not the latest, follow https://developers.hp.com/hp-linux-imaging-and-printing/gethplip to install latest version\nIn case of problem use advanced mode: https://developers.hp.com/hp-linux-imaging-and-printing/KnowledgeBase/InstallHPLIPwithqt5.html"
-                exit 1
-              }
             }
         - name: nss-order
           become: true
@@ -659,8 +593,8 @@ all:
             [ -x /usr/local/bin/rosa -a "$(rosa version |grep -c "There is a newer release")" -eq 0 ] || {
               curl -sSL https://mirror.openshift.com/pub/openshift-v4/clients/rosa/latest/rosa-linux.tar.gz | tar -zx -o rosa
               mv rosa /usr/local/bin/rosa
-              rosa version
-              rosa completion bash > /etc/bash_completion.d/rosa
+              /usr/local/bin/rosa version
+              /usr/local/bin/rosa completion bash > /etc/bash_completion.d/rosa
             }
         - name: kubectx-ns
           become: false
@@ -1016,90 +950,6 @@ all:
             [ "$(grep -c 'awsume' ~/.bashrc)" -gt 0 ] || {
               echo "${AWSSUME_BASHRC}" >> ~/.bashrc
             }
-        - name: chrome unsafe link
-          become: false
-          desc: chrome allowing access to site with self-signed or invalid TLS certificates
-          command: |
-            [ -e ~/.local/share/applications/unsafe-chrome.desktop  ] || {
-              mkdir -p ~/.local/share/applications
-              echo '[Desktop Entry]
-            Version=1.0
-            Name=Unsafe Google Chrome
-            GenericName=Web Browser
-            Comment=Access the Internet
-            Exec=/usr/bin/google-chrome-stable --ignore-certificate-errors
-            StartupNotify=true
-            Terminal=false
-            Icon=google-chrome
-            Type=Application
-            Categories=Network;WebBrowser;' > ~/.local/share/applications/unsafe-chrome.desktop
-              echo "Unsafe Chrome link installed"
-            }
-        - name: guake link
-          become: false
-          desc: guake link so that it can be add to tweaks autostart
-          command: |
-            [ -e ~/.local/share/applications/guake.desktop  ] || {
-              mkdir -p ~/.local/share/applications
-              echo '[Desktop Entry]
-            Version=1.0
-            Name=Guake
-            GenericName=Guake
-            Comment=Guake
-            Exec=/usr/bin/guake
-            StartupNotify=true
-            Terminal=false
-            Type=Application
-            Categories=Terminal;' > ~/.local/share/applications/guake.desktop
-              echo "Guake link installed"
-            }
-        - name: caprine
-          become: true
-          desc: Ensure latest version of Caprine/unofficial Messenger client for Linux is installed
-          command: |
-            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/sindresorhus/caprine/releases/latest | jq -r ".tag_name")"
-            INSTALLED_VERSION="$(dpkg -s caprine 2>/dev/null |grep Version | sed "s/Version: /v/g")"
-            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
-              curl -sL https://api.github.com/repos/sindresorhus/caprine/releases/latest | jq -r ".assets[] |
-                select(.name | test(\".deb\")) | .browser_download_url" |
-                  xargs curl -s -L -o "/tmp/caprine.deb"
-              apt -y install /tmp/caprine.deb
-            }
-        - name: datadog
-          become: true
-          desc: |
-            Ensure latest version of Datadog agent is installed
-            Datadog Agent is installed only when DD_API_KEY environment variable is set (for example via ~/.bashrc export)
-            To uninstall Datadog run: datadog-installer purge
-          command: |
-            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/DataDog/datadog-agent/releases/latest | jq -r ".tag_name")"
-            INSTALLED_VERSION="$(datadog-agent version 2>/dev/null| sed -E "s/Agent (.*) - Commit: .*/\1/g")"
-            CURRENT_DD_API_KEY="$(yq -r ".api_key" /etc/datadog-agent/datadog.yaml 2>/dev/null)"
-            DD_API_KEY="{{ lookup('env', 'DD_API_KEY') }}"
-            ! [ -z "${DD_API_KEY}" -o "${CURRENT_VERSION}" != "${INSTALLED_VERSION}" -o "${CURRENT_DD_API_KEY}" != "${DD_API_KEY}" ] || {
-              DD_API_KEY="${DD_API_KEY}" \
-              DD_SITE="datadoghq.eu" \
-              DD_APM_INSTRUMENTATION_ENABLED=host \
-              DD_REMOTE_UPDATES=true \
-              DD_ENV="home" \
-              DD_LOGS_ENABLED=true \
-              DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true \
-              DD_PROCESS_AGENT_PROCESS_COLLECTION_ENABLED=true \
-              DD_APM_ENABLED=true \
-              DD_APM_NON_LOCAL_TRAFFIC=true \
-              DD_APM_INSTRUMENTATION_LIBRARIES=java:1,python:3,js:5,php:1,dotnet:3 \
-              bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)"
-              usermod -a -G docker dd-agent
-              sudo -u dd-agent install -m 0640 /etc/datadog-agent/system-probe.yaml.example /etc/datadog-agent/system-probe.yaml
-              echo "network_config:
-                enabled: true" > /etc/datadog-agent/system-probe.yaml
-              sudo -u dd-agent install -m 0640 /etc/datadog-agent/conf.d/journald.d/conf.yaml.example /etc/datadog-agent/conf.d/journald.d/conf.yaml
-              echo "logs:
-              - type: journald
-                container_mode: true" > /etc/datadog-agent/conf.d/journald.d/conf.yaml
-              datadog-installer apm instrument
-              systemctl restart datadog-agent
-            }
         - name: cri-dockerd
           become: true
           desc: Ensure latest version of cri-dockerd is installed. cri-dockerd is a requirement for Minikube to run
@@ -1111,17 +961,6 @@ all:
                 select(.name | test(\"ubuntu-{{ versions.cri_dockerd_ubuntu_version }}_amd64.deb\")) | .browser_download_url" |
                   xargs curl -s -L -o "/tmp/cri-dockerd.deb"
               apt -y install /tmp/cri-dockerd.deb
-            }
-        - name: discord
-          become: true
-          desc: Discord app
-          command: |
-            DOWNLOAD_URL="$(curl -s -o /dev/null -w '%header{location}' https://discord.com/api/download?platform=linux)"
-            CURRENT_VERSION="$(echo $DOWNLOAD_URL | sed -E 's/.*linux\/([0..9].+)\/discord.*/\1/')"
-            INSTALLED_VERSION="$(apt list discord 2>/dev/null | grep discord |  sed -E 's/.* ([0..9].+) amd.*/\1/')"
-            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
-              curl -s -L -o "/tmp/discord.deb" "${DOWNLOAD_URL}"
-              apt -y install /tmp/discord.deb
             }
         - name: otel
           become: true
@@ -1143,9 +982,9 @@ all:
           command: |
             [ -x ~/.local/bin/poetry ] || (
               curl -sSL https://install.python-poetry.org | python3 -
-              poetry completions bash >> ~/.bash_completion
+              ${HOME}/.local/bin/poetry completions bash >> ~/.bash_completion
               # ensure poetry will create virtualenv in project directory
-              poetry config virtualenvs.in-project true
+              ${HOME}/.local/bin/poetry config virtualenvs.in-project true
             )
         - name: nvm_node_npm
           desc: Node.js swithing engine, NodeJS LTS install/update plus global tools - Serverless, ncu installation
