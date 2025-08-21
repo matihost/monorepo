@@ -10,7 +10,7 @@ endif
 all: ## run all playbooks for most modern Ubuntu version
 	ansible-playbook ubuntu-setup.yaml $(VERBOSITY) && \
 		ansible-playbook update.yaml $(VERBOSITY) && \
-		ansclean.yaml $(VERBOSITY)
+		ansible-playbook clean.yaml $(VERBOSITY)
 
 wsl: ## run all playbooks for WSL
 	ansible-playbook -i wsl.yml ubuntu-setup.yaml $(VERBOSITY) && \

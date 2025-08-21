@@ -11,3 +11,16 @@ resource "azurerm_log_analytics_workspace" "workspace" {
   # internet_ingestion_enabled = true
   # internet_query_enabled = true
 }
+
+resource "azurerm_log_analytics_solution" "containers" {
+  solution_name         = "Containers"
+  workspace_resource_id = azurerm_log_analytics_workspace.workspace.id
+  workspace_name        = azurerm_log_analytics_workspace.workspace.name
+  location              = local.location
+  resource_group_name   = local.resource_group_name
+
+  plan {
+    publisher = "Microsoft"
+    product   = "OMSGallery/Containers"
+  }
+}

@@ -5,6 +5,8 @@ resource "azurerm_virtual_network" "vnet" {
   resource_group_name = local.resource_group_name
 }
 
+
+
 resource "azurerm_subnet" "subnet" {
   for_each = var.subnets
 
@@ -15,6 +17,22 @@ resource "azurerm_subnet" "subnet" {
   service_endpoints    = ["Microsoft.Sql", "Microsoft.Storage", "Microsoft.ContainerRegistry"]
 
   default_outbound_access_enabled = false
+}
+
+
+# By default, if there is no route table associated with subnets, azure associate "system" default one
+# By creating explicit one, the effective route table is a merge of system, and explicit one.
+resource "azurerm_route_table" "route_table" {
+  location            = local.location
+  name                = "${local.prefix}-vnet-route-table"
+  resource_group_name = local.resource_group_name
+}
+
+resource "azurerm_subnet_route_table_association" "subnet" {
+  for_each = var.subnets
+
+  subnet_id      = azurerm_subnet.subnet[each.key].id
+  route_table_id = azurerm_route_table.route_table.id
 }
 
 

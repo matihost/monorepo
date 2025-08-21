@@ -34,8 +34,9 @@ generate "provider" {
 provider "azurerm" {
   subscription_id = "${local.subscription_id}"
   resource_provider_registrations = "extended"
-  # add Grafana
-  resource_providers_to_register = [ "Microsoft.Dashboard" ]
+  resource_providers_to_register = [
+      "Microsoft.RedHatOpenShift",
+  ]
   features {
     resource_group {
       prevent_deletion_if_contains_resources = true
@@ -45,6 +46,10 @@ provider "azurerm" {
       recover_soft_deleted_key_vaults = true
     }
   }
+}
+
+provider "azuread" {
+  tenant_id = "${local.tenant_id}"
 }
 EOF
 }

@@ -62,6 +62,7 @@ Various technology deployments, tools & code:
     * ibm-alb - Application and Network Load Balancer usage
     * ibm-ocp - IBM RedHat OpenShift Kubernetes Service (ROKS) deployment
   * azure - Terragrunt / OpenTofu deployments for Azure
+    * aks - Azure Kubernetes Service (AKS) deployment
     * aro - Azure RedHat OpenShift (ARO) deployment
     * azure-network-setup - minimal Azure recommended network setup
     * azure-entraid - setup IAM resource needed on fresh Azure subscription (resource group)

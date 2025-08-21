@@ -3,6 +3,8 @@
 Setup Azure monitoring infrastructure:
 
 * Log Analytics Workspace
+* Azure Monitor Workspace (aka managed Prometheus)
+* Azure Managed Grafana
 
 ## Prerequisites
 
