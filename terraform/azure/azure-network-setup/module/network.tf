@@ -35,7 +35,10 @@ resource "azurerm_subnet_route_table_association" "subnet" {
   route_table_id = azurerm_route_table.route_table.id
 }
 
-
+# TODO zone resilient nat gateways
+# A single NAT gateway resource can't be used across multiple availability zones. To ensure zone-resiliency, it is recommended to deploy a NAT gateway resource to each availability zone and assign to subnets containing AKS clusters in each zone. For more information on this deployment model, see NAT gateway for each zone. If no zone is configured for NAT gateway,
+# the default zone placement is "no zone", in which Azure places NAT gateway into a zone for you.
+# https://learn.microsoft.com/en-us/azure/nat-gateway/nat-availability-zones#zonal-nat-gateway-resource-for-each-zone-in-a-region-to-create-zone-resiliency
 resource "azurerm_nat_gateway" "nat" {
   name                = "${local.prefix}-natgateway"
   location            = local.location

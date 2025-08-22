@@ -24,7 +24,7 @@ inputs = {
   worker_subnet_suffix = "vms"
 
   ha     = false
-  public = false
+  public = true
 
 
   namespaces = [

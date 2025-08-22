@@ -25,15 +25,17 @@ resource "azurerm_kubernetes_cluster" "aks" {
   # the provisioning of the Kubernetes Service will fail.
   node_resource_group = "aks-${local.cluster_name}"
 
-  dns_prefix = var.cluster_name
+  dns_prefix = "api-${local.cluster_name}"
 
   # Private cluster/access settings
   private_cluster_enabled = !var.public
-  private_dns_zone_id     = azurerm_private_dns_zone.aks-private-zone.id
+  # has to be empty for public cluster
+  private_dns_zone_id = !var.public ? azurerm_private_dns_zone.aks-private-zone.id : null
   # This flag controls whether Azure also creates a public DNS record (FQDN)
   # that resolves to the private IP of the API server.
   # Useful if you want a stable, globally resolvable DNS name but still keep the endpoint private.
-  private_cluster_public_fqdn_enabled = true
+  # Should be false for public cluster.
+  private_cluster_public_fqdn_enabled = !var.public
 
   # TODO
   # api_server_access_profile {
@@ -63,7 +65,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   # https://learn.microsoft.com/en-us/azure/architecture/operator-guides/aks/aks-upgrade-practices#cluster-upgrades
-  # kubernetes_version = "1.32"
+  # when no version is define AKS is created with current default version:
+  # az aks get-versions --location "${REGION}"
+  #
+  # kubernetes_version = "1.33"
   automatic_upgrade_channel = "patch" # or none
   node_os_upgrade_channel   = "NodeImage"
   # TODO ?
@@ -106,7 +111,16 @@ resource "azurerm_kubernetes_cluster" "aks" {
     network_policy      = "cilium"
     network_data_plane  = "cilium"
     load_balancer_sku   = "standard"
-    outbound_type       = "userDefinedRouting"
+
+    # https://learn.microsoft.com/en-us/azure/aks/egress-outboundtype#outbound-type-of-userdefinedrouting
+    # Use userDefinedRouting only when outbound traffic is explicitly provisioned with default route overrided to use VirtualAppliance or VirtualNetworkGateway.
+    # Otherwise you will get error:
+    # Default route 0.0.0.0/0 has a next hop of Internet but only next hops of VirtualAppliance or VirtualNetworkGateway are allowed.
+    # Please see http://aka.ms/aks/outboundtype for more details.
+    #
+    # Migrating the outbound type to user managed types (userAssignedNATGateway or userDefinedRouting) will change the outbound public IP addresses of the cluster.
+    # if Authorized IP ranges is enabled, ensure new outbound IP range is appended to authorized IP range.
+    outbound_type = "userAssignedNATGateway"
   }
 
   # TODO
@@ -159,8 +173,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
 
   depends_on = [
-    # to ensure to delete cluster then private dns zone and identity
-    azurerm_role_assignment.aks-private-zone-admin,
+    # to ensure cluster managed user has correct assignments before creating cluster
+    azurerm_role_assignment.aks-user-identity-private-zone-admin,
+    azurerm_role_assignment.kubelet
   ]
 
   lifecycle {
@@ -218,12 +233,11 @@ resource "azurerm_kubernetes_cluster_node_pool" "user" {
   max_count                   = 9
   node_public_ip_enabled      = false
 
-  lifecycle {
-    ignore_changes = [
-      upgrade_settings[0].drain_timeout_in_minutes,
-      upgrade_settings[0].max_surge,
-      upgrade_settings[0].node_soak_duration_in_minutes,
-    ]
+  # for some reason, these are default, but when reaplied, TF provider want to null them
+  upgrade_settings {
+    drain_timeout_in_minutes      = 0
+    max_surge                     = "10%"
+    node_soak_duration_in_minutes = 0
   }
 }
 
@@ -245,6 +259,14 @@ output "cluster_name" {
   value = azurerm_kubernetes_cluster.aks.name
 }
 
-output "cluster_rg" {
+output "cluster_objects_rg" {
   value = azurerm_kubernetes_cluster.aks.node_resource_group
+}
+
+output "cluster_rg" {
+  value = local.resource_group_name
+}
+
+output "cluster_public_fqdn" {
+  value = azurerm_kubernetes_cluster.aks.private_cluster_public_fqdn_enabled
 }

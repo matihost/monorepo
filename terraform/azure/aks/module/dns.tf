@@ -13,17 +13,17 @@ resource "azurerm_private_dns_zone" "aks-private-zone" {
 }
 
 # Private AKS DNS zone Managed User
-resource "azurerm_user_assigned_identity" "aks-private-zone-admin" {
-  name                = "aks-${local.cluster_name}-domain-admin"
-  location            = local.location
-  resource_group_name = local.resource_group_name
-}
+# resource "azurerm_user_assigned_identity" "aks-private-zone-admin" {
+#   name                = "aks-${local.cluster_name}-domain-admin"
+#   location            = local.location
+#   resource_group_name = local.resource_group_name
+# }
 
-resource "azurerm_role_assignment" "aks-private-zone-admin" {
-  scope                = azurerm_private_dns_zone.aks-private-zone.id
-  role_definition_name = "Private DNS Zone Contributor"
-  principal_id         = azurerm_user_assigned_identity.aks-private-zone-admin.principal_id
-}
+# resource "azurerm_role_assignment" "aks-private-zone-admin" {
+#   scope                = azurerm_private_dns_zone.aks-private-zone.id
+#   role_definition_name = "Private DNS Zone Contributor"
+#   principal_id         = azurerm_user_assigned_identity.aks-private-zone-admin.principal_id
+# }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "aks-private-zone-vpc-link" {
   name                  = "aks-${local.cluster_name}-domain2vpc-${data.azurerm_virtual_network.vnet.name}-link"

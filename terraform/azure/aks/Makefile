@@ -23,10 +23,14 @@ init: init-tf-backend
 run: init ## setup AKS: make run [ENV=dev-northeurope-shared1] [MODE=apply]
 	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
 
-kubeconfig: ## configure kubeconfig with AKS credentials of your Azure user
-	CLUSTER_RG = `cd stage/$(ENV) && terragrunt output -raw cluster_rg 2>/dev/null` && \
-		CLUSTER_NAME = `shell cd stage/$(ENV) && terragrunt output -raw cluster_name 2>/dev/null` && \
-		az aks get-credentials --resource-group "$(CLUSTER_RG)" --name "$(CLUSTER_NAME)"
+get-cluster-admin-entraid-group-name: ## get name of EntraId group member who are assigned cluster-admin to the AKS cluster
+	cd stage/$(ENV) && terragrunt output -raw cluster-admin-entraid-group 2>/dev/null
+
+kubeconfig: ## configure kubeconfig with AKS credentials of your Azure user with non-interactive mode (by default interactive, device logon method is used)
+	CLUSTER_RG="$$(cd stage/$(ENV) && terragrunt output -raw cluster_rg 2>/dev/null)" && \
+		CLUSTER_NAME="$$(cd stage/$(ENV) && terragrunt output -raw cluster_name 2>/dev/null)" && \
+		az aks get-credentials --resource-group "$${CLUSTER_RG}" --name "$${CLUSTER_NAME}" --overwrite-existing  && \
+		kubelogin convert-kubeconfig -l azurecli
 
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show

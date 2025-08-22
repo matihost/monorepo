@@ -1,17 +1,14 @@
-# Private AKS Admin
-# azurerm_kubernetes_cluster.name.identity.identity_ids assigns admin privilege on it
-resource "azurerm_user_assigned_identity" "cluster-admin" {
-  name                = "aks-${local.cluster_name}-admin"
-  location            = local.location
-  resource_group_name = local.resource_group_name
-}
-
-
-
+# Members of this group has cluster-admin RBAC on the AKS cluster
 resource "azuread_group" "cluster-admin" {
-  display_name     = "aks-${local.cluster_name}-admin"
+  display_name = "aks-${local.cluster_name}-admin"
+  # owner is not automatically member of the group
   owners           = [data.azuread_client_config.current.object_id]
   security_enabled = true
+}
+
+resource "azuread_group_member" "owner-cluster-admin" {
+  group_object_id  = azuread_group.cluster-admin.object_id
+  member_object_id = data.azuread_client_config.current.object_id
 }
 
 resource "azurerm_role_assignment" "cluster-admin" {
@@ -20,6 +17,16 @@ resource "azurerm_role_assignment" "cluster-admin" {
   principal_id         = azuread_group.cluster-admin.object_id
 }
 
+
+
+
+# User Managed Identity for AKS identity, kubelet identity, private DNS zone for AKS management
+# azurerm_kubernetes_cluster.name.identity.identity_ids assigns admin privilege on it
+resource "azurerm_user_assigned_identity" "cluster-admin" {
+  name                = "aks-${local.cluster_name}-admin"
+  location            = local.location
+  resource_group_name = local.resource_group_name
+}
 
 # For kubelet identity
 # To avoid error:
@@ -30,7 +37,7 @@ resource "azurerm_role_assignment" "kubelet" {
   principal_id         = azurerm_user_assigned_identity.cluster-admin.principal_id
 }
 
-
+# For Private DNS access
 # Service principal or user-assigned identity must be given certain permissions to resource /subscriptions.../resourceGroups/.../providers/Microsoft.Network/privateDnsZones/aks-shared1-dev.privatelink.northeurope.azmk8s.io.
 # Check access result not allowed for action Microsoft.Network/privateDnsZones/read.
 resource "azurerm_role_assignment" "aks-user-identity-private-zone-admin" {
@@ -40,8 +47,15 @@ resource "azurerm_role_assignment" "aks-user-identity-private-zone-admin" {
 }
 
 
+# TODO is it needed?
 # resource "azurerm_role_assignment" "role_network" {
 #   scope                = data.azurerm_resource_group.rg.id
 #   role_definition_name = "Network Contributor"
 #   principal_id         = azuread_service_principal.aro.object_id
 # }
+
+
+
+output "cluster-admin-entraid-group" {
+  value = azuread_group.cluster-admin.display_name
+}
