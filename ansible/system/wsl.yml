@@ -5,6 +5,7 @@ all:
       hosts:
         localhost:
       vars:
+        wsl: true
         versions:
           # represents path to local gems, see: 'gem environment' output for example: ~/.local/share/gem/ruby/3.3.0/bin
           ruby_user_path: "${HOME}/.local/share/gem/ruby/3.3.0/bin"
@@ -440,6 +441,16 @@ all:
             [ "$(grep -c '{{ versions.ruby_user_path }}' ~/.bashrc)" -ne 0 ] || {
               echo 'export PATH={{ versions.ruby_user_path }}:${PATH}' >> ~/.bashrc
               echo "Added user space Ruby libraries binaries to Bash PATH variable"
+            }
+        - name: windows-browser
+          desc: Ensure Windows OS web browser is opened when trigerred from wsl
+          become: false
+          command: |
+            [ "{{ wsl | default("false") }}" = "false" ] || {
+              [ "$(grep -c 'export BROWSER' ~/.bashrc)" -ne 0 ] || {
+                echo 'export BROWSER="/mnt/c/browser.exe"' >> ~/.bashrc
+                echo "Added opening Windows OS browser from WSL"
+              }
             }
         - name: asciidoctor
           become: false

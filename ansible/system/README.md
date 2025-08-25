@@ -3,6 +3,7 @@
 Various playbooks for Ubuntu machine management.
 
 Supported Ubuntu distributions:
+
 * For regular Ubuntu workstation - includes Gnome applications: **25.04 (plucky)**
 
 * For Windows Linux Subsystem (WSL) - does not include Gnome applications and virtualizations (like virt or vbox): **24.04 (noble)**
@@ -51,6 +52,17 @@ winget install -e --id Microsoft.VisualStudioCode
 # install Remote Development plugin
 code --install-extension ms-vscode-remote.vscode-remote-extensionpack
 ```
+
+Ensure Web browser from WSL is opened in Windows OS side:
+
+```bat
+# create a symlink to preferred browser on Windows side
+# the symlink MUST NOT contain spaces for path in Linux
+cd c:\
+mklink browser.exe "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+```
+
+See [Automatic opening native Windows web browser when triggered from WSL](#automatic-opening-native-windows-web-browser-when-triggered-from-wsl) for details why.
 
 Open WSL Ubuntu distribution:
 
@@ -148,3 +160,29 @@ onedrive
 systemctl enable --now  --user onedrive.service
 journalctl --user -u onedrive --follow
 ```
+
+### WSL
+
+#### Automatic opening native Windows web browser when triggered from WSL
+
+Some commands opens web browser for logging purposes.
+Some allows providing tokens, so that you can copy and paste link and do manual logging from Windows OS web browser.
+However some - like Azure CLI - requires logging via native OS even with device-code enabled - identifying WSL as non-compliant OS even when device login/token method is used.
+It is possible to trigger native WIndows OS browser opening from WSL - however it requires a [setup](https://medium.com/@pcbowers/wsl-windows-10-allow-web-links-to-open-automatically-27bdc53d6f86). Windows 11 WSL provides [alternative](https://bogdan-calapod.github.io/posts/wsl-windows-browser/) as well.
+
+From Windows WSL CMD:
+
+```cmd
+# create a symlink to preferred browser on Windows side
+# the symlink MUST NOT contain spaces for path in Linux
+cd c:\
+mklink browser.exe "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+```
+
+Then from WSL Linux distribution:
+
+```bash
+export BROWSER='/mnt/c/browser.exe'
+```
+
+This Ansible ubuntu-setup.yaml with wsl.yaml as inventory set the BROWSER variable in `~/.bash_rc` so that it works for each bash shell.
