@@ -47,12 +47,13 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   # Enable RBAC based on Azure AD/EntraId
   # https://learn.microsoft.com/en-us/azure/aks/manage-azure-rbac
-  local_account_disabled = true
   azure_active_directory_role_based_access_control {
     tenant_id              = local.tenant_id
     azure_rbac_enabled     = true
     admin_group_object_ids = [azuread_group.cluster-admin.object_id]
   }
+  # whether local clusterAdmin account is accessible
+  local_account_disabled = true
 
   identity {
     type         = "UserAssigned" # or SystemAssigned

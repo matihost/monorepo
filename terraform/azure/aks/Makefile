@@ -32,6 +32,58 @@ kubeconfig: ## configure kubeconfig with AKS credentials of your Azure user with
 		az aks get-credentials --resource-group "$${CLUSTER_RG}" --name "$${CLUSTER_NAME}" --overwrite-existing  && \
 		kubelogin convert-kubeconfig -l azurecli
 
+breakglass-kubeconfig: ## configure kubeconfig witn non-EntraID clusterAdmin local account, requires that cluster local_account_disabled is false, use only when other method of accessing the cluster failed
+	CLUSTER_RG="$$(cd stage/$(ENV) && terragrunt output -raw cluster_rg 2>/dev/null)" && \
+		CLUSTER_NAME="$$(cd stage/$(ENV) && terragrunt output -raw cluster_name 2>/dev/null)" && \
+		az aks get-credentials --admin --resource-group "$${CLUSTER_RG}" --name "$${CLUSTER_NAME}" --overwrite-existing  && \
+		kubelogin convert-kubeconfig -l azurecli
+
+get-possible-upgrades: ## check possible upgrades for AKS
+	CLUSTER_RG="$$(cd stage/$(ENV) && terragrunt output -raw cluster_rg 2>/dev/null)" && \
+		CLUSTER_NAME="$$(cd stage/$(ENV) && terragrunt output -raw cluster_name 2>/dev/null)" && \
+		az aks get-upgrades \
+			--resource-group "$${CLUSTER_RG}" \
+			--name "$${CLUSTER_NAME}" \
+			-o table
+
+upgrade-control-plane: ## upgrade control plane to new versions
+ifndef NEW_VERSION
+	$(error Environment NEW_VERSION is not defined. Check make get-possible-upgrades)
+endif
+	CLUSTER_RG="$$(cd stage/$(ENV) && terragrunt output -raw cluster_rg 2>/dev/null)" && \
+		CLUSTER_NAME="$$(cd stage/$(ENV) && terragrunt output -raw cluster_name 2>/dev/null)" && \
+		az aks upgrade \
+				--resource-group "$${CLUSTER_RG}" \
+				--name "$${CLUSTER_NAME}" \
+				--kubernetes-version $(NEW_VERSION) \
+				--control-plane-only \
+				--yes
+
+get-node-pools-names: ## get names of configured nodepools
+	CLUSTER_RG="$$(cd stage/$(ENV) && terragrunt output -raw cluster_rg 2>/dev/null)" && \
+		CLUSTER_NAME="$$(cd stage/$(ENV) && terragrunt output -raw cluster_name 2>/dev/null)" && \
+		az aks nodepool list \
+			--resource-group "$${CLUSTER_RG}" \
+			--cluster-name "$${CLUSTER_NAME}" \
+			--query "[].name" \
+			-o tsv
+
+upgrade-node-pools: ## upgrades node pool to current control plane version
+	CLUSTER_RG="$$(cd stage/$(ENV) && terragrunt output -raw cluster_rg 2>/dev/null)" && \
+		CLUSTER_NAME="$$(cd stage/$(ENV) && terragrunt output -raw cluster_name 2>/dev/null)" && \
+		NODE_POOLS="$$(az aks nodepool list --resource-group "$${CLUSTER_RG}" --cluster-name "$${CLUSTER_NAME}" --query "[].name" -o tsv 2>/dev/null)" && \
+		AKS_VERSION="$$(az aks show --resource-group "$${CLUSTER_RG}" --name "$${CLUSTER_NAME}" --query kubernetesVersion -o tsv)" && \
+		for pool in $${NODE_POOLS}; do \
+			echo "Upgrading node pool: $${pool} to $${AKS_VERSION}..." && \
+			az aks nodepool upgrade \
+				--resource-group "$${CLUSTER_RG}" \
+				--cluster-name "$${CLUSTER_NAME}" \
+				--name "$${pool}" \
+				--kubernetes-version "$${AKS_VERSION}" \
+				--max-unavailable 2 \
+				--yes; \
+		done
+
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show
 
