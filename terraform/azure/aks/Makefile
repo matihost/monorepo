@@ -38,6 +38,13 @@ breakglass-kubeconfig: ## configure kubeconfig witn non-EntraID clusterAdmin loc
 		az aks get-credentials --admin --resource-group "$${CLUSTER_RG}" --name "$${CLUSTER_NAME}" --overwrite-existing  && \
 		kubelogin convert-kubeconfig -l azurecli
 
+acr-login: ## login to ACR registry associated with AKS cluster
+	CLUSTER_RG="$$(cd stage/$(ENV) && terragrunt output -raw cluster_rg 2>/dev/null)" && \
+	ACR_NAME="$$(cd stage/$(ENV) && terragrunt output -raw acr_name 2>/dev/null)" && \
+		az acr login \
+			--resource-group "$${CLUSTER_RG}" \
+			--name "$${ACR_NAME}"
+
 get-possible-upgrades: ## check possible upgrades for AKS
 	CLUSTER_RG="$$(cd stage/$(ENV) && terragrunt output -raw cluster_rg 2>/dev/null)" && \
 		CLUSTER_NAME="$$(cd stage/$(ENV) && terragrunt output -raw cluster_name 2>/dev/null)" && \
@@ -83,6 +90,31 @@ upgrade-node-pools: ## upgrades node pool to current control plane version
 				--max-unavailable 2 \
 				--yes; \
 		done
+
+get-container-registries: ## get names of configured container registries
+	CLUSTER_RG="$$(cd stage/$(ENV) && terragrunt output -raw cluster_rg 2>/dev/null)" && \
+		az acr list \
+			--resource-group "$${CLUSTER_RG}" \
+			--query "[].name" \
+			-o tsv
+
+delete-node: ## delete node gracefully
+ifndef NODE_POOL
+	$(error Environment NODE_POOL is not defined. Check make get-node-pools-names)
+endif
+ifndef NODE_NAME
+	$(error Environment NODE_NAME is not defined. Check kubectl get nodes)
+endif
+	CLUSTER_RG="$$(cd stage/$(ENV) && terragrunt output -raw cluster_rg 2>/dev/null)" && \
+		CLUSTER_NAME="$$(cd stage/$(ENV) && terragrunt output -raw cluster_name 2>/dev/null)" && \
+		kubectx "$${CLUSTER_NAME}" && \
+		kubectl cordon "$(NODE_NAME)" && \
+		kubectl drain "$(NODE_NAME)" --delete-emptydir-data --ignore-daemonsets --timeout 300s && \
+		az aks nodepool delete-machines \
+			--resource-group "$${CLUSTER_RG}" \
+			--cluster-name "$${CLUSTER_NAME}" \
+			--name "$(NODE_POOL)" \
+			--machine-names "$(NODE_NAME)"
 
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show

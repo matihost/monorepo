@@ -1,0 +1,26 @@
+# yamllint disable-file
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: limits
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "namespace-config.labels" . | nindent 4 }}
+spec:
+  limits:
+  - type: "Container"
+    max:
+      cpu: "8"
+      memory: "8Gi"
+    min:
+      cpu: "10m"
+      memory: "4Mi"
+    default:
+      cpu: "300m"
+      memory: "200Mi"
+    defaultRequest:
+      cpu: "200m"
+      memory: "100Mi"
+    maxLimitRequestRatio:
+      cpu: "300"

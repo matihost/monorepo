@@ -1,0 +1,27 @@
+# yamllint disable-file
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: quota
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "namespace-config.labels" . | nindent 4 }}
+spec:
+  hard:
+    configmaps: "100"
+    persistentvolumeclaims: "20"
+    requests.storage: "250Gi"
+    pods: "100"
+    replicationcontrollers: "20"
+    secrets: "50"
+    services: "20"
+    # TODO consider 0 to force developer to use Ingres/Route/VirtualService to expose service externally
+    services.loadbalancers: "5"
+    services.nodeports: "5"
+    requests.cpu: {{ .Values.quota.requests.cpu | default "16" | quote }}
+    requests.memory: {{ .Values.quota.requests.memory | default "32Gi" | quote }}
+    limits.cpu: {{ .Values.quota.limits.cpu | default "16" | quote }}
+    limits.memory: {{ .Values.quota.limits.memory | default "32Gi" | quote }}
+    requests.ephemeral-storage: "10Gi"
+    limits.ephemeral-storage: "10Gi"

@@ -143,12 +143,15 @@ resource "azurerm_kubernetes_cluster" "aks" {
   azure_policy_enabled = true
 
 
-  # Managed Prometheus
+  # Azure Monitor Workspace (aka managed Prometheus)
+  # TODO requires DataCollectionRule to fully work
   monitor_metrics {
     annotations_allowed = null
     labels_allowed      = null
   }
 
+  # Log Analytics Workspace
+  # TODO requires DataCollectionRule to fully work
   oms_agent {
     log_analytics_workspace_id      = data.azurerm_log_analytics_workspace.log.id
     msi_auth_for_monitoring_enabled = true
@@ -241,20 +244,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "user" {
     node_soak_duration_in_minutes = 0
   }
 }
-
-
-# resource "null_resource" "cluster-config" {
-#   triggers = {
-#     always_run = timestamp()
-#   }
-#   provisioner "local-exec" {
-#     command = "${path.module}/configure-cluster.sh '${azurerm_kubernetes_cluster.aks.resource_group_name}' '${azurerm_kubernetes_cluster.aks.name}' '${var.region}' '${jsonencode(var.namespaces)}'"
-#   }
-
-#   depends_on = [
-#     azurerm_kubernetes_cluster_node_pool.user,
-#   ]
-# }
 
 output "cluster_name" {
   value = azurerm_kubernetes_cluster.aks.name

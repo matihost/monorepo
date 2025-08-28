@@ -11,6 +11,7 @@ terraform {
 inputs = {
   env              = "dev"
   locations        = ["West Europe", "Poland Central", "North Europe"]
+  locations_short  = ["westeurope", "polandcentral", "northeurope"]
   vm_sizes         = ["Standard_B1s", "Standard_B2ats_v2", "Standard_D8s_v5", "Standard_D4s_v5"]
   enforce_policies = false
 }

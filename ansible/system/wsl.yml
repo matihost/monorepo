@@ -526,6 +526,7 @@ all:
               helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
               helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
               helm repo add external-dns https://kubernetes-sigs.github.io/external-dns
+              helm repo add external-secrets https://charts.external-secrets.io
               helm repo update
               [ "$(helm plugin list |grep -c diff)" -eq 1 ] || {
                 helm plugin install https://github.com/databus23/helm-diff

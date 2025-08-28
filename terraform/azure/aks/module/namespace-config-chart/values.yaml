@@ -1,0 +1,13 @@
+namespace: namespace-name
+rbac:
+  view: entraIdGroupObjectId
+  edit: entraIdGroupObjectId
+# dockerconfigjson: base64encodedvalue
+# dockerreponame: quay
+quota:
+  requests:
+    cpu: "16"
+    memory: "32Gi"
+  limits:
+    cpu: "16"
+    memory: "32Gi"

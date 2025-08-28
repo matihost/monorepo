@@ -51,6 +51,12 @@ variable "locations" {
   description = "Allowed locations to be used in resource group"
 }
 
+variable "locations_short" {
+  default     = ["westeurope"]
+  type        = list(string)
+  description = "Allowed locations to be used in resource group (short notation)"
+}
+
 variable "vm_sizes" {
   default     = ["Standard_B1s", "Standard_B2ats_v2"]
   type        = list(string)

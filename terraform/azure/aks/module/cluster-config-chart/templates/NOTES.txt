@@ -1,0 +1,2 @@
+Install cluster AKS configurations:
+- Storage  Classes

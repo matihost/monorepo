@@ -12,15 +12,15 @@ resource "azurerm_log_analytics_workspace" "workspace" {
   # internet_query_enabled = true
 }
 
-resource "azurerm_log_analytics_solution" "containers" {
-  solution_name         = "Containers"
+resource "azurerm_log_analytics_solution" "container_insights" {
+  solution_name         = "ContainerInsights"
   workspace_resource_id = azurerm_log_analytics_workspace.workspace.id
   workspace_name        = azurerm_log_analytics_workspace.workspace.name
   location              = local.location
   resource_group_name   = local.resource_group_name
 
   plan {
+    product   = "OMSGallery/ContainerInsights"
     publisher = "Microsoft"
-    product   = "OMSGallery/Containers"
   }
 }

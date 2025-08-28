@@ -5,6 +5,12 @@ Setup Azure Kubernetes Service (AKS) along with the following addons:
 * Azure RBAC (aka Azure EntraID) Roles to manage K8S RBAC, with EntraId group acting as cluster-admins
 
 * Integration with Managed Grafana, Managed Monitor Workspaces (aka Managed Prometheus)
+  WARNING: still requires [DCR configuration](https://techcommunity.microsoft.com/blog/azureinfrastructureblog/how-to-set-up-data-collection-rules-dcr-for-azure-kubernetes-service-aks/4411415) for fully operational state
+
+* Namespaces setup
+
+* Gatekeeper and external secret operator addons
+
 
 ## Prerequisites
 

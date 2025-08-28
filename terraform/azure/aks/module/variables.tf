@@ -26,8 +26,7 @@ locals {
   location            = var.region
   prefix              = "${var.env}-${local.azure_region_abbreviations[var.region]}"
   subscription_name   = data.azurerm_subscription.current.display_name
-  # tflint-ignore: terraform_unused_declarations
-  key_vault_name = "${local.prefix}-${substr(sha256(local.subscription_name), 0, 7)}"
+  key_vault_name      = "${local.prefix}-${substr(sha256(local.subscription_name), 0, 7)}"
   azure_region_abbreviations = {
     "eastus"             = "eus"
     "eastus2"            = "eu2"

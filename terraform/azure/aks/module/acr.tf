@@ -6,7 +6,9 @@ resource "azurerm_container_registry" "aks" {
   sku                           = "Premium"
   zone_redundancy_enabled       = true
   public_network_access_enabled = var.public
-  admin_enabled                 = false
+
+  # whether to expose break-glass admin access to ACR, normally only EntraId access possible
+  admin_enabled = false
 
   lifecycle {
     ignore_changes = [tags, ]
@@ -42,3 +44,24 @@ resource "azurerm_private_endpoint" "aks-cr" {
   #   private_dns_zone_ids = [azurerm_private_dns_zone.example.id]
   # }
 }
+
+
+output "acr_name" {
+  value = azurerm_container_registry.aks.name
+}
+
+
+output "acr_login_server" {
+  value = azurerm_container_registry.aks.login_server
+}
+
+# Available when admin=true, otherwise only EntraID access available
+#
+# output "acr_username" {
+#   value = azurerm_container_registry.example.admin_username
+# }
+
+# output "acr_password" {
+#   value = azurerm_container_registry.example.admin_password
+#   sensitive = true
+# }

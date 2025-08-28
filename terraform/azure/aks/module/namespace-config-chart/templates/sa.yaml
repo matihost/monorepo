@@ -1,0 +1,30 @@
+# yamllint disable-file
+
+---
+{{- if .Values.dockerconfigjson }}
+apiVersion: v1
+data:
+  .dockerconfigjson: {{ .Values.dockerconfigjson }}
+kind: Secret
+metadata:
+  name: {{ .Values.dockerreponame }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "namespace-config.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "0" # ensure to be installed before ResourceQuota, see quota.yaml for detais
+type: kubernetes.io/dockerconfigjson
+{{- end }}
+---
+apiVersion: v1
+{{- if .Values.dockerconfigjson }}
+imagePullSecrets:
+- name: {{ .Values.dockerreponame }}
+{{- end }}
+kind: ServiceAccount
+metadata:
+  name: app
+  namespace: {{ .Values.namespace }}
+  labels:
+  {{- include "namespace-config.labels" . | nindent 4 }}

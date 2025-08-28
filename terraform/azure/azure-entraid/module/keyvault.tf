@@ -1,12 +1,9 @@
-locals {
-  key_vault_name = "${local.prefix}-${substr(sha256(local.subscription_name), 0, 7)}"
-}
-
 resource "azurerm_key_vault" "key_vault" {
+  for_each = toset(var.locations_short)
 
   # Vault names are globally unique.
   # The vault name should be string of 3 to 24 characters and can contain only numbers (0-9), letters (a-z, A-Z), and hyphens (-)
-  name                        = local.key_vault_name
+  name                        = "${var.env}-${local.azure_region_abbreviations[each.key]}-${substr(sha256(local.subscription_name), 0, 7)}"
   location                    = var.region
   resource_group_name         = var.env
   enabled_for_disk_encryption = true
@@ -31,7 +28,9 @@ resource "azurerm_key_vault" "key_vault" {
 #
 # https://learn.microsoft.com/en-us/azure/key-vault/general/rbac-guide?tabs=azure-cli#best-practices-for-individual-keys-secrets-and-certificates-role-assignments
 resource "azurerm_role_assignment" "key_vault-creator" {
-  scope = azurerm_key_vault.key_vault.id
+  for_each = toset(var.locations_short)
+
+  scope = azurerm_key_vault.key_vault[each.key].id
   # The Key Vault Contributor role is for management plane operations only to manage key vaults.
   # It does not allow access to keys, secrets and certificates.
   role_definition_name = "Key Vault Secrets Officer"
