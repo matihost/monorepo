@@ -7,10 +7,13 @@ Setup Azure Kubernetes Service (AKS) along with the following addons:
 * Integration with Managed Grafana, Managed Monitor Workspaces (aka Managed Prometheus)
   WARNING: still requires [DCR configuration](https://techcommunity.microsoft.com/blog/azureinfrastructureblog/how-to-set-up-data-collection-rules-dcr-for-azure-kubernetes-service-aks/4411415) for fully operational state
 
-* Namespaces setup
-
 * Gatekeeper and external secret operator addons
 
+* Namespaces setup. Each namespace contains:
+  * dedicated Azure KeyVault and External Secret Operator Store - to sync NS dedicated Azure KeyVault Secrets with K8S Secrets resources.
+  * Automatically created external secret `all-secrets` containing all Secrets from associated with NS KeyVault.
+  * EntraID groups for each namespace for view and edit RBAC binding.
+  * Workload Identity assigning `app` K8S SA to User Assigned Identity (being part of NS edit EntraId group)
 
 ## Prerequisites
 

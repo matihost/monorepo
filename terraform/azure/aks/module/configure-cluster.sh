@@ -2,10 +2,11 @@
 
 CLUSTER_RG="${1:?CLUSTER_RG is required}"
 SUB="${2:?SUB is required}"
-CLUSTER_NAME="${3:?CLUSTER_NAME is required}"
-REGION="${4:?REGION is required}"
-ACR_NAME="${5:?ACR_NAME is required}"
-NAMESPACES="${6:?NAMESPACES is required}"
+TENANT_ID="${3:?TENANT_ID is required}"
+CLUSTER_NAME="${4:?CLUSTER_NAME is required}"
+REGION="${5:?REGION is required}"
+ACR_NAME="${6:?ACR_NAME is required}"
+NAMESPACES="${7:?NAMESPACES is required}"
 
 # set -e
 set -x
@@ -50,8 +51,12 @@ function configure-namespaces() {
 
     NS="$(echo "${NAMESPACE}" | jq -r ".name")"
     QUOTA="$(echo "${NAMESPACE}" | jq -r ".quota")"
-    NC_VIEW_GROUP_OBJ_ID="$(az ad group show --group "aks-${CLUSTER_NAME}-ns-${NS}-view" --query id -o tsv 2>/dev/null)"
-    NC_EDIT_GROUP_OBJ_ID="$(az ad group show --group "aks-${CLUSTER_NAME}-ns-${NS}-edit" --query id -o tsv 2>/dev/null)"
+    NS_VIEW_GROUP_OBJ_ID="$(az ad group show --group "aks-${CLUSTER_NAME}-ns-${NS}-view" --query id -o tsv 2>/dev/null)"
+    NS_EDIT_GROUP_OBJ_ID="$(az ad group show --group "aks-${CLUSTER_NAME}-ns-${NS}-edit" --query id -o tsv 2>/dev/null)"
+    NS_EDIT_WORKLOAD_IDENTITY_USER_ASSIGNED_CLIENT_ID="$(az identity show --name "aks-${CLUSTER_NAME}-ns-${NS}-edit" --subscription "${SUB}" --resource-group "${CLUSTER_RG}" --query 'clientId' -o tsv 2>/dev/null)"
+    NS_KEY_VAULT_NAME="$(echo -n "${NS}" | sha256sum)"
+    NS_KEY_VAULT_NAME="${CLUSTER_NAME}-${NS_KEY_VAULT_NAME:0:6}"
+    NS_KEY_VAULT_URL="$(az keyvault show --name "${NS_KEY_VAULT_NAME}" --subscription "${SUB}" --resource-group "${CLUSTER_RG}" --query 'properties.vaultUri' -o tsv 2>/dev/null)"
 
     [ -n "$(kubectl get ns "${NS}" --no-headers --ignore-not-found)" ] || {
       kubectl create ns "${NS}"
@@ -59,8 +64,11 @@ function configure-namespaces() {
     helm upgrade --install "ns-${NS}-config" -n cluster-config --create-namespace "${DIRNAME}/namespace-config-chart" \
       --set namespace="${NS}" \
       --set-json quota="$(echo "${QUOTA}" | jq -r)" \
-      --set rbac.view="${NC_VIEW_GROUP_OBJ_ID}" \
-      --set rbac.edit="${NC_EDIT_GROUP_OBJ_ID}"
+      --set workload_identity.tenantId="${TENANT_ID}" \
+      --set workload_identity.clientId="${NS_EDIT_WORKLOAD_IDENTITY_USER_ASSIGNED_CLIENT_ID}" \
+      --set vault.url="${NS_KEY_VAULT_URL}" \
+      --set rbac.view="${NS_VIEW_GROUP_OBJ_ID}" \
+      --set rbac.edit="${NS_EDIT_GROUP_OBJ_ID}"
   done
 }
 

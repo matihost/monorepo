@@ -1,4 +1,9 @@
 namespace: namespace-name
+workload_identity:
+  clientId: clientIdOfUserAssignedIdentityOrApplicationClientId
+  tenantId: tenantOfTheUserAssignedIdentityOrApplicationClientId
+vault:
+  url: urlForKeyVaultAssociatedWithNS
 rbac:
   view: entraIdGroupObjectId
   edit: entraIdGroupObjectId

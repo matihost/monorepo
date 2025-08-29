@@ -1,5 +1,4 @@
 # yamllint disable-file
-
 ---
 {{- if .Values.dockerconfigjson }}
 apiVersion: v1
@@ -26,5 +25,9 @@ kind: ServiceAccount
 metadata:
   name: app
   namespace: {{ .Values.namespace }}
+  annotations:
+    azure.workload.identity/client-id: {{ .Values.workload_identity.clientId | quote }} # azurerm_user_assigned_identity.workload.client_id
+    azure.workload.identity/tenant-id: {{ .Values.workload_identity.tenantId | quote }} # azurerm_user_assigned_identity.workload.tenant_id
+
   labels:
   {{- include "namespace-config.labels" . | nindent 4 }}
