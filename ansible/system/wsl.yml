@@ -11,8 +11,8 @@ all:
           ruby_user_path: "${HOME}/.local/share/gem/ruby/3.3.0/bin"
           # Current supported kubernetess and crio versions:
           # https://github.com/cri-o/packaging/blob/main/README.md#define-the-kubernetes-version-and-used-cri-o-stream
-          kubernetes: v1.31
-          crio: v1.31
+          kubernetes: v1.34
+          crio: v1.33
           # TODO change to {{ ansible_distribution_version }} when current is supported Ubuntu
           # List of supported Ubuntu versions:
           # https://packages.microsoft.com/repos/azure-cli/dists/
@@ -147,9 +147,9 @@ all:
             https://pkgs.k8s.io/core:/stable:/{{ versions.kubernetes }}/deb/Release.key
         - name: crio
           repo: >-
-            deb [arch=amd64] https://pkgs.k8s.io/addons:/cri-o:/stable:/{{ versions.crio}}/deb/ /
+            deb [arch=amd64] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ versions.crio}}/deb/ /
           key_url: >-
-            https://pkgs.k8s.io/addons:/cri-o:/stable:/{{ versions.crio}}/deb/Release.key
+            https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ versions.crio}}/deb/Release.key
         - name: google-cloud-sdk
           repo: "deb [arch=amd64] https://packages.cloud.google.com/apt cloud-sdk main"
           key_url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
@@ -178,6 +178,7 @@ all:
           repo: "deb [arch=amd64] https://dbeaver.io/debs/dbeaver-ce /"
           key_url: "https://dbeaver.io/debs/dbeaver.gpg.key"
         packages:
+        - apache2-utils # for htpasswd
         - neofetch
         - mc
         - autofs

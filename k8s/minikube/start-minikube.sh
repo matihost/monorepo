@@ -85,16 +85,16 @@ function ensureCriDockerdPresent() {
 }
 
 function ensureCrioPresent() {
-  CRIO_VERSION=v1.30
+  CRIO_VERSION=v1.33
 
   [ -x /usr/bin/crio ] || (
     # shellcheck disable=SC1091
     . /etc/os-release
 
-    curl -fsSL https://pkgs.k8s.io/core:/stable:/$CRIO_VERSION/deb/Release.key |
-      sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    curl -fsSL https://download.opensuse.org/repositories/isv:/cri-o:/stable:/$CRIO_VERSION/deb/Release.key |
+      sudo gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
 
-    echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/$CRIO_VERSION/deb/ /" |
+    echo "deb [signed-by= /etc/apt/keyrings/cri-o-apt-keyring.gpg] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/$CRIO_VERSION/deb/ /" |
       sudo tee /etc/apt/sources.list.d/kubernetes.list
 
     sudo apt-get update -qq
@@ -313,7 +313,7 @@ if ! minikube status &>/dev/null; then
     # because there is conflict with Istio https://github.com/istio/istio/issues/46764
     # making Istio CNI unable to spin istio-cni-node
     # shellcheck disable=SC2046
-    helm install cilium cilium/cilium --namespace kube-system --set operator.replicas=1 --set containerRuntime.integration=auto --set cni.exclusive=false
+    helm install cilium cilium/cilium --namespace kube-system --set operator.replicas=1 --set cni.exclusive=false
   fi
 
   for ADDON in ${ADDONS}; do

@@ -80,7 +80,33 @@ function ensure-external-secrets-operator() {
   # helm search repo ${HELM_CHART}
   helm upgrade --install ${DEPLOYMENT_NAME} ${HELM_CHART} --namespace kube-system --create-namespace
   # --version $(HELM_CHART_VERSION) --debug
-  # --set google.project="${PROJECT}" \
+  # to avoid:
+  # https://external-secrets-webhook.kube-system.svc:443/validate-external-secrets-io-v1-secretstore?timeout=5s":
+  # no endpoints available for service "external-secrets-webhook"
+  wait-for-svc kube-system external-secrets-webhook || { exit 1; }
+}
+
+wait-for-svc() {
+  local namespace=$1
+  local service=$2
+  local timeout=${3:-300}
+  local interval=${4:-5}
+
+  echo "Waiting up to $timeout seconds for service '$service' in namespace '$namespace' to have endpoints..."
+
+  local end=$((SECONDS + timeout))
+
+  while [ $SECONDS -lt $end ]; do
+    if kubectl get endpoints "$service" -n "$namespace" -o jsonpath='{.subsets[*].addresses[*].ip}' | grep -q .; then
+      echo "Service $service has endpoints"
+      return 0
+    fi
+    echo "Still waiting..."
+    sleep "${interval}"
+  done
+
+  echo "Timeout: Service $service has no endpoints after $timeout seconds"
+  return 1
 }
 
 function ensure-external-secrets-operator-installed-locally() {

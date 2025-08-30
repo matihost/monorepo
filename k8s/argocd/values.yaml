@@ -1,0 +1,18 @@
+configs:
+  cm:
+    admin:
+      enabled: true
+  params:
+    server.insecure: true
+#   secret:
+#     argocdServerAdminPassword: $2a$10$41ZzQxGHkIfvrHI83Ka9F.c8/0PmUq71cGjeeV3emR6yDrG4YkJV6
+# global:
+#   domain: argocd.minikube
+server:
+  ingress:
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: true
+      nginx.ingress.kubernetes.io/ssl-passthrough: false
+    enabled: true
+    # ingressClassName: nginx
+    tls: true

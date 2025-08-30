@@ -21,9 +21,15 @@
     ansible.builtin.shell: "add-apt-repository -yu {{ apt_repo.name }}"
     changed_when: not(shell_out.stdout is search('enabled'))
     register: shell_out
+  - name: Check presence of /etc/apt/sources.list (For modern Ubuntu, Ubuntu sources have moved to /etc/apt/sources.list.d/ubuntu.sources)
+    ansible.builtin.stat:
+      path: /etc/apt/sources.list
+    register: sources
   - name: Ensure mutliverse/universe is not used in partner repository to mitigate https://askubuntu.com/questions/1352857/get-rid-of-apt-update-warnings # noqa command-instead-of-module
     ansible.builtin.shell: "sed -i 's/[multiverse |universe ]*partner[ multiverse| universe]*.*/ partner/g' /etc/apt/sources.list"
-    when: apt_repo.name in ['multiverse', 'universe']
+    when:
+    - apt_repo.name in ['multiverse', 'universe']
+    - sources.stat.exists
     register: shell_out
     changed_when: shell_out.rc != 0
 
