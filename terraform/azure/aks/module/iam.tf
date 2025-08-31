@@ -46,14 +46,12 @@ resource "azurerm_role_assignment" "aks-user-identity-private-zone-admin" {
   principal_id         = azurerm_user_assigned_identity.cluster-admin.principal_id
 }
 
-
-# TODO is it needed?
-# resource "azurerm_role_assignment" "role_network" {
-#   scope                = data.azurerm_resource_group.rg.id
-#   role_definition_name = "Network Contributor"
-#   principal_id         = azuread_service_principal.aro.object_id
-# }
-
+# For spinning LoadBalancers
+resource "azurerm_role_assignment" "aks-user-identity-admin-networking" {
+  scope                = local.resource_group_id
+  role_definition_name = "Network Contributor"
+  principal_id         = azurerm_user_assigned_identity.cluster-admin.principal_id
+}
 
 
 output "cluster-admin-entraid-group" {

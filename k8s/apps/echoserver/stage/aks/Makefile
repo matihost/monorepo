@@ -1,9 +1,9 @@
 NS := learning
 APP := echoserver
-CN := $(APP).$(NS).minikube
+CN := $(APP).$(NS).svc.aks-shared1-dev.privatelink.northeurope.azmk8s.io
 
 k8s:
-	@kubectl config use-context minikube || { echo "Minikube not present in kube context"; exit 1; }
+	@kubectl config current-context | grep -q "dev-" || { echo "Not logged to AKS cluster"; exit 1; }
 	@kubectl config set-context --current --namespace $(NS)
 
 
@@ -25,8 +25,7 @@ create-cert: k8s ## create TLS CRT to be used by ingress, for simplicity/copy-pa
 deploy-via-helm: k8s create-cert ## deploys app via Helm
 	helm upgrade --install $(APP) "../.." -n $(NS) --create-namespace \
 	  --set ingress.host="$(CN)" \
-	  --set ingress.class=nginx \
-	  --set networkPolicy.enabled=true
+	  --set ingress.class=nginx
 
 uninstall-helm: k8s ## uninstall
 	helm uninstall $(APP) -n $(NS)

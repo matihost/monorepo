@@ -1,6 +1,6 @@
 # Private AKS DNS zone
 
-# Pprivate dns zone name for AKS has to be in either of these formats:
+# Private dns zone name for AKS has to be in either of these formats:
 #   private.northeurope.azmk8s.io
 #   privatelink.northeurope.azmk8s.io
 #  [a-zA-Z0-9-]{1,32}.private.northeurope.azmk8s.io

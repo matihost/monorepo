@@ -1,0 +1,23 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: matihost
+  namespace: argocd
+spec:
+  description: Applications from GitHub matihost/monorepo
+  destinations:
+  - name: in-cluster
+    namespace: learning
+    server: https://kubernetes.default.svc
+  - name: in-cluster
+    namespace: test
+    server: https://kubernetes.default.svc
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  sourceRepos:
+  - https://github.com/matihost/monorepo.git

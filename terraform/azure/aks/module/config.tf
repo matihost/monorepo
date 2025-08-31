@@ -3,7 +3,7 @@ resource "null_resource" "cluster-config" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = "${path.module}/configure-cluster.sh '${azurerm_kubernetes_cluster.aks.resource_group_name}' '${local.subscription_name}' '${local.tenant_id}' '${azurerm_kubernetes_cluster.aks.name}' '${var.region}' '${azurerm_container_registry.aks.name}' '${jsonencode(var.namespaces)}'"
+    command = "${path.module}/configure-cluster.sh '${azurerm_kubernetes_cluster.aks.resource_group_name}' '${local.subscription_name}' '${local.tenant_id}' '${azurerm_kubernetes_cluster.aks.name}' '${var.region}' '${azurerm_container_registry.aks.name}' '${local.nginx-ip}' '${jsonencode(var.namespaces)}'"
   }
 
   depends_on = [
@@ -14,7 +14,6 @@ resource "null_resource" "cluster-config" {
     azurerm_role_assignment.ns-key_vault-creator-for-editors,
     azuread_group_member.ns-workload-identity-edit-membership,
     azurerm_role_assignment.ns-key_vault-creator-for-viewers
-
   ]
 }
 

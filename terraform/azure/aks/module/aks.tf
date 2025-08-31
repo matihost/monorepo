@@ -179,7 +179,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
   depends_on = [
     # to ensure cluster managed user has correct assignments before creating cluster
     azurerm_role_assignment.aks-user-identity-private-zone-admin,
-    azurerm_role_assignment.kubelet
+    azurerm_role_assignment.kubelet,
+    azurerm_role_assignment.aks-user-identity-admin-networking
   ]
 
   lifecycle {

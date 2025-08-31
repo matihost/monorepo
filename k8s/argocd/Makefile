@@ -20,6 +20,11 @@ CN := argocd.minikube
 ENV_FLAGS := --set server.ingress.ingressClassName=nginx
 endif
 
+ifeq ($(strip $(ENV)),aks)
+CN := argocd.svc.aks-shared1-dev.privatelink.northeurope.azmk8s.io
+ENV_FLAGS := --set server.ingress.ingressClassName=nginx
+endif
+
 
 init: ## add repo
 	helm repo add argo https://argoproj.github.io/argo-helm
@@ -37,7 +42,8 @@ endif
 	@helm upgrade --install $(DEPLOYMENT_NAME) $(HELM_CHART) --namespace $(NS) --create-namespace --values $(VALUES) $(VERSION_FLAG) \
 		$(ENV_FLAGS) \
 		--set global.domain="$(CN)" \
-		--set configs.secret.argocdServerAdminPassword=$$(htpasswd -bnBC 10 "" $(ADMIN_PASS) | tr -d ':\n' | sed 's/$2y/$2a/')
+		--set configs.secret.argocdServerAdminPassword=$$(htpasswd -bnBC 10 "" $(ADMIN_PASS) | tr -d ':\n' | sed 's/$2y/$2a/') && \
+	kubectl apply -f files
 
 
 create-certs:

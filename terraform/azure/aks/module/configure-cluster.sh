@@ -6,7 +6,8 @@ TENANT_ID="${3:?TENANT_ID is required}"
 CLUSTER_NAME="${4:?CLUSTER_NAME is required}"
 REGION="${5:?REGION is required}"
 ACR_NAME="${6:?ACR_NAME is required}"
-NAMESPACES="${7:?NAMESPACES is required}"
+NGINX_INGRESS_IP="${7:?NGINX_INGRESS_IP is required}"
+NAMESPACES="${8:?NAMESPACES is required}"
 
 # set -e
 set -x
@@ -138,9 +139,43 @@ function ensure-external-secrets-operator-installed-locally() {
   wait-for-svc kube-system external-secrets-webhook || { exit 1; }
 }
 
+function is_internal_ip() {
+  local ip="$1"
+
+  if [[ "$ip" =~ ^10\. ]] ||
+    [[ "$ip" =~ ^172\.1[6-9]\. ]] ||
+    [[ "$ip" =~ ^172\.2[0-9]\. ]] ||
+    [[ "$ip" =~ ^172\.3[0-1]\. ]] ||
+    [[ "$ip" =~ ^192\.168\. ]]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
+function ensure-nginx() {
+  [ -n "${NGINX_INGRESS_IP}" ] && {
+    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+    helm repo update
+    # Azure K8S Service Annotations:
+    # https://cloud-provider-azure.sigs.k8s.io/topics/loadbalancer/#loadbalancer-annotations
+    # https://learn.microsoft.com/en-us/previous-versions/azure/aks/ingress-tls?tabs=azure-cli#use-a-static-public-ip-address
+    helm upgrade --install ingress-nginx -n kube-system ingress-nginx/ingress-nginx \
+      --set controller.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-resource-group="${CLUSTER_RG}" \
+      --set controller.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-internal="$(is_internal_ip "${NGINX_INGRESS_IP}")" \
+      --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${CLUSTER_NAME}-nginx-ingress" \
+      --set controller.service.loadBalancerIP="${NGINX_INGRESS_IP}" \
+      --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz
+    # TODO using annotation to provide IP does not work - even when recommended:
+    # Error syncing load balancer: failed to ensure load balancer: findMatchedPIPByLoadBalancerIP: cannot find public IP with IP address 68.219.211.66 in resource group dev
+    # --set controller.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${NGINX_INGRESS_IP}"
+  }
+}
+
 # Main
 login-to-aks || { exit 1; }
 ensure-cluster-config
+ensure-nginx
 # ensure-external-secrets-operator
 ensure-external-secrets-operator-installed-locally
 configure-namespaces
