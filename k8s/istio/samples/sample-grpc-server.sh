@@ -8,7 +8,7 @@ gke)
   INTERNAL_DNS_SUFFIX="internal.gke.$(echo -n "${CLUSTER_NAME}" | sed 's/-/./g').gcp.testing"
   ;;
 minikube)
-  INTERNAL_DNS_SUFFIX="internal.testing.minikube"
+  INTERNAL_DNS_SUFFIX="internal.minikube"
   ;;
 *)
   echo "Mode minikube or gke only supported"
@@ -97,4 +97,4 @@ EOF
 deploySampleApp
 
 echo -e "Test app via: \ngrpc-health-probe -tls -tls-no-verify -addr grpc.sample-istio.${INTERNAL_DNS_SUFFIX}:443\nor via go/grcp-client app:"
-echo -e "grpc-client -tls -tls-no-verify -addr grpc.sample-istio.internal.testing.minikube:443 test"
+echo -e "grpc-client -tls -tls-no-verify -addr grpc.sample-istio.internal.minikube:443 test"

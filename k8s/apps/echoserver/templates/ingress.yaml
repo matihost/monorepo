@@ -1,7 +1,7 @@
 # yamllint disable-file
 {{- $fullName := include "app.fullname" . -}}
 {{- if .Values.ingress.enabled }}
-{{- if .Values.ingress.tls.enabled }}
+{{- if and .Values.ingress.tls.enabled .Values.ingress.tls.createTlsSecret }}
 ---
 apiVersion: v1
 kind: Secret

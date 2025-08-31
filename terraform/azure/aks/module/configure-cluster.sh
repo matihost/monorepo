@@ -132,6 +132,10 @@ function ensure-external-secrets-operator-installed-locally() {
     --set image.repository="${REPO_URL}/external-secrets/external-secrets" \
     --set webhook.image.repository="${REPO_URL}/external-secrets/external-secrets" \
     --set certController.image.repository="${REPO_URL}/external-secrets/external-secrets"
+  # to avoid:
+  # https://external-secrets-webhook.kube-system.svc:443/validate-external-secrets-io-v1-secretstore?timeout=5s":
+  # no endpoints available for service "external-secrets-webhook"
+  wait-for-svc kube-system external-secrets-webhook || { exit 1; }
 }
 
 # Main

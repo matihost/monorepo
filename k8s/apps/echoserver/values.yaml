@@ -3,9 +3,9 @@
 replicaCount: 1
 
 image:
-  repository: registry.k8s.io/echoserver
+  repository: kicbase/echo-server
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "1.0"
 
 pod:
   port: 8080
@@ -48,11 +48,12 @@ ingress:
     # for NGINX ingress to rewrite urls to ensure last slash is added
     nginx.ingress.kubernetes.io/rewrite-target: /
     # kubernetes.io/tls-acme: "true"
-  host: echoserver.learning.minikube.testing
+  # host: echoserver.learning.minikube  # mandatory to be provided
   tls:
     enabled: true
-    key: ""
-    crt: ""
+    createTlsSecret: false # assumption a secret with name of echoserver exists already
+    key: "" # base64 of PEM encoded crt
+    crt: "" # base64 of PEM encoded key
 
 apigateway:
   enabled: false

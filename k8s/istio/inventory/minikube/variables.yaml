@@ -12,6 +12,6 @@ all:
       enable: true
       default: false
     ingress_gateway:
-      default_dns_suffix: internal.testing.minikube
+      default_dns_suffix: internal.minikube
     egress_gateway:
       enable: true

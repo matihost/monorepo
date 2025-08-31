@@ -18,7 +18,7 @@ gke-istio-xlb)
   ;;
 minikube)
   MODE=minikube
-  INTERNAL_DNS_SUFFIX="internal.testing.minikube"
+  INTERNAL_DNS_SUFFIX="internal.minikube"
   ;;
 *)
   echo "Mode minikube or gke only supported"

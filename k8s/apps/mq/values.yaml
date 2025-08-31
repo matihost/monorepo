@@ -45,4 +45,4 @@ webconsole:
   # User app password for accessing queues is optional
   istio:
     enabled: false
-    hostSuffix: testing.minikube
+    hostSuffix: minikube

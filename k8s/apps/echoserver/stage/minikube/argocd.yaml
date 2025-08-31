@@ -1,0 +1,31 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: echoserver
+spec:
+  destination:
+    name: in-cluster
+    namespace: learning
+  project: matihost
+  source:
+    helm:
+      parameters:
+      - name: ingress.class
+        value: nginx
+      - name: ingress.host
+        value: echoserver.learning.minikube
+      - name: networkPolicy.enabled
+        value: "true"
+      valueFiles:
+      - values.yaml
+    path: k8s/apps/echoserver
+    repoURL: https://github.com/matihost/monorepo.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      enabled: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

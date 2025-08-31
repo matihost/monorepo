@@ -12,10 +12,13 @@ endif
 
 DEPLOYMENT_NAME := argo-cd
 NS := argocd
-
 VALUES := values.yaml
-
 HELM_CHART := argo/argo-cd
+
+ifeq ($(strip $(ENV)),minikube)
+CN := argocd.minikube
+ENV_FLAGS := --set server.ingress.ingressClassName=nginx
+endif
 
 
 init: ## add repo
@@ -27,26 +30,45 @@ update-repo: ## update repo, show current latest version of the chart
 show-repo: update-repo ## show current version of chart repo
 	helm search repo $(HELM_CHART)
 
-ifeq ($(strip $(ENV)),minikube)
-CN := argocd.minikube
-ENV_FLAGS := --set server.ingress.ingressClassName=nginx
-endif
-
-install: update-repo ## install/upgrade
+install: update-repo create-certs ## install/upgrade
 ifndef ADMIN_PASS
 	$(error Env ADMIN_PASS is not defined.)
-endif
-ifndef ENV
-	$(error Env ENV is not defined.)
 endif
 	@helm upgrade --install $(DEPLOYMENT_NAME) $(HELM_CHART) --namespace $(NS) --create-namespace --values $(VALUES) $(VERSION_FLAG) \
 		$(ENV_FLAGS) \
 		--set global.domain="$(CN)" \
 		--set configs.secret.argocdServerAdminPassword=$$(htpasswd -bnBC 10 "" $(ADMIN_PASS) | tr -d ':\n' | sed 's/$2y/$2a/')
-	-@FILENAME="/tmp/$(CN)" && \
-	openssl req -x509 -sha256 -subj "/CN=$(CN)" -days 365 -out "$${FILENAME}.crt" -newkey rsa:2048 -nodes -keyout "$${FILENAME}.key" > /dev/null 2>&1 && \
-	kubectl create secret tls argocd-server-tls --key="$${FILENAME}.key" --cert="$${FILENAME}.crt" -n argocd
 
+
+create-certs:
+ifndef ENV
+	$(error Env ENV is not defined.)
+endif
+	@kubectl get ns argocd >/dev/null 2>&1 || kubectl create ns argocd
+	@if [ ! -e "/tmp/$(CN).key" ]; then \
+	  echo "Generating TLS certs for CN=$(CN)..."; \
+	  openssl req -x509 -sha256 -nodes -days 365 \
+	    -subj "/CN=$(CN)" \
+	    -newkey rsa:2048 \
+	    -keyout "/tmp/$(CN).key" \
+	    -out "/tmp/$(CN).crt" >/dev/null 2>&1; \
+	fi
+	@if [ ! -e "/tmp/argo-all.key" ]; then \
+	  echo "Generating TLS certs for CN=*..."; \
+	  openssl req -x509 -sha256 -nodes -days 365 \
+	    -subj "/CN=*" \
+	    -newkey rsa:2048 \
+	    -keyout "/tmp/argo-all.key" \
+	    -out "/tmp/argo-all.crt" >/dev/null 2>&1; \
+	fi
+	@kubectl create secret tls argocd-server-tls \
+		--key="/tmp/$(CN).key" \
+		--cert="/tmp/$(CN).crt" \
+		-n argocd --dry-run=client -o yaml | kubectl apply -f -
+	@kubectl create secret tls argocd-tls-all \
+		--key="/tmp/argo-all.key" \
+		--cert="/tmp/argo-all.crt" \
+		-n argocd --dry-run=client -o yaml | kubectl apply -f -
 
 uninstall: ## uninstall
 	helm uninstall $(DEPLOYMENT_NAME) -n $(NS)

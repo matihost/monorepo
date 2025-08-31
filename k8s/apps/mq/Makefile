@@ -5,7 +5,7 @@ K8S := minikube
 ifeq ($(strip $(K8S)),gke)
 	HOST_SUFFIX := internal.gke.shared1.dev.gcp.testing
 else ifeq ($(strip $(K8S)),minikube)
-	HOST_SUFFIX := testing.minikube
+	HOST_SUFFIX := minikube
 endif
 
 CN := webconsole.$(MQ_NAME).mq.learning.$(HOST_SUFFIX)
