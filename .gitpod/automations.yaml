@@ -1,0 +1,21 @@
+tasks:
+    init-000:
+        command: pre-commit install && pre-commit run
+        name: 'install pre-commit git hooks: init'
+        triggeredBy:
+            - postDevcontainerStart
+    init-001:
+        command: cd java && make build
+        name: 'build java: init'
+        triggeredBy:
+            - postDevcontainerStart
+    init-002:
+        command: cd go/learning && make build
+        name: 'build go: init'
+        triggeredBy:
+            - postDevcontainerStart
+    init-003:
+        command: cd ansible/learning && make dictionaries.yaml
+        name: 'run ansible: init'
+        triggeredBy:
+            - postDevcontainerStart

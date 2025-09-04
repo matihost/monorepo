@@ -1,7 +1,6 @@
 # Matihost's Monorepo
 
 [![License](https://img.shields.io/github/license/matihost/monorepo.svg)](https://opensource.org/licenses/MIT)
-[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-908a85?logo=gitpod)](https://gitpod.io/#https://github.com/matihost/monorepo)
 [![CI](https://github.com/matihost/monorepo/actions/workflows/ci.yaml/badge.svg)](https://github.com/matihost/monorepo/actions/workflows/ci.yaml)
 
 Various technology deployments, tools & code:
@@ -21,6 +20,7 @@ Various technology deployments, tools & code:
   * images - docker images useful in other repos
     * ansible - docker image with Ansible, available at: quay.io/matihost/ansible
     * jenkins - docker image with Jenkins and predefined plugins, available at: quay.io/matihost/jenkins:lts
+    * devcontainers - docker image for DevContainers remote development
     * buildah - experiments with buildah
     * and usually each app has also Makefile task to build its docker image as well
 
