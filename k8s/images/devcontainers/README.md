@@ -1,6 +1,6 @@
-# GitPod Custom Docker image
+# DevContainers Custom Docker image
 
-Docker image for Gitpod io development of this repository.
+Docker image for DevContainers development of this repository.
 
 ## Running
 
