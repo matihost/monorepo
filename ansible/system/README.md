@@ -6,7 +6,8 @@ Supported Ubuntu distributions:
 
 * For regular Ubuntu workstation - includes Gnome applications: **25.04 (plucky)**
 
-* For Windows Linux Subsystem (WSL) - does not include Gnome applications and virtualizations (like virt or vbox): **24.04 (noble)**
+* For console only environments like Windows Linux Subsystem (WSL) or containers - does not include Gnome applications and virtualizations (like virt or vbox): **24.04 (noble)**
+Container image using these playbooks is managed under [k8s/images/devcontainers](../../k8s/images/devcontainers/)
 
 WARNING:
 Scripts uses GitHub API, many repeats of invocation may lead to throttling - leading to fail some task (mainly cli installing tools from GitHub.

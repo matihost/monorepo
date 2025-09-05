@@ -8,8 +8,8 @@ USER vscode
 RUN echo 'PATH="$HOME/.local/bin:$HOME/bin:$PATH"' >> ~/.bashrc && export PATH="$HOME/.local/bin:$HOME/bin:$PATH" && \
     mkdir -p ~/src && cd ~/src && git clone https://github.com/matihost/monorepo.git && cd monorepo && \
     cd ansible/system && \
-    ansible-galaxy collection install community.general
-    # && \
-    # ansible-playbook -i wsl.yml ubuntu-setup.yaml -v -e wsl=false && \
-	# ansible-playbook update.yaml -v && \
-	# ansible-playbook clean.yaml -v
+    ansible-galaxy collection install community.general && \
+    ansible-playbook -i inventory/console.yml ubuntu-setup.yaml -v  && \
+	ansible-playbook -i inventory/console.yml update.yaml -v && \
+	ansible-playbook -i inventory/console.yml clean.yaml -v && \
+    rm -rf ~/src/monorepo
