@@ -32,16 +32,19 @@
   - name: Install required snaps
     community.general.snap:
       name: "{{ snaps | default([]) }}"
+    when: snaps | default([]) | length > 0
   - name: Install required classic snaps
     community.general.snap:
       name: "{{ item }}"
       classic: true
     loop: "{{ classic_snaps | default([]) }}"
+    when: classic_snaps | default([]) | length > 0
   - name: Update snap packages
     ansible.builtin.shell: snap refresh
     register: snap_result
     ignore_errors: true
     changed_when: not (snap_result.stderr is search('All snaps up to date.'))
+    when: snaps | default([]) | length > 0
 
   - name: Install root level CLIs
     ansible.builtin.shell: "{{ item.command }}"
