@@ -13,9 +13,9 @@ all: ## run all playbooks for most modern Ubuntu version
 		ansible-playbook clean.yaml $(VERBOSITY)
 
 wsl: ## run all playbooks for WSL
-	ansible-playbook -i wsl.yml ubuntu-setup.yaml $(VERBOSITY) && \
-		ansible-playbook -i wsl.yml update.yaml $(VERBOSITY) && \
-		ansible-playbook -i wsl.yml clean.yaml $(VERBOSITY)
+	ansible-playbook -i inventory/console.yml ubuntu-setup.yaml -e wsl=true -e node=true $(VERBOSITY) && \
+		ansible-playbook -i inventory/console.yml update.yaml -e wsl=true -e node=true $(VERBOSITY) && \
+		ansible-playbook -i inventory/console.yml clean.yaml -e wsl=true -e node=true $(VERBOSITY)
 
 get-github-quota: ## run current GitHub API quota
 	@echo "Remaining: $(shell curl -sL   -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/rate_limit | jq -r '.resources.core.remaining')"
