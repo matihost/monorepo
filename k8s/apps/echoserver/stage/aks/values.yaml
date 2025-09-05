@@ -1,0 +1,3 @@
+ingress:
+  class: nginx
+  host: echoserver.learning.svc.aks-shared1-dev.privatelink.northeurope.azmk8s.io

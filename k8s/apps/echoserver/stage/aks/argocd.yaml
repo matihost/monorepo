@@ -8,18 +8,17 @@ spec:
     name: in-cluster
     namespace: learning
   project: matihost
-  source:
-    helm:
-      parameters:
-      - name: ingress.class
-        value: nginx
-      - name: ingress.host
-        value: echoserver.learning.svc.aks-shared1-dev.privatelink.northeurope.azmk8s.io
+  sources:
+  - helm:
       valueFiles:
-      - values.yaml
+      - $values/aks/values.yaml
     path: k8s/apps/echoserver
     repoURL: https://github.com/matihost/monorepo.git
     targetRevision: HEAD
+  - repoURL: https://github.com/matihost/monorepo.git
+    path: k8s/apps/echoserver/stage
+    targetRevision: HEAD
+    ref: values
   syncPolicy:
     automated:
       enabled: true
