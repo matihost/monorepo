@@ -46,6 +46,7 @@
       register: yum_result
       changed_when: '"0 files removed" not in yum_result.stdout'
   - name: Clean /var/log rotated logs and dist upgrade logs
+    ignore_errors: true
     ansible.builtin.shell:
       find /var/log -type f -regex ".*\.gz$" -delete -print && \
       find /var/log -type f -regex ".*[-,\.][0-9]*$" -delete -print && \
