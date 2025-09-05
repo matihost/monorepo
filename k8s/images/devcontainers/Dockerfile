@@ -9,7 +9,4 @@ RUN echo 'PATH="$HOME/.local/bin:$HOME/bin:$PATH"' >> ~/.bashrc && export PATH="
     mkdir -p ~/src && cd ~/src && git clone https://github.com/matihost/monorepo.git && cd monorepo && \
     cd ansible/system && \
     ansible-galaxy collection install community.general && \
-    ansible-playbook -i inventory/console.yml ubuntu-setup.yaml -v  && \
-	ansible-playbook -i inventory/console.yml update.yaml -v && \
-	ansible-playbook -i inventory/console.yml clean.yaml -v && \
-    rm -rf ~/src/monorepo
+    ansible-playbook -i inventory/console.yml ubuntu-setup.yaml -v
