@@ -2,11 +2,17 @@ TAG := latest
 GROUP := matihost
 NAME := gitpod/runner
 
+DOCKERFILE := Dockerfile
+
+ifneq ($(strip $(TAG)),latest)
+	DOCKERFILE := Dockerfile.$(TAG)
+endif
+
 .EXPORT_ALL_VARIABLES:
 BUILDKIT_PROGRESS=plain
 
 build: ## builds docker image
-	docker build --load -t quay.io/$(GROUP)/$(NAME):$(TAG) .
+	docker build --load -f $(DOCKERFILE) -t quay.io/$(GROUP)/$(NAME):$(TAG) .
 
 push: ## push image with tag to quay.io repository (assume docker login quay.io has been perfomed)
 	docker push quay.io/$(GROUP)/$(NAME):$(TAG)

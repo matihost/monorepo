@@ -1,6 +1,6 @@
 {
 	"name": "Matihost",
-	"image": "quay.io/matihost/gitpod/runner:latest",
+	"image": "quay.io/matihost/gitpod/runner:minimal",
 	"features": {
 		"ghcr.io/devcontainers/features/node:1": {
 			"version": "lts"
