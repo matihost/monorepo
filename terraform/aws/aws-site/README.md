@@ -2,7 +2,7 @@
 
 Setup the following resources :
 
-* a bucket with name of your intended DNS of the site ([AWS requirement that endpoint matches the bucket name](https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteEndpoints.html?icmpid=docs_amazons3_console#website-endpoint-dns-cname))
+* if you intent to deploy only HTTP exposure or you cannot use TXT methind of Let's Encrypt verification (aka `bucket_as_dns = true`), then you need to have a S3 bucket with name of your intended DNS of the site ([AWS requirement that endpoint matches the bucket name](https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteEndpoints.html?icmpid=docs_amazons3_console#website-endpoint-dns-cname))
 
 * bucket is opened to read from the public internet from a bucket level and a bucket IAM resource policy level. See [Prerequistes](#prerequisites) for instruction how to open the S3 bucket on AWS account level. W/o it site cannot be exposed.
 
@@ -29,6 +29,7 @@ You may run  [../aws-iam-linked](../aws-iam-linked) module - which is opinionate
 ## Deployment (with HTTP only)
 
 * Ensure `enable_tls` variable is `false` (which is default when not provided).
+* When you intent to expose HTTP only then, then `bucket_as_dns = true`   or you need to create TLS for HTTPS via Let's Encrypt HTTP method only (no access to define TXT DNS entry) even for the first time.
 
 * WARNING: Ensure you do not have deployed Resource Control Policy (RCP) `EnforceConfusedDeputyProtection` in the account as it block all unauthenticated access to S3.
 
@@ -82,6 +83,8 @@ HTTPs exposure requires additional steps.
 Ensure you have working [http://www.mydomain.com](http://www.mydomain.com) site point to S3 site url as CNAME
 This method requires - you do not have enabled RCP on S3 on the account - as it block all unathenticated access to S3.
 
+* If you can use TXT method of verification for Let's Encrypt and you don't need bare HTTP exposure from S3, then use `bucket_as_dns = false` to avoid relying on S3 bucket name being equal to DNS name.
+
 Generate TLS certificate via Let's Encrypt: (certbot tool required):
 
 ```bash
@@ -134,8 +137,8 @@ Since it is CloudFront pointing to S3 - RCP preventing unauthenticated/confused 
 * But also **remove CNAME record from your domain name pointing to CloudFront distribution**!
 If you don't do and you want to recreate CloudFront distribution using same alias/CNAME - it will be rejected with [error](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/troubleshooting-distributions.html#troubleshoot-incorrectly-configured-DNS-record-error).
 
-* If you want to recreate deployment - please bear in mind this repo uses S3 bucket being name of your site DNS (see [prerequisites](#prerequisites) why). S3 buckets are globally unique and information about bucket is eventual consistent.. Translating to human language:
-When you remove S3 bucket and you want to create it again - [you may need to wait from several minutes to several hours](https://serverfault.com/a/770488) - for AWS to let you create S3 bucket with the same name.
+* If you want to recreate deployment and you use `bucket_as_dns = true` - then you essenctially need to recreate S3 bucket with the same name, (see [prerequisites](#prerequisites) why). S3 buckets are globally unique and information about bucket is eventual consistent.. Translating to human language:
+When you remove S3 bucket and you want to create exactly the same bucket again - [you may need to wait from several minutes to several hours](https://serverfault.com/a/770488) - for AWS to let you create S3 bucket with the same name.
 
 ### Refresh TLS certificate
 

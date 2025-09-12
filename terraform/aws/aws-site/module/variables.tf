@@ -35,6 +35,12 @@ variable "enable_tls" {
   default     = false
 }
 
+variable "bucket_as_dns" {
+  type        = bool
+  description = "Whether name of S3 bucket for a site is named with DNS name. When it is DNS name, then S3 bucket can be used to expose app solely via HTTP"
+  default     = true
+}
+
 variable "tls_crt" {
   type        = string
   description = "TLS certificate"

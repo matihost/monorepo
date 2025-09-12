@@ -1,5 +1,11 @@
+resource "random_id" "bucket-random" {
+  count = var.bucket_as_dns ? 0 : 1
+
+  byte_length = 4
+}
+
 resource "aws_s3_bucket" "bucket" {
-  bucket              = var.dns
+  bucket              = var.bucket_as_dns ? var.dns : "${var.dns}-${random_id.bucket-random[0].hex}"
   force_destroy       = "true"
   object_lock_enabled = "false"
 }

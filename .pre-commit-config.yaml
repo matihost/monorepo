@@ -96,7 +96,7 @@ repos:
     additional_dependencies:
     - .[community,yamllint]
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.12.8
+  rev: v0.13.0
   hooks:
   - id: ruff # python linter
     args: [ --fix ]

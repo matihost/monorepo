@@ -6,7 +6,7 @@ Terraform scripts creating:
 
 - OIDC role which can be assumed by GitHub action for selected GitHub repositories
 
-This setup use AWS resources eliglible to AWS Free Tier __only__.
+This setup use AWS resources eligible to AWS Free Tier __only__.
 
 ## Prerequisites
 

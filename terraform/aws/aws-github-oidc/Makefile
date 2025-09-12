@@ -19,12 +19,14 @@ endif
 ENV := current
 
 init:
-	cd stage/$(ENV) && terragrunt init -upgrade=true
+	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
 
 
 run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
 	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
+get-role-to-assume: ## return role to be places in AWS GitHub Action role-to-assume parameter
+	cd stage/current &&  terragrunt output -raw oidc_role_arn 2>/dev/null
 
 show-state: ## show state
 	cd stage/current && terragrunt state list && terragrunt show

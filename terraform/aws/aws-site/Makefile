@@ -19,7 +19,7 @@ endif
 ENV := dev
 
 init:
-	cd stage/$(ENV) && terragrunt init -upgrade=true
+	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
 
 run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
 	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
@@ -58,9 +58,9 @@ ifeq ($(strip $(TLS_MODE)),TXT)
 	TLS_AUTHZ_MODE_TXT := --preferred-challenges=dns
 endif
 
-generate-letsencrypt-cert: ## generate Let's Encrypt TLS certificate, usage make generate-letsencrypt-cert DOMAIN=domain.mooo.com [ALTERNATIVE_DOMAINS=some.domain.mooo.com,another.mooo.com] [TLS_MODE=HTTP]
+generate-letsencrypt-cert: ## generate Let's Encrypt TLS certificate, usage make generate-letsencrypt-cert DOMAIN=domain.mooo.com DOMAINS=some.domain.mooo.com,another.mooo.com [TLS_MODE=HTTP]
 ifndef DOMAINS
-	$(error Env DOMAINS is not defined. Usage make generate-letsencrypt-cert DOMAIN=domain.mooo.com)
+	$(error Env DOMAINS is not defined. Usage make generate-letsencrypt-cert DOMAIN=domain.mooo.com DOMAINS=domain.mooo.com,domain2.mooo.com)
 endif
 ifndef MAIN_DOMAIN
 	$(error Env MAIN_DOMAIN is not defined. Usage make generate-letsencrypt-cert MAIN_DOMAIN=domain.mooo.com DOMAINS=domain.mooo.com,domain2.mooo.com)

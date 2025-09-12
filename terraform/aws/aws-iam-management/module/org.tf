@@ -1,9 +1,15 @@
 resource "aws_organizations_organization" "org" {
   enabled_policy_types = ["SERVICE_CONTROL_POLICY", "TAG_POLICY", "RESOURCE_CONTROL_POLICY"]
+  # Configure trusted services
+  #
   # In order to Cloud Identity be able to work sso.amazonaws.com has to be explicitly mentioned
   # To enable Centralized root access management iam.amazonaws.com has to be explicitly mentioned
-  aws_service_access_principals = ["sso.amazonaws.com", "iam.amazonaws.com"]
-  feature_set                   = "ALL"
+  aws_service_access_principals = [
+    "sso.amazonaws.com",
+    "iam.amazonaws.com",
+    "account.amazonaws.com"
+  ]
+  feature_set = "ALL"
 }
 
 # Centralized root access management

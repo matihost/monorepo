@@ -24,11 +24,14 @@ inputs = {
   # run to generate one:
   # make generate-letsencrypt-cert DOMAIn=www.yoursite.pl
   enable_tls = true
-  tls_crt    = local.tls_crt
-  tls_chain  = local.tls_chain
-  tls_key    = local.tls_key
-  region     = "us-east-1"
-  zone       = "us-east-1a"
+  # when you intent to expose HTTP only or you need to create TLS via HTTP method only
+  # but if you have already TLS certificate then you can deploy it strait away as HTTPS
+  bucket_as_dns = false
+  tls_crt       = local.tls_crt
+  tls_chain     = local.tls_chain
+  tls_key       = local.tls_key
+  region        = "us-east-1"
+  zone          = "us-east-1a"
   aws_tags = {
     Env    = "prod"
     Region = "us-east1"
