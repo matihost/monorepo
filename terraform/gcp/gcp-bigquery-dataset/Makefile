@@ -18,7 +18,7 @@ else
 endif
 
 init:
-	cd stage/$(ENV) && terragrunt init -upgrade=true
+	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
 
 run: init ## usage: make run [ENV=current] [MODE=apply] [DEBUG=false])
 	cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)

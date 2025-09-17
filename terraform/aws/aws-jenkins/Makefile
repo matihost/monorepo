@@ -24,7 +24,7 @@ ENV := dev
 REGION := us-east-1
 
 init: prepare
-	cd stage/$(ENV) && terragrunt init -upgrade=true
+	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
 
 
 run: init check-master-ami check-agent-ami ## setup Jenkins Master EC2 instance group, usage: make run [ENV=dev] [MODE=apply]

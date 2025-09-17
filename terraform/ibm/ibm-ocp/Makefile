@@ -21,7 +21,7 @@ endif
 ENV := dev
 
 init:
-	cd stage/$(ENV) && terragrunt init -upgrade=true
+	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
 
 
 ibm-authentication: ## authenticate ibmcloud CLI and create API key if needed

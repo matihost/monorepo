@@ -18,7 +18,7 @@ endif
 CURRENT_ACCOUNT_SSH_USER := $(shell gcloud config get-value account 2>/dev/null | sed -E "s/[.@]/_/g")
 
 init-terraform:
-	cd stage/instance && terragrunt init -upgrade=true
+	cd stage/instance && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
 
 run: init-terraform prepare ## setup free-tier eliglible Ubuntu instance, make run [MODE=apply]
 	cd stage/instance && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)

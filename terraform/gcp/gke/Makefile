@@ -18,7 +18,7 @@ endif
 CLUSTER_NAME := shared1-dev
 
 init:
-	cd stage/$(CLUSTER_NAME) && terragrunt init -upgrade=true
+	cd stage/$(CLUSTER_NAME) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
 
 run: init ## setup GKE cluster: make run [CLUSTER_NAME=shared1-dev] [MODE=apply]
 	@cd stage/$(CLUSTER_NAME) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)

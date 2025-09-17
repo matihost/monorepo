@@ -18,7 +18,7 @@ else
 endif
 
 init:
-	cd stage/$(ENV) && terragrunt init -upgrade=true
+	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
 
 run: init ## usage: make run GH_OWNER=matihost GH_REPO=monorepo [ENV=current] [MODE=apply] [DEBUG=false])
 ifndef GH_REPO

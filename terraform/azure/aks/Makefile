@@ -18,7 +18,7 @@ endif
 ENV := dev-northeurope-shared1
 
 init: init-tf-backend
-	cd stage/$(ENV) && terragrunt init -upgrade=true
+	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
 
 run: init ## setup AKS: make run [ENV=dev-northeurope-shared1] [MODE=apply]
 	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)

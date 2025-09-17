@@ -19,7 +19,7 @@ init:
 ifndef ENV
 	$(error Environment ENV is not defined. Usage make init ENV=prod [DEBUG=true])
 endif
-	cd stage/$(ENV)/ghost && terragrunt init -upgrade=true
+	cd stage/$(ENV)/ghost && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
 
 run-ghost: init ## usage: Usage make run-ghost ENV=prod MODE=plan [DEBUG=true])
 ifndef ENV

@@ -26,7 +26,7 @@ else
 endif
 
 init-terraform:
-	terraform init -upgrade=true
+	terraform init -upgrade=true --backend-bootstrap --non-interactive
 
 pre-all: init-terraform
 ifndef REGION

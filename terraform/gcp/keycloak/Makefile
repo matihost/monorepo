@@ -22,7 +22,7 @@ init:
 ifndef ENV
 	$(error Environment ENV is not defined. Usage make run ENV=prod MODE=plan [DEBUG=true])
 endif
-	cd stage/$(ENV)/keycloak && terragrunt init -upgrade=true
+	cd stage/$(ENV)/keycloak && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
 
 run-keycloak: init ## usage: Usage make run-keycloak ENV=prod MODE=plan [DEBUG=true])
 ifndef ENV
@@ -41,7 +41,7 @@ clean: ## clean Terraform cached plugins and data
 	find . -name "node_modules" -exec rm -rf {} +
 
 TAG := latest
-POSTGRESQL_JDBC_VERSION := 1.25.1
+POSTGRESQL_JDBC_VERSION := 1.25.3
 KEYCLOAK_METRICS_SPI_VERSION := 7.0.0
 CURRENT_PROJECT := $(shell gcloud config get-value project 2>/dev/null)
 
