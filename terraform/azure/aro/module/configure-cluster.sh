@@ -7,6 +7,7 @@ API_URL="${3:?CLUSTER_NAME is required}"
 REGION="${4:?REGION is required}"
 OIDC="${5:?OIDC is required}"
 NAMESPACES="${6:?NAMESPACES is required}"
+PAGERDUTY_ROUTING_KEY="${7:-}"
 
 # set -e
 set -x
@@ -69,10 +70,73 @@ function configure-namespaces() {
   done
 }
 
+function configure-monitoring() {
+  # Enable User Workload Monitoring (aka PrometheusRule objects in own namespaces)
+  # https://cloud.redhat.com/experts/aro/user-workload-monitoring/
+  # https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/monitoring/configuring-user-workload-monitoring#enabling-monitoring-for-user-defined-projects_preparing-to-configure-the-monitoring-stack-uwm
+  cat <<EOF | oc apply -f -
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
+data:
+  config.yaml: |
+    enableUserWorkload: true
+EOF
+  configure-pager-duty-receiver
+}
+
+# Configure Prometheus/Alert Manager in ARO to use PagerDuty as alert receiver
+# https://www.pagerduty.com/docs/guides/prometheus-integration-guide/
+function configure-pager-duty-receiver() {
+  if [[ -n "${PAGERDUTY_ROUTING_KEY:-}" ]]; then
+    RECEIVER_NAME="pagerduty"
+    TMP_DIR=$(mktemp -d)
+    ALERTMANAGER_FILE="${TMP_DIR}/alertmanager.yaml"
+
+    # fetch and decode alertmanager.yaml from secret
+    oc -n openshift-monitoring get secret alertmanager-main -o jsonpath='{.data.alertmanager\.yaml}' |
+      base64 -d >"$ALERTMANAGER_FILE"
+
+    cp "$ALERTMANAGER_FILE" "${ALERTMANAGER_FILE}.bak"
+
+    # add PagerDuty receiver if missing
+    # the format for summary of the alert visible in PagerDuty is part of description pagerduty_configs parameter
+    # here is the default summary:
+    # https://github.com/prometheus/alertmanager/blob/main/template/default.tmpl
+    if ! yq -e ".receivers[] | select(.name == \"${RECEIVER_NAME}\")" "$ALERTMANAGER_FILE" >/dev/null 2>&1; then
+      yq -i -y ".receivers += [{
+        \"name\": \"${RECEIVER_NAME}\",
+        \"pagerduty_configs\": [{
+          \"routing_key\": \"${PAGERDUTY_ROUTING_KEY}\",
+          \"description\": \"[${CLUSTER_NAME}] {{ .GroupLabels.SortedPairs.Values | join \\\" \\\" }} {{ if gt (len .CommonLabels) (len .GroupLabels) }}({{ with .CommonLabels.Remove .GroupLabels.Names }}{{ .Values | join \\\" \\\" }}{{ end }}){{ end }}\"
+        }]
+      }]" "$ALERTMANAGER_FILE"
+    fi
+
+    if ! yq -e ".route.routes[]? | select(.matchers[]? == \"severity = critical\" and .receiver == \"${RECEIVER_NAME}\")" "$ALERTMANAGER_FILE" >/dev/null 2>&1; then
+      yq -i -y ".route.routes += [{
+        \"matchers\": [\"severity = critical\"],
+        \"receiver\": \"${RECEIVER_NAME}\"
+      }]" "$ALERTMANAGER_FILE"
+    fi
+
+    ENCODED=$(base64 -w0 <"$ALERTMANAGER_FILE")
+    oc -n openshift-monitoring patch secret alertmanager-main \
+      --type='json' \
+      -p="[{\"op\": \"replace\", \"path\": \"/data/alertmanager.yaml\", \"value\": \"${ENCODED}\"}]"
+
+    # Rollout restart of Alertmanager StatefulSet to ensure new config is read
+    oc -n openshift-monitoring rollout restart statefulset alertmanager-main
+  fi
+}
+
 # Main
 login-to-aro
 ensure-cluster-config
 configure-namespaces
+configure-monitoring
 
 # TODO install ARO ExternalDNS
 

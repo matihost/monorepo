@@ -3,10 +3,11 @@ include "root" {
 }
 
 locals {
-  env            = "dev"
-  region         = "northeurope"
-  zone           = "northeurope-az1"
-  rh_pull_secret = try(get_env("RH_PULL_SECRET"), file("~/.docker/config.json"))
+  env                       = "dev"
+  region                    = "northeurope"
+  zone                      = "northeurope-az1"
+  rh_pull_secret            = try(get_env("RH_PULL_SECRET"), file("~/.docker/config.json"))
+  pagerduty_integration_key = try(get_env("PAGERDUTY_INTEGRATION_KEY"), "")
 }
 
 terraform {
@@ -25,6 +26,8 @@ inputs = {
   worker_subnet_suffix = "aro-shared1-worker-nodes"
 
   rh_pull_secret = local.rh_pull_secret
+
+  pagerduty_integration_key = local.pagerduty_integration_key
 
   oidc = {
     oidc_name      = "id"

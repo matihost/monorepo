@@ -1,6 +1,8 @@
+SHELL := /bin/bash
+
 NS := learning
 APP := echoserver
-CN := $(APP).$(NS).apps.devshared1.northeurope.aroapp.io"
+CN := $(APP).$(NS).apps.devshared1.northeurope.aroapp.io
 
 k8s:
 	@[[ "$$(kubectl config current-context)" == *"aroapp"* ]] || { echo "Not logged to ARO cluster"; exit 1; }
@@ -25,7 +27,8 @@ create-cert: k8s
 deploy-via-helm: create-cert ## deploys app via Helm
 	helm upgrade --install $(APP) "../.." -n $(NS) --create-namespace \
 	  --set ingress.host="$(CN)" \
-	  --set ingress.class=openshift-default
+	  --set ingress.class=openshift-default \
+	  --set prometheus.alert.enabled=true
 
 uninstall-helm: k8s ## uninstall
 	helm uninstall $(APP) -n $(NS)

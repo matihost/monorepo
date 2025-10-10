@@ -84,6 +84,10 @@ variable "rh_pull_secret" {
   description = "RH Pull Secret obtained from https://console.redhat.com/openshift/install/azure/aro-provisioned"
 }
 
+variable "pagerduty_integration_key" {
+  type        = string
+  description = "PagerDuty integration key obtained from: https://www.pagerduty.com/docs/guides/prometheus-integration-guide/"
+}
 
 variable "namespaces" {
   type = list(object({

@@ -29,7 +29,7 @@ resource "azurerm_redhat_openshift_cluster" "aro" {
     # Available varsions:
     # az aro get-versions --location northeurope
     # Useful only during initial creation - as cluster can be created on with some version and later upgrade changes the version
-    version = "4.16.30"
+    version = "4.17.27"
 
 
     # Resource Group Name: "dev"
@@ -105,7 +105,7 @@ resource "null_resource" "cluster-config" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = "${path.module}/configure-cluster.sh '${azurerm_redhat_openshift_cluster.aro.resource_group_name}' '${azurerm_redhat_openshift_cluster.aro.name}' '${azurerm_redhat_openshift_cluster.aro.api_server_profile[0].url}' '${var.region}' '${jsonencode(var.oidc)}' '${jsonencode(var.namespaces)}'"
+    command = "${path.module}/configure-cluster.sh '${azurerm_redhat_openshift_cluster.aro.resource_group_name}' '${azurerm_redhat_openshift_cluster.aro.name}' '${azurerm_redhat_openshift_cluster.aro.api_server_profile[0].url}' '${var.region}' '${jsonencode(var.oidc)}' '${jsonencode(var.namespaces)}' '${var.pagerduty_integration_key}'"
   }
 
   depends_on = [

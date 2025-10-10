@@ -4,7 +4,7 @@ Setup Azure RedHat OpenShift (ARO)
 
 ## Prerequisites
 
-* Latest Terragrunt/OpenTofu installed
+* Latest Terragrunt/OpenTofu/jq/yq installed
 
 * [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux?pivots=apt)
 
@@ -62,6 +62,9 @@ export RH_PULL_SECRET='....'
 
 # Client Secret for OIDC client provider (when defined)
 export OIDC_CLIENT_SECRET="...."
+
+# Optionally if you want to integrate build in Prometheus Alert Manager to use Pager Duty as receiver
+export PAGERDUTY_INTEGRATION_KEY=...
 
 # setup ARO
 make run MODE=apply [ENV=dev-northeurope-shared1]

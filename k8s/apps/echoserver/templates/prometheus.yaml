@@ -1,0 +1,30 @@
+# yamllint disable-file
+{{- if .Values.prometheus.alert.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "app.fullname" . }}-pods-missing
+  namespace: {{ include "app.namespace" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  groups:
+    - name: {{ include "app.fullname" . }}.rules
+      rules:
+        # The alert in PagerDuty will look like: [dev-neu-shared1] learning (EchoserverPodsMissing critical)
+        - alert: EchoserverPodsMissing
+          expr: |
+            sum(
+              kube_replicaset_status_ready_replicas{namespace="{{ include "app.namespace" . }}",replicaset=~"{{ include "app.fullname" . }}.*"}
+            )== 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "No running {{ include "app.fullname" . }} pods in namespace {{ include "app.namespace" . }}"
+            description: |
+              The deployment '{{ include "app.fullname" . }}' in namespace '{{ include "app.namespace" . }}' has no running pods
+              for at least 5 minutes.
+              Check deployment status with:
+              oc get pods -n {{ include "app.namespace" . }} -l app={{ include "app.fullname" . }}
+{{- end }}

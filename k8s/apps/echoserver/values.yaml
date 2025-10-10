@@ -23,9 +23,8 @@ serviceAccount:
 
 podAnnotations: {}
 
-# this image cannot work not as root
-podSecurityContext:
-  runAsUser: 0
+# podSecurityContext:
+#   runAsUser: 0
 
 networkPolicy:
   enabled: false
@@ -94,3 +93,7 @@ affinity:
     topologyKey: kubernetes.io/hostname
     # topologyKey: failure-domain.beta.kubernetes.io/zone
     # topologyKey: topology.kubernetes.io/zone
+
+prometheus:
+  alert:
+    enabled: false
