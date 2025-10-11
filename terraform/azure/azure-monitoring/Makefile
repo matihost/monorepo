@@ -19,7 +19,7 @@ endif
 ENV := dev-westeurope
 
 init: init-tf-backend
-	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
+	cd stage/$(ENV) && terragrunt init -upgrade=true --non-interactive
 
 
 run: init ## setup VPC: make run [ENV=dev] [MODE=apply]

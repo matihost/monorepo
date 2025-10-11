@@ -12,7 +12,7 @@ data "azurerm_subnet" "worker-subnet" {
 
 
 data "azurerm_log_analytics_workspace" "log" {
-  name                = "${local.prefix}-log"
+  name                = "${local.prefix}-logging"
   resource_group_name = local.resource_group_name
 }
 
