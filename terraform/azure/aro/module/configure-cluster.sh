@@ -140,7 +140,7 @@ function configure-pager-duty-receiver() {
 configure-logging-forwarding-to-log-analytics-workspace() {
   install-logging-operator
 
-  [[ -n "$(oc get clusterlogforwarder -n openshift-logging --no-headers --ignore-not-found 2>/dev/null)" ]] || {
+  [[ -n "$(oc get obsclf -n openshift-logging --no-headers --ignore-not-found 2>/dev/null)" ]] || {
     oc -n openshift-logging create secret generic azure-monitor-shared-key --from-literal=shared_key="${LOG_WORKSPACE_SHARED_KEY}"
     oc create clusterrolebinding collect-app-logs --clusterrole=collect-application-logs --serviceaccount openshift-logging:default
     oc create clusterrolebinding collect-infra-logs --clusterrole=collect-infrastructure-logs --serviceaccount openshift-logging:default
@@ -189,7 +189,7 @@ EOF
 }
 
 install-logging-operator() {
-  [[ -n "$(oc get project openshift-logging--no-headers --ignore-not-found 2>/dev/null)" ]] || {
+  [[ -n "$(oc get project openshift-logging --no-headers --ignore-not-found 2>/dev/null)" ]] || {
     oc adm new-project --node-selector='' openshift-logging
     oc label namespace openshift-logging openshift.io/cluster-monitoring="true" --overwrite
     oc apply -f - <<EOF
@@ -223,6 +223,10 @@ ensure-cluster-config
 configure-namespaces
 configure-monitoring
 configure-logging-forwarding-to-log-analytics-workspace
+
+# TODO for monitoring
+# https://github.com/SenWangMSFT/aro-logging-and-metrics-forwarding?tab=readme-ov-file#application-logs-forwarding-to-azure-log-analytics
+# https://cloud.redhat.com/experts/o11y/openshift-coo-azuremonitor/
 
 # TODO install ARO ExternalDNS
 

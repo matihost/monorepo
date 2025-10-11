@@ -1,3 +1,6 @@
+# TODO there is a weird behavior that accessing same workspace created by CLI/GUI or via Terraforn
+# leads that Terraform one is not accessible via its primarySharedKey
+# but when object is imported to Terraform there is no difference...
 resource "azurerm_log_analytics_workspace" "workspace" {
   name                = "${local.prefix}-logging"
   location            = local.location
