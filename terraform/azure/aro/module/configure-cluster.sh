@@ -7,7 +7,9 @@ API_URL="${3:?CLUSTER_NAME is required}"
 REGION="${4:?REGION is required}"
 OIDC="${5:?OIDC is required}"
 NAMESPACES="${6:?NAMESPACES is required}"
-PAGERDUTY_ROUTING_KEY="${7:-}"
+LOG_WORKSPACE_ID="${7:?LOG_WORKSPACE_ID is required}"
+LOG_WORKSPACE_SHARED_KEY="${8:?LOG_WORKSPACE_SHARED_KEY is required}"
+PAGERDUTY_ROUTING_KEY="${9:-}"
 
 # set -e
 set -x
@@ -132,11 +134,95 @@ function configure-pager-duty-receiver() {
   fi
 }
 
+# https://cloud.redhat.com/experts/aro/clf-to-azure/
+# https://access.redhat.com/solutions/7123336
+# https://docs.okd.io/4.14/observability/logging/logging-6.0/log6x-clf.html#log6x-input-spec-filter-audit-infrastructure_logging-6x
+configure-logging-forwarding-to-log-analytics-workspace() {
+  install-logging-operator
+
+  [[ -n "$(oc get clusterlogforwarder -n openshift-logging --no-headers --ignore-not-found 2>/dev/null)" ]] || {
+    oc -n openshift-logging create secret generic azure-monitor-shared-key --from-literal=shared_key="${LOG_WORKSPACE_SHARED_KEY}"
+    oc create clusterrolebinding collect-app-logs --clusterrole=collect-application-logs --serviceaccount openshift-logging:default
+    oc create clusterrolebinding collect-infra-logs --clusterrole=collect-infrastructure-logs --serviceaccount openshift-logging:default
+    oc create clusterrolebinding collect-audit-logs --clusterrole=collect-audit-logs --serviceaccount openshift-logging:default
+  }
+  cat <<EOF | oc apply -f -
+apiVersion: observability.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+   name: instance
+   namespace: openshift-logging
+spec:
+   outputs:
+   - name: azure-monitor-app
+     type: azureMonitor
+     azureMonitor:
+       authentication:
+         sharedKey:
+           key: shared_key
+           secretName: azure-monitor-shared-key
+       customerId: $LOG_WORKSPACE_ID
+       logType: aro_${CLUSTER_NAME//-/_}_application_logs
+   - name: azure-monitor-infra
+     type: azureMonitor
+     azureMonitor:
+       authentication:
+         sharedKey:
+           key: shared_key
+           secretName: azure-monitor-shared-key
+       customerId: $LOG_WORKSPACE_ID
+       logType: aro_${CLUSTER_NAME//-/_}_infrastructure_logs
+   pipelines:
+   - name: app-pipeline
+     inputRefs:
+     - application
+     outputRefs:
+     - azure-monitor-app
+   - name: infra-pipeline
+     inputRefs:
+     - infrastructure
+     outputRefs:
+     - azure-monitor-infra
+   serviceAccount:
+      name: default
+EOF
+}
+
+install-logging-operator() {
+  [[ -n "$(oc get project openshift-logging--no-headers --ignore-not-found 2>/dev/null)" ]] || {
+    oc adm new-project --node-selector='' openshift-logging
+    oc label namespace openshift-logging openshift.io/cluster-monitoring="true" --overwrite
+    oc apply -f - <<EOF
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-logging
+  namespace: openshift-logging
+spec:
+  targetNamespaces:
+    - openshift-logging
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: cluster-logging
+  namespace: openshift-logging
+spec:
+  channel: stable-6.3
+  name: cluster-logging
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+EOF
+  }
+
+}
+
 # Main
 login-to-aro
 ensure-cluster-config
 configure-namespaces
 configure-monitoring
+configure-logging-forwarding-to-log-analytics-workspace
 
 # TODO install ARO ExternalDNS
 

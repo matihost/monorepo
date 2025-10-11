@@ -6,10 +6,10 @@ resource "azurerm_log_analytics_workspace" "workspace" {
   retention_in_days                       = 30 // values range: [30, 730]
   immediate_data_purge_on_30_days_enabled = true
 
-  daily_quota_gb = 5 # GB, -1 to disable quota
+  # daily_quota_gb = 5 # GB, -1 to disable quota
 
-  # internet_ingestion_enabled = true
-  # internet_query_enabled = true
+  internet_ingestion_enabled = true
+  internet_query_enabled     = true
 }
 
 resource "azurerm_log_analytics_solution" "container_insights" {
