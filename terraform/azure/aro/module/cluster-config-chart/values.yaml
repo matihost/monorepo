@@ -1,5 +1,6 @@
 clusterName: devshared1
 region: northeurope
+# tenant_id: ...
 # oidc:
 #   oidc_name: id
 #   issuer_url: "https://KEYCLOAK_SERVER/realms/REALM_NAME"
@@ -7,3 +8,7 @@ region: northeurope
 #   client_secret: "..."
 #   username_claim: "preferred_username"
 #   groups_claim:  "groups"
+# azure_monitor:
+#   client_id: ....
+#   client_secret: ...
+#   dcr_id: ...

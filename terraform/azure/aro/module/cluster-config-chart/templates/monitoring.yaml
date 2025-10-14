@@ -1,0 +1,56 @@
+# yamllint disable-file
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: oauth2-credentials
+  namespace: openshift-monitoring
+stringData:
+  id: {{ .Values.azure_monitor.client_id }}
+  secret: {{ .Values.azure_monitor.client_secret }}
+---
+apiVersion: v1
+data:
+  config.yaml: |
+    # Enable User Workload Monitoring - so that Prometheus will see PrometheusRule objects in other than openshift-monitoring namespaces
+    # https://cloud.redhat.com/experts/aro/user-workload-monitoring/
+    # https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/monitoring/configuring-user-workload-monitoring#enabling-monitoring-for-user-defined-projects_preparing-to-configure-the-monitoring-stack-uwm
+    enableUserWorkload: true
+    # Forward metrics to Azure Monitor Workspace
+    # https://learn.microsoft.com/en-us/azure/openshift/howto-remotewrite-prometheus
+    # TODO since there are 2 instances there are duplicated metrics in Azure Monitor: prometheus-k8s-0 and prometheus-k8s-0
+    # To get reasonable queries always limit to singe one, example:
+    # sum(kube_pod_status_ready{namespace="learning",pod=~"echoserver*",prometheus_replica=~".*-0"})
+    #
+    # No way to have only one: https://github.com/openshift/cluster-monitoring-operator/issues/896
+    # Some ugly workaround to keep 2 instances for HA but working in master/slave mode:
+    # https://medium.com/yotpoengineering/prometheus-operator-with-leader-election-solving-duplicate-remote-write-metrics-in-ha-setup-8b6581d10b45
+    # Another ugly way - additional single Prometheus only to forward metrics to other Prometheus..
+    # https://www.reddit.com/r/kubernetes/comments/18s3jlc/comment/l5j4usq/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+    # https://cloud.redhat.com/experts/o11y/openshift-coo-azuremonitor/
+    # https://stackoverflow.com/questions/54327103/how-to-avoid-multi-prometheus-instances-remote-write
+    prometheusK8s:
+      # logLevel: debug
+      remoteWrite:
+      # Metrics URL is in format
+      # https://azure_monitor_ingestion_url/dataCollectionRules/azure_monitor_dcr_id/streams/Microsoft-PrometheusMetrics/api/v1/write?api-version=2023-04-24
+      # Source: https://learn.microsoft.com/en-us/azure/azure-monitor/metrics/prometheus-remote-write?tabs=entra-id
+        - url: {{ .Values.azure_monitor.ingestion_url }}/dataCollectionRules/{{ .Values.azure_monitor.dcr_id }}/streams/Microsoft-PrometheusMetrics/api/v1/write?api-version=2023-04-24
+          writeRelabelConfigs:
+            - targetLabel: cluster
+              replacement: {{ .Values.clusterName }}
+          oauth2:
+            clientId:
+              secret:
+                name: oauth2-credentials
+                key: id
+            clientSecret:
+              name: oauth2-credentials
+              key: secret
+            tokenUrl: "https://login.microsoftonline.com/{{ .Values.tenant_id }}/oauth2/v2.0/token"
+            scopes:
+              - "https://monitor.azure.com/.default"
+kind: ConfigMap
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring

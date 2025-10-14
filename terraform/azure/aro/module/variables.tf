@@ -1,6 +1,9 @@
 data "azuread_client_config" "current" {
 }
 
+data "azurerm_client_config" "current" {
+}
+
 data "azurerm_subscription" "current" {
 }
 
@@ -23,6 +26,7 @@ locals {
 locals {
   # tflint-ignore: terraform_unused_declarations
   subscription_id     = data.azurerm_subscription.current.id
+  tenant_id           = data.azurerm_client_config.current.tenant_id
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = var.region
   prefix              = "${var.env}-${local.azure_region_abbreviations[var.region]}"

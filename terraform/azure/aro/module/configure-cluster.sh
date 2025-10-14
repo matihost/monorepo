@@ -9,7 +9,12 @@ OIDC="${5:?OIDC is required}"
 NAMESPACES="${6:?NAMESPACES is required}"
 LOG_WORKSPACE_ID="${7:?LOG_WORKSPACE_ID is required}"
 LOG_WORKSPACE_SHARED_KEY="${8:?LOG_WORKSPACE_SHARED_KEY is required}"
-PAGERDUTY_ROUTING_KEY="${9:-}"
+TENANT_ID="${9:?TENANT_ID is required}"
+AZURE_MONITOR_URL="${10:?TENANT_ID is required}"
+MP_CLIENT_ID="${11:?MP_CLIENT_ID is required}"
+MP_CLIENT_SECRET="${12:?MP_CLIENT_SECRET is required}"
+MP_DCR_ID="${13:?MP_DCR_ID is required}"
+PAGERDUTY_ROUTING_KEY="${14:-}"
 
 # set -e
 set -x
@@ -54,6 +59,11 @@ function ensure-cluster-config() {
     --force \
     --set clusterName="${CLUSTER_NAME}" \
     --set region="${REGION}" \
+    --set tenant_id="${TENANT_ID}" \
+    --set azure_monitor.ingestion_url="${AZURE_MONITOR_URL}" \
+    --set azure_monitor.client_id="${MP_CLIENT_ID}" \
+    --set azure_monitor.client_secret="${MP_CLIENT_SECRET}" \
+    --set azure_monitor.dcr_id="${MP_DCR_ID}" \
     --set-json oidc="$(echo -n "${OIDC}" | jq -r)"
 }
 
@@ -73,19 +83,7 @@ function configure-namespaces() {
 }
 
 function configure-monitoring() {
-  # Enable User Workload Monitoring (aka PrometheusRule objects in own namespaces)
-  # https://cloud.redhat.com/experts/aro/user-workload-monitoring/
-  # https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/monitoring/configuring-user-workload-monitoring#enabling-monitoring-for-user-defined-projects_preparing-to-configure-the-monitoring-stack-uwm
-  cat <<EOF | oc apply -f -
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cluster-monitoring-config
-  namespace: openshift-monitoring
-data:
-  config.yaml: |
-    enableUserWorkload: true
-EOF
+  # enableUserWorkloads in cluster-monitoring-config/openshift-monitoring config map part of cluster-config-chart
   configure-pager-duty-receiver
 }
 

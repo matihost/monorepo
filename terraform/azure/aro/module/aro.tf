@@ -105,7 +105,7 @@ resource "null_resource" "cluster-config" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = "${path.module}/configure-cluster.sh '${azurerm_redhat_openshift_cluster.aro.resource_group_name}' '${azurerm_redhat_openshift_cluster.aro.name}' '${azurerm_redhat_openshift_cluster.aro.api_server_profile[0].url}' '${var.region}' '${jsonencode(var.oidc)}' '${jsonencode(var.namespaces)}' '${local.log_analytics_workspace_id}' '${local.log_analytics_workspace_primary_shared_key}' '${var.pagerduty_integration_key}'"
+    command = "${path.module}/configure-cluster.sh '${azurerm_redhat_openshift_cluster.aro.resource_group_name}' '${azurerm_redhat_openshift_cluster.aro.name}' '${azurerm_redhat_openshift_cluster.aro.api_server_profile[0].url}' '${var.region}' '${jsonencode(var.oidc)}' '${jsonencode(var.namespaces)}' '${local.log_analytics_workspace_id}' '${local.log_analytics_workspace_primary_shared_key}' '${local.tenant_id}' '${local.azure_monitor_ingestion_url}' '${local.metrics_publisher_client_id}' '${local.metrics_publisher_client_secret}' '${local.azure_monitor_dcr_id}' '${var.pagerduty_integration_key}'"
   }
 
   depends_on = [
