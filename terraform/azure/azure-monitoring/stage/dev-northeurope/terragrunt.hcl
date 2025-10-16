@@ -3,6 +3,7 @@ include "root" {
 }
 
 locals {
+  email           = get_env("ALERT_EMAIL", "")
   env             = "dev"
   region          = "northeurope"
   region_abbr     = "neu"
@@ -17,7 +18,8 @@ terraform {
 
 
 inputs = {
-  env    = "dev"
-  region = local.region
-  zone   = local.zone
+  env         = "dev"
+  region      = local.region
+  zone        = local.zone
+  alert_email = local.email
 }

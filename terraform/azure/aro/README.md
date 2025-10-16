@@ -1,6 +1,12 @@
 # Terraform :: ARO
 
-Setup Azure RedHat OpenShift (ARO)
+Setup Azure RedHat OpenShift (ARO) with the following addons:
+
+* OIDC integration for SSO access
+* Optional PagerDuty alert receive for internal OpenShift Prometheus alerts
+* Forwarding logs to Azure Log Analysis Workspace
+* Forwarding internal Prometheus metrics to Alert Monitoring Workspace, plus  PrometheusAlert "down" alert on Azure Monitor level
+* Opinionated namespaces management along with quota/limits.
 
 ## Prerequisites
 

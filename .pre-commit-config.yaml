@@ -29,16 +29,23 @@ repos:
 - repo: https://github.com/gruntwork-io/pre-commit
   rev: v0.1.30
   hooks:
-  # TODO enabled when tofu is supported
-  # - id: terraform-fmt
-  # - id: terraform-validate
-  - id: terragrunt-hclfmt
+  - id: tofu-fmt
+  - id: tofu-validate
+  - id: terragrunt-hcl-fmt
+  - id: markdown-link-check
+  - id: gofmt
+  - id: golangci-lint
+  - id: goimports
+  - id: yapf
+  - id: packer-validate
+  # TODO add helm lint, https://github.com/gruntwork-io/pre-commit?tab=readme-ov-file#helm-lint-caveats
+  # - id: helmlint
   # OpenTofu is not supported by tflint
   # https://github.com/terraform-linters/tflint/issues/2194
   # Incompatibility between OpenTofu like OpenTofu support for_each for providers
   # - id: tflint
 - repo: https://github.com/antonbabenko/pre-commit-terraform
-  rev: v1.100.0
+  rev: v1.102.0
   hooks:
   - id: terraform_trivy
     args:
@@ -96,7 +103,7 @@ repos:
     additional_dependencies:
     - .[community,yamllint]
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.13.0
+  rev: v0.14.0
   hooks:
   - id: ruff # python linter
     args: [ --fix ]

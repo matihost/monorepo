@@ -18,6 +18,7 @@ include "root" {
 }
 
 locals {
+  email           = get_env("ALERT_EMAIL", "")
   env             = "dev"
   storage_account = "cshell2${local.env}2polc2${substr(uuidv5("dns", run_cmd("--terragrunt-quiet", find_in_parent_folders("get_state_storage_account_name.sh"))), 0, 6)}"
   region          = "polandcentral"
@@ -31,7 +32,8 @@ terraform {
 
 
 inputs = {
-  env    = "dev"
-  region = local.region
-  zone   = local.zone
+  env         = "dev"
+  region      = local.region
+  zone        = local.zone
+  alert_email = local.email
 }

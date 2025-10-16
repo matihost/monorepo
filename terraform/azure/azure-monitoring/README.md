@@ -5,6 +5,7 @@ Setup Azure monitoring infrastructure:
 * Log Analytics Workspace
 * Azure Monitor Workspace (aka managed Prometheus)
 * Azure Managed Grafana
+* Default Alert Action Group being email notification (disabled when EMAIL is missing, but Action group is created for use)
 
 ## Prerequisites
 
@@ -30,6 +31,9 @@ Setup Azure monitoring infrastructure:
 ## Usage
 
 ```bash
+
+# (Optionally) Email which alert will be sent by default
+export ALERT_EMAIL="email@email.com"
 # setup Monitoring resources
 make run MODE=apply ENV=dev-westeurope
 ```

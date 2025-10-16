@@ -48,6 +48,12 @@ locals {
   }
 }
 
+variable "alert_email" {
+  default     = ""
+  type        = string
+  description = "Default email all alets should go to, when not provided, the email is dummy and  the action handles is marked as disabled"
+}
+
 
 # tflint-ignore: terraform_unused_declarations
 variable "zone" {

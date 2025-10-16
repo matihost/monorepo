@@ -1163,7 +1163,7 @@ all:
           desc: Node.js swithing engine, NodeJS LTS install/update plus global tools - Serverless, ncu installation
           become: false
           command: |
-            GLOBAL_PACKAGES="npm-check-updates serverless"
+            GLOBAL_PACKAGES="npm-check-updates serverless markdown-link-check"
             CURRENT_VERSION="$(curl -sL https://api.github.com/repos/nvm-sh/nvm/releases/latest | jq -r ".tag_name")"
             INSTALLED_VERSION="v$(bash -ic  "nvm --version")"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
