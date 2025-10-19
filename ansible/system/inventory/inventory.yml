@@ -1075,6 +1075,37 @@ all:
                   xargs curl -s -L -o "/tmp/caprine.deb"
               apt -y install /tmp/caprine.deb
             }
+        - name: musescore
+          become: false
+          desc: Ensure latest version of Muse Score Studio is installed
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/musescore/MuseScore/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(musescore4portable --version 2>/dev/null | sed "s/MuseScore4 /v/g")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              if command -v musescore4portable >/dev/null; then
+                musescore4portable upgrade
+              else
+                curl -sL https://api.github.com/repos/musescore/MuseScore/releases/latest | jq -r ".assets[] |
+                  select(.name | (endswith(\"x86_64.AppImage\")) and startswith(\"MuseScore-Studio\")) | .browser_download_url" |
+                    xargs curl -s -L -o "/tmp/musescore.AppImage"
+                chmod u+x /tmp/musescore.AppImage
+                /tmp/musescore.AppImage install
+              fi
+            }
+            [ -e ~/.local/share/applications/musescore.desktop  ] || {
+              mkdir -p ~/.local/share/applications
+              echo "[Desktop Entry]
+            Version=1.0
+            Name=MuseScore Studio
+            GenericName=MuseScore
+            Comment=MuseScore Studio
+            Exec=${HOME}/.local/bin/musescore4portable
+            StartupNotify=true
+            Terminal=false
+            Type=Application
+            Categories=Entertainment;" > ~/.local/share/applications/musescore.desktop
+              echo "MuseScore link installed"
+            }
         - name: datadog
           become: true
           desc: |
