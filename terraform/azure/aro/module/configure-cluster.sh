@@ -161,26 +161,26 @@ spec:
            secretName: azure-monitor-shared-key
        customerId: $LOG_WORKSPACE_ID
        logType: aro_${CLUSTER_NAME//-/_}_application_logs
-   - name: azure-monitor-infra
-     type: azureMonitor
-     azureMonitor:
-       authentication:
-         sharedKey:
-           key: shared_key
-           secretName: azure-monitor-shared-key
-       customerId: $LOG_WORKSPACE_ID
-       logType: aro_${CLUSTER_NAME//-/_}_infrastructure_logs
+  #  - name: azure-monitor-infra
+  #    type: azureMonitor
+  #    azureMonitor:
+  #      authentication:
+  #        sharedKey:
+  #          key: shared_key
+  #          secretName: azure-monitor-shared-key
+  #      customerId: $LOG_WORKSPACE_ID
+  #      logType: aro_${CLUSTER_NAME//-/_}_infrastructure_logs
    pipelines:
    - name: app-pipeline
      inputRefs:
      - application
      outputRefs:
      - azure-monitor-app
-   - name: infra-pipeline
-     inputRefs:
-     - infrastructure
-     outputRefs:
-     - azure-monitor-infra
+  #  - name: infra-pipeline
+  #    inputRefs:
+  #    - infrastructure
+  #    outputRefs:
+  #    - azure-monitor-infra
    serviceAccount:
       name: default
 EOF
