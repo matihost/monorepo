@@ -177,6 +177,8 @@ all:
           repo: "deb [arch=amd64] https://dbeaver.io/debs/dbeaver-ce /"
           key_url: "https://dbeaver.io/debs/dbeaver.gpg.key"
         packages:
+        - net-tools
+        - sshuttle
         - apache2-utils # for htpasswd
         - network-manager
         - neofetch

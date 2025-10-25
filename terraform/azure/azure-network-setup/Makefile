@@ -16,7 +16,7 @@ else
 endif
 
 
-ENV := dev-westeurope
+ENV := dev-northeurope
 
 init: init-tf-backend
 	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive

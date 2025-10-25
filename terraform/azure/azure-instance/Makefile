@@ -16,7 +16,7 @@ else
 endif
 
 
-ENV := dev-westeurope
+ENV := dev-northeurope
 
 init: init-tf-backend prepare
 	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
@@ -47,7 +47,7 @@ shutdown-local-proxy: ## shutdown tunneled bastion's HTTP proxy
 	@-[ "$(shell sudo ss -antl |grep -c 2022)" -eq 0 ] || sudo kill -9 $(shell sudo lsof -t -i:2022)
 
 
-expose-proxy-via-ssh-locally: ## expose TinyProxy locally to access resource inside VNet - uses ssh tunneling (done via az tunnel), needs 2 ports, but more resilient
+expose-jump-box-ssh-locally:
 	@[ "$(shell sudo ss -antl |grep -c 2022)" -ne 0 ] || az network bastion tunnel \
   --name $(shell cd stage/$(ENV) && terragrunt output bastion_name)  \
   --resource-group dev \
@@ -55,8 +55,13 @@ expose-proxy-via-ssh-locally: ## expose TinyProxy locally to access resource ins
   --resource-port 22 \
   --port 2022 &
 	@sleep 2 # workaround for az tunnel delay when run in background
+
+expose-proxy-via-ssh-locally: expose-jump-box-ssh-locally ## expose TinyProxy locally to access resource inside VNet - uses ssh tunneling (done via az tunnel), needs 2 ports, but more resilient
 	@[ "$(shell sudo ss -antl |grep -c 8888)" -ne 0 ] || ssh -o StrictHostKeyChecking=accept-new -f -N -i ~/.ssh/id_rsa.cloud.vm ubuntu@127.0.0.1 -p 2022 -L 8888:127.0.0.1:8888
 
+
+sshutle: expose-jump-box-ssh-locally ## create sshuttle VPN via instance to the network where instance is located
+	sshuttle --dns -e "ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.cloud.vm" -NHr   "ubuntu@localhost:2022" 10.0.0.0/8
 
 test: ## test connectivity via proxy to vm ngnix
 	export http_proxy=http://localhost:8888 && export https_proxy=http://localhost:8888 && curl http://dev-weu-vm

@@ -45,7 +45,7 @@ repos:
   # Incompatibility between OpenTofu like OpenTofu support for_each for providers
   # - id: tflint
 - repo: https://github.com/antonbabenko/pre-commit-terraform
-  rev: v1.102.0
+  rev: v1.103.0
   hooks:
   - id: terraform_trivy
     args:
@@ -103,7 +103,7 @@ repos:
     additional_dependencies:
     - .[community,yamllint]
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.14.0
+  rev: v0.14.1
   hooks:
   - id: ruff # python linter
     args: [ --fix ]

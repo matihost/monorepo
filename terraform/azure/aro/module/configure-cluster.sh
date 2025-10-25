@@ -137,7 +137,6 @@ function configure-pager-duty-receiver() {
 # https://docs.okd.io/4.14/observability/logging/logging-6.0/log6x-clf.html#log6x-input-spec-filter-audit-infrastructure_logging-6x
 configure-logging-forwarding-to-log-analytics-workspace() {
   install-logging-operator
-
   [[ -n "$(oc get obsclf -n openshift-logging --no-headers --ignore-not-found 2>/dev/null)" ]] || {
     oc -n openshift-logging create secret generic azure-monitor-shared-key --from-literal=shared_key="${LOG_WORKSPACE_SHARED_KEY}"
     oc create clusterrolebinding collect-app-logs --clusterrole=collect-application-logs --serviceaccount openshift-logging:default
@@ -212,7 +211,20 @@ spec:
   sourceNamespace: openshift-marketplace
 EOF
   }
+  wait_for_resource ClusterLogForwarder
+}
 
+wait_for_resource() {
+  local resource="$1" timeout=300 interval=5 elapsed=0
+  while true; do
+    [[ "$(oc api-resources | grep -c "$resource")" -gt 0 ]] && return 0
+    ((elapsed >= timeout)) && {
+      echo "Timeout waiting for $resource"
+      exit 1
+    }
+    sleep "$interval"
+    ((elapsed += interval))
+  done
 }
 
 # Main
