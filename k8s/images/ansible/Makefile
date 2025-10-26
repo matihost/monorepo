@@ -5,6 +5,7 @@ else
 	ROOT_TAG := $(TAG)-root
 endif
 
+SHELL := /usr/bin/env bash
 .EXPORT_ALL_VARIABLES:
 BUILDKIT_PROGRESS=plain
 

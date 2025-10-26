@@ -1,3 +1,6 @@
+SHELL := /usr/bin/env bash
+.EXPORT_ALL_VARIABLES:
+
 # https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd#changelog
 HELM_CHART_VERSION := latest
 ifneq ($(strip $(HELM_CHART_VERSION)),latest)

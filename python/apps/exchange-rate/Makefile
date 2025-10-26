@@ -1,6 +1,7 @@
-TAG := latest
-
+SHELL := /usr/bin/env bash
 .EXPORT_ALL_VARIABLES:
+
+TAG := latest
 BUILDKIT_PROGRESS=plain
 
 init: ## install poetry dependencies, required to be run once

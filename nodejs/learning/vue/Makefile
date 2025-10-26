@@ -2,6 +2,7 @@ BASE := quay.io/matihost/vue
 TAG := latest
 IMAGE := $(BASE):${TAG}
 
+SHELL := /usr/bin/env bash
 .EXPORT_ALL_VARIABLES:
 BUILDKIT_PROGRESS=plain
 

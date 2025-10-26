@@ -1,3 +1,4 @@
+SHELL := /usr/bin/env bash
 .EXPORT_ALL_VARIABLES:
 
 RHCS_TOKEN := $(shell rosa token --refresh)

@@ -1,3 +1,6 @@
+SHELL := /usr/bin/env bash
+.EXPORT_ALL_VARIABLES:
+
 deploy-on-minikube: ## deploys OPA Gatekeeper on Minikube (assumes kubecontext points to Minikube )
 	ansible-playbook -i inventory/minikube deploy-gatekeeper.yaml -v
 

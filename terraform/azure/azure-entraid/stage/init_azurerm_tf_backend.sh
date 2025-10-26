@@ -17,7 +17,7 @@ STATE_CONTAINER_NAME="$("${SCRIPT_DIR}"/get_state_container_name.sh)"
   az provider register --namespace Microsoft.Storage
   echo "TODO wait to ensure Microsoft.Storage namespace is registered so that it is possible to spin Storage Account"
   sleep 120
-  az storage account create --name "${STATE_STORAGE_ACCOUNT}" --resource-group "${STATE_RG}" --location "${LOCATION}" --sku Standard_LRS
+  az storage account create --name "${STATE_STORAGE_ACCOUNT}" --resource-group "${STATE_RG}" --location "${LOCATION}" --sku Standard_LRS --https-only true --min-tls-version TLS1_2
 }
 
 [ "$(az storage container list --account-name "${STATE_STORAGE_ACCOUNT}" --query "[?name=='${STATE_CONTAINER_NAME}'].name" --output tsv 2>/dev/null)" == "${STATE_CONTAINER_NAME}" ] || {

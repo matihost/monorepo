@@ -66,4 +66,8 @@ inputs = {
       cidr_range = "10.1.64.0/19"
     }
   }
+
+  tags = {
+    Environment = "dev"
+  }
 }

@@ -1,3 +1,4 @@
+SHELL := /usr/bin/env bash
 .EXPORT_ALL_VARIABLES:
 
 JENKINS_MASTER_AMI := jenkins-master

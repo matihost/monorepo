@@ -1,3 +1,6 @@
+SHELL := /usr/bin/env bash
+.EXPORT_ALL_VARIABLES:
+
 # Istio via Operator
 
 deploy-istio-operator-on-minikube-on-docker-wo-cni: ## deploys Istio via Operator on Minikube with Docker without CNI enabled (assumes kubecontext points to Minikube )

@@ -27,6 +27,8 @@ inputs = {
 
   rh_pull_secret = local.rh_pull_secret
 
+  public = false
+
   pagerduty_integration_key = local.pagerduty_integration_key
 
   oidc = {

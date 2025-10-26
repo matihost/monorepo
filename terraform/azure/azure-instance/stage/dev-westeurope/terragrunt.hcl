@@ -25,5 +25,9 @@ inputs = {
   ssh_pub_key        = local.pub_ssh
   ssh_key            = local.ssh_key
   user_data_template = local.user_data_template
-  spot               = true
+  spot               = false
+
+  tags = {
+    Environment = "dev"
+  }
 }

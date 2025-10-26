@@ -5,9 +5,7 @@ locals {
   state_storage_account = "${run_cmd("--terragrunt-quiet", find_in_parent_folders("get_state_storage_account_name.sh"))}"
   state_container       = "${run_cmd("--terragrunt-quiet", find_in_parent_folders("get_state_container_name.sh"))}"
 
-  tenant_id             = "${run_cmd("--terragrunt-quiet", "az", "account", "show", "--query", "tenantId", "-o", "tsv")}"
-  container_instance_id = "${run_cmd("--terragrunt-quiet", "az", "ad", "sp", "list", "--display-name", "Azure Container Instance", "--query", "[].id", "-o", "tsv")}"
-
+  tenant_id = "${run_cmd("--terragrunt-quiet", "az", "account", "show", "--query", "tenantId", "-o", "tsv")}"
 }
 
 remote_state {
@@ -33,6 +31,14 @@ generate "provider" {
   contents  = <<EOF
 provider "azurerm" {
   subscription_id = "${local.subscription_id}"
+  tenant_id       = "${local.tenant_id}"
+
+  # assuming user is either logged via az cli (default)
+  # or
+  # env variables for Service Principa/Managed Identity are provided:
+  # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/service_principal_client_secret
+  # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/managed_service_identity
+
   resource_provider_registrations = "extended"
   resource_providers_to_register = [
       "Microsoft.RedHatOpenShift",
@@ -61,5 +67,4 @@ inputs = {
   state_resource_group  = local.state_resource_group
   state_storage_account = local.state_storage_account
   state_container       = local.state_container
-  container_instance_id = local.container_instance_id
 }

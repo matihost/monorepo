@@ -1,4 +1,5 @@
 
+SHELL := /usr/bin/env bash
 .EXPORT_ALL_VARIABLES:
 
 define PV_TEMPLATE

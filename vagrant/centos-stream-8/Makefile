@@ -1,3 +1,4 @@
+SHELL := /usr/bin/env bash
 .EXPORT_ALL_VARIABLES:
 # VBox disks is experimental
 # Enabling all experimental features

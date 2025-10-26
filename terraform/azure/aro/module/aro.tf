@@ -58,11 +58,11 @@ resource "azurerm_redhat_openshift_cluster" "aro" {
   }
 
   api_server_profile {
-    visibility = "Public"
+    visibility = var.public ? "Public" : "Private"
   }
 
   ingress_profile {
-    visibility = "Public"
+    visibility = var.public ? "Public" : "Private"
   }
 
   worker_profile {

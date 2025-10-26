@@ -1,3 +1,6 @@
+SHELL := /usr/bin/env bash
+.EXPORT_ALL_VARIABLES:
+
 clean: ## clean build results
 	rm -rf target
 

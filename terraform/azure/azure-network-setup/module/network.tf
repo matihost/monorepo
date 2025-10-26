@@ -3,6 +3,8 @@ resource "azurerm_virtual_network" "vnet" {
   location            = local.location
   name                = "${local.prefix}-vnet"
   resource_group_name = local.resource_group_name
+
+  tags = var.tags
 }
 
 
@@ -31,6 +33,8 @@ resource "azurerm_route_table" "route_table" {
   location            = local.location
   name                = "${local.prefix}-vnet-route-table"
   resource_group_name = local.resource_group_name
+
+  tags = var.tags
 }
 
 resource "azurerm_subnet_route_table_association" "subnet" {
@@ -48,6 +52,8 @@ resource "azurerm_nat_gateway" "nat" {
   name                = "${local.prefix}-natgateway"
   location            = local.location
   resource_group_name = local.resource_group_name
+
+  tags = var.tags
 }
 
 resource "azurerm_public_ip" "nat" {
@@ -56,6 +62,8 @@ resource "azurerm_public_ip" "nat" {
   resource_group_name = local.resource_group_name
   allocation_method   = "Static"
   sku                 = "Standard"
+
+  tags = var.tags
 }
 
 resource "azurerm_nat_gateway_public_ip_association" "nat" {

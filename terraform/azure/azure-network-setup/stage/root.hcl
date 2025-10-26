@@ -7,7 +7,6 @@ locals {
 
   tenant_id             = "${run_cmd("--terragrunt-quiet", "az", "account", "show", "--query", "tenantId", "-o", "tsv")}"
   container_instance_id = "${run_cmd("--terragrunt-quiet", "az", "ad", "sp", "list", "--display-name", "Azure Container Instance", "--query", "[].id", "-o", "tsv")}"
-
 }
 
 remote_state {
@@ -33,6 +32,14 @@ generate "provider" {
   contents  = <<EOF
 provider "azurerm" {
   subscription_id = "${local.subscription_id}"
+  tenant_id = "${local.tenant_id}"
+
+  # assuming user is either logged via az cli (default)
+  # or
+  # env variables for Service Principa/Managed Identity are provided:
+  # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/service_principal_client_secret
+  # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/managed_service_identity
+
   resource_provider_registrations = "extended"
   features {
     resource_group {

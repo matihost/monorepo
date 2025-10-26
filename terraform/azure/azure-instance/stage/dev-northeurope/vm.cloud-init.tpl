@@ -7,6 +7,7 @@ repo_update: true
 repo_upgrade: all
 
 packages:
+ - net-tools
  - nginx
  - tinyproxy
  - plocate

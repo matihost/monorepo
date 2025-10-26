@@ -3,6 +3,7 @@ CURRENT_DIR := $(notdir $(shell pwd))
 NAME := $(CURRENT_DIR)
 REPO := quay.io/matihost
 
+SHELL := /usr/bin/env bash
 .EXPORT_ALL_VARIABLES:
 BUILDKIT_PROGRESS=plain
 

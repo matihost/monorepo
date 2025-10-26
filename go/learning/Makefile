@@ -6,6 +6,7 @@ DIR := $(shell pwd )
 
 GO_PACKAGE := $(PROJECT)/$(REPOSITORY)
 
+SHELL := /usr/bin/env bash
 .EXPORT_ALL_VARIABLES:
 BUILDKIT_PROGRESS=plain
 

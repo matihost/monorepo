@@ -1,3 +1,6 @@
+SHELL := /usr/bin/env bash
+.EXPORT_ALL_VARIABLES:
+
 GITHUB_PAT := $(shell gh auth token)
 
 deploy-on-minikube: ## deploys GitHub Actions Runner Controller on Minikube (assumes kubecontext points to Minikube )

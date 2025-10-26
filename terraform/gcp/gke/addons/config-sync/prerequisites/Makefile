@@ -1,3 +1,4 @@
+SHELL := /usr/bin/env bash
 .EXPORT_ALL_VARIABLES:
 
 CURRENT_PROJECT := $(shell gcloud config get-value project)

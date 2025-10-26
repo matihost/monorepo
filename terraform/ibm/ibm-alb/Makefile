@@ -1,3 +1,4 @@
+SHELL := /usr/bin/env bash
 .EXPORT_ALL_VARIABLES:
 
 IC_API_KEY := $(shell cat $(HOME)/.ibmcloud/apikey.json | jq -r .apikey)

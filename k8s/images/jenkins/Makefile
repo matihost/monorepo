@@ -1,5 +1,6 @@
 TAG := lts
 
+SHELL := /usr/bin/env bash
 .EXPORT_ALL_VARIABLES:
 BUILDKIT_PROGRESS=plain
 

@@ -1,3 +1,6 @@
+SHELL := /usr/bin/env bash
+.EXPORT_ALL_VARIABLES:
+
 init: ## install poetry dependencies, required to be run once
 	poetry config virtualenvs.in-project true
 	poetry install

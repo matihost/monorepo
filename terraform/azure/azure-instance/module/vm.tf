@@ -19,6 +19,8 @@ resource "azurerm_ssh_public_key" "ssh" {
   location            = local.location
   resource_group_name = local.resource_group_name
   public_key          = var.ssh_pub_key
+
+  tags = var.tags
 }
 
 
@@ -26,6 +28,8 @@ resource "azurerm_key_vault_secret" "ssh" {
   name         = local.vm_name
   value        = var.ssh_key
   key_vault_id = data.azurerm_key_vault.key_vault.id
+
+  tags = var.tags
 }
 
 
@@ -39,6 +43,8 @@ resource "azurerm_network_interface" "nic" {
     subnet_id                     = data.azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
   }
+
+  tags = var.tags
 }
 
 resource "azurerm_linux_virtual_machine" "linux" {
@@ -80,4 +86,6 @@ resource "azurerm_linux_virtual_machine" "linux" {
     sku       = var.image.sku
     version   = var.image.version
   }
+
+  tags = var.tags
 }

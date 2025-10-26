@@ -74,3 +74,9 @@ variable "env" {
   type        = string
   description = "Environment name, represents resource group"
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "Azure tags"
+  default     = {}
+}

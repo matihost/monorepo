@@ -1,3 +1,4 @@
+SHELL := /usr/bin/env bash
 .EXPORT_ALL_VARIABLES:
 
 DEBUG := false
@@ -21,7 +22,6 @@ ENV := dev-northeurope
 init: init-tf-backend
 	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
 
-
 run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
 	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
 
@@ -42,6 +42,18 @@ whoami: ## show current logon (tenant, subsription, user)
 
 login: ## login to Azure Subscription
 	az login
+
+sp-login: ## login to Azure Subscription as Service Principal
+ifndef ARM_CLIENT_ID
+	$(error Env ARM_CLIENT_ID is not defined)
+endif
+ifndef ARM_CLIENT_SECRET
+	$(error Env ARM_CLIENT_ID is not defined)
+endif
+ifndef ARM_TENANT_ID
+	$(error Env ARM_CLIENT_ID is not defined)
+endif
+	az login --service-principal -u ARM_CLIENT_ID -p ARM_CLIENT_SECRET --tenant ARM_TENANT_ID
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))

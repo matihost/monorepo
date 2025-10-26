@@ -6,6 +6,8 @@ resource "azurerm_public_ip" "bastion" {
   resource_group_name = local.resource_group_name
   allocation_method   = "Static"
   sku                 = "Standard"
+
+  tags = var.tags
 }
 
 
@@ -124,6 +126,8 @@ resource "azurerm_network_security_group" "bastion" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+
+  tags = var.tags
 }
 
 
@@ -156,4 +160,6 @@ resource "azurerm_bastion_host" "bastion" {
     subnet_id            = azurerm_subnet.bastion[0].id
     public_ip_address_id = azurerm_public_ip.bastion[0].id
   }
+
+  tags = var.tags
 }

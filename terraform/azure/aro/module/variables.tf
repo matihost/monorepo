@@ -88,6 +88,12 @@ variable "rh_pull_secret" {
   description = "RH Pull Secret obtained from https://console.redhat.com/openshift/install/azure/aro-provisioned"
 }
 
+variable "public" {
+  type        = bool
+  description = "Whether cluster is exposed publicly, if private - ensure this TF is run from within network - as these scripts requires API access to ARO API."
+  default     = true
+}
+
 variable "pagerduty_integration_key" {
   type        = string
   description = "PagerDuty integration key obtained from: https://www.pagerduty.com/docs/guides/prometheus-integration-guide/"
@@ -197,4 +203,10 @@ variable "region" {
 variable "env" {
   type        = string
   description = "Environment name, represents resource group"
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "Azure tags"
+  default     = {}
 }
