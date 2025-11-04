@@ -11,7 +11,7 @@ all:
           # Current supported kubernetess and crio versions:
           # https://github.com/cri-o/packaging/blob/main/README.md#define-the-kubernetes-version-and-used-cri-o-stream
           kubernetes: v1.34
-          crio: v1.33
+          crio: v1.34
           # TODO change to {{ ansible_distribution_version }} when current is supported Ubuntu
           # List of supported Ubuntu versions:
           # https://packages.microsoft.com/repos/azure-cli/dists/
@@ -19,18 +19,18 @@ all:
           # OpenVPN3 repo Supports only LTSs versions
           # List of supported Ubuntu versions:
           # https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos#DebianUbuntu:UsingOpenVPNaptrepositories
-          openvpn_repo_ubuntu_version: "oracular"
+          openvpn_repo_ubuntu_version: "questing"
           # List of supported Ubuntu versions: https://www.hashicorp.com/official-packaging-guide?product_intent=terraform
-          terraform_ubuntu_version: "oracular"
-          virtualbox_ubuntu_version: "oracular"
+          terraform_ubuntu_version: "plucky"
+          virtualbox_ubuntu_version: "plucky"
           # TODO change to {{ ansible_distribution_release }} when current is supported Ubuntu LTS
           cri_dockerd_ubuntu_version: "jammy"
           # MQ Version available at: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/
-          mq: 9.4.2.0
+          mq: 9.4.4.0
           # List of supported Ubuntu versions: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive
-          onedrive_ubuntu_version: "24.10"
+          onedrive_ubuntu_version: "25.04"
           # List of supported Ubuntu versions: https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/
-          pgadmin_ubuntu_version: "oracular"
+          pgadmin_ubuntu_version: "plucky"
           # List of supported Ubuntu versions: https://apt.envoyproxy.io/
           envoy_ubuntu_version: "jammy"
         virtual_interface_ip: 192.168.10.1
@@ -181,7 +181,7 @@ all:
         - sshuttle
         - apache2-utils # for htpasswd
         - network-manager
-        - neofetch
+        - fastfetch
         - eyed3
         - mc
         - lm-sensors
@@ -423,7 +423,7 @@ all:
         - name: ensure-hp-lip
           desc: |
             Ensure the latest hplip is installed from source
-            TODO the latest 3.25.2 cannot be installed on Ubuntu 25.04 out of the box yet: https://bugs.launchpad.net/hplip/+bug/1879353
+            TODO the latest 3.25.6 cannot be installed on Ubuntu 25.04 out of the box yet: https://bugs.launchpad.net/hplip/+bug/1879353
             To install latest HPLIP in advanced mode (without GUI): https://developers.hp.com/hp-linux-imaging-and-printing/KnowledgeBase/InstallHPLIPwithqt5.html
             You need to install the following dependencies
                 PyQt5
