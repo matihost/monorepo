@@ -36,7 +36,7 @@ repos:
   - id: gofmt
   - id: golangci-lint
   - id: goimports
-  - id: yapf
+  # - id: yapf # or ruff-formatter
   - id: packer-validate
   # TODO add helm lint, https://github.com/gruntwork-io/pre-commit?tab=readme-ov-file#helm-lint-caveats
   # - id: helmlint
@@ -45,7 +45,7 @@ repos:
   # Incompatibility between OpenTofu like OpenTofu support for_each for providers
   # - id: tflint
 - repo: https://github.com/antonbabenko/pre-commit-terraform
-  rev: v1.103.0
+  rev: v1.104.0
   hooks:
   - id: terraform_trivy
     args:
@@ -103,13 +103,13 @@ repos:
     additional_dependencies:
     - .[community,yamllint]
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.14.1
+  rev: v0.14.7
   hooks:
   - id: ruff # python linter
     args: [ --fix ]
   - id: ruff-format # python formatter
 - repo: https://github.com/gitleaks/gitleaks
-  rev: v8.28.0
+  rev: v8.30.0
   hooks:
   - id: gitleaks
 # - repo: https://github.com/pocc/pre-commit-hooks

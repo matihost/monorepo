@@ -1,0 +1,51 @@
+[project]
+name = "learning"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "matihost"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+]
+packages = [{ include = "learning" }]
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.6.9"
+mypy = "^1.17.1"
+pytest = "^8.4.1"
+debugpy = "^1.8.16"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+pyhead = 'learning.cli.head:main'
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "N",  # PEP8 naming convetions
+    "D"  # pydocstyle
+]
+ignore = [
+    "E501",  # line too long
+    "D401",  # imperative mood
+    "D103",   # missing docstring in public function
+    "D104"   # missing docstring in public package
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

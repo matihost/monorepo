@@ -29,7 +29,7 @@ resource "azurerm_redhat_openshift_cluster" "aro" {
     # Available varsions:
     # az aro get-versions --location northeurope
     # Useful only during initial creation - as cluster can be created on with some version and later upgrade changes the version
-    version = "4.17.27"
+    version = "4.18.26"
 
 
     # Resource Group Name: "dev"
