@@ -43,6 +43,8 @@ provider "azurerm" {
   resource_providers_to_register = [
       "Microsoft.RedHatOpenShift",
   ]
+  storage_use_azuread = true
+
   features {
     resource_group {
       prevent_deletion_if_contains_resources = true

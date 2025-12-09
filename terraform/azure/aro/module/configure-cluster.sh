@@ -14,7 +14,12 @@ AZURE_MONITOR_URL="${10:?TENANT_ID is required}"
 MP_CLIENT_ID="${11:?MP_CLIENT_ID is required}"
 MP_CLIENT_SECRET="${12:?MP_CLIENT_SECRET is required}"
 MP_DCR_ID="${13:?MP_DCR_ID is required}"
-PAGERDUTY_ROUTING_KEY="${14:-}"
+SUBSCRIPTION_ID="${14:?SUBSCRIPTION_ID is required}"
+BACKUP_CLIENT_ID="${15:?BACKUP_CLIENT_ID is required}"
+BACKUP_CLIENT_SECRET="${16:?BACKUP_CLIENT_SECRET is required}"
+BACKUP_STORAGE_ACCOUNT="${17:?BACKUP_STORAGE_ACCOUNT is required}"
+BACKUP_CONTAINER_NAME="${18:?BACKUP_CONTAINER_NAME is required}"
+PAGERDUTY_ROUTING_KEY="${19:-}"
 
 # set -e
 set -x
@@ -205,7 +210,7 @@ metadata:
   name: cluster-logging
   namespace: openshift-logging
 spec:
-  channel: stable-6.3
+  channel: stable-6.4
   name: cluster-logging
   source: redhat-operators
   sourceNamespace: openshift-marketplace
@@ -227,12 +232,195 @@ wait_for_resource() {
   done
 }
 
+# ARO backup with Velero/OADP
+# https://cloud.redhat.com/experts/aro/backup-restore/
+configure-backup() {
+  [[ -n "$(oc get project openshift-adp --no-headers --ignore-not-found 2>/dev/null)" ]] || {
+    oc adm new-project --node-selector='' openshift-adp
+    oc apply -f - <<EOF
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-adp
+  namespace: openshift-adp
+spec:
+  targetNamespaces:
+    - openshift-adp
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: redhat-oadp-operator
+  namespace: openshift-adp
+spec:
+  channel: stable-1.4
+  name: redhat-oadp-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+EOF
+  }
+  wait_for_resource BackupStorageLocation
+  oc apply -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloud-credentials
+  namespace: openshift-adp
+type: Opaque
+stringData:
+  cloud: |
+    AZURE_SUBSCRIPTION_ID=${SUBSCRIPTION_ID}
+    AZURE_TENANT_ID=${TENANT_ID}
+    AZURE_CLIENT_ID=${BACKUP_CLIENT_ID}
+    AZURE_CLIENT_SECRET=${BACKUP_CLIENT_SECRET}
+EOF
+
+  export BACKUP_RG="${CLUSTER_RG}"
+  oc apply -f - <<EOF
+apiVersion: oadp.openshift.io/v1alpha1
+kind: DataProtectionApplication
+metadata:
+  name: azure-dpa
+  namespace: openshift-adp
+spec:
+  backupLocations:
+    - name: azure-backup
+      velero:
+        provider: azure
+        default: true
+        objectStorage:
+          bucket: ${BACKUP_CONTAINER_NAME}
+          prefix: backups
+        config:
+          resourceGroup: ${BACKUP_RG}
+          storageAccount: ${BACKUP_STORAGE_ACCOUNT}
+          subscriptionId: ${SUBSCRIPTION_ID}
+          useAAD: 'true'
+        credential:
+          name: cloud-credentials
+          key: cloud
+  snapshotLocations:
+    - name: azure-snapshot
+      velero:
+        provider: azure
+        config:
+          resourceGroup: ${CLUSTER_RG}
+          subscriptionId: ${SUBSCRIPTION_ID}
+          apiTimeout: 2m0s
+        credential:
+          name: cloud-credentials
+          key: cloud
+  configuration:
+    velero:
+      defaultPlugins:
+        - openshift
+        - csi
+        - azure
+      defaultSnapshotMoveData: true
+    nodeAgent:
+      enable: true
+      uploaderType: kopia
+EOF
+
+  oc label volumesnapshotclass csi-azuredisk-vsc velero.io/csi-volumesnapshot-class=true
+
+  for NAMESPACE in $(echo "${NAMESPACES}" | jq -cr '.[]'); do
+
+    NS="$(echo "${NAMESPACE}" | jq -r ".name")"
+
+    cat <<EOF | oc apply -f -
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: ${NS}-daily-backup
+  namespace: openshift-adp
+spec:
+  schedule: "0 1 * * *"  # Daily at 1 AM, so RPO is 24h
+  template:
+    includedNamespaces:
+      - ${NS}
+    excludedResources:
+      - imagestreams.image.openshift.io
+      - builds.build.openshift.io
+      - buildconfigs.build.openshift.io
+      - pods
+    includeClusterResources: false
+    snapshotVolumes: false
+    defaultVolumesToFsBackup: true
+    ttl: 168h0m0s  # 7 days retention
+EOF
+  done
+
+  NAMESPACES_NAMES="$(echo "${NAMESPACES}" | jq -cr '[.[].name]')"
+  cat <<EOF | oc apply -f -
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: cluster-daily-backup
+  namespace: openshift-adp
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM, RPO = 24h
+  template:
+    includedNamespaces:
+      - "*"  # all namespaces
+    excludedNamespaces: ${NAMESPACES_NAMES}
+    includeClusterResources: true
+    excludedResources:
+      - imagestreams.image.openshift.io
+    snapshotVolumes: false
+    defaultVolumesToFsBackup: false
+    ttl: 168h                          # 7 days retention
+EOF
+
+  cat <<EOF | oc apply -f -
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: oadp-service-monitor
+  name: oadp-service-monitor
+  namespace: openshift-adp
+spec:
+  endpoints:
+  - interval: 30s
+    path: /metrics
+    targetPort: 8085
+    scheme: http
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "velero"
+EOF
+
+  cat <<EOF | oc apply -f -
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: backup-rules
+  namespace: openshift-user-workload-monitoring
+spec:
+  groups:
+  - name: backup.rules
+    rules:
+    - alert: OADPBackupFailing
+      annotations:
+        description: 'OADP had {{\$value | humanize}} backup failures over the last 24 hours.'
+        summary: OADP has issues creating backups
+      expr: |
+        increase(velero_backup_failure_total{job="openshift-adp-velero-metrics-svc"}[24h]) > 0
+      for: 5m
+      labels:
+        severity: critical
+        cluster: ${CLUSTER_NAME}
+EOF
+}
+
 # Main
 login-to-aro
 ensure-cluster-config
-configure-namespaces
 configure-monitoring
 configure-logging-forwarding-to-log-analytics-workspace
+configure-backup
+configure-namespaces
 
 # TODO for monitoring
 # https://github.com/SenWangMSFT/aro-logging-and-metrics-forwarding?tab=readme-ov-file#application-logs-forwarding-to-azure-log-analytics
@@ -242,9 +430,6 @@ configure-logging-forwarding-to-log-analytics-workspace
 
 # TODO configure
 # https://learn.microsoft.com/en-us/azure/openshift/configure-azure-ad-cli
-
-# TODO configure Backup
-# https://learn.microsoft.com/en-us/azure/openshift/howto-create-a-backup
 
 # TODO configure Service Mesh
 

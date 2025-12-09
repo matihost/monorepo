@@ -25,7 +25,7 @@ locals {
 
 locals {
   # tflint-ignore: terraform_unused_declarations
-  subscription_id     = data.azurerm_subscription.current.id
+  subscription_id     = data.azurerm_subscription.current.subscription_id
   tenant_id           = data.azurerm_client_config.current.tenant_id
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = var.region
