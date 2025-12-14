@@ -20,7 +20,7 @@ endif
 ENV := prod-01
 
 init:
-	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --backend-bootstrap --non-interactive
+	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
 
 
 run: init prepare ## setup Minecraft Server VM, usage make run [MODE=plan/apply/destroy] [ENV=prod-01] PASS=pass_for_minecraft_rcon OP_USER=minecraftusername

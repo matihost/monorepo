@@ -42,6 +42,8 @@ clean: ## clean Terraform cached plugins and data
 	find . -name "node_modules" -exec rm -rf {} +
 
 TAG := latest
+# TODO Unable to update higher than 1.25.3 due to:
+# https://github.com/GoogleCloudPlatform/cloud-sql-jdbc-socket-factory/issues/2181
 POSTGRESQL_JDBC_VERSION := 1.25.3
 KEYCLOAK_METRICS_SPI_VERSION := 7.0.0
 CURRENT_PROJECT := $(shell gcloud config get-value project 2>/dev/null)

@@ -2,7 +2,7 @@
 # TODO handle user management and password taken from GCP Secret
 
 resource "google_sql_database_instance" "keycloak" {
-  database_version = "POSTGRES_17"
+  database_version = "POSTGRES_18"
   instance_type    = "CLOUD_SQL_INSTANCE"
   name             = local.regional_name
   project          = var.project

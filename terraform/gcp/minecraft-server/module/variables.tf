@@ -42,8 +42,8 @@ variable "repository_id" {
 
 variable "minecraft_server_url" {
   type        = string
-  default     = "https://piston-data.mojang.com/v1/objects/e6ec2f64e6080b9b5d9b471b291c33cc7f509733/server.jar"
-  description = "Minecraft server.jar version 1.21.5, downloadable from: https://www.minecraft.net/pl-pl/download/server"
+  default     = "https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar"
+  description = "Minecraft server.jar version 1.21.11, downloadable from: https://www.minecraft.net/pl-pl/download/server"
 }
 
 variable "minecraft_server_name" {
@@ -67,4 +67,10 @@ variable "server_rcon_pass" {
 variable "server_op_user" {
   type        = string
   description = "Minecraft operator/op user"
+}
+
+variable "skip_scheduler" {
+  type        = bool
+  default     = false
+  description = "Whether to disable scheduler doing stopping at 10pm and starting at 10am"
 }

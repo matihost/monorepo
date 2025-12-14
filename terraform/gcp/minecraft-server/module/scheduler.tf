@@ -24,6 +24,8 @@ resource "google_cloud_scheduler_job" "stop-cron" {
   schedule    = "05 22 * * *"
   time_zone   = "Europe/Warsaw"
 
+  paused = var.skip_scheduler
+
   pubsub_target {
     # topic.id is the topic's full resource name.
     topic_name = google_pubsub_topic.minecraft-lifecycle-topic.id
@@ -40,6 +42,8 @@ resource "google_cloud_scheduler_job" "start-cron" {
   description = "Start Minecraft ${var.minecraft_server_name} instance group"
   schedule    = "05 10 * * *"
   time_zone   = "Europe/Warsaw"
+
+  paused = var.skip_scheduler
 
   pubsub_target {
     # topic.id is the topic's full resource name.
