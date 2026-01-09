@@ -35,7 +35,7 @@ jobs:
   images:
     runs-on: 'ubuntu-24.04'
     container:
-      image: maven:3-eclipse-temurin-21
+      image: maven:3-eclipse-temurin-25
     steps:
     - name: checkout
       uses: actions/checkout@v4

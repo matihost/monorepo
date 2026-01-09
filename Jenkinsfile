@@ -23,7 +23,7 @@ spec:
     fsGroup: 1000
   containers:
   - name: maven-jdk21
-    image: maven:3-eclipse-temurin-21
+    image: maven:3-eclipse-temurin-25
     command:
     - sleep
     args:

@@ -21,8 +21,12 @@ remote_state {
     storage_account_name = local.state_storage_account
     container_name       = local.state_container
     key                  = "${basename(abspath("${get_parent_terragrunt_dir()}/.."))}/${basename(get_parent_terragrunt_dir())}/${path_relative_to_include()}/terraform.tfstate"
-    tenant_id            = local.tenant_id
-    subscription_id      = local.subscription_id
+    # providing both tenant_id and subscription_id
+    # ends with error:
+    # error listing access keys on the storage account: AzureCLICredential: ERROR: Please specify only one of subscription and tenant, not both
+    #
+    # tenant_id            = local.tenant_id
+    subscription_id = local.subscription_id
   }
 }
 

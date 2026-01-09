@@ -45,7 +45,7 @@ jobs:
     runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     timeout-minutes: 5
     container:
-      image: maven:3-eclipse-temurin-21
+      image: maven:3-eclipse-temurin-25
     outputs:
       GIT_COMMIT_HASH: ${{ steps.git_hash.outputs.GIT_COMMIT_HASH }}
     steps:
@@ -78,7 +78,7 @@ jobs:
     runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     timeout-minutes: 30
     container:
-      image: maven:3-eclipse-temurin-21
+      image: maven:3-eclipse-temurin-25
     steps:
     - name: Download sources
       uses: actions/cache/restore@v4
@@ -181,7 +181,7 @@ jobs:
     runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     timeout-minutes: 30
     container:
-      image: maven:3-eclipse-temurin-21
+      image: maven:3-eclipse-temurin-25
     steps:
     - name: Download sources
       uses: actions/cache/restore@v4

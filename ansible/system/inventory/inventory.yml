@@ -58,6 +58,8 @@ all:
           foxundermoon.shell-format
           garytyler.darcula-pycharm
           george-alisson.html-preview-vscode
+          github.copilot
+          github.copilot-chat
           github.vscode-github-actions
           github.vscode-pull-request-github
           golang.go
@@ -104,8 +106,6 @@ all:
           techer.open-in-browser
           tomoki1207.pdf
           twxs.cmake
-          visualstudioexptteam.intellicode-api-usage-examples
-          visualstudioexptteam.vscodeintellicode
           vmware.vscode-spring-boot
           vscjava.vscode-gradle
           vscjava.vscode-java-debug
@@ -204,10 +204,10 @@ all:
         - python3-pip
         - graphviz
         - ruby
-        - openjdk-17-jdk
-        - openjdk-17-source
         - openjdk-21-jdk
         - openjdk-21-source
+        - openjdk-25-jdk
+        - openjdk-25-source
         - dos2unix
         - guake
         - mono-complete
@@ -527,9 +527,9 @@ all:
           command: |
             [ -d ~/.sdkman/bin ] || (
             curl -s "https://get.sdkman.io" | bash
-            bash -ic "sdk i java 17-openjdk /usr/lib/jvm/java-17-openjdk-amd64;\
-            sdk i java 21-openjdk /usr/lib/jvm/java-21-openjdk-amd64;\
-            sdk d java 21-openjdk;\
+            bash -ic "sdk i java 21-openjdk /usr/lib/jvm/java-21-openjdk-amd64;\
+            sdk i java 25-openjdk /usr/lib/jvm/java-25-openjdk-amd64;\
+            sdk d java 25-openjdk;\
             sdk i maven;\
             sdk i groovy;\
             sdk i scala;")
@@ -692,7 +692,7 @@ all:
             [ -d ~/bin/.jmc ] || {
               cd "$(mktemp -d)" &&
             curl -sL https://api.github.com/repos/adoptium/jmc-overrides/releases/latest | \
-              jq -r ".assets[] | select(.browser_download_url | contains(\"linux\")) | .browser_download_url" | \
+              jq -r ".assets[] | select(.browser_download_url | contains(\"linux.gtk.x86_64\")) | .browser_download_url" | \
             xargs curl -sSL | tar -zxv &&
               mv 'JDK Mission Control' ~/bin/.jmc &&
               ln -s ~/bin/.jmc/jmc ~/bin/jmc
@@ -866,7 +866,7 @@ all:
             INSTALLED_VERSION="$(terragrunt --version 2>/dev/null | sed -E 's/.* version (.*)/\1/g')"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl -sL https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r ".assets[] |
-                select(.name | test(\"linux_amd64\")) | .browser_download_url" |
+                select(.name | test(\"linux_amd64$\")) | .browser_download_url" |
                   xargs curl -s -L -o "/usr/local/bin/terragrunt"
               chmod a+x /usr/local/bin/terragrunt
               echo "Terragrunt has been installed"
@@ -1155,7 +1155,7 @@ all:
               curl -sL https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest  | jq -r ".assets[] |
                 select(.name | test(\"ubuntu-{{ versions.cri_dockerd_ubuntu_version }}_amd64.deb\")) | .browser_download_url" |
                   xargs curl -s -L -o "/tmp/cri-dockerd.deb"
-              apt -y install /tmp/cri-dockerd.deb
+              apt --allow-downgrades -y install /tmp/cri-dockerd.deb
             }
         - name: discord
           become: true

@@ -117,15 +117,15 @@ function ensure-external-secrets-operator-installed-locally() {
     --name "${ACR_NAME}"
   DEPLOYMENT_NAME=external-secrets
   HELM_CHART=external-secrets/external-secrets
-  HELM_CHART_VERSION=0.19.2
+  HELM_CHART_VERSION=1.2.1
   HELM_CHART_APP_VERSION="v${HELM_CHART_VERSION}"
   REPO_URL="${ACR_NAME}.azurecr.io"
   helm repo add external-secrets https://charts.external-secrets.io
   helm repo update
   helm pull "${HELM_CHART}" --version "${HELM_CHART_VERSION}"
   helm push "external-secrets-${HELM_CHART_VERSION}.tgz" "oci://${REPO_URL}/external-secrets"
-  docker pull "oci.external-secrets.io/external-secrets/external-secrets:${HELM_CHART_APP_VERSION}"
-  docker tag "oci.external-secrets.io/external-secrets/external-secrets:${HELM_CHART_APP_VERSION}" "${REPO_URL}/external-secrets/external-secrets:${HELM_CHART_APP_VERSION}"
+  docker pull "ghcr.io/external-secrets/external-secrets:${HELM_CHART_APP_VERSION}"
+  docker tag "ghcr.io/external-secrets/external-secrets:${HELM_CHART_APP_VERSION}" "${REPO_URL}/external-secrets/external-secrets:${HELM_CHART_APP_VERSION}"
   docker push "${REPO_URL}/external-secrets/external-secrets:${HELM_CHART_APP_VERSION}"
   rm external-secrets-${HELM_CHART_VERSION}.tgz
   helm upgrade --install "${DEPLOYMENT_NAME}" "oci://${REPO_URL}/external-secrets/external-secrets" --namespace kube-system --create-namespace \

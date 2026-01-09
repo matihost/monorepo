@@ -25,7 +25,7 @@ BUILDKIT_PROGRESS=plain
 
 
 run-jar: ## run built jar; usage: make run-jar [CURRENCY=USD] [DEBUG=false] [JMX=false]
-	java -XshowSettings:* -XX:+PrintFlagsFinal -XX:NativeMemoryTracking=summary -Xlog:async -Xlog:gc*=debug,gc+ergo*=trace,gc+age*=trace,safepoint*:file=/tmp/command-line.gc.log:level,tags,utctime,uptime,pid:filecount=5,filesize=100m \
+	java -XshowSettings:all -XX:+PrintFlagsFinal -XX:NativeMemoryTracking=summary -Xlog:async -Xlog:gc*=debug,gc+ergo*=trace,gc+age*=trace,safepoint*:file=/tmp/command-line.gc.log:level,tags,utctime,uptime,pid:filecount=5,filesize=100m \
 		$(JMX_FLAG) $(DEBUG_FLAG)\
 		-XX:OnOutOfMemoryError='kill -9 %p' -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp \
 		-XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:+UseNUMA -XX:+PreserveFramePointer \

@@ -87,8 +87,14 @@ make kubeconfig-oidc ISSUER_URL=https://id.yoursite.com/realms/yourrealm CLIENT_
 
 ```bash
 # create ~/.kube/config entry for EKS
-make kubeconfig
+make kubeconfig [ENV=dev]
 
 # open the best k8s dashboard
 k9s
+```
+
+### List Pod Identity Associations
+
+```bash
+make list-pod-identity-associations [ENV=dev]
 ```

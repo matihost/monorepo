@@ -77,7 +77,7 @@ resource "azurerm_key_vault" "ns-key-vault" {
 
   sku_name = "standard"
 
-  enable_rbac_authorization       = true
+  rbac_authorization_enabled      = true
   enabled_for_deployment          = true
   enabled_for_template_deployment = true
 

@@ -1,5 +1,5 @@
 TAG := latest
-JAVA_VERSION := 21
+JAVA_VERSION := 25
 CURRENT_DIR := $(notdir $(shell pwd))
 NAME := $(CURRENT_DIR)
 REPO := quay.io/matihost

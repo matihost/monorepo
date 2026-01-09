@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # check=skip=SecretsUsedInArgOrEnv
-ARG JAVA_VERSION=21
+ARG JAVA_VERSION=25
 FROM alpine AS certs
 RUN apk --update add ca-certificates
 FROM gcr.io/kaniko-project/executor:debug AS kaniko

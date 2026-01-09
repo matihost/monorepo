@@ -75,6 +75,9 @@ test: ## install test application,  make test [MODE=apply] [FARGATE=true] [APP=a
 	kubectl $(K8S_MODE_STR) -f test/${APP} -n $(K8S_NS)
 
 
+list-pod-identity-associations: ## list Pod Identity Associations
+	aws eks list-pod-identity-associations --cluster-name $(shell cd stage/$(ENV) && terragrunt output -raw cluster_name) --region $(shell cd stage/$(ENV) && terragrunt output -raw region)
+
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show
 
