@@ -5,6 +5,8 @@ all:
       hosts:
         localhost:
       vars:
+        # to install and configure Datadog agent when DD_API_KEY is set in environment as well
+        datadog_agent: false
         versions:
           # represents path to local gems, see: 'gem environment' output for example: ~/.local/share/gem/ruby/3.3.0/bin
           ruby_user_path: "${HOME}/.local/share/gem/ruby/3.3.0/bin"
@@ -1119,10 +1121,10 @@ all:
             INSTALLED_VERSION="$(datadog-agent version 2>/dev/null| sed -E "s/Agent (.*) - Commit: .*/\1/g")"
             CURRENT_DD_API_KEY="$(yq -r ".api_key" /etc/datadog-agent/datadog.yaml 2>/dev/null)"
             DD_API_KEY="{{ lookup('env', 'DD_API_KEY') }}"
-            [ -z "${DD_API_KEY}" ] || {
+            [ -z "${DD_API_KEY}" ] || [ "{{ datadog_agent | default("False") }}" = "False" ] ||  {
               ! [ "${CURRENT_VERSION}" != "${INSTALLED_VERSION}" -o "${CURRENT_DD_API_KEY}" != "${DD_API_KEY}" ] || {
                 DD_API_KEY="${DD_API_KEY}" \
-                DD_SITE="datadoghq.eu" \
+                DD_SITE="datadoghq.com" \
                 DD_APM_INSTRUMENTATION_ENABLED=host \
                 DD_REMOTE_UPDATES=true \
                 DD_ENV="home" \

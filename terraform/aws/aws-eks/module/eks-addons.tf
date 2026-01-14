@@ -94,12 +94,86 @@ resource "aws_iam_role_policy_attachment" "efs-addon_AmazonEFSCSIDriverPolicy" {
 resource "aws_eks_addon" "cloudwatch" {
   cluster_name = aws_eks_cluster.cluster.name
   addon_name   = "amazon-cloudwatch-observability"
-  # addon_version               = "v4.3.0-eksbuild.1"
+  # addon_version               = "v4.8.0-eksbuild.1"
   resolve_conflicts_on_create = "OVERWRITE"
 
 
   configuration_values = jsonencode(
     { "containerLogs" : { "enabled" : true },
+      "manager" : {
+        "nodeSelector" : {
+          "karpenter.sh/nodepool" : "system",
+          "kubernetes.io/arch" : "amd64"
+        },
+        "tolerations" : [
+          {
+            "key" : "CriticalAddonsOnly",
+            "operator" : "Exists"
+          },
+          {
+            "effect" : "NoExecute",
+            "operator" : "Exists",
+            "tolerationSeconds" : 300
+          }
+        ]
+      },
+      "tolerations" : [
+        {
+          "key" : "CriticalAddonsOnly",
+          "operator" : "Exists"
+        },
+        {
+          "effect" : "NoExecute",
+          "operator" : "Exists",
+          "tolerationSeconds" : 300
+        }
+      ]
+    }
+  )
+}
+
+resource "aws_eks_addon" "metrics-server" {
+  cluster_name = aws_eks_cluster.cluster.name
+  addon_name   = "metrics-server"
+  # addon_version               = "v0.8.0-eksbuild.6"
+  resolve_conflicts_on_create = "OVERWRITE"
+
+
+  configuration_values = jsonencode(
+    {
+      "nodeSelector" : {
+        "karpenter.sh/nodepool" : "system",
+        "kubernetes.io/arch" : "amd64"
+      },
+      "tolerations" : [
+        {
+          "key" : "CriticalAddonsOnly",
+          "operator" : "Exists"
+        },
+        {
+          "effect" : "NoExecute",
+          "operator" : "Exists",
+          "tolerationSeconds" : 300
+        }
+      ]
+    }
+  )
+}
+
+
+resource "aws_eks_addon" "kube-state-metrics" {
+  cluster_name = aws_eks_cluster.cluster.name
+  addon_name   = "kube-state-metrics"
+  # addon_version               = "v2.17.0-eksbuild.6"
+  resolve_conflicts_on_create = "OVERWRITE"
+
+
+  configuration_values = jsonencode(
+    {
+      "nodeSelector" : {
+        "karpenter.sh/nodepool" : "system",
+        "kubernetes.io/arch" : "amd64"
+      },
       "tolerations" : [
         {
           "key" : "CriticalAddonsOnly",

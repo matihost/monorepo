@@ -2,6 +2,11 @@ include "root" {
   path = find_in_parent_folders("root.hcl")
 }
 
+locals {
+  dd_api_key = try(get_env("DD_API_KEY"), "")
+  dd_app_key = try(get_env("DD_APP_KEY"), "")
+}
+
 terraform {
   # https://github.com/gruntwork-io/terragrunt/issues/1675
   source = "${find_in_parent_folders("module")}///"
@@ -20,6 +25,8 @@ inputs = {
   zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
 
   install_nginx = true
+  dd_api_key    = local.dd_api_key
+  dd_app_key    = local.dd_app_key
 
   # Uncomment to integrated cluster authen/authz with OIDC
   # oidc = {

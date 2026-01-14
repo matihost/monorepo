@@ -1,0 +1,117 @@
+# Datadog Operator values file
+# helm show values datadog/datadog-operator
+
+# apiKey -- Your Datadog API key
+# apiKey:  # <DATADOG_API_KEY>
+
+# appKey -- Your Datadog APP key
+# appKey:  # <DATADOG_APP_KEY>
+
+
+# clusterName -- Set a unique cluster name reporting from the Datadog Operator.
+# clusterName:
+
+# site -- The site of the Datadog intake to send data to (documentation: https://docs.datadoghq.com/getting_started/site/)
+
+## Set to 'datadoghq.com' to send data to the US1 site (default).
+## Set to 'datadoghq.eu' to send data to the EU site.
+## Set to 'us3.datadoghq.com' to send data to the US3 site.
+## Set to 'us5.datadoghq.com' to send data to the US5 site.
+## Set to 'ddog-gov.com' to send data to the US1-FED site.
+## Set to 'ap1.datadoghq.com' to send data to the AP1 site.
+site: datadoghq.com
+
+# dd_url -- The host of the Datadog intake server to send Agent data to, only set this option if you need the Agent to send data to a custom URL
+
+## Overrides the site setting defined in "site".
+# dd_url:  # <DATADOG_API_ENDPOINT>
+#
+# env -- Define any environment variables to be passed to the operator.
+# env: []
+
+image:
+#   # image.repository -- Repository to use for Datadog Operator image
+  # repository: gcr.io/datadoghq/operator
+  repository: public.ecr.aws/datadog/operator
+
+introspection:
+# introspection.enabled -- If true, enables introspection feature (beta). Requires v1.4.0+
+  enabled: false
+
+datadogAgentProfile:
+# datadogAgentProfile.enabled -- If true, enables DatadogAgentProfile controller (beta). Requires v1.5.0+
+  enabled: false
+
+# supportExtendedDaemonset -- If true, supports using ExtendedDaemonSet CRD
+supportExtendedDaemonset: "false"
+
+# operatorMetricsEnabled -- Enable forwarding of Datadog Operator metrics and events to Datadog.
+operatorMetricsEnabled: "true"
+# metricsPort -- Port used for OpenMetrics endpoint
+metricsPort: 8383
+
+
+datadogAgent:
+  # datadogAgent.enabled -- Enables Datadog Agent controller
+  enabled: true
+
+datadogAgentInternal:
+  # datadogAgentInternal.enabled -- Enables the Datadog Agent Internal controller
+  enabled: false
+
+datadogDashboard:
+  # datadogDashboard.enabled -- Enables the Datadog Dashboard controller
+  enabled: false
+
+datadogGenericResource:
+  # datadogGenericResource.enabled -- Enables the Datadog Generic Resource controller
+  enabled: false
+
+datadogMonitor:
+  # datadogMonitor.enabled -- Enables the Datadog Monitor controller
+  enabled: false
+
+datadogSLO:
+  # datadogSLO.enabled -- Enables the Datadog SLO controller
+  enabled: false
+
+remoteConfiguration:
+  # remoteConfiguration.enabled -- If true, enables Remote Configuration in the Datadog Operator (beta). Requires clusterName, API and App keys to be set.
+  enabled: true
+
+
+resources:
+# We usually recommend not to specify default resources and to leave this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. If you do want to specify resources, uncomment the following
+# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 500m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# nodeSelector -- Allows to schedule Datadog Operator on specific nodes
+nodeSelector:
+  karpenter.sh/nodepool: "system"
+
+# tolerations -- Allows to schedule Datadog Operator on tainted nodes
+tolerations:
+  - key: "CriticalAddonsOnly"
+    operator: "Exists"
+  - effect: "NoExecute"
+    operator: "Exists"
+    tolerationSeconds: 300
+
+# collectOperatorMetrics -- Configures an openmetrics check to collect operator metrics
+collectOperatorMetrics: true
+
+# clusterRole -- Set specific configuration for the cluster role
+clusterRole:
+  # allowReadAllResources is required to allow the operator to view all custom resources.
+  # If collecting CRDs in the Kubernetes Explorer this is required
+  allowReadAllResources: false
+
+  # allowCreatePodsExec is required for `remote_copy` mode of the CWS Instrumentation feature.
+  allowCreatePodsExec: false

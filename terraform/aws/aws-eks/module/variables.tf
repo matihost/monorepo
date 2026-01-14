@@ -42,6 +42,11 @@ variable "region" {
   description = "Preffered AWS region where resource need to be placed"
 }
 
+variable "aws_tags" {
+  type        = map(any)
+  default     = {}
+  description = "A map of tags to add to all resources"
+}
 
 variable "vpc_name" {
   default     = "dev-us-east-1"
@@ -65,7 +70,7 @@ variable "zones" {
 
 variable "cluster_version" {
   type        = string
-  default     = "1.33"
+  default     = "1.34"
   description = "Version of EKS"
   validation {
     condition     = can(regex("^[0-9]*[0-9]+.[0-9]*[0-9]+$", var.cluster_version))
@@ -91,6 +96,20 @@ variable "install_nginx" {
   type        = bool
   default     = false
   description = "Whether to install NXGIN ingress controller"
+}
+
+variable "dd_api_key" {
+  type        = string
+  default     = ""
+  description = "Datadog API key for Datadog Operator installation"
+  sensitive   = true
+}
+
+variable "dd_app_key" {
+  type        = string
+  default     = ""
+  description = "Datadog APP key for Datadog Operator installation"
+  sensitive   = true
 }
 
 variable "namespaces" {

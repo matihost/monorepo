@@ -7,7 +7,7 @@ In particular it creates:
 - EKS with Auto mode - with two NodePools:
   - `system` - buildin for critical workflows
   - custom `compute` for workflows
-- Cloud Watch, EFS and CSI Snapshots addons
+- Cloud Watch, EFS, CSI Snapshots, Kube Server, Kube State Metrics addons
 - K8S metrics server on `system` nodepool
 - ExternalDNS
 - Private DNS Route53 zone
@@ -19,6 +19,7 @@ In particular it creates:
 - Configure OIDC authen & authz (Keycloak tested) with Group
   - Add ClusterRoleBinding allowing `cluster-admin` for Group: `cluster-admins`
 - (Optional) NGNIX ingress controller backed by internal NLB
+- (Optional) Datadog integration
 
 ## Prerequisites
 

@@ -28,10 +28,10 @@ show-modules-dependencies: ## show java modules dependencies
 build: ## builds the project
 	mvn -s .mvn/settings.xml --show-version $(DEBUG_FLAG) clean install
 
-sbuild: ## builds the project with OWASP dependency check
-	mvn -s .mvn/settings.xml --show-version $(DEBUG_FLAG) clean install -Powasp
+sbuild: ## builds the project with security OWASP dependency check and SpotBugs analysis
+	mvn -s .mvn/settings.xml --show-version $(DEBUG_FLAG) clean install -Pcheck
 
-build-native: ## builds the project with GrallVM SpringBoot support
+build-native: ## builds the project with GraalVM SpringBoot support
 	mvn -s .mvn/settings.xml --show-version $(DEBUG_FLAG) clean install -Pnative
 
 

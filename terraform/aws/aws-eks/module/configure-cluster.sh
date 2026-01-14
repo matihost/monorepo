@@ -5,6 +5,8 @@ CLUSTER_NAME="${2:?CLUSTER_NAME is required}"
 REGION="${3:?REGION is required}"
 NAMESPACES="${4:?NAMESPACES is required}"
 INSTALL_NGINX="${5:-false}"
+DATADOG_API_KEY="${6:-}"
+DATADOG_APP_KEY="${7:-}"
 
 set -e
 set -x
@@ -14,44 +16,6 @@ DIRNAME="$(dirname "$0")"
 function login-to-eks() {
   # login to AWS - assuming running as IAM principal being registered via aws_eks_access_entry and aws_eks_access_policy_association
   aws eks update-kubeconfig --name "${CLUSTER_NAME}" --region "${REGION}"
-}
-
-#  EKS does not contain K8S metrics server
-# https://docs.aws.amazon.com/eks/latest/userguide/metrics-server.html
-# TODO switch to Helm https://artifacthub.io/packages/helm/metrics-server/metrics-server for upgrades
-function ensure-metrics-server() {
-  [ -n "$(kubectl get deployment metrics-server -n kube-system --no-headers --ignore-not-found)" ] || {
-    rm -rf target/metrics-server
-    mkdir -p target/metrics-server
-    cat <<EOF >target/metrics-server/kustomization.yaml
-resources:
-  - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-
-patches:
-  - path: customization-patch.yaml
-EOF
-
-    cat <<EOF >target/metrics-server/customization-patch.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: metrics-server
-  namespace: kube-system
-spec:
-  template:
-    spec:
-      nodeSelector:
-        karpenter.sh/nodepool: "system"
-      tolerations:
-        - key: "CriticalAddonsOnly"
-          operator: "Exists"
-        - effect: "NoExecute"
-          operator: "Exists"
-          tolerationSeconds: 300
-EOF
-    kubectl apply -k target/metrics-server
-    rm -rf target/metrics-server
-  }
 }
 
 function ensure-cluster-config() {
@@ -100,13 +64,96 @@ function ensure-externaldns() {
     --set env[0].value="${REGION}"
 }
 
+function ensure-datadog-agent() {
+  # installing Datadog operator via Helm not via EKS addoon, as EKS addon requires manual Datadog subscription setup
+  # (free but cannot be automated easily)
+  [ -z "${DATADOG_API_KEY}" ] || [ -z "${DATADOG_APP_KEY}" ] || {
+    helm repo add datadog https://helm.datadoghq.com
+    helm upgrade --install datadog-operator -n datadog --create-namespace datadog/datadog-operator \
+      --set apiKey="${DATADOG_API_KEY}" \
+      --set appKey="${DATADOG_APP_KEY}" \
+      --set clusterName="${CLUSTER_NAME}" \
+      -f "${DIRNAME}/datadog.yaml"
+    kubectl apply -f - <<EOF
+kind: "DatadogAgent"
+apiVersion: "datadoghq.com/v2alpha1"
+metadata:
+  name: "datadog"
+  namespace: "datadog"
+spec:
+  global:
+    clusterName: "${CLUSTER_NAME}"
+    site: "datadoghq.com"
+    credentials:
+      apiSecret:
+        secretName: "datadog-operator-apikey"
+        keyName: "api-key"
+      appSecret:
+        secretName: "datadog-operator-appkey"
+        keyName: "app-key"
+    registry: "public.ecr.aws/datadog"
+    tags:
+      - "env:dev"
+    kubelet:
+      tlsVerify: false
+  features:
+    remoteConfiguration:
+      enabled: true
+    kubeStateMetricsCore:
+      enabled: true
+    clusterChecks:
+      enabled: true
+    orchestratorExplorer:
+      enabled: true
+    usm:
+        enabled: true
+    apm:
+      instrumentation:
+        enabled: true
+        targets:
+          - name: "default-target"
+            ddTraceVersions:
+              java: "1"
+              python: "4"
+              js: "5"
+              php: "1"
+              dotnet: "3"
+              ruby: "2"
+    logCollection:
+      enabled: false
+      containerCollectAll: false
+  override:
+    clusterAgent:
+      image:
+        tag: latest # cluster-agent has no fixed mayor version image tag
+      nodeSelector:
+        karpenter.sh/nodepool: "system"
+      tolerations:
+        - key: "CriticalAddonsOnly"
+          operator: "Exists"
+        - effect: "NoExecute"
+          operator: "Exists"
+          tolerationSeconds: 300
+    nodeAgent:
+      image:
+        tag: "7" # helm chart is released slower than node agent image, so pin to latest minor version
+      tolerations:
+        - key: "CriticalAddonsOnly"
+          operator: "Exists"
+        - effect: "NoExecute"
+          operator: "Exists"
+          tolerationSeconds: 300
+EOF
+  }
+}
+
 # Main
 login-to-eks
 ensure-cluster-config
-ensure-metrics-server
 configure-namespaces
 ensure-nginx
 ensure-externaldns
+ensure-datadog-agent
 
 # TODO install SecretManager integration
 # https://github.com/aws/secrets-store-csi-driver-provider-aws

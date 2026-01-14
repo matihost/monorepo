@@ -155,12 +155,16 @@
       </build>
     </profile>
     <profile>
-      <id>owasp</id>
+      <id>check</id>
       <build>
         <plugins>
           <plugin>
             <groupId>org.owasp</groupId>
             <artifactId>dependency-check-maven</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
           </plugin>
         </plugins>
       </build>
@@ -477,6 +481,18 @@
             <execution>
               <id>default</id>
               <phase>verify</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>com.github.spotbugs</groupId>
+          <artifactId>spotbugs-maven-plugin</artifactId>
+          <version>4.9.8.2</version>
+          <executions>
+            <execution>
               <goals>
                 <goal>check</goal>
               </goals>

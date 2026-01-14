@@ -24,10 +24,6 @@ generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
-variable "aws_tags" {
-   type = map
-}
-
 provider "aws" {
   region  = var.region
   default_tags {
