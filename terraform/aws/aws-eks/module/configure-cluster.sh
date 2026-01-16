@@ -74,6 +74,7 @@ function ensure-datadog-agent() {
       --set appKey="${DATADOG_APP_KEY}" \
       --set clusterName="${CLUSTER_NAME}" \
       -f "${DIRNAME}/datadog.yaml"
+    NAMESPACES_NAMES="$(echo "${NAMESPACES}" | jq -cr '[.[].name]')"
     kubectl apply -f - <<EOF
 kind: "DatadogAgent"
 apiVersion: "datadoghq.com/v2alpha1"
@@ -103,6 +104,7 @@ spec:
       enabled: true
     clusterChecks:
       enabled: true
+      useClusterChecksRunners: true
     orchestratorExplorer:
       enabled: true
     usm:
@@ -111,14 +113,25 @@ spec:
       instrumentation:
         enabled: true
         targets:
+          # - name: "java-target"
+          #   namespaceSelector:
+          #     matchNames:
+          #       - "NAMESPACE_NAME"
+          #   podSelector:
+          #     matchLabels:
+          #       dd: "java"
+          #   ddTraceVersions:
+          #     java: "1"
           - name: "default-target"
             ddTraceVersions:
               java: "1"
               python: "4"
               js: "5"
-              php: "1"
-              dotnet: "3"
-              ruby: "2"
+              # php: "1"
+              # dotnet: "3"
+              # ruby: "2"
+            namespaceSelector:
+              matchNames: ${NAMESPACES_NAMES}
     logCollection:
       enabled: false
       containerCollectAll: false
@@ -150,10 +163,10 @@ EOF
 # Main
 login-to-eks
 ensure-cluster-config
+ensure-datadog-agent
 configure-namespaces
 ensure-nginx
 ensure-externaldns
-ensure-datadog-agent
 
 # TODO install SecretManager integration
 # https://github.com/aws/secrets-store-csi-driver-provider-aws

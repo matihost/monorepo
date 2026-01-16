@@ -1,6 +1,14 @@
+# helm show values ingress-nginx/ingress-nginx > nginx.templ.yaml
+#
 # https://kubernetes.github.io/ingress-nginx/deploy/
 # Possible annotations: https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.13/guide/service/annotations/
 controller:
+  podAnnotations:
+    ad.datadoghq.com/controller.check_names: '["nginx", "nginx_ingress_controller"]'
+    ad.datadoghq.com/controller.init_configs: '[{},{}]'
+    ad.datadoghq.com/controller.instances: '[{ "nginx_status_url":"http://%%host%%:80/nginx_status/"}, {"prometheus_url": "http://%%host%%:10254/metrics"}]'
+  config:
+    nginx-status-ipv4-whitelist: "127.0.0.1,10.0.0.0/8"
   service:
     type: LoadBalancer
     annotations:
@@ -15,6 +23,15 @@ controller:
       service.beta.kubernetes.io/aws-load-balancer-healthcheck-success-codes: 200-299
       service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
       service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+  nodeSelector:
+    kubernetes.io/os: linux
+    karpenter.sh/nodepool: "system"
+  tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+    - effect: "NoExecute"
+      operator: "Exists"
+      tolerationSeconds: 300
 
 # global:
 #   image:
