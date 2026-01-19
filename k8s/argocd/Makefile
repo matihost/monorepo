@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 # https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd#changelog
 HELM_CHART_VERSION := latest
 ifneq ($(strip $(HELM_CHART_VERSION)),latest)
-	VERSION_FLAG :=$(VERSION_FLAG)
+	VERSION_FLAG :=--version $(HELM_CHART_VERSION)
 endif
 
 DEBUG := false

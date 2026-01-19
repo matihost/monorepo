@@ -6,7 +6,7 @@ controller:
   podAnnotations:
     ad.datadoghq.com/controller.check_names: '["nginx", "nginx_ingress_controller"]'
     ad.datadoghq.com/controller.init_configs: '[{},{}]'
-    ad.datadoghq.com/controller.instances: '[{ "nginx_status_url":"http://%%host%%:80/nginx_status/"}, {"prometheus_url": "http://%%host%%:10254/metrics"}]'
+    ad.datadoghq.com/controller.instances: '[{ "nginx_status_url":"http://%%host%%:80/nginx_status/"}, {"prometheus_url": "http://%%host%%:10254/metrics", "collect_nginx_histograms": true}]'
   config:
     nginx-status-ipv4-whitelist: "127.0.0.1,10.0.0.0/8"
   service:

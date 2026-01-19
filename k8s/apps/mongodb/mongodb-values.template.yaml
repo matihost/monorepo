@@ -1,0 +1,45 @@
+auth:
+  rootUser: "admin"
+  rootPassword: "${ADMIN_PASSWORD}"
+  usernames:
+  - boomerang
+  passwords: ["${USER1PASSWORD}"]
+  databases:
+  - boomerang
+arbiter:
+  enabled: false
+podAnnotations:
+  ad.datadoghq.com/mongodb.checks: |
+    {
+      "mongo": {
+        "init_config": {},
+        "instances": [
+          {
+            "hosts": ["%%host%%:%%port%%"],
+            "username": "datadog",
+            "password": "${DD_PASSWORD}",
+            "options": {
+              "authSource": "admin"
+            },
+            "database_autodiscovery": {
+              "enabled": "true"
+            },
+            "dbm": "true",
+            "cluster_name": "${DEPLOYMENT_NAME}"
+          }
+        ]
+      }
+    }
+initdbScripts:
+  datadog-user.js: |
+    var adminDb = db.getSiblingDB("admin");
+
+    adminDb.createUser({
+      user: "datadog",
+      pwd: "${DD_PASSWORD}",
+      roles: [
+        { role: "clusterMonitor", db: "admin" },
+        { role: "readAnyDatabase", db: "admin" },
+        { role: "read", db: "local" }
+      ]
+    });

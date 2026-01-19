@@ -1184,6 +1184,30 @@ all:
               # so that otelcol-contrib user which runs systemctl service can access journal logs
               usermod -a -G adm otelcol-contrib
             }
+        - name: mongodb-compass
+          become: true
+          desc: Ensure latest version of MongoDB Compass (GUI) is installed.
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/mongodb-js/compass/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(mongodb-compass --version 2>&1| sed -E "s/.*ompass (.*)/v\1/g")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/mongodb-js/compass/releases/latest  | jq -r ".assets[] |
+                select(.name | test(\"mongodb-compass_.*_amd64.deb$\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/mongodb-compass.deb"
+              apt --allow-downgrades -y install /tmp/mongodb-compass.deb
+            }
+        - name: mongosh
+          become: true
+          desc: Ensure latest version of MongoDB Shell (mongosh) is installed.
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/mongodb-js/mongosh/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="v$(mongosh --version 2>&1)"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/mongodb-js/mongosh/releases/latest  | jq -r ".assets[] |
+                select(.name | test(\"mongodb-mongosh_.*_amd64.deb$\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/mongodb-mongosh.deb"
+              apt --allow-downgrades -y install /tmp/mongodb-mongosh.deb
+            }
         - name: poetry
           desc: Dependency management for Python
           become: false
