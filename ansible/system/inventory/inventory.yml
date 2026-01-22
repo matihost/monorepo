@@ -1141,12 +1141,22 @@ all:
                 DD_LOGS_CONFIG_PROCESS_COLLECT_ALL=true \
                 bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)"
                 usermod -a -G docker dd-agent
+
                 echo "network_config:
-                  enabled: true" >> /etc/datadog-agent/system-probe.yaml
+                enabled: true" >> /etc/datadog-agent/system-probe.yaml
+                # workaound for error in datadog system probe status:
+                # NPM === Status: Not running
+                # Error: error loading CO-RE network tracer:
+                # error reading tracer.o: /opt/datadog-agent/embedded/share/system-probe/ebpf/co-re/tracer.o has incorrect permissions: user=995, group=983, permissions=-rw-r--r--
+                chown root:root /opt/datadog-agent/embedded/share/system-probe/ebpf/co-re/tracer.o /opt/datadog-agent/embedded/share/system-probe/ebpf/runtime-security-syscall-wrapper.o
+                chmod 700 /opt/datadog-agent/embedded/share/system-probe/ebpf/co-re/tracer.o /opt/datadog-agent/embedded/share/system-probe/ebpf/runtime-security-syscall-wrapper.o
+
+                # enabling journald log collection
                 cp /etc/datadog-agent/conf.d/journald.d/conf.yaml.example /etc/datadog-agent/conf.d/journald.d/conf.yaml
                 echo "logs:
                 - type: journald
                   container_mode: true" > /etc/datadog-agent/conf.d/journald.d/conf.yaml
+
                 datadog-installer apm instrument
                 systemctl restart datadog-agent
               }
@@ -1189,16 +1199,16 @@ all:
               usermod -a -G adm otelcol-contrib
             }
         - name: mongodb-compass
-          become: true
+          become: false
           desc: Ensure latest version of MongoDB Compass (GUI) is installed.
           command: |
             CURRENT_VERSION="$(curl -sL https://api.github.com/repos/mongodb-js/compass/releases/latest | jq -r ".tag_name")"
-            INSTALLED_VERSION="$(mongodb-compass --version 2>&1| sed -E "s/.*ompass (.*)/v\1/g")"
+            INSTALLED_VERSION="$(mongodb-compass --version 2>/dev/null| sed -E "s/.*ompass (.*)/v\1/g")"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl -sL https://api.github.com/repos/mongodb-js/compass/releases/latest  | jq -r ".assets[] |
                 select(.name | test(\"mongodb-compass_.*_amd64.deb$\")) | .browser_download_url" |
                   xargs curl -s -L -o "/tmp/mongodb-compass.deb"
-              apt --allow-downgrades -y install /tmp/mongodb-compass.deb
+              sudo apt --allow-downgrades -y install /tmp/mongodb-compass.deb
             }
         - name: mongosh
           become: true
@@ -1211,6 +1221,21 @@ all:
                 select(.name | test(\"mongodb-mongosh_.*_amd64.deb$\")) | .browser_download_url" |
                   xargs curl -s -L -o "/tmp/mongodb-mongosh.deb"
               apt --allow-downgrades -y install /tmp/mongodb-mongosh.deb
+            }
+        - name: velero
+          become: false
+          desc: Ensure latest version of Velero CLI is installed.
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/vmware-tanzu/velero/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(velero version 2>/dev/null| grep Version | sed -E "s/.*Version: (.*)/\1/g")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/vmware-tanzu/velero/releases/latest  | jq -r ".assets[] |
+                select(.name | test(\"velero-.*-linux-amd64.tar.gz$\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/velero.tar.gz"
+              cd /tmp && tar -xzf /tmp/velero.tar.gz
+              sudo mv /tmp/velero*/velero /usr/local/bin/
+              rm -rf /tmp/velero*
+              echo "Velero ${CURRENT_VERSION} has been installed"
             }
         - name: poetry
           desc: Dependency management for Python

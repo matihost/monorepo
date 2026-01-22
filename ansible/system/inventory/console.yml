@@ -556,6 +556,21 @@ all:
               sudo tar xzvfC cilium-linux-amd64.tar.gz /usr/local/bin
               rm cilium-linux-amd64.tar.gz{,.sha256sum}
             }
+        - name: velero
+          become: false
+          desc: Ensure latest version of Velero CLI is installed.
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/vmware-tanzu/velero/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(velero version 2>/dev/null| grep Version | sed -E "s/.*Version: (.*)/\1/g")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/vmware-tanzu/velero/releases/latest  | jq -r ".assets[] |
+                select(.name | test(\"velero-.*-linux-amd64.tar.gz$\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/velero.tar.gz"
+              cd /tmp && tar -xzf /tmp/velero.tar.gz
+              sudo mv /tmp/velero*/velero /usr/local/bin/
+              rm -rf /tmp/velero*
+              echo "Velero ${CURRENT_VERSION} has been installed"
+            }
         - name: code-plugins
           become: false
           command: |
