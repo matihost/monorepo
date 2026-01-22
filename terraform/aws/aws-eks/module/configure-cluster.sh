@@ -147,6 +147,14 @@ spec:
         - effect: "NoExecute"
           operator: "Exists"
           tolerationSeconds: 300
+      # extraConfd:
+      #   configDataMap:
+      #     <INTEGRATION_NAME>.yaml: |-
+      #       cluster_check: true
+      #       init_config:
+      #         - <INIT_CONFIG>
+      #       instances:
+      #         - <INSTANCES_CONFIG>
     nodeAgent:
       image:
         tag: "7" # helm chart is released slower than node agent image, so pin to latest minor version

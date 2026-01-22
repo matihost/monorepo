@@ -6,7 +6,7 @@ all:
         localhost:
       vars:
         # to install and configure Datadog agent when DD_API_KEY is set in environment as well
-        datadog_agent: false
+        datadog_agent: true
         versions:
           # represents path to local gems, see: 'gem environment' output for example: ~/.local/share/gem/ruby/3.3.0/bin
           ruby_user_path: "${HOME}/.local/share/gem/ruby/3.3.0/bin"
@@ -174,7 +174,7 @@ all:
           key_url: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_{{ versions.onedrive_ubuntu_version }}/Release.key
         - name: jenkins
           repo: "deb [arch=amd64] https://pkg.jenkins.io/debian-stable binary/"
-          key_url: "https://pkg.jenkins.io/debian/jenkins.io-2023.key"
+          key_url: "https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key"
         - name: dbeaver
           repo: "deb [arch=amd64] https://dbeaver.io/debs/dbeaver-ce /"
           key_url: "https://dbeaver.io/debs/dbeaver.gpg.key"
@@ -856,7 +856,7 @@ all:
             INSTALLED_VERSION="$(tofu version 2>/dev/null |grep OpenTofu | sed "s/OpenTofu //g")"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl -sL https://api.github.com/repos/opentofu/opentofu/releases/latest | jq -r ".assets[] |
-                select(.name | test(\"amd64.deb\")) | .browser_download_url" |
+                select(.name | test(\"amd64.deb$\")) | .browser_download_url" |
                   xargs curl -s -L -o "/tmp/tofu.deb"
               apt -y install /tmp/tofu.deb
             }
@@ -1115,7 +1115,8 @@ all:
           desc: |
             Ensure latest version of Datadog agent is installed
             Datadog Agent is installed only when DD_API_KEY environment variable is set (for example via ~/.bashrc export)
-            To uninstall Datadog run: datadog-installer purge
+            To uninstall Datadog run: datadog-installer purge; apt -y remove datadog-agent; rm -rf /etc/datadog-agent
+            Install script parameters: https://github.com/DataDog/agent-linux-install-script
           command: |
             CURRENT_VERSION="$(curl -sL https://api.github.com/repos/DataDog/datadog-agent/releases/latest | jq -r ".tag_name")"
             INSTALLED_VERSION="$(datadog-agent version 2>/dev/null| sed -E "s/Agent (.*) - Commit: .*/\1/g")"
@@ -1125,21 +1126,24 @@ all:
               ! [ "${CURRENT_VERSION}" != "${INSTALLED_VERSION}" -o "${CURRENT_DD_API_KEY}" != "${DD_API_KEY}" ] || {
                 DD_API_KEY="${DD_API_KEY}" \
                 DD_SITE="datadoghq.com" \
+                DD_TAGS="role:developer" \
                 DD_APM_INSTRUMENTATION_ENABLED=host \
+                DD_APM_INSTRUMENTATION_LIBRARIES=java:1,python:4,js:5,php:1,dotnet:3,ruby:2\
+                DD_APM_ERROR_TRACKING_STANDALONE=true \
+                DD_RUNTIME_SECURITY_CONFIG_ENABLED=false \
+                DD_COMPLIANCE_CONFIG_ENABLED=false \
                 DD_REMOTE_UPDATES=true \
+                DD_DISCOVERY_ENABLED=true \
                 DD_ENV="home" \
-                DD_LOGS_ENABLED=true \
-                DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true \
-                DD_PROCESS_AGENT_PROCESS_COLLECTION_ENABLED=true \
-                DD_APM_ENABLED=true \
-                DD_APM_NON_LOCAL_TRAFFIC=true \
-                DD_APM_INSTRUMENTATION_LIBRARIES=java:1,python:3,js:5,php:1,dotnet:3 \
+                DD_PRIVILEGED_LOGS_ENABLED=true \
+                DD_OTELCOLLECTOR_ENABLED=false \
+                DD_SYSTEM_PROBE_SERVICE_MONITORING_ENABLED=false \
+                DD_LOGS_CONFIG_PROCESS_COLLECT_ALL=true \
                 bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)"
                 usermod -a -G docker dd-agent
-                sudo -u dd-agent install -m 0640 /etc/datadog-agent/system-probe.yaml.example /etc/datadog-agent/system-probe.yaml
                 echo "network_config:
-                  enabled: true" > /etc/datadog-agent/system-probe.yaml
-                sudo -u dd-agent install -m 0640 /etc/datadog-agent/conf.d/journald.d/conf.yaml.example /etc/datadog-agent/conf.d/journald.d/conf.yaml
+                  enabled: true" >> /etc/datadog-agent/system-probe.yaml
+                cp /etc/datadog-agent/conf.d/journald.d/conf.yaml.example /etc/datadog-agent/conf.d/journald.d/conf.yaml
                 echo "logs:
                 - type: journald
                   container_mode: true" > /etc/datadog-agent/conf.d/journald.d/conf.yaml
