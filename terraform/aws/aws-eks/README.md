@@ -10,6 +10,7 @@ In particular it creates:
 - Cloud Watch, EFS, CSI Snapshots, Kube Server, Kube State Metrics addons
 - K8S metrics server on `system` nodepool
 - ExternalDNS
+- Velero - for backup - scheduled backups for each configured namespaces and cluster-backup
 - Private DNS Route53 zone
 - Configure storage, ingress, node pool classes
 - Configure app namespaces (quota, limits, networkpolicies)
@@ -98,4 +99,35 @@ k9s
 
 ```bash
 make list-pod-identity-associations [ENV=dev]
+```
+
+### Backups
+
+```bash
+# create instant backup from scheduled backup
+velero backup create cluster-daily-backup1 --from-schedule cluster-daily-backup
+velero backup create learning-backup1 --from-schedule learning-daily-backup
+
+# list backups
+velero get backups
+velero backup get
+
+# list schedules
+velero get schedules
+velero schedule get
+
+# describe particular backup
+velero backup describe learning-backup1
+# get list of object, details about CSI snapshots etc
+velero backup describe learning-backup1 --details
+
+# get log happenned during backup
+velero backup log learning-backup1
+
+
+# delete particular backup
+velero backup delete learning-backup1 --confirm
+
+# delete all backups
+velero backup delete --all --confirm
 ```

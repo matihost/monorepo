@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ACCOUNT_ID="${1:?CLUSTER_NAME is required}"
+ACCOUNT_ID="${1:?ACCOUNT_ID is required}"
 CLUSTER_NAME="${2:?CLUSTER_NAME is required}"
 REGION="${3:?REGION is required}"
 NAMESPACES="${4:?NAMESPACES is required}"
@@ -107,6 +107,8 @@ spec:
       useClusterChecksRunners: true
     orchestratorExplorer:
       enabled: true
+    npm:
+      enabled: true
     usm:
         enabled: true
     apm:
@@ -168,6 +170,56 @@ EOF
   }
 }
 
+function ensure-backup() {
+  helm repo add vmware-tanzu https://vmware-tanzu.github.io/helm-charts
+  helm repo update
+  helm upgrade --install velero -n velero --create-namespace vmware-tanzu/velero -f "${DIRNAME}/velero.yaml" \
+    --set configuration.backupStorageLocation[0].name="default" \
+    --set configuration.backupStorageLocation[0].provider="aws" \
+    --set configuration.backupStorageLocation[0].bucket="${ACCOUNT_ID}-${CLUSTER_NAME}-velero-backups" \
+    --set configuration.backupStorageLocation[0].config.region="${REGION}" \
+    --set configuration.volumeSnapshotLocation[0].name="default" \
+    --set configuration.volumeSnapshotLocation[0].provider="aws" \
+    --set configuration.volumeSnapshotLocation[0].config.region="${REGION}" \
+    --set serviceAccount.server.annotations."eks\\.amazonaws\\.com/role-arn"="arn:aws:iam::${ACCOUNT_ID}:role/${CLUSTER_NAME}-velero-irsa"
+
+  for NAMESPACE in $(echo "${NAMESPACES}" | jq -cr '.[]'); do
+
+    NS="$(echo "${NAMESPACE}" | jq -r ".name")"
+
+    cat <<EOF | oc apply -f -
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: ${NS}-daily-backup
+  namespace: velero
+spec:
+  schedule: "0 1 * * *"  # Daily at 1 AM, so RPO is 24h
+  template:
+    includedNamespaces:
+      - ${NS}
+    ttl: 168h0m0s  # 7 days retention
+EOF
+  done
+
+  NAMESPACES_NAMES="$(echo "${NAMESPACES}" | jq -cr '[.[].name]')"
+  cat <<EOF | oc apply -f -
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: cluster-daily-backup
+  namespace: velero
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM, RPO = 24h
+  template:
+    includedNamespaces:
+      - "*"  # all namespaces
+    excludedNamespaces: ${NAMESPACES_NAMES}
+    includeClusterResources: true
+    ttl: 168h                          # 7 days retention
+EOF
+
+}
 # Main
 login-to-eks
 ensure-cluster-config
@@ -175,6 +227,7 @@ ensure-datadog-agent
 configure-namespaces
 ensure-nginx
 ensure-externaldns
+ensure-backup
 
 # TODO install SecretManager integration
 # https://github.com/aws/secrets-store-csi-driver-provider-aws

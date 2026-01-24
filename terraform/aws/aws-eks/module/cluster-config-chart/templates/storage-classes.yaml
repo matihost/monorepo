@@ -26,3 +26,16 @@ metadata:
 provisioner: efs.csi.aws.com
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
+---
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: ebs-csi
+  labels:
+    velero.io/csi-volumesnapshot-class: "true"
+driver: ebs.csi.eks.amazonaws.com
+# flag does not matter as
+# per
+# https://github.com/vmware-tanzu/velero/blob/release-1.16/design/clean_artifacts_in_csi_flow.md
+# VolumeSnapshot and VolumeSnapshotContent are deleted when Backup is created automatically either way
+deletionPolicy: Retain # or Delete

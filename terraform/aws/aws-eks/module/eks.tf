@@ -234,5 +234,6 @@ resource "null_resource" "cluster-config" {
     aws_eks_access_entry.admin,
     aws_eks_access_policy_association.admin,
     aws_eks_pod_identity_association.externaldns,
+    aws_iam_role_policy_attachment.backup_irsa,
   ]
 }

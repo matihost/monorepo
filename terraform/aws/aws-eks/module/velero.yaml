@@ -1,0 +1,84 @@
+# helm show values vmware-tanzu/velero
+
+image:
+  repository: velero/velero
+  tag: latest
+  pullPolicy: Always
+
+
+nodeSelector:
+  karpenter.sh/nodepool: "system"
+
+tolerations:
+  - key: "CriticalAddonsOnly"
+    operator: "Exists"
+  - effect: "NoExecute"
+    operator: "Exists"
+    tolerationSeconds: 300
+
+# For AWS
+# configuration:
+#   backupStorageLocation:
+#   - bucket: $BUCKET
+#     provider: aws
+#   volumeSnapshotLocation:
+#   - config:
+#       region: $REGION
+#     provider: aws
+# Init containers to add to the Velero deployment's pod spec. At least one plugin provider image is required.
+# If the value is a string then it is evaluated as a template.
+initContainers:
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws:latest
+    imagePullPolicy: Always
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+
+credentials:
+  # Whether a secret should be used. Set to false if, for examples:
+  # - using kube2iam or kiam to provide AWS IAM credentials instead of providing the key file. (AWS only)
+  # - using workload identity instead of providing the key file. (Azure/GCP only)
+  useSecret: false
+
+# IRSA for Velero
+# serviceAccount:
+#   server:
+#     annotations:
+#       eks.amazonaws.com/role-arn: "arn:aws:iam::${ACCOUNT}:role/eks-velero-backup"
+
+# init container uses bitnamilegacy image - but it is no more working
+kubectl:
+  image:
+    repository: docker.io/bitnamilegacy/kubectl
+    tag: latest
+
+configuration:
+  # Must have to
+  features: EnableCSI
+  # When POD has no annotation like: backup.velero.io/backup-volumes: <<name-of-volume-in-the-pod>>
+  # then if it is EBS and VolumeSnapshotClass with
+  # label velero.io/csi-volumesnapshot-class=true exists
+  # velero will use it to snapshot EBS volumes.
+  # Otherwise EFS volumes will be skipped in backup.
+  #
+  # If defaultVolumesToFsBackup is true then all volumes
+  # without the annotation will be treated as FS volumes. EBS volumes will not be snapshotted.
+  defaultVolumesToFsBackup: false
+
+# For FS backups (like EGS)
+deployNodeAgent: true
+nodeAgent:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+  tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+    - effect: "NoExecute"
+      operator: "Exists"
+      tolerationSeconds: 300
