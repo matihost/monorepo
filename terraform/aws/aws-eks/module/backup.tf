@@ -1,7 +1,7 @@
 resource "aws_s3_bucket" "backup" {
   bucket              = "${local.account_id}-${local.prefix}-velero-backups"
   force_destroy       = "true"
-  object_lock_enabled = "false"
+  object_lock_enabled = "false" # when versioning is disabled, this must be false
 }
 
 
@@ -55,7 +55,7 @@ resource "aws_iam_role_policy_attachment" "backup_irsa" {
 
 
 resource "aws_iam_policy" "velero-policy" {
-  description = "Allow pass ReadOnlyAccess role to Tools"
+  description = "Allow Velero to manage backups in S3 and EBS"
   name        = "${local.prefix}-velero-irsa"
 
   policy = <<EOF

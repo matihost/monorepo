@@ -5,6 +5,21 @@ image:
   tag: latest
   pullPolicy: Always
 
+podAnnotations:
+  ad.datadoghq.com/velero.checks: |
+    {
+      "velero": {
+        "init_config": {},
+        "instances": [{"openmetrics_endpoint": "http://%%host%%:8085/metrics"}]
+      }
+    }
+  ad.datadoghq.com/node-agent.checks: |
+    {
+      "velero": {
+        "init_config": {},
+        "instances": [{"openmetrics_endpoint": "http://%%host%%:8085/metrics"}]
+      }
+    }
 
 nodeSelector:
   karpenter.sh/nodepool: "system"

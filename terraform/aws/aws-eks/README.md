@@ -131,3 +131,26 @@ velero backup delete learning-backup1 --confirm
 # delete all backups
 velero backup delete --all --confirm
 ```
+
+### Datadog
+
+```bash
+# SSH to the Datadog Agent pod on the same node where target pod is located.
+NODE_NAME="..."
+kubectl exec -n datadog -it $(kubectl get pods -n datadog --field-selector spec.nodeName=$NODE_NAME -o jsonpath="{.items[0].metadata.name}") -c agent -- bash
+
+## get status
+agent status
+
+# get collectors status
+agent status collector
+
+# check particular integrations/check (for example: velero, nginx, mongo, nginx_ingress_controller)
+agent check velero
+
+# run twice to get rate metrics from particular check
+agent check mongo --check-rate
+
+# show agent runtime configuration
+agent config
+```
