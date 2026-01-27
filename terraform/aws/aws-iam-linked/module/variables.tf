@@ -19,3 +19,15 @@ variable "region" {
   type        = string
   description = "Preffered AWS region where resource need to be placed"
 }
+
+variable "partition" {
+  type        = string
+  description = "The AWS partition in which to create resources"
+  default     = "aws"
+}
+
+variable "aws_tags" {
+  type        = map(string)
+  description = "AWS tags"
+  default     = {}
+}

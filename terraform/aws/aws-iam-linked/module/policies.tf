@@ -15,7 +15,7 @@ resource "aws_iam_policy" "selfmanagement" {
               "iam:*AccessKey*",
               "iam:UpdateLoginProfile"
           ],
-          "Resource": "arn:aws:iam::${local.account_id}:user/$${aws:username}"
+          "Resource": "arn:${var.partition}:iam::${local.account_id}:user/$${aws:username}"
         },
         {
           "Effect": "Allow",
@@ -38,8 +38,8 @@ resource "aws_iam_policy" "selfmanagement" {
               "iam:ResyncMFADevice"
           ],
           "Resource": [
-              "arn:aws:iam::${local.account_id}:mfa/*",
-              "arn:aws:iam::${local.account_id}:user/$${aws:username}"
+              "arn:${var.partition}:iam::${local.account_id}:mfa/*",
+              "arn:${var.partition}:iam::${local.account_id}:user/$${aws:username}"
           ]
         }
     ]
@@ -110,7 +110,7 @@ resource "aws_iam_policy" "assume-read-only" {
               "Action": [
                   "sts:AssumeRole"
               ],
-              "Resource": "arn:aws:iam:::role/ReadOnlyAccess"
+              "Resource": "arn:${var.partition}:iam:::role/ReadOnlyAccess"
           }
       ]
   }
@@ -131,7 +131,7 @@ resource "aws_iam_policy" "assume-admin" {
               "Action": [
                   "sts:AssumeRole"
               ],
-              "Resource": "arn:aws:iam:::role/FullAdminAccess"
+              "Resource": "arn:${var.partition}:iam:::role/FullAdminAccess"
           }
       ]
   }
@@ -197,13 +197,13 @@ resource "aws_iam_policy" "createASGAndALB" {
           {
               "Effect": "Allow",
               "Action": "iam:CreateServiceLinkedRole",
-              "Resource": "arn:aws:iam::*:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling*",
+              "Resource": "arn:${var.partition}:iam::*:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling*",
               "Condition": {"StringLike": {"iam:AWSServiceName": "autoscaling.amazonaws.com"}}
           },
           {
               "Effect": "Allow",
               "Action": "iam:CreateServiceLinkedRole",
-              "Resource": "arn:aws:iam::*:role/aws-service-role/elasticloadbalancing.amazonaws.com/AWSServiceRoleForElasticLoadBalancing*",
+              "Resource": "arn:${var.partition}:iam::*:role/aws-service-role/elasticloadbalancing.amazonaws.com/AWSServiceRoleForElasticLoadBalancing*",
               "Condition": {"StringLike": {"iam:AWSServiceName": "elasticloadbalancing.amazonaws.com"}}
           },
           {
@@ -212,7 +212,7 @@ resource "aws_iam_policy" "createASGAndALB" {
                   "iam:AttachRolePolicy",
                   "iam:PutRolePolicy"
               ],
-              "Resource": "arn:aws:iam::*:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling*"
+              "Resource": "arn:${var.partition}:iam::*:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling*"
           },
           {
               "Effect": "Allow",
@@ -220,7 +220,7 @@ resource "aws_iam_policy" "createASGAndALB" {
                   "iam:AttachRolePolicy",
                   "iam:PutRolePolicy"
               ],
-              "Resource": "arn:aws:iam::*:role/aws-service-role/elasticloadbalancing.amazonaws.com/AWSServiceRoleForElasticLoadBalancing*"
+              "Resource": "arn:${var.partition}:iam::*:role/aws-service-role/elasticloadbalancing.amazonaws.com/AWSServiceRoleForElasticLoadBalancing*"
           }
       ]
   }
@@ -307,7 +307,7 @@ resource "aws_iam_policy" "tools-access" {
         {
             "Effect": "Allow",
             "Action": [ "iam:PassRole", "iam:GetRole" ],
-            "Resource": "arn:aws:iam::${local.account_id}:role/ReadOnlyAccess",
+            "Resource": "arn:${var.partition}:iam::${local.account_id}:role/ReadOnlyAccess",
             "Condition": {"StringEquals": {"iam:PassedToService": "ts.amazonaws.com"}}
         }
     ]

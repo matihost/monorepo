@@ -1,8 +1,8 @@
 locals {
   bucket  = "${local.account}-terraform-state"
   account = "${run_cmd("--terragrunt-quiet", "aws", "sts", "get-caller-identity", "--query", "\"Account\"", "--output", "text")}"
-  region  = "${get_env("AWS_REGION", "us-east-1")}"
-  zone    = "us-east-1a"
+  region  = "eusc-de-east-1"
+  zone    = "eusc-de-east-1a"
 }
 
 remote_state {
@@ -50,4 +50,7 @@ inputs = {
   account = local.account
   region  = local.region
   zone    = local.zone
+
+  partition = "aws-eusc"
+
 }

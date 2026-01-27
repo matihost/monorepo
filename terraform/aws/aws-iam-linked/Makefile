@@ -16,15 +16,16 @@ else
 	MODE_STR := plan
 endif
 
+ENV := dev
 
 init:
-	cd stage/current && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
+	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
 
 run: init ## usage: make run MODE=plan [DEBUG=true])
-	cd stage/current && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
+	cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 show-state: ## show state
-	cd stage/current && terragrunt state list && terragrunt show
+	cd stage/$(ENV) && terragrunt state list && terragrunt show
 
 clean: ## clean cached plugins and data
 	find . -name ".terra*" -exec rm -rf {} +
