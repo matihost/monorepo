@@ -32,6 +32,15 @@ provider "aws" {
     tags = var.aws_tags
   }
 }
+
+provider "aws" {
+  for_each = toset(concat([var.region], try(var.vpc_peering_regions, []), try(var.vpc_peering_acceptance_regions, [])))
+  alias  = "by_region"
+  region = each.key
+  default_tags {
+    tags = var.aws_tags
+  }
+}
 EOF
 }
 

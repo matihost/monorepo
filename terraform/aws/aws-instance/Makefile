@@ -4,70 +4,77 @@ SHELL := /usr/bin/env bash
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
-	TG_FLAGS := --terragrunt-debug
+	TG_FLAGS := --inputs-debug
 endif
 
 MODE := apply
 ifeq ($(strip $(MODE)),apply)
-	MODE_STR := apply -auto-approve
+	MODE_STR := --non-interactive -- apply -auto-approve
 else ifeq ($(strip $(MODE)),destroy)
-	MODE_STR := destroy -auto-approve
+	MODE_STR := --non-interactive -- destroy -auto-approve
 else
-	MODE_STR := plan
+	MODE_STR := --non-interactive -- plan
 endif
 
+PARTITION := aws
 
 ENV := dev
 
+ifeq ($(strip $(PARTITION)),eusc)
+	DEPLOY_PATH := stage/eusc/$(ENV)
+else
+	DEPLOY_PATH := stage/$(ENV)
+endif
+
 init: prepare
-	cd stage/$(ENV) && terragrunt run-all init -upgrade=true
+	cd $(DEPLOY_PATH) && terragrunt run --all -- init -upgrade=true
 
 run-one: prepare ## setup one EC2 instance from environment, usage: make run-one INSTANCE=instance-ubuntu [ENV=dev] [MODE=apply]
 ifndef INSTANCE
 	$(error Env INSTANCE is not defined. Usage make run-one ENV=dev INSTANCE=ubuntu)
 endif
-	cd stage/$(ENV)/${INSTANCE} && terragrunt init -upgrade=true && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
+	cd $(DEPLOY_PATH)/${INSTANCE} && terragrunt init -upgrade=true && terragrunt validate && terragrunt $(MODE_STR) $(TG_FLAGS)
 
 run: init ## setup EC2 instances for environment, usage: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt run-all validate && terragrunt run-all $(MODE_STR) --non-interactive $(TG_FLAGS)
+	@cd $(DEPLOY_PATH) && terragrunt run --all validate && terragrunt run --all $(MODE_STR) $(TG_FLAGS)
 
 ssh: ## ssh to EC2 instance
 ifndef INSTANCE
 	$(error Env INSTANCE is not defined. Usage make ssh ENV=dev INSTANCE=ubuntu)
 endif
-	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(shell cd stage/$(ENV)/${INSTANCE} && terragrunt output ec2_dns)
+	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(shell cd $(DEPLOY_PATH)/${INSTANCE} && terragrunt output ec2_dns)
 
 ssm-ssh: ## ssh to EC2 instance over SSM SSH
 ifndef INSTANCE
 	$(error Env INSTANCE is not defined. Usage make ssm-ssh ENV=dev INSTANCE=ubuntu)
 endif
-	aws ssm start-session --target "$(shell cd stage/$(ENV)/${INSTANCE} && terragrunt output ec2_id)"
+	aws ssm start-session --target "$(shell cd $(DEPLOY_PATH)/${INSTANCE} && terragrunt output ec2_id)"
 
 destroy-instance: ## terminate instance
 ifndef INSTANCE
 	$(error Env INSTANCE is not defined. Usage make destroy-instance ENV=dev INSTANCE=ubuntu)
 endif
-	aws ec2 terminate-instances --instance-ids "$(shell cd stage/$(ENV)/${INSTANCE} && terragrunt output ec2_id)"
+	aws ec2 terminate-instances --instance-ids "$(shell cd $(DEPLOY_PATH)/${INSTANCE} && terragrunt output ec2_id)"
 
 show-instance-startup-logs: # show EC2 cloud-init startup logs
 ifndef INSTANCE
 	$(error Env INSTANCE is not defined. Usage make destroy-instance ENV=dev INSTANCE=ubuntu)
 endif
-	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(shell cd stage/$(ENV)/${INSTANCE} && terragrunt output ec2_dns) cat /var/log/cloud-init-output.log
+	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(shell cd $(DEPLOY_PATH)/${INSTANCE} && terragrunt output ec2_dns) cat /var/log/cloud-init-output.log
 
 show-instance-startup-script: # show EC2 cloud-init startup script
 ifndef INSTANCE
 	$(error Env INSTANCE is not defined. Usage make destroy-instance ENV=dev INSTANCE=ubuntu)
 endif
-	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(shell cd stage/$(ENV)/${INSTANCE} && terragrunt output ec2_dns) sudo cat /var/lib/cloud/instance/cloud-config.txt
+	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(shell cd $(DEPLOY_PATH)/${INSTANCE} && terragrunt output ec2_dns) sudo cat /var/lib/cloud/instance/cloud-config.txt
 
 
 test: ## test Nginx instance
-	curl http://$(shell cd stage/$(ENV)/${INSTANCE} && terragrunt output ec2_dns):80
+	curl http://$(shell cd $(DEPLOY_PATH)/${INSTANCE} && terragrunt output ec2_dns):80
 
 
 show-state: ## show state
-	cd stage/$(ENV)/${INSTANCE} && terragrunt state list && terragrunt show
+	cd $(DEPLOY_PATH)/${INSTANCE} && terragrunt state list && terragrunt show
 
 
 clean: ## clean cached plugins and data

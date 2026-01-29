@@ -103,10 +103,20 @@ variable "region" {
 }
 
 # tflint-ignore: terraform_unused_declarations
+variable "partition" {
+  type        = string
+  description = "The AWS partition in which to create resources"
+  default     = "aws"
+}
+
+
+# tflint-ignore: terraform_unused_declarations
 variable "aws_tags" {
   type        = map(string)
   description = "AWS tags"
+  default     = {}
 }
+
 
 variable "instance_profile" {
   default     = ""

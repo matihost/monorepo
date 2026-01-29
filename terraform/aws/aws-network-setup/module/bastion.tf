@@ -23,7 +23,16 @@ data "aws_ami" "ubuntu" {
     values = [var.ec2_architecture]
   }
 
-  owners = ["099720109477"] # Canonical
+  # "most_recent" is set to "true" and results are not filtered by owner or
+  # image ID. With this configuration, a third party may introduce a new image
+  # which will be returned by this data source. Filter by owner or image ID to
+  # avoid this possibility.
+  allow_unsafe_filter = true # it is safe when search is by owner-alias or owners
+
+  filter {
+    name   = "owner-alias"
+    values = ["amazon"]
+  }
 }
 
 resource "aws_security_group" "bastion_access" {

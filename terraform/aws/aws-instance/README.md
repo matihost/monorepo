@@ -17,7 +17,7 @@ Use  AWS resources eliglible to AWS Free Tier __only__.
 
 ```bash
 # setup all instance for particular env
-make run [ENV=dev] [MODE=apply]
+make run [ENV=dev/default] [MODE=apply] [PARTITION=eusc]
 
 # deploy single instance
 make run-one ENV=dev INSTANCE=windows

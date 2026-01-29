@@ -4,56 +4,67 @@ SHELL := /usr/bin/env bash
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
-	TG_FLAGS := --terragrunt-debug
+	TG_FLAGS := --inputs-debug
 endif
 
 MODE := apply
 ifeq ($(strip $(MODE)),apply)
-	MODE_STR := apply -auto-approve
+	MODE_STR := --non-interactive -- apply -auto-approve
 else ifeq ($(strip $(MODE)),destroy)
-	MODE_STR := destroy -auto-approve
+	MODE_STR := --non-interactive -- destroy -auto-approve
 else
-	MODE_STR := plan
+	MODE_STR := --non-interactive -- plan
 endif
 
+PARTITION := aws
 
 ENV := dev
-REGION := us-east-1
+
+ifeq ($(strip $(PARTITION)),eusc)
+	DEPLOY_PATH := stage/eusc/$(ENV)
+	ifndef REGION
+		REGION := eusc-de-east-1
+	endif
+else
+	DEPLOY_PATH := stage/$(ENV)
+	ifndef REGION
+		REGION := us-east-1
+	endif
+endif
 
 init: prepare
-	cd stage/$(ENV) && terragrunt init --all -upgrade=true
+	cd $(DEPLOY_PATH) && terragrunt run --all -- init -upgrade=true
 
 run-one: prepare ## ## setup VPC in one region: make run [ENV=dev] [REGION=us-east-1] [MODE=apply]
-	cd stage/$(ENV)/$(REGION) && terragrunt init -upgrade=true && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
-
+	cd $(DEPLOY_PATH)/$(REGION) && terragrunt init -upgrade=true && terragrunt validate && terragrunt $(MODE_STR) $(TG_FLAGS)
 
 run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate --all && terragrunt $(MODE_STR) --all --non-interactive $(TG_FLAGS)
+	@cd $(DEPLOY_PATH) && terragrunt run --all validate && terragrunt run --all $(MODE_STR) $(TG_FLAGS)
 
 ssh: ## ssh to VPC bastion host
-	eval $(shell cd stage/$(ENV)/$(REGION) && terragrunt output bastion_ssh)
+	eval $(shell cd $(DEPLOY_PATH)/$(REGION) && terragrunt output bastion_ssh)
 
 nat-ssh: ## ssh to NAT instance
-	eval "$(shell cd stage/$(ENV)/$(REGION) && terragrunt output nat_ssh)"
+	eval "$(shell cd $(DEPLOY_PATH)/$(REGION) && terragrunt output nat_ssh)"
 
 webserver-ssm-ssh: ## ssh to webserver instance over SSM
-	aws ssm start-session --target "$(shell cd stage/$(ENV)/$(REGION) && terragrunt output webserver_id)"
+	aws ssm start-session --target "$(shell cd $(DEPLOY_PATH)/$(REGION) && terragrunt output webserver_id)"
 
 expose_bastion_proxy_locally: ## expose bastion's HTTP proxy locally
-	@[ "$(shell sudo ss -antl |grep -c 8888)" -ne 0 ] || eval "$(shell cd stage/$(ENV) && terragrunt output expose_bastion_proxy_locally)"
+	@[ "$(shell sudo ss -antl |grep -c 8888)" -ne 0 ] || eval "$(shell cd $(DEPLOY_PATH) && terragrunt output expose_bastion_proxy_locally)"
 
 shutdown_local_bastion_proxy: ## shutdown tunneled bastion's HTTP proxy
 	@[ "$(shell sudo ss -antl |grep -c 8888)" -eq 0 ] || sudo kill -9 $(shell sudo lsof -t -i:8888)
 
 test: expose_bastion_proxy_locally ## test private  webeserver
-	eval "$(shell cd stage/$(ENV) && terragrunt output connect_via_bastion_proxy)"
+	eval "$(shell cd $(DEPLOY_PATH) && terragrunt output connect_via_bastion_proxy)"
 
 
 show-state: ## show state
-	cd stage/$(ENV) && terragrunt state list && terragrunt show
+	cd $(DEPLOY_PATH) && terragrunt state list && terragrunt show
 
 show-bastion-user-data: ## show bastion user data value
-	aws ec2 describe-instance-attribute --instance-id $(shell cd stage/$(ENV) && terragrunt output bastion_id) --attribute userData --output text --query "UserData.Value" | base64 -d
+	aws ec2 describe-instance-attribute --instance-id $(shell cd $(DEPLOY_PATH) && terragrunt output bastion_id) --attribute userData --output text --query "UserData.Value" | base64 -d
 
 
 clean: ## clean cached plugins and data

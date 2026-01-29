@@ -65,6 +65,11 @@ data "aws_ami" "image" {
     values = [var.ec2_architecture]
   }
 
+  # "most_recent" is set to "true" and results are not filtered by owner or
+  # image ID. With this configuration, a third party may introduce a new image
+  # which will be returned by this data source. Filter by owner or image ID to
+  # avoid this possibility.
+  allow_unsafe_filter = true # it is safe when search is by owner-alias or owners
 
   dynamic "filter" {
     for_each = var.ec2_ami_account_alias != "" ? [1] : []
