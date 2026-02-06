@@ -42,5 +42,5 @@ metadata:
   labels:
   {{- include "namespace-config.labels" . | nindent 4 }}
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::{{ .Values.aws.accountId }}:role/{{ .Values.irsaRole}}
+    eks.amazonaws.com/role-arn: arn:{{ .Values.aws.partition }}:iam::{{ .Values.aws.accountId }}:role/{{ .Values.irsaRole}}
 {{- end }}

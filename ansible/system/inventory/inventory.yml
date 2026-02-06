@@ -60,7 +60,6 @@ all:
           foxundermoon.shell-format
           garytyler.darcula-pycharm
           george-alisson.html-preview-vscode
-          github.copilot
           github.copilot-chat
           github.vscode-github-actions
           github.vscode-pull-request-github

@@ -14,7 +14,7 @@ resource "aws_iam_policy" "externaldns" {
         "route53:ChangeResourceRecordSets"
       ],
       "Resource": [
-        "arn:aws:route53:::hostedzone/*"
+        "arn:${var.partition}:route53:::hostedzone/*"
       ]
     },
     {

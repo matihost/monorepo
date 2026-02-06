@@ -4,34 +4,40 @@ SHELL := /usr/bin/env bash
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
-	TG_FLAGS := --terragrunt-debug
+	TG_FLAGS := --inputs-debug
 endif
 
 MODE := apply
 ifeq ($(strip $(MODE)),apply)
-	MODE_STR := apply -auto-approve
+	MODE_STR := --non-interactive -- apply -auto-approve
 	K8S_MODE_STR := apply
 else ifeq ($(strip $(MODE)),destroy)
-	MODE_STR := destroy -auto-approve
+	MODE_STR := --non-interactive -- destroy -auto-approve
 	K8S_MODE_STR := delete
 else
-	MODE_STR := plan
+	MODE_STR := --non-interactive -- plan
 	K8S_MODE_STR := get
 endif
 
+PARTITION := aws
 
 ENV := dev
 
+ifeq ($(strip $(PARTITION)),eusc)
+	DEPLOY_PATH := stage/eusc/$(ENV)
+else
+	DEPLOY_PATH := stage/$(ENV)
+endif
+
 init:
-	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
+	cd $(DEPLOY_PATH) && terragrunt run -- init -upgrade=true
 
-
-run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
+run: init ## setup EKS: make run [ENV=dev] [MODE=apply]
+	@cd $(DEPLOY_PATH) && terragrunt run validate && terragrunt run $(MODE_STR) $(TG_FLAGS)
 
 
 kubeconfig: ## generate kubeconfig entry for EKS cluster
-	aws eks --region $(shell cd stage/$(ENV) && terragrunt output -raw region) update-kubeconfig --name $(shell cd stage/$(ENV) && terragrunt output -raw cluster_name)
+	aws eks --region $(shell cd $(DEPLOY_PATH)&& terragrunt output -raw region) update-kubeconfig --name $(shell cd $(DEPLOY_PATH)&& terragrunt output -raw cluster_name)
 
 oidc-test: ## test OIDC setup and provide instructions to update ~/.kube/config to use it
 ifndef ISSUER_URL
@@ -76,10 +82,10 @@ test: ## install test application,  make test [MODE=apply] [FARGATE=true] [APP=a
 
 
 list-pod-identity-associations: ## list Pod Identity Associations
-	aws eks list-pod-identity-associations --cluster-name $(shell cd stage/$(ENV) && terragrunt output -raw cluster_name) --region $(shell cd stage/$(ENV) && terragrunt output -raw region)
+	aws eks list-pod-identity-associations --cluster-name $(shell cd $(DEPLOY_PATH)&& terragrunt output -raw cluster_name) --region $(shell cd $(DEPLOY_PATH)&& terragrunt output -raw region)
 
 show-state: ## show state
-	cd stage/$(ENV) && terragrunt state list && terragrunt show
+	cd $(DEPLOY_PATH)&& terragrunt state list && terragrunt show
 
 clean: ## clean cached plugins and data
 	find . -name ".terra*" -exec rm -rf {} +
@@ -87,8 +93,7 @@ clean: ## clean cached plugins and data
 
 upgrade-providers-version: init
 
-
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help run clean test
+.PHONY: help run clean

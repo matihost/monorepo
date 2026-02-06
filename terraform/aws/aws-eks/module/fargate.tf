@@ -14,7 +14,7 @@ resource "aws_iam_role" "fargate" {
 }
 
 resource "aws_iam_role_policy_attachment" "fargate-AmazonEKSFargatePodExecutionRolePolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy"
+  policy_arn = "arn:${var.partition}:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy"
   role       = aws_iam_role.fargate.name
 }
 

@@ -1,9 +1,9 @@
 NS := learning
 APP := echoserver
-CN := $(APP).$(NS).us-east-1.dev.aws.testing
+CN := $(APP).$(NS).$(shell kubectl config current-context | cut -d: -f4).dev.aws.testing
 
 k8s:
-	@kubectl config current-context | grep -q "aws:eks" || { echo "Not logged to AKS cluster"; exit 1; }
+	@kubectl config current-context | grep -q ":eks:" || { echo "Not logged to EKS cluster"; exit 1; }
 	@kubectl config set-context --current --namespace $(NS)
 
 

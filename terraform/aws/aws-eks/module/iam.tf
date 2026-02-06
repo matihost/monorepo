@@ -11,7 +11,7 @@ resource "aws_eks_access_entry" "admin" {
 
 resource "aws_eks_access_policy_association" "admin" {
   cluster_name  = aws_eks_cluster.cluster.id
-  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  policy_arn    = "arn:${var.partition}:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
   principal_arn = local.admin_arn
 
   access_scope {

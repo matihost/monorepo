@@ -56,11 +56,19 @@ credentials:
   # - using workload identity instead of providing the key file. (Azure/GCP only)
   useSecret: false
 
+# TODO Velero does not support EUSC
+#  message: 'BackupStorageLocation "default" is unavailable: rpc error: code = Unknown
+#  desc = operation error S3: ListObjectsV2, get identity: get credentials: failed
+#  to refresh cached credentials, failed to retrieve credentials, operation error
+#  STS: AssumeRoleWithWebIdentity, https response error StatusCode: 0, RequestID:
+#  , request send failed, Post "https://sts.eusc-de-east-1.amazonaws.com/": dial
+#  tcp: lookup sts.eusc-de-east-1.amazonaws.com on 172.30.0.10:53: no such host'
+
 # IRSA for Velero
 # serviceAccount:
 #   server:
 #     annotations:
-#       eks.amazonaws.com/role-arn: "arn:aws:iam::${ACCOUNT}:role/eks-velero-backup"
+#       eks.amazonaws.com/role-arn: "arn:${AWS_PARTITION}:iam::${ACCOUNT}:role/eks-velero-backup"
 
 # init container uses bitnamilegacy image - but it is no more working
 kubectl:

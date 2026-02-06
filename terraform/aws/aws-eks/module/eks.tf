@@ -159,19 +159,19 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "node_AmazonEKSWorkerNodeMinimalPolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodeMinimalPolicy"
+  policy_arn = "arn:${var.partition}:iam::aws:policy/AmazonEKSWorkerNodeMinimalPolicy"
   role       = aws_iam_role.node.name
 }
 
 # to download images from this account ECR
 resource "aws_iam_role_policy_attachment" "node_AmazonEC2ContainerRegistryPullOnly" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPullOnly"
+  policy_arn = "arn:${var.partition}:iam::aws:policy/AmazonEC2ContainerRegistryPullOnly"
   role       = aws_iam_role.node.name
 }
 
 # To be able to install Cloud Watch EKS Addons with access to all metrics
 resource "aws_iam_role_policy_attachment" "node_CloudWatchAgentServerPolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  policy_arn = "arn:${var.partition}:iam::aws:policy/CloudWatchAgentServerPolicy"
   role       = aws_iam_role.node.name
 }
 
@@ -196,27 +196,27 @@ resource "aws_iam_role" "cluster" {
 }
 
 resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSClusterPolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  policy_arn = "arn:${var.partition}:iam::aws:policy/AmazonEKSClusterPolicy"
   role       = aws_iam_role.cluster.name
 }
 
 resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSComputePolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSComputePolicy"
+  policy_arn = "arn:${var.partition}:iam::aws:policy/AmazonEKSComputePolicy"
   role       = aws_iam_role.cluster.name
 }
 
 resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSBlockStoragePolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSBlockStoragePolicy"
+  policy_arn = "arn:${var.partition}:iam::aws:policy/AmazonEKSBlockStoragePolicy"
   role       = aws_iam_role.cluster.name
 }
 
 resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSLoadBalancingPolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSLoadBalancingPolicy"
+  policy_arn = "arn:${var.partition}:iam::aws:policy/AmazonEKSLoadBalancingPolicy"
   role       = aws_iam_role.cluster.name
 }
 
 resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSNetworkingPolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSNetworkingPolicy"
+  policy_arn = "arn:${var.partition}:iam::aws:policy/AmazonEKSNetworkingPolicy"
   role       = aws_iam_role.cluster.name
 }
 
@@ -226,7 +226,7 @@ resource "null_resource" "cluster-config" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = "${path.module}/configure-cluster.sh '${local.account_id}' '${aws_eks_cluster.cluster.name}' '${var.region}' '${jsonencode(var.namespaces)}' '${var.install_nginx}' '${nonsensitive(var.dd_api_key)}' '${nonsensitive(var.dd_app_key)}'"
+    command = "${path.module}/configure-cluster.sh '${var.partition}' '${local.account_id}' '${aws_eks_cluster.cluster.name}' '${var.region}' '${jsonencode(var.namespaces)}' '${var.install_nginx}' '${nonsensitive(var.dd_api_key)}' '${nonsensitive(var.dd_app_key)}'"
   }
 
   depends_on = [

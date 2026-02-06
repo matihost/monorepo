@@ -2,6 +2,7 @@ namespace: namespace-name
 # dockerconfigjson: base64encodedvalue
 # dockerreponame: quay
 aws:
+  partition: "aws"
   accountId: ""
 # irsaRole: "..."
 quota:

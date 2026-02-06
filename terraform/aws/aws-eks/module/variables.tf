@@ -35,7 +35,12 @@ variable "zone" {
   description = "Preffered AWS AZ where resources need to placed, has to be compatible with region variable"
 }
 
-
+# tflint-ignore: terraform_unused_declarations
+variable "partition" {
+  type        = string
+  description = "The AWS partition in which to create resources"
+  default     = "aws"
+}
 variable "region" {
   default     = "us-east-1"
   type        = string
@@ -70,7 +75,7 @@ variable "zones" {
 
 variable "cluster_version" {
   type        = string
-  default     = "1.34"
+  default     = "1.35"
   description = "Version of EKS"
   validation {
     condition     = can(regex("^[0-9]*[0-9]+.[0-9]*[0-9]+$", var.cluster_version))
@@ -96,6 +101,12 @@ variable "install_nginx" {
   type        = bool
   default     = false
   description = "Whether to install NXGIN ingress controller"
+}
+
+variable "install_efs" {
+  type        = bool
+  default     = true
+  description = "Whether to install EFS CSI driver add-on"
 }
 
 variable "dd_api_key" {

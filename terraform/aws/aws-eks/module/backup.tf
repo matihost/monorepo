@@ -84,7 +84,7 @@ resource "aws_iam_policy" "velero-policy" {
                 "s3:ListMultipartUploadParts"
             ],
             "Resource": [
-                "arn:aws:s3:::${aws_s3_bucket.backup.bucket}/*"
+                "arn:${var.partition}:s3:::${aws_s3_bucket.backup.bucket}/*"
             ]
         },
         {
@@ -93,7 +93,7 @@ resource "aws_iam_policy" "velero-policy" {
                 "s3:ListBucket"
             ],
             "Resource": [
-                "arn:aws:s3:::${aws_s3_bucket.backup.bucket}"
+                "arn:${var.partition}:s3:::${aws_s3_bucket.backup.bucket}"
             ]
         }
     ]

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-
-ACCOUNT_ID="${1:?ACCOUNT_ID is required}"
-CLUSTER_NAME="${2:?CLUSTER_NAME is required}"
-REGION="${3:?REGION is required}"
-NAMESPACES="${4:?NAMESPACES is required}"
-INSTALL_NGINX="${5:-false}"
-DATADOG_API_KEY="${6:-}"
-DATADOG_APP_KEY="${7:-}"
+AWS_PARTITION="${1:?AWS_PARTITION is required}"
+ACCOUNT_ID="${2:?ACCOUNT_ID is required}"
+CLUSTER_NAME="${3:?CLUSTER_NAME is required}"
+REGION="${4:?REGION is required}"
+NAMESPACES="${5:?NAMESPACES is required}"
+INSTALL_NGINX="${6:-false}"
+DATADOG_API_KEY="${7:-}"
+DATADOG_APP_KEY="${8:-}"
 
 set -e
 set -x
@@ -42,6 +42,7 @@ function configure-namespaces() {
     helm upgrade --install "ns-${NS}-config" -n cluster-config --create-namespace "${DIRNAME}/namespace-config-chart" \
       --set namespace="${NS}" \
       --set aws.accountId="${ACCOUNT_ID}" \
+      --set aws.partition="${AWS_PARTITION}" \
       --set irsaRole="${IRSA_ROLE}" \
       --set-json quota="$(echo "${QUOTA}" | jq -r)"
   done
@@ -181,7 +182,7 @@ function ensure-backup() {
     --set configuration.volumeSnapshotLocation[0].name="default" \
     --set configuration.volumeSnapshotLocation[0].provider="aws" \
     --set configuration.volumeSnapshotLocation[0].config.region="${REGION}" \
-    --set serviceAccount.server.annotations."eks\\.amazonaws\\.com/role-arn"="arn:aws:iam::${ACCOUNT_ID}:role/${CLUSTER_NAME}-velero-irsa"
+    --set serviceAccount.server.annotations."eks\\.amazonaws\\.com/role-arn"="arn:${AWS_PARTITION}:iam::${ACCOUNT_ID}:role/${CLUSTER_NAME}-velero-irsa"
 
   for NAMESPACE in $(echo "${NAMESPACES}" | jq -cr '.[]'); do
 

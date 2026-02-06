@@ -28,9 +28,11 @@ resource "aws_eks_addon" "snapshot-controller" {
 
 # https://docs.aws.amazon.com/eks/latest/userguide/workloads-add-ons-available-eks.html#add-ons-aws-efs-csi-driver
 resource "aws_eks_addon" "efs" {
+  count = var.install_efs ? "1" : "0"
+
   cluster_name = aws_eks_cluster.cluster.name
   addon_name   = "aws-efs-csi-driver"
-  # addon_version               = "v2.1.9-eksbuild.1"
+  # addon_version               = "v2.3.0-eksbuild.1"
   resolve_conflicts_on_create = "OVERWRITE"
 
   pod_identity_association {
@@ -83,7 +85,7 @@ resource "aws_iam_role" "efs-addon" {
 
 
 resource "aws_iam_role_policy_attachment" "efs-addon_AmazonEFSCSIDriverPolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy"
+  policy_arn = "arn:${var.partition}:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy"
   role       = aws_iam_role.efs-addon.name
 }
 
