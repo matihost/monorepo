@@ -85,7 +85,7 @@ list-pod-identity-associations: ## list Pod Identity Associations
 	aws eks list-pod-identity-associations --cluster-name $(shell cd $(DEPLOY_PATH)&& terragrunt output -raw cluster_name) --region $(shell cd $(DEPLOY_PATH)&& terragrunt output -raw region)
 
 show-state: ## show state
-	cd $(DEPLOY_PATH)&& terragrunt state list && terragrunt show
+	cd $(DEPLOY_PATH) && terragrunt state list && terragrunt show
 
 clean: ## clean cached plugins and data
 	find . -name ".terra*" -exec rm -rf {} +

@@ -15,7 +15,7 @@ resource "aws_iam_role" "task-role" {
          "Action":"sts:AssumeRole",
          "Condition":{
             "ArnLike":{
-            "aws:SourceArn":"arn:aws:ecs:${var.region}:${local.account_id}:*"
+            "aws:SourceArn":"arn:${var.partition}:ecs:${var.region}:${local.account_id}:*"
             },
             "StringEquals":{
                "aws:SourceAccount":"${local.account_id}"
@@ -36,11 +36,19 @@ EOF
       {
       "Effect": "Allow",
       "Action": [
-            "ssmmessages:CreateControlChannel",
-            "ssmmessages:CreateDataChannel",
-            "ssmmessages:OpenControlChannel",
-            "ssmmessages:OpenDataChannel"
+        "ssmmessages:CreateControlChannel",
+        "ssmmessages:CreateDataChannel",
+        "ssmmessages:OpenControlChannel",
+        "ssmmessages:OpenDataChannel"
       ],
+      "Resource": "*"
+      },
+      {
+      "Effect": "Allow",
+      "Action": [
+        "ecs:ListClusters",
+        "ecs:ListContainerInstances",
+        "ecs:DescribeContainerInstances"],
       "Resource": "*"
       }
   ]
@@ -88,9 +96,9 @@ EOF
         "kms:Decrypt"
       ],
       "Resource": [
-        "arn:aws:ssm:${var.region}:${local.account_id}:parameter/*",
-        "arn:aws:secretsmanager:${var.region}:${local.account_id}:secret:*",
-        "arn:aws:kms:${var.region}:${local.account_id}:key/*"
+        "arn:${var.partition}:ssm:${var.region}:${local.account_id}:parameter/*",
+        "arn:${var.partition}:secretsmanager:${var.region}:${local.account_id}:secret:*",
+        "arn:${var.partition}:kms:${var.region}:${local.account_id}:key/*"
       ]
     }
   ]
@@ -103,5 +111,5 @@ EOF
 
 resource "aws_iam_role_policy_attachment" "exec-role" {
   role       = aws_iam_role.exec-role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  policy_arn = "arn:${var.partition}:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }

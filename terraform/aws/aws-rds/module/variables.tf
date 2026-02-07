@@ -45,6 +45,12 @@ variable "zone" {
 }
 
 # tflint-ignore: terraform_unused_declarations
+variable "partition" {
+  type        = string
+  description = "The AWS partition in which to create resources"
+  default     = "aws"
+}
+
 variable "region" {
   default     = "us-east-1"
   type        = string

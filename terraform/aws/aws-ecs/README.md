@@ -35,7 +35,7 @@ aws configure
 ```bash
 
 # deploy ECS apps
-make run ENV=dev MODE=apply
+make run MODE=apply [ENV=dev] [PARTITION=aws]
 
 # show Terraform state
 make show-state

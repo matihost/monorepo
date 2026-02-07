@@ -1,5 +1,5 @@
 locals {
-  region                    = "us-east-1"
+  region                    = "eusc-de-east-1"
   dd_api_key                = try(get_env("DD_API_KEY"), "")
   dd_rds_dns                = try(get_env("DD_RDS_DNS"), "")
   dd_rds_password           = try(get_env("DD_RDS_PASSWORD"), "")
@@ -7,7 +7,7 @@ locals {
 }
 
 include "root" {
-  path = find_in_parent_folders("root.hcl")
+  path = find_in_parent_folders("eusc.hcl")
 }
 
 terraform {
@@ -25,7 +25,11 @@ inputs = {
     Env    = "dev"
     Region = local.region
   }
-  zones = ["${local.region}a", "${local.region}b", "${local.region}c"]
+  zones = [
+    "${local.region}a", "${local.region}b",
+    # TODO eusc does not have 3 AZs yet
+    # "${local.region}c"
+  ]
   apps = {
     "nginx" : {
       name                = "nginx",

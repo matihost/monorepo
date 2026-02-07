@@ -53,11 +53,11 @@ resource "aws_rds_cluster" "db" {
   enabled_cloudwatch_logs_exports = ["postgresql"]
   engine                          = "aurora-postgresql"
   # engine_mode                         = "provisioned"
-  engine_version                      = "16.2"
+  engine_version                      = "17.5"
   allow_major_version_upgrade         = "true"
   iam_database_authentication_enabled = "true"
   # iops                                = "0"
-  # db_cluster_parameter_group_name     = "default.aurora-postgresql16"
+  # db_cluster_parameter_group_name     = "default.aurora-postgresql17"
 
   master_username              = "postgres"
   master_password              = random_password.postgres[each.key].result
@@ -90,6 +90,7 @@ resource "aws_rds_cluster_instance" "db_instance_1" {
   db_subnet_group_name  = aws_db_subnet_group.private.name
   apply_immediately     = true
   copy_tags_to_snapshot = true
+
 }
 
 

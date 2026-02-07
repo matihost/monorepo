@@ -14,7 +14,7 @@ resource "aws_lb" "app" {
   load_balancer_type = "application"
   security_groups    = [data.aws_security_group.app-security-group[each.key].id]
 
-  # TODO replace with subnet mapping to reserver EIP
+  # TODO replace with subnet mapping to reserved EIP
   subnets = local.private_subnet_ids
 }
 
@@ -29,7 +29,7 @@ resource "aws_lb_listener" "app" {
   # port              = "443"
   # protocol          = "HTTPS"
   # ssl_policy        = "ELBSecurityPolicy-2016-08"
-  # certificate_arn   = "arn:aws:iam::187416307283:server-certificate/test_cert_rab3wuqwgja25ct3n4jdj2tzu4"
+  # certificate_arn   = "arn:${var.partition}:iam::187416307283:server-certificate/test_cert_rab3wuqwgja25ct3n4jdj2tzu4"
 
   default_action {
     type             = "forward"

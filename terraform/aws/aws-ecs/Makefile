@@ -4,29 +4,37 @@ SHELL := /usr/bin/env bash
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
-	TG_FLAGS := --terragrunt-debug
+	TG_FLAGS := --inputs-debug
 endif
 
 MODE := apply
 ifeq ($(strip $(MODE)),apply)
-	MODE_STR := apply -auto-approve
+	MODE_STR := --non-interactive -- apply -auto-approve
 else ifeq ($(strip $(MODE)),destroy)
-	MODE_STR := destroy -auto-approve
+	MODE_STR := --non-interactive -- destroy -auto-approve
 else
-	MODE_STR := plan
+	MODE_STR := --non-interactive -- plan
 endif
+
+PARTITION := aws
 
 ENV := dev
 
+ifeq ($(strip $(PARTITION)),eusc)
+	DEPLOY_PATH := stage/eusc/$(ENV)
+else
+	DEPLOY_PATH := stage/$(ENV)
+endif
+
 init:
-	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
+	cd $(DEPLOY_PATH) && terragrunt run -- init -upgrade=true
 
 run: init ## setup ECS services: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
+	@cd $(DEPLOY_PATH) && terragrunt run validate && terragrunt run $(MODE_STR) $(TG_FLAGS)
 
 
 show-state: ## show state
-	cd stage/$(ENV) && terragrunt state list && terragrunt show
+	cd $(DEPLOY_PATH) && terragrunt state list && terragrunt show
 
 clean: ## clean cached plugins and data
 	find . -name ".terra*" -exec rm -rf {} +

@@ -61,7 +61,7 @@ test: expose_bastion_proxy_locally ## test private  webeserver
 
 
 show-state: ## show state
-	cd $(DEPLOY_PATH) && terragrunt state list && terragrunt show
+	cd $(DEPLOY_PATH)/$(REGION) && terragrunt state list && terragrunt show
 
 show-bastion-user-data: ## show bastion user data value
 	aws ec2 describe-instance-attribute --instance-id $(shell cd $(DEPLOY_PATH) && terragrunt output bastion_id) --attribute userData --output text --query "UserData.Value" | base64 -d

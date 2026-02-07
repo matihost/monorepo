@@ -24,16 +24,18 @@ variable "zones" {
 
 variable "apps" {
   type = map(object({
-    name                = string
-    image               = string
-    memory              = number
-    cpu                 = number
-    port                = number
-    protocol            = string
-    desired_instances   = number
-    security_group_name = string
-    env_vars            = list(map(string))
-    docker_labels       = map(string)
+    name                    = string
+    image                   = string
+    memory                  = number
+    cpu                     = number
+    port                    = number
+    protocol                = string
+    desired_instances       = number
+    security_group_name     = string
+    env_vars                = list(map(string))
+    docker_labels           = map(string)
+    maximum_percent         = optional(number)
+    minimum_healthy_percent = optional(number)
   }))
   description = "Map of apps to deploy as ECS tasks,"
 }
@@ -54,6 +56,11 @@ variable "zone" {
 }
 
 # tflint-ignore: terraform_unused_declarations
+variable "partition" {
+  type        = string
+  description = "The AWS partition in which to create resources"
+  default     = "aws"
+}
 variable "region" {
   default     = "us-east-1"
   type        = string
@@ -62,6 +69,6 @@ variable "region" {
 
 # tflint-ignore: terraform_unused_declarations
 variable "aws_tags" {
-  type        = map(string)
+  type        = map(any)
   description = "AWS tags"
 }
