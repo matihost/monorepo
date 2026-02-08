@@ -4,41 +4,48 @@ SHELL := /usr/bin/env bash
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
-	TG_FLAGS := --terragrunt-debug
+	TG_FLAGS := --inputs-debug
 endif
 
 MODE := apply
 ifeq ($(strip $(MODE)),apply)
-	MODE_STR := apply -auto-approve
+	MODE_STR := --non-interactive -- apply -auto-approve
 else ifeq ($(strip $(MODE)),destroy)
-	MODE_STR := destroy -auto-approve
+	MODE_STR := --non-interactive -- destroy -auto-approve
 else
-	MODE_STR := plan
+	MODE_STR := --non-interactive -- plan
 endif
+
+PARTITION := aws
 
 ENV := dev
 
-init:
-	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
+ifeq ($(strip $(PARTITION)),eusc)
+	DEPLOY_PATH := stage/eusc/$(ENV)
+else
+	DEPLOY_PATH := $(DEPLOY_PATH)
+endif
 
+init:
+	cd $(DEPLOY_PATH) && terragrunt run -- init -upgrade=true
 
 run: init ## setup Client VPN: make run [ENV=dev] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
+	@cd $(DEPLOY_PATH) && terragrunt run validate && terragrunt run $(MODE_STR) $(TG_FLAGS)
 
 open-webconsole: ## open ARO web console
-	ARO_CONSOLE_URL="$(shell cd stage/$(ENV) && terragrunt output -raw console_url 2>/dev/null)" && \
+	ARO_CONSOLE_URL="$(shell cd $(DEPLOY_PATH) && terragrunt output -raw console_url 2>/dev/null)" && \
 	xdg-open "$${ARO_CONSOLE_URL}" || sensible-browser "$${ARO_CONSOLE_URL}" || x-www-browser "$${ARO_CONSOLE_URL}" || gnome-open "$${ARO_CONSOLE_URL}"
 
 
 
 get-client-ovpn: ## create target/client.ovpn file needed to connect to VPN
 	mkdir -p target && cd target && \
-	REGION="$(shell cd stage/$(ENV) && terragrunt output -raw region 2>/dev/null)" && \
-	CLIENT_VPN_ENDPOINT_ID="$(shell cd stage/$(ENV) && terragrunt output -raw client_vpn_endpoint_id 2>/dev/null)" && \
+	REGION="$(shell cd $(DEPLOY_PATH) && terragrunt output -raw region 2>/dev/null)" && \
+	CLIENT_VPN_ENDPOINT_ID="$(shell cd $(DEPLOY_PATH) && terragrunt output -raw client_vpn_endpoint_id 2>/dev/null)" && \
 	aws ec2 export-client-vpn-client-configuration --output text \
     --region "$${REGION}" \
     --client-vpn-endpoint-id "$${CLIENT_VPN_ENDPOINT_ID}" > client.ovpn
-	cd stage/$(ENV) && \
+	cd $(DEPLOY_PATH) && \
 		terragrunt output -raw client-ovpn-extension-config 2>/dev/null >> ../../target/client.ovpn
 
 connect-to-vpn: get-client-ovpn ## connect to Open VPN peer
@@ -47,7 +54,7 @@ connect-to-vpn: get-client-ovpn ## connect to Open VPN peer
 
 
 show-state: ## show state
-	cd stage/$(ENV) && terragrunt state list && terragrunt show
+	cd $(DEPLOY_PATH) && terragrunt state list && terragrunt show
 
 clean: ## clean cached plugins and data
 	find . -name ".terra*" -exec rm -rf {} +

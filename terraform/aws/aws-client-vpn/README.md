@@ -36,21 +36,18 @@ sudo apparmor_parser -r /etc/apparmor.d/openvpn
 
 ```bash
 # setup Client Side VPN
-make run ENV=dev MODE=apply
+make run MODE=apply [ENV=dev] [PARTITION=aws]
 
 # create target/client.ovpn file needed to connect to VPN
 # mode is either all (default), aka all trafic goes via VPN
-# or private - when only GCP VPC traffic routed via VPN
+# or private - when only VPC traffic routed via VPN
 make get-client-ovpn ENV=dev
 
 # connect to to VPN, press Ctrl+C to disconnect
 # mode is either all (default), aka all trafic goes via VPN
-# or private - when only GCP VPC traffic routed via VPN
+# or private - when only VPC traffic routed via VPN
 make connect-to-vpn
 
 # show Terraform state
 make show-state
-
-# terminates all AWS resource created with apply task
-make destroy
 ```
