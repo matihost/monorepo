@@ -4,27 +4,27 @@ SHELL := /usr/bin/env bash
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
-	DEBUG_MODE :=--terragrunt-log-level debug --terragrunt-debug
+	TG_FLAGS := --inputs-debug
 endif
 
 MODE := apply
 ifeq ($(strip $(MODE)),apply)
-	MODE_STR := apply -auto-approve $(DEBUG_MODE)
+	MODE_STR := --non-interactive -- apply -auto-approve
 else ifeq ($(strip $(MODE)),destroy)
-	MODE_STR := destroy -auto-approve $(DEBUG_MODE)
+	MODE_STR := --non-interactive -- destroy -auto-approve
 else
-	MODE_STR := plan $(DEBUG_MODE)
+	MODE_STR := --non-interactive -- plan
 endif
 
 
 ENV := dev-northeurope-shared1
 
 init: init-tf-backend
-	cd stage/$(ENV) && terragrunt init -upgrade=true --non-interactive
+	cd stage/$(ENV) && terragrunt run -- init -upgrade=true
 
 
 run: init ## setup ARO: make run [ENV=dev-northeurope-shared1] [MODE=apply]
-	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR)
+	@cd stage/$(ENV) && terragrunt run validate && terragrunt run $(MODE_STR) $(TG_FLAGS)
 
 
 CLUSTER_RG = "$(shell cd stage/$(ENV) && terragrunt output -raw cluster_rg 2>/dev/null)"

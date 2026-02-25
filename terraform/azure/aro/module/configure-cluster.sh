@@ -246,6 +246,7 @@ metadata:
 spec:
   targetNamespaces:
     - openshift-adp
+  upgradeStrategy: Default
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
@@ -253,7 +254,7 @@ metadata:
   name: redhat-oadp-operator
   namespace: openshift-adp
 spec:
-  channel: stable-1.4
+  channel: stable
   name: redhat-oadp-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace

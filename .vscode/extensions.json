@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "davidanson.vscode-markdownlint",
+    "redhat.vscode-yaml",
+    "streetsidesoftware.code-spell-checker",
+    "yzhang.markdown-all-in-one",
+    "vue.volar"
+  ]
+}

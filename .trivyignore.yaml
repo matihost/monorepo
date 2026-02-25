@@ -18,3 +18,4 @@ misconfigurations:
   # EKS public exposure
   - id: AVD-AWS-0040
   - id: AVD-AWS-0041
+  - id: AZU-0012
