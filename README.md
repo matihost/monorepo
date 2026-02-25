@@ -2,6 +2,7 @@
 
 [![License](https://img.shields.io/github/license/matihost/monorepo.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/matihost/monorepo/actions/workflows/ci.yaml/badge.svg)](https://github.com/matihost/monorepo/actions/workflows/ci.yaml)
+[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink?logo=github)](https://github.com/sponsors/matihost)
 
 Various technology deployments, tools & code:
 
