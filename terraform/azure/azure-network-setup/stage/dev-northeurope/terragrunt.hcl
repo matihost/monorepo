@@ -50,6 +50,12 @@ inputs = {
     },
     "containers" = {
       cidr_range = "10.2.64.0/19"
+    },
+    "pe" = {
+      cidr_range = "10.2.3.64/27"
+    },
+    "ilb" = {
+      cidr_range = "10.2.3.96/27"
     }
   }
 
