@@ -53,7 +53,7 @@ resource "azurerm_redhat_openshift_cluster" "aro" {
   main_profile {
     # https://learn.microsoft.com/en-us/azure/openshift/support-policies-v4#control-plane-nodes
     # az vm list-skus --location northeurope --size Standard_D --all --output table
-    vm_size   = "Standard_D8s_v5" # smallest possible node type work ARO control plane node
+    vm_size   = "Standard_D8s_v6" # smallest possible node type work ARO control plane node
     subnet_id = data.azurerm_subnet.main-subnet.id
   }
 
@@ -68,7 +68,7 @@ resource "azurerm_redhat_openshift_cluster" "aro" {
   worker_profile {
     # https://learn.microsoft.com/en-us/azure/openshift/support-policies-v4#general-purpose
     # az vm list-skus --location northeurope --size Standard_D --all --output table
-    vm_size      = "Standard_D4s_v5" # smallest possible node type work ARO worker node
+    vm_size      = "Standard_D4s_v6" # smallest possible node type work ARO worker node
     disk_size_gb = 128
     # The maximum number of worker nodes definable at creation time is 50.
     # Maxi is 250 nodes after the cluster is created.

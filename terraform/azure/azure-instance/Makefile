@@ -17,7 +17,7 @@ else
 endif
 
 
-ENV := dev-northeurope
+ENV := dev-westeurope
 
 init: init-tf-backend prepare
 	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
@@ -55,7 +55,7 @@ expose-jump-box-ssh-locally:
   --target-resource-id $(shell cd stage/$(ENV) && terragrunt output vm_id) \
   --resource-port 22 \
   --port 2022 & \
-	sleep 2 # workaround for az tunnel delay when run in background
+	sleep 5 # workaround for az tunnel delay when run in background
 
 
 expose-proxy-via-ssh-locally: expose-jump-box-ssh-locally ## expose TinyProxy locally to access resource inside VNet - uses ssh tunneling (done via az tunnel), needs 2 ports, but more resilient

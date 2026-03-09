@@ -16,8 +16,8 @@ resource "azurerm_dashboard_grafana" "grafana" {
   deterministic_outbound_ip_enabled = false
   public_network_access_enabled     = false
 
-  sku                     = "Essential" # or Standard
-  zone_redundancy_enabled = false       # or true
+  sku                     = "Standard" # or Essential
+  zone_redundancy_enabled = false      # or true
 
   identity {
     type = "SystemAssigned"

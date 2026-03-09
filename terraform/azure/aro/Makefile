@@ -17,7 +17,7 @@ else
 endif
 
 
-ENV := dev-northeurope-shared1
+ENV := dev-westeurope-shared1
 
 init: init-tf-backend
 	cd stage/$(ENV) && terragrunt run -- init -upgrade=true

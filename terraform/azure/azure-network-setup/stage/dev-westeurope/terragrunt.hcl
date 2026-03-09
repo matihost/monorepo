@@ -21,10 +21,10 @@ inputs = {
   zone               = local.zone
   vnet_ip_cidr_range = "10.0.0.0/16"
 
-  # Managed Bastion cost around 7 $ per bastion / per day
-  # bastion = {
-  #   cidr_range = "10.0.3.0/27"
-  # }
+  # Managwed Bastion cost around 7 $ per bastion / per day
+  managed_bastion = {
+    cidr_range = "10.0.3.0/27"
+  }
 
   cloudshell = {
     cidr_range           = "10.0.0.0/24"

@@ -4,8 +4,8 @@ include "root" {
 
 locals {
   env                       = "dev"
-  region                    = "northeurope"
-  zone                      = "northeurope-az1"
+  region                    = "westeurope"
+  zone                      = "westeurope-az1"
   rh_pull_secret            = try(get_env("RH_PULL_SECRET"), file("~/.docker/config.json"))
   pagerduty_integration_key = try(get_env("PAGERDUTY_INTEGRATION_KEY"), "")
 }

@@ -18,7 +18,7 @@ terraform {
 
 
 inputs = {
-  name               = "vm"
+  name               = "jump"
   env                = "dev"
   region             = local.region
   zone               = local.zone
