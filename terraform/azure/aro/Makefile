@@ -51,6 +51,14 @@ get-sp-expiration-date: ## check ARO cluster ServicePrincipal credential expirat
 rotate-sp-credentials: ## automated ServicePrincipal credential rotation will check if the service principal exists and rotate or create a new service principal.
 	az aro update --refresh-credentials --name $(CLUSTER_NAME) --resource-group $(CLUSTER_RG)
 
+show-current-pull-secret: ## show current pull secret
+	oc get secrets pull-secret -n openshift-config -o template='{{index .data ".dockerconfigjson"}}' | base64 -d
+
+show-current-runtime-pull-secret: ## show current pull secret from runtime (kubelet config)
+	oc exec -n openshift-apiserver `oc get pod -n openshift-apiserver -o jsonpath="{.items[0].metadata.name}"` -- cat /var/lib/kubelet/config.json
+
+show-aro-entraid-callback: ## show ARO cluster's callback URL for Azure AD authentication (for use in Entra ID app registration)
+	echo "$$(az aro show -g $(CLUSTER_RG) -n $(CLUSTER_NAME) --query consoleProfile.url -o tsv | sed 's/console-openshift-console/oauth-openshift/')oauth2callback/AAD"
 
 show-state: ## show state
 	cd stage/$(ENV) && terragrunt state list && terragrunt show

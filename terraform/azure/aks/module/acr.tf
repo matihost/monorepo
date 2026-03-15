@@ -23,6 +23,10 @@ resource "azurerm_role_assignment" "aks-cr" {
   skip_service_principal_aad_check = true
 }
 
+data "azurerm_private_dns_zone" "acr" {
+  name                = "privatelink.azurecr.io"
+  resource_group_name = local.resource_group_name
+}
 
 resource "azurerm_private_endpoint" "aks-cr" {
   name                          = azurerm_container_registry.aks.name
@@ -38,11 +42,12 @@ resource "azurerm_private_endpoint" "aks-cr" {
     is_manual_connection           = false
   }
 
-  # TODO ?
-  # private_dns_zone_group {
-  #   name                 = "example-dns-zone-group"
-  #   private_dns_zone_ids = [azurerm_private_dns_zone.example.id]
-  # }
+  private_dns_zone_group {
+    name = "acr-zonegroup"
+    private_dns_zone_ids = [
+      data.azurerm_private_dns_zone.acr.id
+    ]
+  }
 }
 
 

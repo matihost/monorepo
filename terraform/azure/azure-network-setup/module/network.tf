@@ -20,6 +20,8 @@ resource "azurerm_subnet" "subnet" {
 
   default_outbound_access_enabled = false
 
+  private_link_service_network_policies_enabled = false
+
   lifecycle {
     # default is true - ARO master subnet is changed afterwards to false, and it cannot be changed later
     ignore_changes = [private_link_service_network_policies_enabled]
