@@ -64,7 +64,8 @@ resource "null_resource" "cluster-config" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = "${path.module}/configure-cluster.sh '${var.project}' '${var.cluster_name}' '${local.gke_name}' '${local.location}' '${var.env}' '*.gxlb.gke.${var.cluster_name}.${var.env}.gcp.testing' '${google_service_account.edns-sa.account_id}'"
+    command     = "${path.module}/configure-cluster.sh '${var.project}' '${var.cluster_name}' '${local.gke_name}' '${local.location}' '${var.env}' '*.gxlb.gke.${var.cluster_name}.${var.env}.gcp.testing' '${google_service_account.edns-sa.account_id}'"
+    interpreter = ["bash", "-c"]
   }
 
   depends_on = [

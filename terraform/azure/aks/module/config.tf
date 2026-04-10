@@ -3,7 +3,8 @@ resource "null_resource" "cluster-config" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = "${path.module}/configure-cluster.sh '${azurerm_kubernetes_cluster.aks.resource_group_name}' '${local.subscription_name}' '${local.tenant_id}' '${azurerm_kubernetes_cluster.aks.name}' '${var.region}' '${azurerm_container_registry.aks.name}' '${local.nginx-ip}' '${jsonencode(var.namespaces)}'"
+    command     = "${path.module}/configure-cluster.sh '${azurerm_kubernetes_cluster.aks.resource_group_name}' '${local.subscription_name}' '${local.tenant_id}' '${azurerm_kubernetes_cluster.aks.name}' '${var.region}' '${azurerm_container_registry.aks.name}' '${local.nginx-ip}' '${jsonencode(var.namespaces)}'"
+    interpreter = ["bash", "-c"]
   }
 
   depends_on = [

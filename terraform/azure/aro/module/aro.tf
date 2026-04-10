@@ -77,8 +77,9 @@ resource "azurerm_redhat_openshift_cluster" "aro" {
   }
 
   service_principal {
-    client_id     = azuread_application.aro.client_id
-    client_secret = azuread_service_principal_password.aro.value
+    client_id = azuread_application.aro.client_id
+    # or azuread_service_principal_password.aro.value, but it is not used because
+    client_secret = azuread_application_password.aro-rbac.value
   }
 
   depends_on = [
@@ -105,7 +106,8 @@ resource "null_resource" "cluster-config" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = "${path.module}/configure-cluster.sh '${azurerm_redhat_openshift_cluster.aro.resource_group_name}' '${azurerm_redhat_openshift_cluster.aro.name}' '${azurerm_redhat_openshift_cluster.aro.api_server_profile[0].url}' '${var.region}' '${jsonencode(var.oidc)}' '${jsonencode(var.namespaces)}' '${local.log_analytics_workspace_id}' '${local.log_analytics_workspace_primary_shared_key}' '${local.tenant_id}' '${local.azure_monitor_ingestion_url}' '${local.metrics_publisher_client_id}' '${local.metrics_publisher_client_secret}' '${local.azure_monitor_dcr_id}' '${local.subscription_id}' '${local.backup_client_id}' '${local.backup_client_secret}' '${azurerm_storage_account.backup.name}' '${azurerm_storage_container.backup.name}' '${var.pagerduty_integration_key}'"
+    command     = "${path.module}/configure-cluster.sh '${azurerm_redhat_openshift_cluster.aro.resource_group_name}' '${azurerm_redhat_openshift_cluster.aro.name}' '${azurerm_redhat_openshift_cluster.aro.api_server_profile[0].url}' '${var.region}' '${jsonencode(var.oidc)}' '${jsonencode(var.namespaces)}' '${local.log_analytics_workspace_id}' '${local.log_analytics_workspace_primary_shared_key}' '${local.tenant_id}' '${local.azure_monitor_ingestion_url}' '${local.metrics_publisher_client_id}' '${local.metrics_publisher_client_secret}' '${local.azure_monitor_dcr_id}' '${local.subscription_id}' '${local.backup_client_id}' '${local.backup_client_secret}' '${azurerm_storage_account.backup.name}' '${azurerm_storage_container.backup.name}' '${var.pagerduty_integration_key}'"
+    interpreter = ["bash", "-c"]
   }
 }
 

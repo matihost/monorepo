@@ -3,12 +3,13 @@ resource "null_resource" "lambda-package-build" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = <<EOF
+    command     = <<EOF
 	cd ${path.module} && python -m venv target && . ./target/bin/activate && \
 	pip install boto3 Pillow && cd target/lib/python3*/site-packages && \
 	zip -r ../../../../lambda.zip . && cd ../../../.. && \
 	zip lambda.zip *.py && rm -rf target && mkdir target && mv lambda.zip target
 EOF
+    interpreter = ["bash", "-c"]
   }
 }
 

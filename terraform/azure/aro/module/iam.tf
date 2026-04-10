@@ -16,9 +16,9 @@ resource "azuread_service_principal" "aro" {
   owners      = [data.azuread_client_config.current.object_id]
 }
 
-resource "azuread_service_principal_password" "aro" {
-  service_principal_id = azuread_service_principal.aro.id
-}
+# resource "azuread_service_principal_password" "aro" {
+#   service_principal_id = azuread_service_principal.aro.id
+# }
 
 data "azuread_service_principal" "redhatopenshift" {
   // This is the Azure Red Hat OpenShift RP service principal id, do NOT delete it

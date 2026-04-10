@@ -29,9 +29,10 @@ resource "null_resource" "function-code" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = <<-EOT
+    command     = <<-EOT
     mkdir -p target && zip target/function-source.zip index.js package.json
     EOT
+    interpreter = ["bash", "-c"]
   }
 }
 

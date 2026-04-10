@@ -194,7 +194,8 @@ resource "null_resource" "clean_default_machines" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = "${path.module}/delete-machine-pools.sh '${rhcs_cluster_rosa_hcp.rosa_hcp_cluster.id}' 'workers-'"
+    command     = "${path.module}/delete-machine-pools.sh '${rhcs_cluster_rosa_hcp.rosa_hcp_cluster.id}' 'workers-'"
+    interpreter = ["bash", "-c"]
   }
 
   depends_on = [

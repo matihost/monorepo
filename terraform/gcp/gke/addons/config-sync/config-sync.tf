@@ -28,7 +28,8 @@ resource "null_resource" "config-sync-install" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = "${path.module}/config-sync.sh ${data.google_service_account.configsync-sa.email} ${var.project}"
+    command     = "${path.module}/config-sync.sh ${data.google_service_account.configsync-sa.email} ${var.project}"
+    interpreter = ["bash", "-c"]
   }
 
   depends_on = [

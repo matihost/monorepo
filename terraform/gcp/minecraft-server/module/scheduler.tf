@@ -65,11 +65,12 @@ resource "null_resource" "scheduler-code" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = <<-EOT
+    command     = <<-EOT
     mkdir -p ${path.module}/target &&
       cp -r scheduler ${path.module}/target/ && cd ${path.module}/target/scheduler &&
       zip -r scheduler.zip * && mv scheduler.zip ..
     EOT
+    interpreter = ["bash", "-c"]
   }
 }
 

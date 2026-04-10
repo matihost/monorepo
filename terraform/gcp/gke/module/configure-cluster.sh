@@ -28,14 +28,14 @@ function ensure-cluster-is-running() {
 }
 
 function ensure-cluster-config() {
-  # has to be with --force - otherwise imported resources - are not updated with Helm
+  # has to be with --force-replace - otherwise imported resources - are not updated with Helm
   # https://github.com/helm/helm/issues/11040#issuecomment-1154702487
   helm upgrade --install cluster-config -n cluster-config --create-namespace "${DIRNAME}/cluster-config-chart" \
     --set project="${PROJECT}" \
     --set clusterName="${CLUSTER_NAME_PREFIX}" \
     --set env="${ENV}" \
     --set location="${LOCATION}" \
-    --force
+    --force-replace
 }
 
 function ensure-external-dns() {

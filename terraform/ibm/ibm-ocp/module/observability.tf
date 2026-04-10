@@ -70,7 +70,8 @@ resource "null_resource" "deploy-observability-agents" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = "${path.module}/deploy-observability-agents.sh '${ibm_container_vpc_cluster.ocp.name}' '${var.region}' '${ibm_resource_key.logs-key.credentials.ingestion_key}' '${local.sysdig_access_key}'"
+    command     = "${path.module}/deploy-observability-agents.sh '${ibm_container_vpc_cluster.ocp.name}' '${var.region}' '${ibm_resource_key.logs-key.credentials.ingestion_key}' '${local.sysdig_access_key}'"
+    interpreter = ["bash", "-c"]
   }
 
   depends_on = [

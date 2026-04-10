@@ -58,10 +58,10 @@ function ensure-cluster-config() {
   disable_default_storageclass
   import_existing_object_to_helm oauths cluster cluster-config cluster-config
 
-  # has to be with --force - otherwise imported resources to Helm - are not updated with Helm
+  # has to be with --force-replace - otherwise imported resources to Helm - are not updated with Helm
   # https://github.com/helm/helm/issues/11040#issuecomment-1154702487
   helm upgrade --install cluster-config -n cluster-config --create-namespace "${DIRNAME}/cluster-config-chart" \
-    --force \
+    --force-replace \
     --set clusterName="${CLUSTER_NAME}" \
     --set region="${REGION}" \
     --set tenant_id="${TENANT_ID}" \

@@ -33,7 +33,7 @@ resource "null_resource" "minecraft-config-template" {
     dest_file  = "${path.module}/target/minecraft-config-template.tar.xz"
   }
   provisioner "local-exec" {
-    command = <<-EOT
+    command     = <<-EOT
     pwd && mkdir -p ${path.module}/target/minecraft-server &&
       cp -r config/* ${path.module}/target/minecraft-server &&
       curl -sSL ${var.minecraft_server_url} -o  ${path.module}/target/minecraft-server/server/server.jar &&
@@ -47,6 +47,7 @@ resource "null_resource" "minecraft-config-template" {
 
       tar -Jcvf minecraft-config-template.tar.xz minecraft-server
     EOT
+    interpreter = ["bash", "-c"]
   }
 }
 

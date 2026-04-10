@@ -67,7 +67,8 @@ resource "null_resource" "config-connector-context-config" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = "${path.module}/config-connector.sh ${google_service_account.identity-workflow-sa.email} ${var.project} ${var.kns} \"${join(" ", var.kns_sas)}\""
+    command     = "${path.module}/config-connector.sh ${google_service_account.identity-workflow-sa.email} ${var.project} ${var.kns} \"${join(" ", var.kns_sas)}\""
+    interpreter = ["bash", "-c"]
   }
 
   depends_on = [

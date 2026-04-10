@@ -226,7 +226,8 @@ resource "null_resource" "cluster-config" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command = "${path.module}/configure-cluster.sh '${var.partition}' '${local.account_id}' '${aws_eks_cluster.cluster.name}' '${var.region}' '${jsonencode(var.namespaces)}' '${var.install_nginx}' '${nonsensitive(var.dd_api_key)}' '${nonsensitive(var.dd_app_key)}'"
+    command     = "${path.module}/configure-cluster.sh '${var.partition}' '${local.account_id}' '${aws_eks_cluster.cluster.name}' '${var.region}' '${jsonencode(var.namespaces)}' '${var.install_nginx}' '${nonsensitive(var.dd_api_key)}' '${nonsensitive(var.dd_app_key)}'"
+    interpreter = ["bash", "-c"]
   }
 
   depends_on = [
