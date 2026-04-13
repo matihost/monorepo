@@ -62,6 +62,11 @@ variable "tls_key" {
   sensitive   = true
 }
 
+variable "cache_policy" {
+  type        = string
+  description = "CloudFront caching policy"
+  default     = "Managed-CachingOptimized"
+}
 
 # Default variables
 

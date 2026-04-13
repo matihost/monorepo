@@ -72,10 +72,14 @@ endif
 	sudo chown -R $(shell whoami):$(shell whoami) ~/.tls
 	sudo chmod -R go-rwx ~/.tls
 
-
-
 list-server-certificates: ## show certificates uploaded to AWS
 	aws iam list-server-certificates
+
+convert-html-to-pdf: ## convert HTML CV to PDF, usage make convert-html-to-pdf HTML_FILE=path/to/file.html
+ifndef HTML_FILE
+	$(error Env HTML_FILE is not defined. Usage make convert-html-to-pdf HTML_FILE=path/to/file.html)
+endif
+	wkhtmltopdf --page-size A4 --margin-top 10mm --margin-bottom 10mm $(HTML_FILE) $(HTML_FILE:.html=.pdf)
 
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))

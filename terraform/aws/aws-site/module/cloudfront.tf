@@ -19,7 +19,7 @@ locals {
 }
 
 data "aws_cloudfront_cache_policy" "policy" {
-  name = "Managed-CachingOptimized"
+  name = var.cache_policy
 }
 
 resource "aws_cloudfront_origin_access_control" "site" {

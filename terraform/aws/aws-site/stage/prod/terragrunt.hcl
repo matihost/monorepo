@@ -32,6 +32,7 @@ inputs = {
   tls_key       = local.tls_key
   region        = "us-east-1"
   zone          = "us-east-1a"
+  cache_policy  = "Managed-CachingOptimized" # or Managed-CachingDisabled for development to see changes immediately without invalidation
   aws_tags = {
     Env    = "prod"
     Region = "us-east1"
