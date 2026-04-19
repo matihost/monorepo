@@ -58,7 +58,6 @@ all:
           foxundermoon.shell-format
           garytyler.darcula-pycharm
           george-alisson.html-preview-vscode
-          github.copilot
           github.copilot-chat
           github.vscode-github-actions
           github.vscode-pull-request-github
@@ -87,6 +86,7 @@ all:
           ms-vscode-remote.remote-wsl
           ms-vscode-remote.vscode-remote-extensionpack
           ms-vscode.cmake-tools
+          ms-vscode.cpp-devtools
           ms-vscode.cpptools
           ms-vscode.cpptools-extension-pack
           ms-vscode.cpptools-themes

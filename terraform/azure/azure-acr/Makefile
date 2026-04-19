@@ -91,6 +91,18 @@ show-current-pull-secret: ## show current pull secret
 show-current-runtime-pull-secret: ## show current pull secret from runtime (kubelet config)
 	oc exec -n openshift-apiserver `oc get pod -n openshift-apiserver -o jsonpath="{.items[0].metadata.name}"` -- cat /var/lib/kubelet/config.json
 
+augment-pull-secret-with-acr: ## augment pull secret with ACR credentials, usage: make augment-pull-secret PULL_SECRET='{"auths":{}}'
+ifndef PULL_SECRET
+	$(error PULL_SECRET variable is not set. Usage: make augment-pull-secret PULL_SECRET='{"auths":{}}')
+endif
+	ACR_NAME="$$(cd stage/$(ENV) && terragrunt output -raw acr_name 2>/dev/null)" && \
+	ACR_USERNAME="$$(cd stage/$(ENV) && terragrunt output -raw acr_username 2>/dev/null)" && \
+	ACR_PASSWORD="$$(cd stage/$(ENV) && terragrunt output -raw acr_password 2>/dev/null)" && \
+	echo -n '$(PULL_SECRET)' | 	jq -c --arg acr "$${ACR_NAME}.azurecr.io" \
+		 --arg user "$${ACR_USERNAME}" \
+		 --arg pass "$${ACR_PASSWORD}" \
+		 '.auths += {($$acr): {"auth": ($$user + ":" + $$pass | @base64)}}'
+
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help

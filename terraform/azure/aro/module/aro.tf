@@ -29,7 +29,7 @@ resource "azurerm_redhat_openshift_cluster" "aro" {
     # Available varsions:
     # az aro get-versions --location northeurope
     # Useful only during initial creation - as cluster can be created on with some version and later upgrade changes the version
-    version = "4.19.20"
+    version = "4.20.15"
 
 
     # Resource Group Name: "dev"
@@ -106,7 +106,7 @@ resource "null_resource" "cluster-config" {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    command     = "${path.module}/configure-cluster.sh '${azurerm_redhat_openshift_cluster.aro.resource_group_name}' '${azurerm_redhat_openshift_cluster.aro.name}' '${azurerm_redhat_openshift_cluster.aro.api_server_profile[0].url}' '${var.region}' '${jsonencode(var.oidc)}' '${jsonencode(var.namespaces)}' '${local.log_analytics_workspace_id}' '${local.log_analytics_workspace_primary_shared_key}' '${local.tenant_id}' '${local.azure_monitor_ingestion_url}' '${local.metrics_publisher_client_id}' '${local.metrics_publisher_client_secret}' '${local.azure_monitor_dcr_id}' '${local.subscription_id}' '${local.backup_client_id}' '${local.backup_client_secret}' '${azurerm_storage_account.backup.name}' '${azurerm_storage_container.backup.name}' '${var.pagerduty_integration_key}'"
+    command     = "${path.module}/configure-cluster.sh '${azurerm_redhat_openshift_cluster.aro.resource_group_name}' '${azurerm_redhat_openshift_cluster.aro.name}' '${azurerm_redhat_openshift_cluster.aro.api_server_profile[0].url}' '${var.region}' '${jsonencode(var.oidc)}' '${jsonencode(var.namespaces)}' '${local.log_analytics_workspace_id}' '${local.log_analytics_workspace_primary_shared_key}' '${local.tenant_id}' '${local.azure_monitor_ingestion_url}' '${local.metrics_publisher_client_id}' '${local.metrics_publisher_client_secret}' '${local.azure_monitor_dcr_id}' '${local.subscription_id}' '${local.backup_client_id}' '${local.backup_client_secret}' '${azurerm_storage_account.backup.name}' '${azurerm_storage_container.backup.name}' '${var.pagerduty_integration_key}' '${var.forward_metrics}' '${var.custom_ca_filepath}' '${local.kv_name}' '${local.kv_client_id}' '${local.kv_client_secret}'"
     interpreter = ["bash", "-c"]
   }
 }

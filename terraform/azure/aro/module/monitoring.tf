@@ -38,12 +38,10 @@ resource "azuread_service_principal_password" "aro-metrics-publisher-sp-pass" {
   service_principal_id = azuread_service_principal.aro-metrics-publisher-sp.id
 }
 
-
 data "azurerm_monitor_workspace" "monitor" {
   name                = "${local.prefix}-monitor"
   resource_group_name = local.resource_group_name
 }
-
 
 # When you create an Azure Monitor workspace,
 # by default a data collection rule and a data collection endpoint in the form <azure-monitor-workspace-name>
@@ -53,8 +51,9 @@ data "azurerm_monitor_data_collection_rule" "monitor-dcr" {
   resource_group_name = "MA_${local.prefix}-monitor_${var.region}_managed"
 }
 
-
 resource "azurerm_role_assignment" "aro-metrics-publisher-sp" {
+  count = var.forward_metrics ? 1 : 0
+
   scope                = data.azurerm_monitor_data_collection_rule.monitor-dcr.id
   role_definition_name = "Monitoring Metrics Publisher"
   principal_id         = azuread_service_principal.aro-metrics-publisher-sp.object_id
@@ -74,6 +73,8 @@ data "azurerm_monitor_action_group" "default" {
 
 
 resource "azurerm_monitor_alert_prometheus_rule_group" "down-alert" {
+  count = var.forward_metrics ? 1 : 0
+
   name                = "${azurerm_redhat_openshift_cluster.aro.name}-down"
   location            = local.location
   resource_group_name = local.resource_group_name

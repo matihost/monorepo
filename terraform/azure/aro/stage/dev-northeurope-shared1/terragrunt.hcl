@@ -6,7 +6,7 @@ locals {
   env                       = "dev"
   region                    = "northeurope"
   zone                      = "northeurope-az1"
-  rh_pull_secret            = try(get_env("RH_PULL_SECRET"), file("~/.docker/config.json"))
+  rh_pull_secret            = try(get_env("ARO_PULL_SECRET"), file("~/.docker/config.json"))
   pagerduty_integration_key = try(get_env("PAGERDUTY_INTEGRATION_KEY"), "")
 }
 
@@ -27,10 +27,11 @@ inputs = {
 
   rh_pull_secret = local.rh_pull_secret
 
-  public = false
+  public = true
 
+  forward_metrics           = false
   pagerduty_integration_key = local.pagerduty_integration_key
-
+  custom_ca_filepath        = "/usr/local/share/ca-certificates/${run_cmd("--terragrunt-quiet", "hostname")}-root-ca.crt"
   oidc = {
     oidc_name      = "id"
     issuer_url     = "https://id.matihost.pl/realms/id"

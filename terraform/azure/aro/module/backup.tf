@@ -7,13 +7,16 @@ resource "azurerm_storage_account" "backup" {
   resource_group_name        = local.resource_group_name
   location                   = local.location
   account_tier               = "Standard"
-  account_replication_type   = "GRS"
+  account_replication_type   = "RAGRS"
   account_kind               = "StorageV2"
   https_traffic_only_enabled = true
   min_tls_version            = "TLS1_2"
   # TODO disable public network access, requires private endpoint connections, and figure out how to force Velero to use it
   public_network_access_enabled = true
   shared_access_key_enabled     = false
+
+  allow_nested_items_to_be_public   = false
+  infrastructure_encryption_enabled = true
 
   lifecycle {
     ignore_changes = [tags]
@@ -46,11 +49,6 @@ resource "azuread_service_principal" "backup" {
   client_id   = azuread_application.backup.client_id
   owners      = [data.azuread_client_config.current.object_id]
 }
-
-resource "azuread_service_principal_password" "backup" {
-  service_principal_id = azuread_service_principal.aro.id
-}
-
 
 resource "azurerm_role_assignment" "backup-contributor" {
   scope                = azurerm_storage_account.backup.id

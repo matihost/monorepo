@@ -62,3 +62,7 @@ Selector labels
 app.kubernetes.io/name: {{ include "app.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{- define "cn-name" -}}
+{{- printf "%s" .Values.ingress.host | replace "." "-" | trunc 63 | trimSuffix "-" }}
+{{- end }}

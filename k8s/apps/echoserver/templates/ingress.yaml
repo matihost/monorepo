@@ -1,6 +1,36 @@
 # yamllint disable-file
 {{- $fullName := include "app.fullname" . -}}
 {{- if .Values.ingress.enabled }}
+{{- if and .Values.ingress.tls.enabled .Values.ingress.tls.externalSecret }}
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: {{ $fullName }}
+  namespace: {{ include "app.namespace" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  refreshInterval: 15m
+  secretStoreRef:
+    kind: ClusterSecretStore
+    # TODO configure, currently assumes Azure Key Vault
+    name: azure-store-spn-secret
+  target:
+    creationPolicy: Owner
+    deletionPolicy: Retain
+    template:
+      type: kubernetes.io/tls
+      engineVersion: v2
+      data:
+        tls.crt: '{{ "{{ .tls | b64dec | pkcs12cert }}" }}'
+        tls.key: '{{ "{{ .tls | b64dec | pkcs12key }}" }}'
+  data:
+  - secretKey: tls
+    remoteRef:
+      # Azure Key Vault certificates must be fetched as secret/cert-name
+      key: secret/{{ include "cn-name" . }}
+{{- end }}
 {{- if and .Values.ingress.tls.enabled .Values.ingress.tls.createTlsSecret }}
 ---
 apiVersion: v1

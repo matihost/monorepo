@@ -30,6 +30,24 @@ deploy-via-helm: create-cert ## deploys app via Helm
 	  --set ingress.class=openshift-default \
 	  --set prometheus.alert.enabled=true
 
+
+import-docker-to-acr: ## import docker image to ACR registry
+ifndef ACR_NAME
+	$(error ACR_NAME is not set)
+endif
+	docker pull kicbase/echo-server:1.0
+	docker tag kicbase/echo-server:1.0 $(ACR_NAME).azurecr.io/kicbase/echo-server:1.0
+	docker push $(ACR_NAME).azurecr.io/kicbase/echo-server:1.0
+
+deploy-with-externalsecret: import-docker-to-acr ## deploys app via Helm with External Secret for TLS cert, usage: make deploy-with-externalsecret ACR_NAME=....
+	helm upgrade --install $(APP) "../.." -n $(NS) --create-namespace \
+		--set image.repository=$(ACR_NAME).azurecr.io/kicbase/echo-server \
+		--set ingress.host="$(CN)" \
+		--set ingress.tls.createTlsSecret=false \
+		--set ingress.tls.externalSecret=true \
+		--set ingress.class=openshift-default \
+		--set prometheus.alert.enabled=true
+
 uninstall-helm: k8s ## uninstall
 	helm uninstall $(APP) -n $(NS)
 

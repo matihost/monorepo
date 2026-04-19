@@ -88,6 +88,7 @@ all:
           ms-vscode-remote.remote-wsl
           ms-vscode-remote.vscode-remote-extensionpack
           ms-vscode.cmake-tools
+          ms-vscode.cpp-devtools
           ms-vscode.cpptools
           ms-vscode.cpptools-extension-pack
           ms-vscode.cpptools-themes
@@ -991,6 +992,24 @@ all:
               curl -sSL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz" | tar -zx -o eksctl
               mv eksctl /usr/local/bin
               echo "EKSCTL CLI installed"
+            }
+        - name: root-ca
+          become: true
+          desc: To ensure that there is a root CA certificate for the host and it is added to the trusted store and can be used by browsers and CLI tools.
+          command: |
+            trust list --filter=ca-anchors | grep -qi "{{ ansible_hostname }} Internal Root CA" \
+              && [ -f "/usr/local/share/ca-certificates/{{ ansible_hostname }}-root-ca.crt" ] \
+              || {
+              openssl genrsa -out /usr/local/share/ca-certificates/{{ ansible_hostname }}-root-ca.key 4096
+              openssl req -x509 -new -nodes \
+                -key /usr/local/share/ca-certificates/{{ ansible_hostname }}-root-ca.key \
+                -sha256 -days 3650 \
+                -out /usr/local/share/ca-certificates/{{ ansible_hostname }}-root-ca.crt \
+                -subj "/CN={{ ansible_hostname }} Internal Root CA" \
+                -addext "basicConstraints=critical,CA:TRUE" \
+                -addext "keyUsage=critical,keyCertSign,cRLSign"
+              update-ca-certificates
+              echo "Root CA certificate for {{ ansible_hostname }} installed"
             }
         - name: ibmcloud
           become: false

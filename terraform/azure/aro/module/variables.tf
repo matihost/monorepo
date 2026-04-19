@@ -31,8 +31,7 @@ locals {
   location            = var.region
   prefix              = "${var.env}-${local.azure_region_abbreviations[var.region]}"
   subscription_name   = data.azurerm_subscription.current.display_name
-  # tflint-ignore: terraform_unused_declarations
-  key_vault_name = "${local.prefix}-${substr(sha256(local.subscription_name), 0, 7)}"
+  key_vault_name      = "${local.prefix}-${substr(sha256(local.subscription_name), 0, 7)}"
   azure_region_abbreviations = {
     "eastus"             = "eus"
     "eastus2"            = "eu2"
@@ -97,6 +96,18 @@ variable "public" {
 variable "pagerduty_integration_key" {
   type        = string
   description = "PagerDuty integration key obtained from: https://www.pagerduty.com/docs/guides/prometheus-integration-guide/"
+}
+
+variable "forward_metrics" {
+  type        = bool
+  description = "Forward metrics to Azure Monitor Workspace"
+  default     = false
+}
+
+variable "custom_ca_filepath" {
+  type        = string
+  description = "Path to custom CA certificate file in PEM format"
+  default     = ""
 }
 
 variable "namespaces" {

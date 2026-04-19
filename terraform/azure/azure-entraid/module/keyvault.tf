@@ -37,4 +37,12 @@ resource "azurerm_role_assignment" "key_vault-creator" {
   principal_id         = data.azurerm_client_config.current.object_id
 }
 
+resource "azurerm_role_assignment" "key_vault-certs-creator" {
+  for_each = toset(var.locations_short)
+
+  scope                = azurerm_key_vault.key_vault[each.key].id
+  role_definition_name = "Key Vault Certificates Officer"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
+
 # TODO add variable to add more users, service principals, and managed identities to access key-vault

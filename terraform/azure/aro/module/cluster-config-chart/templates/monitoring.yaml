@@ -1,5 +1,5 @@
 # yamllint disable-file
----
+{{- if .Values.azure_monitor.forward_metrics }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -8,6 +8,7 @@ metadata:
 stringData:
   id: {{ .Values.azure_monitor.client_id }}
   secret: {{ .Values.azure_monitor.client_secret }}
+{{- end }}
 ---
 apiVersion: v1
 data:
@@ -16,6 +17,7 @@ data:
     # https://cloud.redhat.com/experts/aro/user-workload-monitoring/
     # https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/monitoring/configuring-user-workload-monitoring#enabling-monitoring-for-user-defined-projects_preparing-to-configure-the-monitoring-stack-uwm
     enableUserWorkload: true
+{{- if .Values.azure_monitor.forward_metrics }}
     # Forward metrics to Azure Monitor Workspace
     # https://learn.microsoft.com/en-us/azure/openshift/howto-remotewrite-prometheus
     # TODO since there are 2 instances there are duplicated metrics in Azure Monitor: prometheus-k8s-0 and prometheus-k8s-0
@@ -50,6 +52,7 @@ data:
             tokenUrl: "https://login.microsoftonline.com/{{ .Values.tenant_id }}/oauth2/v2.0/token"
             scopes:
               - "https://monitor.azure.com/.default"
+{{- end }}
 kind: ConfigMap
 metadata:
   name: cluster-monitoring-config

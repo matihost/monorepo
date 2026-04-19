@@ -20,6 +20,11 @@ BACKUP_CLIENT_SECRET="${16:?BACKUP_CLIENT_SECRET is required}"
 BACKUP_STORAGE_ACCOUNT="${17:?BACKUP_STORAGE_ACCOUNT is required}"
 BACKUP_CONTAINER_NAME="${18:?BACKUP_CONTAINER_NAME is required}"
 PAGERDUTY_ROUTING_KEY="${19:-}"
+FORWARD_METRICS="${20:-false}"
+CA_FILE="${21:-}"
+KV_NAME="${22:?KV_NAME is required}"
+KV_CLIENT_ID="${23:?KV_CLIENT_ID is required}"
+KV_CLIENT_SECRET="${24:?KV_CLIENT_SECRET is required}"
 
 # set -e
 set -x
@@ -53,6 +58,22 @@ function ensure-authenticated-only-cannot-create-projects() {
   }
 }
 
+function inject-custom-ca() {
+  [ -n "$(kubectl get proxy cluster -o jsonpath='{.spec.trustedCA.name}' --no-headers --ignore-not-found)" ] || {
+    [ -e "$CA_FILE" ] && {
+      echo "Injecting custom CA from $CA_FILE"
+      oc create configmap custom-ca-bundle \
+        --from-file=ca-bundle.crt="$CA_FILE" \
+        -n "openshift-config" \
+        --dry-run=client -o yaml | oc apply -f -
+
+      oc patch proxy/cluster \
+        --type=merge \
+        -p "{\"spec\":{\"trustedCA\":{\"name\":\"custom-ca-bundle\"}}}"
+    }
+  }
+}
+
 function ensure-cluster-config() {
   ensure-authenticated-only-cannot-create-projects
   disable_default_storageclass
@@ -61,7 +82,7 @@ function ensure-cluster-config() {
   # has to be with --force-replace - otherwise imported resources to Helm - are not updated with Helm
   # https://github.com/helm/helm/issues/11040#issuecomment-1154702487
   helm upgrade --install cluster-config -n cluster-config --create-namespace "${DIRNAME}/cluster-config-chart" \
-    --force-replace \
+    --force \
     --set clusterName="${CLUSTER_NAME}" \
     --set region="${REGION}" \
     --set tenant_id="${TENANT_ID}" \
@@ -69,7 +90,11 @@ function ensure-cluster-config() {
     --set azure_monitor.client_id="${MP_CLIENT_ID}" \
     --set azure_monitor.client_secret="${MP_CLIENT_SECRET}" \
     --set azure_monitor.dcr_id="${MP_DCR_ID}" \
-    --set-json oidc="$(echo -n "${OIDC}" | jq -r)"
+    --set-json oidc="$(echo -n "${OIDC}" | jq -r)" \
+    --set azure_monitor.forward_metrics="${FORWARD_METRICS}" \
+    --set secret.client_id="${KV_CLIENT_ID}" \
+    --set secret.client_secret="${KV_CLIENT_SECRET}" \
+    --set secret.kv="${KV_NAME}"
 }
 
 function configure-namespaces() {
@@ -415,11 +440,81 @@ spec:
 EOF
 }
 
+function configure-pipelines() {
+  cat <<EOF | oc apply -f -
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: openshift-pipelines-operator-rh
+  namespace: openshift-operators
+spec:
+  channel: latest
+  # channel: pipelines-1.21
+  # installPlanApproval: Manual
+  name: openshift-pipelines-operator-rh
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  # startingCSV: openshift-pipelines-operator-rh.v1.21.1
+EOF
+  wait_for_resource TektonConfig
+  # disables PostgreSQL database for pipelines and uses embedded SQLite instead
+  oc patch tektonconfig config \
+    --type=merge \
+    -p '{"spec":{"result":{"disabled":true}}}'
+}
+
+function configure-external-secret-operator() {
+  [[ -n "$(oc get project external-secrets-operator --no-headers --ignore-not-found 2>/dev/null)" ]] || {
+    oc adm new-project --node-selector='' external-secrets-operator
+    cat <<EOF | oc apply -f -
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: external-secrets-operator-z85gw
+  namespace: external-secrets-operator
+spec:
+  upgradeStrategy: Default
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: openshift-external-secrets-operator
+  namespace: external-secrets-operator
+spec:
+  channel: stable-v1
+  installPlanApproval: Automatic
+  name: openshift-external-secrets-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  # startingCSV: openshift-external-secrets-operator.v1.1.0
+EOF
+  }
+  wait_for_resource ExternalSecret
+  wait_for_resource ExternalSecretsConfig
+
+  cat <<EOF | oc apply -f -
+apiVersion: operator.openshift.io/v1alpha1
+kind: ExternalSecretsConfig
+metadata:
+  name: cluster
+spec:
+  controllerConfig:
+    networkPolicies:
+    - componentName: ExternalSecretsCoreController
+      egress:
+      - {}
+      name: allow-external-secrets-egress
+EOF
+}
+
 # Main
 login-to-aro
+inject-custom-ca
+configure-external-secret-operator
 ensure-cluster-config
 configure-monitoring
 configure-logging-forwarding-to-log-analytics-workspace
+configure-pipelines
 configure-backup
 configure-namespaces
 
