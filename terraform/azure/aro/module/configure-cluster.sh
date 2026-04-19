@@ -82,7 +82,7 @@ function ensure-cluster-config() {
   # has to be with --force-replace - otherwise imported resources to Helm - are not updated with Helm
   # https://github.com/helm/helm/issues/11040#issuecomment-1154702487
   helm upgrade --install cluster-config -n cluster-config --create-namespace "${DIRNAME}/cluster-config-chart" \
-    --force \
+    --server-side=true \
     --set clusterName="${CLUSTER_NAME}" \
     --set region="${REGION}" \
     --set tenant_id="${TENANT_ID}" \

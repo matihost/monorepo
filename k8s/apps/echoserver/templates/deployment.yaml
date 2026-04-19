@@ -39,17 +39,19 @@ spec:
             - name: app-port
               containerPort: {{ .Values.pod.port }}
               protocol: TCP
+          {{- if ne (.Values.pod.health.port | default .Values.pod.port) .Values.pod.port }}
             - name: health-port
               containerPort: {{ .Values.pod.health.port | default .Values.pod.port }}
               protocol: TCP
+          {{- end }}
           livenessProbe:
             httpGet:
               path: {{ .Values.pod.health.livePath | default "/" }}
-              port: health-port
+              port: {{ if ne (.Values.pod.health.port | default .Values.pod.port) .Values.pod.port }}health-port{{ else }}app-port{{ end }}
           readinessProbe:
             httpGet:
               path: {{ .Values.pod.health.readyPath | default "/" }}
-              port: health-port
+              port: {{ if ne (.Values.pod.health.port | default .Values.pod.port) .Values.pod.port }}health-port{{ else }}app-port{{ end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       # example of usage of nodeSelector

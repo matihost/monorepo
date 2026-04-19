@@ -54,8 +54,8 @@ spec:
         extraScopes:
           - email
           - profile
-        groups:
-          - groups
+        # groups:
+        #   - groups
         issuer: {{ .Values.oidc.issuer_url | quote }}
       type: OpenID
 {{- end }}

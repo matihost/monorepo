@@ -568,11 +568,11 @@ all:
             helm search repo
           become: false
           command: |
-            CURRENT_VERSION="$(curl -Ls https://github.com/helm/helm/releases | grep 'href="/helm/helm/releases/tag/v3.[0-9]*.[0-9]*\"' | \
+            CURRENT_VERSION="$(curl -Ls https://github.com/helm/helm/releases | grep 'href="/helm/helm/releases/tag/v4.[0-9]*.[0-9]*\"' | \
               sed -E 's/.*\/helm\/helm\/releases\/tag\/(v[0-9\.]+)".*/\1/g' | head -1)"
             INSTALLED_VERSION="$(helm version 2>/dev/null | sed -E 's/.*\{Version:"([^"]+)".*/\1/')"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
-              curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+              curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-4 | bash
               helm repo add stable https://charts.helm.sh/stable
               helm repo add nginx-stable https://helm.nginx.com/stable
               helm repo add jenkinsci https://charts.jenkins.io
