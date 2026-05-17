@@ -20,7 +20,7 @@
 - name: Run post file change command
   ansible.builtin.shell: "{{ file_config.command }}"
   register: cli_result
-  changed_when: cli_result.stdout
+  changed_when: cli_result.rc == 0 and cli_result.stdout_lines | length > 0
   args:
     executable: /bin/bash
   ignore_errors: true

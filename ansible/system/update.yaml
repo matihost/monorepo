@@ -3,7 +3,7 @@
   hosts: local
   gather_facts: true
   tasks:
-  - when: ansible_os_family == "Debian"
+  - when: ansible_facts.os_family == "Debian"
     block:
     - name: Update PPA repositories keys
       ansible.builtin.shell: |
@@ -11,8 +11,8 @@
       register: apt_result
       changed_when: '"All Launchpad PPA signing keys are up-to-date" not in apt_result.stdout'
       when:
-      - ansible_distribution == 'Ubuntu'
-      - ansible_distribution_version is version('24.10', '>')
+      - ansible_facts.distribution == 'Ubuntu'
+      - ansible_facts.distribution_version is version('24.10', '>')
     - name: Update packages for Debian based distribution
       ansible.builtin.apt:
         name: "*"
@@ -34,7 +34,7 @@
         force_apt_get: yes
 
 
-  - when: ansible_os_family == "RedHat"
+  - when: ansible_facts.os_family == "RedHat"
     block:
     - name: Update packages for RHEL based distribution
       ansible.builtin.dnf:

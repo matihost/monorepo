@@ -11,8 +11,12 @@ run-head: ## run pyhead from poetry as script
 run-python-head: ## run pyhead from poetry python
 	poetry run python -m learning.cli.head $(FILENAME)
 
-run-python-learning: ## run pyhead from poetry python
-	poetry run python -m learning.cli.learning
+run-python-basics: ## run basics from poetry python
+	poetry run python -m learning.cli.basics
+
+# as basics has no dependencies, we can run it without virtualenv/poetry
+run-python-basics: ## run basics from poetry python
+	python -m learning.cli.basics
 
 debug: ## debug pyhead from poetry
 	PYTHONPATH=src poetry run python3 -m debugpy --wait-for-client --listen 5678 -m learning.cli.$(APP) $(FILENAME)

@@ -26,7 +26,7 @@
       - rhel-7-server-rpms
       - rhel-7-server-extras-rpms
       state: present
-    when: ansible_os_family == "RedHat" and ansible_distribution == "RedHat"
+    when: ansible_facts.os_family == "RedHat" and ansible_facts.distribution == "RedHat"
   - name: Install Epel and CentOS repos
     yum:
       name:

@@ -10,27 +10,27 @@ all:
           ruby_user_path: "${HOME}/.local/share/gem/ruby/3.3.0/bin"
           # Current supported kubernetess and crio versions:
           # https://github.com/cri-o/packaging/blob/main/README.md#define-the-kubernetes-version-and-used-cri-o-stream
-          kubernetes: v1.34
-          crio: v1.34
-          # TODO change to {{ ansible_distribution_version }} when current is supported Ubuntu
+          kubernetes: v1.36
+          crio: v1.36
+          # TODO change to {{ ansible_facts.distribution_version }} when current is supported Ubuntu
           # List of supported Ubuntu versions:
           # https://packages.microsoft.com/repos/azure-cli/dists/
           azure_repo_ubuntu_version: "noble"
           # OpenVPN3 repo Supports only LTSs versions
           # List of supported Ubuntu versions:
           # https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos#DebianUbuntu:UsingOpenVPNaptrepositories
-          openvpn_repo_ubuntu_version: "noble"
+          openvpn_repo_ubuntu_version: "questing"
           # List of supported Ubuntu versions: https://www.hashicorp.com/official-packaging-guide?product_intent=terraform
-          terraform_ubuntu_version: "noble"
-          virtualbox_ubuntu_version: "noble"
-          # TODO change to {{ ansible_distribution_release }} when current is supported Ubuntu LTS
+          terraform_ubuntu_version: "questing"
+          virtualbox_ubuntu_version: "resolute"
+          # TODO change to {{ ansible_facts.distribution_release }} when current is supported Ubuntu LTS
           cri_dockerd_ubuntu_version: "jammy"
           # MQ Version available at: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/
-          mq: 9.4.4.0
+          mq: 9.4.5.1
           # List of supported Ubuntu versions: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive
-          onedrive_ubuntu_version: "24.04"
+          onedrive_ubuntu_version: "26.04"
           # List of supported Ubuntu versions: https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/
-          pgadmin_ubuntu_version: "noble"
+          pgadmin_ubuntu_version: "resolute"
           # List of supported Ubuntu versions: https://apt.envoyproxy.io/
           envoy_ubuntu_version: "jammy"
         virtual_interface_ip: 192.168.10.1
@@ -387,16 +387,6 @@ all:
           become: true
           command: |
             sed -i -E "s/^hosts: .+$/hosts:          myhostname files mdns4_minimal [NOTFOUND=return] dns/" /etc/nsswitch.conf
-        - name: keepass-http
-          become: true
-          desc: Download KeePassRPC plugin to KeePass plugins for integration with Kee plugin to Firefox
-          command: |
-            [ -e /usr/lib/keepass2/Plugins/KeePassRPC.plgx ] || {
-              curl -sL https://api.github.com/repos/kee-org/keepassrpc/releases/latest | jq -r ".assets[] |
-                select(.name | test(\"KeePassRPC.plgx\")) | .browser_download_url" |
-                  xargs curl -s -L -o "/usr/lib/keepass2/Plugins/KeePassRPC.plgx"
-              echo "KeePassRPC downloaded, you may run Firefox with Kee plugin now and KeePass app"
-            }
         - name: docker-config
           become: true
           command: |
@@ -474,9 +464,9 @@ all:
           command: |
             [ -d ~/.sdkman/bin ] || (
             curl -s "https://get.sdkman.io" | bash
-            bash -ic "sdk i java 17-openjdk /usr/lib/jvm/java-17-openjdk-amd64;\
-            sdk i java 21-openjdk /usr/lib/jvm/java-21-openjdk-amd64;\
-            sdk d java 21-openjdk;\
+            bash -ic "sdk i java 21-openjdk /usr/lib/jvm/java-21-openjdk-amd64;\
+            sdk i java 25-openjdk /usr/lib/jvm/java-25-openjdk-amd64;\
+            sdk d java 25-openjdk;\
             sdk i maven;\
             sdk i groovy;\
             sdk i scala;")

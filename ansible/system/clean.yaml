@@ -12,7 +12,7 @@
     - not(journal_clean.stderr is search('freed 0B'))
     - journal_clean.stdout
   - name: Debian based specific cleaning
-    when: ansible_os_family == "Debian"
+    when: ansible_facts.os_family == "Debian"
     block:
     - name: Update apt cache
       ansible.builtin.apt:
@@ -35,7 +35,7 @@
       ansible.builtin.include_role:
         name: remove_old_kernels
   - name: RHEL based system specific cleaning
-    when: ansible_os_family == "RedHat"
+    when: ansible_facts.os_family == "RedHat"
     block:
     - name: Remove dependencies that are no longer required from RHEL based system
       ansible.builtin.dnf:
@@ -53,7 +53,7 @@
       find /var/log -type f -regex ".*\.old$" -delete -print && \
       for i in `find /var/log/dist-upgrade -mindepth 1 -type d 2>/dev/null` ; do echo $i && rm -rf $i; done
     register: log_clean
-    changed_when: log_clean.stdout
+    changed_when: log_clean.rc == 0 and log_clean.stdout_lines | length > 0
   - name: Clean all podman (root) and docker containers, images and volumes
     ansible.builtin.shell: |
       command -v podman 1>/dev/null 2>/dev/null && {
@@ -72,7 +72,7 @@
         }
       }
     register: clean_out
-    changed_when: clean_out.stdout
+    changed_when: log_clean.rc == 0 and log_clean.stdout_lines | length > 0
     failed_when: false
   - name: Clean all containerd images
     ansible.builtin.shell: |
@@ -98,7 +98,7 @@
         fi
       }
     register: clean_out
-    changed_when: clean_out.stdout
+    changed_when: log_clean.rc == 0 and log_clean.stdout_lines | length > 0
     failed_when: false
     args:
       executable: /bin/bash
@@ -113,7 +113,7 @@
           fi
         }
       register: clean_out
-      changed_when: clean_out.stdout
+      changed_when: log_clean.rc == 0 and log_clean.stdout_lines | length > 0
       failed_when: false
   - become: false
     block:
@@ -125,5 +125,5 @@
           rm -rf ${TERRAFORM_PLUGINS}/*
         }
       register: clean_out
-      changed_when: clean_out.stderr
+      changed_when: clean_out.rc != 0 and clean_out.stderr_lines | length > 0
       failed_when: false

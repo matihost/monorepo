@@ -12,9 +12,9 @@ all:
           ruby_user_path: "${HOME}/.local/share/gem/ruby/3.3.0/bin"
           # Current supported kubernetess and crio versions:
           # https://github.com/cri-o/packaging/blob/main/README.md#define-the-kubernetes-version-and-used-cri-o-stream
-          kubernetes: v1.34
-          crio: v1.34
-          # TODO change to {{ ansible_distribution_version }} when current is supported Ubuntu
+          kubernetes: v1.36
+          crio: v1.36
+          # TODO change to {{ ansible_facts.distribution_version }} when current is supported Ubuntu
           # List of supported Ubuntu versions:
           # https://packages.microsoft.com/repos/azure-cli/dists/
           azure_repo_ubuntu_version: "noble"
@@ -23,16 +23,16 @@ all:
           # https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos#DebianUbuntu:UsingOpenVPNaptrepositories
           openvpn_repo_ubuntu_version: "questing"
           # List of supported Ubuntu versions: https://www.hashicorp.com/official-packaging-guide?product_intent=terraform
-          terraform_ubuntu_version: "plucky"
-          virtualbox_ubuntu_version: "plucky"
-          # TODO change to {{ ansible_distribution_release }} when current is supported Ubuntu LTS
+          terraform_ubuntu_version: "questing"
+          virtualbox_ubuntu_version: "resolute"
+          # TODO change to {{ ansible_facts.distribution_release }} when current is supported Ubuntu LTS
           cri_dockerd_ubuntu_version: "jammy"
           # MQ Version available at: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/
-          mq: 9.4.4.0
+          mq: 9.4.5.1
           # List of supported Ubuntu versions: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive
-          onedrive_ubuntu_version: "25.04"
+          onedrive_ubuntu_version: "26.04"
           # List of supported Ubuntu versions: https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/
-          pgadmin_ubuntu_version: "plucky"
+          pgadmin_ubuntu_version: "resolute"
           # List of supported Ubuntu versions: https://apt.envoyproxy.io/
           envoy_ubuntu_version: "jammy"
         virtual_interface_ip: 192.168.10.1
@@ -217,6 +217,7 @@ all:
         - yq
         - curl
         - keepass2
+        - keepass2-plugin-keepassrpc
         - code
         - onedrive
         - nautilus-dropbox
@@ -454,9 +455,11 @@ all:
             sed -i -E "s/^hosts: .+$/hosts:          myhostname files mdns4_minimal [NOTFOUND=return] dns/" /etc/nsswitch.conf
         - name: keepass-http
           become: true
-          desc: Download KeePassRPC plugin to KeePass plugins for integration with Kee plugin to Firefox
+          desc: |
+            Download KeePassRPC plugin to KeePass plugins for integration with Kee plugin to Firefox.
+            Only if keepass2-plugin-keepassrpc is not installed it already.
           command: |
-            [ -e /usr/lib/keepass2/Plugins/KeePassRPC.plgx ] || {
+            [ -e /usr/lib/keepass2/Plugins/KeePassRPC.dll -o -e /usr/lib/keepass2/Plugins/KeePassRPC.plgx ] || {
               curl -sL https://api.github.com/repos/kee-org/keepassrpc/releases/latest | jq -r ".assets[] |
                 select(.name | test(\"KeePassRPC.plgx\")) | .browser_download_url" |
                   xargs curl -s -L -o "/usr/lib/keepass2/Plugins/KeePassRPC.plgx"
@@ -997,19 +1000,19 @@ all:
           become: true
           desc: To ensure that there is a root CA certificate for the host and it is added to the trusted store and can be used by browsers and CLI tools.
           command: |
-            trust list --filter=ca-anchors | grep -qi "{{ ansible_hostname }} Internal Root CA" \
-              && [ -f "/usr/local/share/ca-certificates/{{ ansible_hostname }}-root-ca.crt" ] \
+            trust list --filter=ca-anchors | grep -qi "{{ ansible_facts.hostname }} Internal Root CA" \
+              && [ -f "/usr/local/share/ca-certificates/{{ ansible_facts.hostname }}-root-ca.crt" ] \
               || {
-              openssl genrsa -out /usr/local/share/ca-certificates/{{ ansible_hostname }}-root-ca.key 4096
+              openssl genrsa -out /usr/local/share/ca-certificates/{{ ansible_facts.hostname }}-root-ca.key 4096
               openssl req -x509 -new -nodes \
-                -key /usr/local/share/ca-certificates/{{ ansible_hostname }}-root-ca.key \
+                -key /usr/local/share/ca-certificates/{{ ansible_facts.hostname }}-root-ca.key \
                 -sha256 -days 3650 \
-                -out /usr/local/share/ca-certificates/{{ ansible_hostname }}-root-ca.crt \
-                -subj "/CN={{ ansible_hostname }} Internal Root CA" \
+                -out /usr/local/share/ca-certificates/{{ ansible_facts.hostname }}-root-ca.crt \
+                -subj "/CN={{ ansible_facts.hostname }} Internal Root CA" \
                 -addext "basicConstraints=critical,CA:TRUE" \
                 -addext "keyUsage=critical,keyCertSign,cRLSign"
               update-ca-certificates
-              echo "Root CA certificate for {{ ansible_hostname }} installed"
+              echo "Root CA certificate for {{ ansible_facts.hostname }} installed"
             }
         - name: ibmcloud
           become: false
