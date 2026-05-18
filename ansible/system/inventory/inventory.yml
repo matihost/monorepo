@@ -1199,8 +1199,8 @@ all:
           desc: Discord app
           command: |
             DOWNLOAD_URL="$(curl -s -o /dev/null -w '%header{location}' https://discord.com/api/download?platform=linux)"
-            CURRENT_VERSION="$(echo $DOWNLOAD_URL | sed -E 's/.*linux\/([0..9].+)\/discord.*/\1/')"
-            INSTALLED_VERSION="$(apt list discord 2>/dev/null | grep discord |  sed -E 's/.* ([0..9].+) amd.*/\1/')"
+            CURRENT_VERSION="$(echo $DOWNLOAD_URL |  sed -E 's#.*/discord-([0-9]+\.[0-9]+\.[0-9]+)\.deb#\1#')"
+            INSTALLED_VERSION="$(apt list discord 2>/dev/null | grep discord |  sed -E 's/.* ([0-9]+\.[0-9]+\.[0-9]+) amd.*/\1/')"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl -s -L -o "/tmp/discord.deb" "${DOWNLOAD_URL}"
               apt -y install /tmp/discord.deb
