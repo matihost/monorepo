@@ -7,6 +7,9 @@ all:
       vars:
         # to install and configure Datadog agent when DD_API_KEY is set in environment as well
         datadog_agent: true
+        backup: false
+        # backup location in Restic repository format
+        backup_location: local:/tmp/restic-backup
         versions:
           # represents path to local gems, see: 'gem environment' output for example: ~/.local/share/gem/ruby/3.3.0/bin
           ruby_user_path: "${HOME}/.local/share/gem/ruby/3.3.0/bin"
@@ -313,6 +316,144 @@ all:
         - aws-sso-util
         - ansible-lint
         - cpplint
+        restic_profiles_config: |
+          version: 1
+
+          global:
+            scheduler: crond
+            # run 'snapshots' when no command is specified when invoking resticprofile
+            default-command: snapshots
+            # initialize a repository if none exist at location
+            initialize: true
+            # priority is using priority class on windows, and nice on unixes
+            priority: low
+            # resticprofile won't start a profile if there's less than 100MB of RAM available
+            min-memory: 100
+
+          default:
+            repository: {{ backup_location }}
+
+            # For Azure Storage Account format: azure:container:path
+            # repository: azure:restic:/backup
+            # option: azure.connections=3
+            # env:
+            #   AZURE_ACCOUNT_NAME: storageaccountname
+            #   AZURE_CLIENT_ID:
+
+            password-file: key
+
+            backup:
+              verbose: true
+              source:
+                - /home
+                - /opt
+                - /srv
+                - /etc/ssh
+                - /etc/sudoers
+                - /etc/sudoers.d
+                - /etc/passwd
+                - /etc/shadow
+                - /etc/group
+                - /etc/gshadow
+                - /etc/subuid
+                - /etc/subgid
+                - /var/spool/cron
+
+              exclude:
+                - /proc
+                - /sys
+                - /dev
+                - /run
+                - /tmp
+                - /mnt
+                - /media
+                - /var/cache
+                - /var/tmp
+                - /var/lib/docker
+                - /var/lib/containerd
+                - /var/lib/kubelet/pods
+                # Azure agent / provisioning (IMPORTANT)
+                - /var/lib/waagent
+                - /var/lib/azure
+                - /var/lib/cloud
+                - /run/cloud-init
+                - /var/lib/waagent-extensions
+
+                # Optional
+                - /var/log
+                # GNOME / desktop noise (important)
+                - /home/*/.cache
+                - /home/*/.local/share/Trash
+
+                # Azure SDK / CLI tools (your current exclusions are OK)
+                - /opt/az
+                - /opt/microsoft
+                # Exclude cache and temporary files in home directories
+                - /home/*/thinclient_drives
+                - "**/cache/**"
+                - "**/.cache/**"
+                - "**/*Cache*/**"
+                - /home/*/.local/share
+                - /home/*/.local/lib
+                - /home/*/.gvfs
+                - /home/*/.m2/repository
+                - /home/*/.nvm
+                - /home/*/.npm
+                - "**/node_modules/**"
+                - /home/*/.serverless
+                - /home/*/Dropbox
+                - /home/*/OneDrive
+                - /home/*/GDrive
+                - /home/*/go
+                - /home/*/.vagrant.d/boxes
+                - "/home/*/VirtualBox VMs"
+                - /home/*/.sdkman
+                - /home/*/snap
+                - /home/*/.vscode
+                # Exclude mount points (important to avoid backing up other filesystems)
+                - /media
+                - /mnt
+
+                # Optional - exclude large media files in home directories
+                - /home/*/Pictures/**
+                - /home/*/Music/**
+                - /home/*/Videos/**
+                - /home/*/Downloads/**
+
+              exclude-caches: true
+              one-file-system: true
+
+              # daily
+              schedule: daily
+              schedule-permission: system
+              schedule-lock-wait: 45m
+              schedule-after-network-online: true
+
+              #
+              # Optional but HIGHLY recommended for GNOME consistency
+              #
+              run-before:
+                - mkdir -p /tmp/restic-desktop
+                - dconf dump / > /tmp/restic-desktop/dconf.ini || true
+
+              run-after:
+                - rm -rf /tmp/restic-desktop
+
+            retention:
+              after-backup: true
+              keep-daily: 7
+              keep-weekly: 4
+              keep-monthly: 6
+              keep-yearly: 2
+              prune: true
+
+          # sudo apt install cron
+          # az login --identity
+          # resticprofile --config /etc/resticprofile/profiles.yaml schedule --all
+          # resticprofile --config /etc/resticprofile/profiles.yaml schedule --list
+          # crontab -l
+          # resticprofile --config /etc/resticprofile/profiles.yaml schedule --list
+          # resticprofile --config /etc/resticprofile/profiles.yaml backup
         clis:
         - name: virtual-network-interface
           desc: To ensure there is a virtual interface with stable IP
@@ -995,6 +1136,32 @@ all:
               curl -sSL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz" | tar -zx -o eksctl
               mv eksctl /usr/local/bin
               echo "EKSCTL CLI installed"
+            }
+        - name: restic
+          become: true
+          command: |
+            CURRENT_VERSION="$(curl -sL "https://api.github.com/repos/restic/restic/releases/latest" | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(restic version 2</dev/null |cut -d' ' -f2)";
+            [[ "v${INSTALLED_VERSION}" == "${CURRENT_VERSION}"* ]] || {
+              echo "Downloading RESTIC ${CURRENT_VERSION}..."
+              curl -sSL "https://github.com/restic/restic/releases/download/${CURRENT_VERSION}/restic_${CURRENT_VERSION:1}_linux_amd64.bz2" | bzip2 -d > /usr/local/bin/restic
+              chmod a+x /usr/local/bin/restic
+              echo "Restic CLI installed"
+            }
+            CURRENT_VERSION="$(curl -sL "https://api.github.com/repos/creativeprojects/resticprofile/releases/latest" | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(resticprofile version 2</dev/null |cut -d' ' -f3)";
+            [[ "v${INSTALLED_VERSION}" == "${CURRENT_VERSION}"* ]] || {
+              echo "Downloading Resticprofile ${CURRENT_VERSION}..."
+              cd /usr/local && curl -sfL https://raw.githubusercontent.com/creativeprojects/resticprofile/master/install.sh | sh
+              echo "Resticprofile CLI installed"
+            }
+            [ "{{ backup | default("False") }}" = "False" ] || {
+              sudo mkdir -p /etc/resticprofile
+              echo "{{ restic_profiles_config }}" | sudo tee /etc/resticprofile/profiles.yaml
+              echo "password" > /etc/resticprofile/key
+              chmod 600 /etc/resticprofile/profiles.yaml /etc/resticprofile/key
+              resticprofile --config /etc/resticprofile/profiles.yaml schedule --all
+              echo "Resticprofile configured and scheduled"
             }
         - name: root-ca
           become: true

@@ -70,9 +70,10 @@ variable "subnet_suffix" {
 variable "size" {
   type        = string
   description = "VM size"
-  default     = "Standard_B2ats_v2" # 2 vcpu, 1 GiB memory
+  default     = "Standard_B2ats_v2" # B familily - burstable CPU, 2 vcpu, 1 GiB memory
   # Standard_B1ls (1 vcpu, 0.5 GiB memory)
   # Standard_B1s (1 vcpu, 1 GiB memory)
+  # Standard_B4als_v2 (4 vcpu, 8 GiB memory)
 }
 
 variable "spot" {
@@ -93,7 +94,7 @@ variable "image" {
   default = {
     admin_username = "ubuntu"
     publisher      = "canonical"
-    offer          = "ubuntu-24_04-lts"
+    offer          = "ubuntu-26_04-lts"
     sku            = "minimal"
     version        = "latest"
   }
@@ -119,6 +120,23 @@ variable "user_data_template" {
   description = "EC2 user_data conttent in tftpl format (aka with TF templating)"
 }
 
+variable "user_data_vars" {
+  default     = []
+  type        = list(string)
+  description = "Variables passed as vars variable in cloud init templating"
+}
+
+variable "backup_storage_account_name" {
+  type        = string
+  description = "Name of storage account used for backup, has to be in the same RG as instance"
+  default     = null
+}
+
+variable "backup_storage_account_rg" {
+  type        = string
+  description = "Name of resource group where storage account used for backup is located, has to be the same as instance RG"
+  default     = null
+}
 
 # tflint-ignore: terraform_unused_declarations
 variable "zone" {

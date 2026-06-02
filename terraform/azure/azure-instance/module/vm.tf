@@ -65,9 +65,12 @@ resource "azurerm_linux_virtual_machine" "linux" {
   # TODO test user_data instead
   # https://learn.microsoft.com/en-us/azure/virtual-machines/user-data
   custom_data = base64encode(templatestring(var.user_data_template, {
-    ssh_key        = base64encode(var.ssh_key),
-    ssh_pub        = base64encode(var.ssh_pub_key),
-    admin_username = var.image.admin_username
+    ssh_key                          = base64encode(var.ssh_key),
+    ssh_pub                          = base64encode(var.ssh_pub_key),
+    admin_username                   = var.image.admin_username
+    vm_name                          = local.vm_name
+    vars                             = var.user_data_vars
+    user_assigned_identity_client_id = azurerm_user_assigned_identity.vm-identity.client_id
   }))
 
   admin_ssh_key {
@@ -78,6 +81,7 @@ resource "azurerm_linux_virtual_machine" "linux" {
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "StandardSSD_LRS"
+    disk_size_gb         = 100
   }
 
   source_image_reference {
@@ -87,5 +91,11 @@ resource "azurerm_linux_virtual_machine" "linux" {
     version   = var.image.version
   }
 
+
+  identity {
+    type         = "SystemAssigned, UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.vm-identity.id]
+
+  }
   tags = var.tags
 }
