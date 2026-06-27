@@ -22,7 +22,7 @@ ENV := dev
 init:
 	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
 
-run: init ## setup VPC: make run [ENV=dev] [MODE=apply]
+run: init ## setup site: make run [ENV=dev] [MODE=apply]
 	@cd stage/$(ENV) && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 test-site:  ## test S3 site URL

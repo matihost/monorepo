@@ -63,7 +63,6 @@ all:
           foxundermoon.shell-format
           garytyler.darcula-pycharm
           george-alisson.html-preview-vscode
-          github.copilot-chat
           github.vscode-github-actions
           github.vscode-pull-request-github
           golang.go
@@ -248,6 +247,8 @@ all:
         - kubelet
         - kubeadm
         - kubectl
+        - etcd-client
+        # - etcd-server
         - cri-o
         - podman
         - buildah
@@ -704,6 +705,16 @@ all:
               rm -f crictl-$VERSION-linux-amd64.tar.gz
               echo 'runtime-endpoint: unix:///var/run/containerd/containerd.sock
             image-endpoint: unix:///var/run/containerd/containerd.sock' > /etc/crictl.yaml
+            }
+        - name: nerdctr
+          become: true
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/containerd/nerdctl/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(nerdctl --version | sed -E 's/.* ([0-9\.]+).*/\1/')"
+            [ "${CURRENT_VERSION}" = "v${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/containerd/nerdctl/releases/latest | jq -r ".assets[] |
+                select(.name | test(\"linux-amd64.tar.gz$\")) | .browser_download_url" | grep -v full | xargs curl -sSL | tar -zx -o nerdctl
+              mv nerdctl /usr/local/bin
             }
         - name: helm
           desc: |

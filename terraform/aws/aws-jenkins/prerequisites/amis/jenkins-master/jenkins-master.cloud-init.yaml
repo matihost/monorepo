@@ -69,4 +69,4 @@ repo_update: true
 repo_upgrade: all
 
 packages:
-  - openjdk-21-jdk
+  - openjdk-25-jdk

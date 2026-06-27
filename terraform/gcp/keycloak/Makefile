@@ -97,13 +97,13 @@ get-initial-admin-username: ## get initial admin user name
 ifndef ENV
 	$(error Environment ENV is not defined. Usage make get-initial-admin-username ENV=prod)
 endif
-	@cd stage/$(ENV)/keycloak && terragrunt output -raw keycloak_initial_admin_username
+	@cd stage/$(ENV)/keycloak && terragrunt output keycloak_initial_admin_username
 
 get-initial-admin-pass: ## get initial admin user password
 ifndef ENV
 	$(error Environment ENV is not defined. Usage make get-initial-admin-pass ENV=prod)
 endif
-	@cd stage/$(ENV)/keycloak && terragrunt output -raw keycloak_initial_admin_password
+	@cd stage/$(ENV)/keycloak && terragrunt output keycloak_initial_admin_password
 
 
 run-keycloak-config: ## configure Keycloak instance; usage: make run-keycloak-config ENV=prod MODE=plan [DEBUG=true] [KEYCLOAK_USER=... KEYCLOAK_PASSWORD=...] [KEYCLOAK_CLIENT_ID=cd KEYCLOAK_CLIENT_SECRET=....]
