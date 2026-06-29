@@ -26,46 +26,46 @@ permissions:
   contents: read
 jobs:
   java:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     env:
       CACHE: java
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
     - name: Set up cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: "${{ github.workspace }}/.m2"
         key: "${{ runner.os }}-path"
-    - uses: actions/setup-java@v4
+    - uses: actions/setup-java@v5
       with:
         distribution: adopt
-        java-version: '21'
+        java-version: '25'
     - run: cd java && make build
   project-euler:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     env:
       CACHE: algorithms/project-euler
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
     - name: Set up cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: "${{ github.workspace }}/.m2"
         key: "${{ runner.os }}-path"
-    - uses: actions/setup-java@v4
+    - uses: actions/setup-java@v5
       with:
         distribution: adopt
-        java-version: '21'
+        java-version: '25'
     - run: cd algorithms/project-euler && make build
   rust:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
     - name: Set up cargo cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: |
           ~/.cargo/registry
@@ -74,12 +74,12 @@ jobs:
         key: "${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}"
     - run: cd rust/guessing_game && cargo build --verbose && cargo test --verbose
   go:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
     - name: Set up cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: |-
           ${{ github.workspace }}/.cache/go-build
@@ -87,20 +87,20 @@ jobs:
         key: "${{ runner.os }}-path"
     - uses: actions/setup-go@v5
       with:
-        go-version: '1.24'
+        go-version: '1.26'
     - run: cd go/learning && go get -d ./... && go build -mod=mod -o .  ./... && go test ./pkg/language && ./language
   python:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
     - name: Set up pip cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: "~/.cache/pip"
         key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
         restore-keys: "${{ runner.os }}-pip-"
     - uses: actions/setup-python@v5
       with:
-        python-version: '3.13'
+        python-version: '3.14'
     - run: cd python/apps/exchange-rate && pip3 install tox && make build && pip3 install . && exchange-rate

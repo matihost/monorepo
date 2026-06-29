@@ -29,8 +29,8 @@ From Windows `cmd` shell:
 # to install latest LTS version of Ubuntu
 wsl --install
 
-# to install WSL with Ubuntu 24.04
-wsl --install Ubuntu-24.04
+# to install WSL with Ubuntu 26.04
+wsl --install Ubuntu-26.04
 
 # to list currently installed distributions
 wsl --list
@@ -103,7 +103,7 @@ code
   # For up to Ubuntu 22.04 you need to install it from pip3 in user space to have most modern Ansible version:
   # pip3 install ansible --user
 
-  # For Ubuntu 24.04++ make sure Ansible is installed from apt package manager
+  # For Ubuntu 26.04++ make sure Ansible is installed from apt package manager
   sudo apt install -y python3-ansible-runner
 
   # ensure user Python apps can be run

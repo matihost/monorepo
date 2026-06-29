@@ -79,7 +79,7 @@ func ShowBasicTypes() {
 	// converting number to string will result in creating one character string
 	// number is Unicode number
 	// if number is invalid, then it so called "replacement character" It's a replacement character (\uFFFD)
-	s = string(322)
+	s = fmt.Sprint(rune(322))
 
 	// the * operator denotes the pointer's underlying value
 	fmt.Println("Various basic types", b, i, f, ui, si, c, s, p, *p)

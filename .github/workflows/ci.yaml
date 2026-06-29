@@ -3,7 +3,7 @@ name: CI
 run-name: >-
   ${{github.workflow }} :: ${{ github.ref_name }}
   ${{ github.event.workflow_run.head_commit.message && format(' :: {0}', github.event.workflow_run.head_commit.message) || github.event.head_commit.message && format(' :: {0}', github.event.head_commit.message) || ''}}
-  ${{ inputs.runner && inputs.runner != 'ubuntu-24.04' && format(' on {0}', inputs.runner) || '' }}
+  ${{ inputs.runner && inputs.runner != 'ubuntu-26.04' && format(' on {0}', inputs.runner) || '' }}
 
 on:
   push:
@@ -21,10 +21,10 @@ on:
       runner:
         description: 'Runner type'
         required: true
-        default: 'ubuntu-24.04'
+        default: 'ubuntu-26.04'
         type: choice
         options:
-        - ubuntu-24.04
+        - ubuntu-26.04
         - matihost
   schedule:
   - cron: '27 20 * * 0'
@@ -42,7 +42,7 @@ env:
 jobs:
   sources:
     name: Checkout sources
-    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
     timeout-minutes: 5
     container:
       image: maven:3-eclipse-temurin-25
@@ -50,7 +50,7 @@ jobs:
       GIT_COMMIT_HASH: ${{ steps.git_hash.outputs.GIT_COMMIT_HASH }}
     steps:
     - name: Checkout sources
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
     # Workaround for https://github.com/actions/runner/issues/2033
@@ -75,20 +75,20 @@ jobs:
         enableCrossOsArchive: true
   java:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
     timeout-minutes: 30
     container:
       image: maven:3-eclipse-temurin-25
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
         fail-on-cache-miss: true
         enableCrossOsArchive: true
     - name: Cache local Maven repository
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         # TODO reading from MAVEN_CONFIG env did not work here
         path: "/root/.m2/repository"
@@ -101,14 +101,14 @@ jobs:
     # - name: Set up JDK 21
     #   uses: actions/setup-java@v3
     #   with:
-    #     java-version: '21'
+    #     java-version: '25'
     #     distribution: 'adopt'
     #     cache: maven
     - name: Build Java source code
       working-directory: java
       run: mvn -s .mvn/settings.xml --show-version clean install
     - name: Archive app jars artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: app-jars
         path: java/apps/**/target/*.jar
@@ -121,13 +121,13 @@ jobs:
         enableCrossOsArchive: true
   java-image-mq-app:
     needs: java
-    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
     timeout-minutes: 30
     container:
       image: quay.io/matihost/java-ci
     steps:
     - name: Download java build sources
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ github.workspace }}/java
         key: java-${{ github.run_id }}-${{ github.run_attempt }}
@@ -136,7 +136,7 @@ jobs:
     - name: Build Java mq client image
       working-directory: java/apps/mq/client
       env:
-        container: "${{ inputs.runner == 'ubuntu-24.04' && 'docker' || 'kube' }}"
+        container: "${{ inputs.runner == 'ubuntu-26.04' && 'docker' || 'kube' }}"
         REGISTRY: "${{ vars.REGISTRY || 'quay.io' }}"
         REGISTRY_USER: "${{ secrets.REGISTRY_USER }}"
         REGISTRY_PASSWORD: "${{ secrets.REGISTRY_PASSWORD }}"
@@ -149,13 +149,13 @@ jobs:
           --destination="${{ env.REGISTRY }}/matihost/mq/basic-client:${{ env.IMAGE_TAG }}"
   java-image-cmdline:
     needs: java
-    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
     timeout-minutes: 30
     container:
       image: quay.io/matihost/java-ci
     steps:
     - name: Download java build sources
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ github.workspace }}/java
         key: java-${{ github.run_id }}-${{ github.run_attempt }}
@@ -164,7 +164,7 @@ jobs:
     - name: Build Java command-line image
       working-directory: java/apps/command-line
       env:
-        container: "${{ inputs.runner == 'ubuntu-24.04' && 'docker' || 'kube' }}"
+        container: "${{ inputs.runner == 'ubuntu-26.04' && 'docker' || 'kube' }}"
         REGISTRY: "${{ vars.REGISTRY || 'quay.io' }}"
         REGISTRY_USER: "${{ secrets.REGISTRY_USER }}"
         REGISTRY_PASSWORD: "${{ secrets.REGISTRY_PASSWORD }}"
@@ -178,20 +178,20 @@ jobs:
           --destination="${{ env.REGISTRY }}/matihost/commandline:${{ env.IMAGE_TAG }}"
   codeql-java:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
     timeout-minutes: 30
     container:
       image: maven:3-eclipse-temurin-25
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
         fail-on-cache-miss: true
         enableCrossOsArchive: true
     - name: Cache local Maven repository
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: "/root/.m2/repository"
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -211,20 +211,20 @@ jobs:
         category: "/language:java"
   codeql-go:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
     timeout-minutes: 30
-    container: golang:1.24
+    container: golang:1.26
     env:
       GO_CACHE: /go
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
         fail-on-cache-miss: true
     - name: Set up cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: |-
           /go
@@ -246,13 +246,13 @@ jobs:
         category: "/language:go"
   codeql-python:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
     timeout-minutes: 30
     container:
       image: quay.io/matihost/ansible:root
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
@@ -280,13 +280,13 @@ jobs:
         category: "/language:python"
   ansible:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
     timeout-minutes: 30
     container:
       image: quay.io/matihost/ansible:root
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
@@ -297,13 +297,13 @@ jobs:
       working-directory: ansible/learning
   rust:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
     timeout-minutes: 30
     container:
       image: rust
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
@@ -313,14 +313,14 @@ jobs:
       working-directory: rust/guessing_game
   image-build-on-gcp-artifact-registry:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
-    if: ((inputs.runner || 'ubuntu-24.04') != 'ubuntu-24.04') && vars.GCP_PROJECT
+    runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
+    if: ((inputs.runner || 'ubuntu-26.04') != 'ubuntu-26.04') && vars.GCP_PROJECT
     timeout-minutes: 30
     container:
       image: quay.io/matihost/java-ci
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
@@ -338,14 +338,14 @@ jobs:
           --destination="gcr.io/${{ env.GCP_PROJECT }}/ansible:${{ env.GIT_COMMIT_HASH }}"
   image-build-generic-registry:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
     if: vars.REGISTRY
     timeout-minutes: 30
     container:
       image: quay.io/matihost/java-ci
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
@@ -365,13 +365,13 @@ jobs:
           --destination="${{ env.REGISTRY }}/matihost/ansible:${{ env.IMAGE_TAG }}"
   image-build-ghcr:
     needs: sources
-    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
     timeout-minutes: 30
     container:
       image: quay.io/matihost/java-ci
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
@@ -380,10 +380,10 @@ jobs:
     - name: Build Ansible image on GH hosted runner with deployment to GH Packages
       working-directory: k8s/images/ansible
       env:
-        container: "${{ inputs.runner == 'ubuntu-24.04' && 'docker' || 'kube' }}"
+        container: "${{ inputs.runner == 'ubuntu-26.04' && 'docker' || 'kube' }}"
       run: |
         mkdir -p /kaniko/.docker
-        AUTH=$(echo -n ${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} | base64)
+        AUTH=$(echo -n '${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}' | base64 -w 0)
         echo "{\"auths\": {\"ghcr.io\": {\"auth\": \"${AUTH}\"}}}" > /kaniko/.docker/config.json
 
         /kaniko/executor -c "$(pwd)" \

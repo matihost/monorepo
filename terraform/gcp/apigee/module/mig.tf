@@ -134,7 +134,7 @@ resource "google_compute_instance_template" "apigee-mig-template" {
 
 data "google_compute_image" "ubuntu-latest" {
   # OpsAgents supported OS: https://cloud.google.com/monitoring/agent/ops-agent?hl=en_US#supported_operating_systems
-  family  = "ubuntu-minimal-2404-lts-amd64"
+  family  = "ubuntu-minimal-2604-lts-amd64"
   project = "ubuntu-os-cloud"
 }
 

@@ -2,8 +2,9 @@ package language
 
 import (
 	"fmt"
-	lang "github.com/matihost/monorepo/go/learning/internal/language"
 	"math"
+
+	lang "github.com/matihost/monorepo/go/learning/internal/language"
 )
 
 // Vertex - sample exported struct
@@ -82,13 +83,7 @@ func ShowStructOperations() {
 	// same by divide declaration from initialization
 	// semicolon to make struct declaration in one line (however it is against gofmt -s)
 	// when struct field name is not provided - its type cannot repeat in the declaration
-	var ds struct {
-		int
-		string
-		s string
-	}
-	// providing values are optional - default zero values are used
-	ds = struct {
+	var ds = struct {
 		int
 		string
 		s string

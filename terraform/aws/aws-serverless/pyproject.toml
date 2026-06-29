@@ -8,16 +8,16 @@ readme = "README.md"
 packages = [{include = "website", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.13"
+python = "^3.14"
 fastapi = {extras = ["standard"], version = "^0.115.14"}
 mangum = "^0.19.0"
 
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.6.9"
-mypy = "^1.17.1"
-pytest = "^8.4.1"
-debugpy = "^1.8.16"
+mypy = "^1.20.2"
+pytest = "^8.4.2"
+debugpy = "^1.8.21"
 
 [build-system]
 requires = ["poetry-core"]

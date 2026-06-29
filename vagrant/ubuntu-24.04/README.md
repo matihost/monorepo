@@ -3,7 +3,7 @@
 Provisions locally Ubuntu 22.04 via VirtualBox/Vagrant.
 Creates SSH keys automatically on the host for connecting to vagrant via ssh.
 
-Relies on bento/ubuntu-24.04 build as since Hashicorp changes licence model for vagrant Canonical stopped providing own Vagrant images.
+Relies on bento/ubuntu-26.04 build as since Hashicorp changes licence model for vagrant Canonical stopped providing own Vagrant images.
 
 ## Prerequisites
 

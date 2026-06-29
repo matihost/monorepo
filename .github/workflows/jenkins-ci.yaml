@@ -48,27 +48,27 @@ permissions:
 jobs:
   Checkout_sources:
     name: Checkout sources
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
   Build_Java:
     name: "Build :: Java"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: Checkout_sources
     steps:
     - name: Set up cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: "${{ github.workspace }}/.m2"
         key: "${{ runner.os }}-path"
-    - uses: actions/setup-java@v4
+    - uses: actions/setup-java@v5
       with:
         distribution: adopt
-        java-version: '21'
+        java-version: '25'
     - run: cd java && make build
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: always()
       with:
         path: "**/target/*.jar"
@@ -80,76 +80,76 @@ jobs:
         junit_files: "**/target/surefire-reports/*.xml"
   Build_Project_Euler:
     name: "Build :: Project Euler"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: Checkout_sources
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 #     # This item has no matching transformer
 #     - container:
 #         isLiteral: true
 #         value: maven-jdk21
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: always()
       with:
         path: "**/target/*.jar"
   Build_Golang:
     name: "Build :: Golang"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: Checkout_sources
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 #     # This item has no matching transformer
 #     - container:
 #         isLiteral: true
 #         value: golang
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: always()
       with:
         path: "**/language"
   Build_Rust:
     name: "Build :: Rust"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: Checkout_sources
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 #     # This item has no matching transformer
 #     - container:
 #         isLiteral: true
 #         value: rust
   Build_Python:
     name: "Build :: Python"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: Checkout_sources
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 #     # This item has no matching transformer
 #     - container:
 #         isLiteral: true
 #         value: python
   Build_Ansible:
     name: "Build :: Ansible"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: Checkout_sources
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 #     # This item has no matching transformer
 #     - container:
 #         isLiteral: true
 #         value: ansible
   Build_Kubectl:
     name: "Build :: Kubectl"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: Checkout_sources
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 #     # This item has no matching transformer
 #     - container:
 #         isLiteral: true

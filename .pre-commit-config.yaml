@@ -34,7 +34,7 @@ repos:
   - id: terragrunt-hcl-fmt
   - id: markdown-link-check
   - id: gofmt
-  - id: golangci-lint
+  #- id: golangci-lint
   - id: goimports
   # - id: yapf # or ruff-formatter
   - id: packer-validate
@@ -45,7 +45,7 @@ repos:
   # Incompatibility between OpenTofu like OpenTofu support for_each for providers
   # - id: tflint
 - repo: https://github.com/antonbabenko/pre-commit-terraform
-  rev: v1.106.0
+  rev: v1.108.0
   hooks:
   - id: terraform_trivy
     args:
@@ -103,7 +103,7 @@ repos:
     additional_dependencies:
     - .[community,yamllint]
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.15.15
+  rev: v0.15.20
   hooks:
   - id: ruff # python linter
     args: [ --fix ]

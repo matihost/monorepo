@@ -6,7 +6,7 @@ name: CD
 run-name: >-
   ${{ github.workflow }} :: ${{ inputs.env || 'dev' }} :: ${{ inputs.mode || 'plan' }} :: ${{ inputs.module || 'aws/aws-site'}} :: ${{ github.ref_name }}
   ${{ github.event.workflow_run.head_commit.message && format(' :: {0}', github.event.workflow_run.head_commit.message) || github.event.head_commit.message && format(' :: {0}', github.event.head_commit.message) || ''}}
-  ${{ inputs.runner && inputs.runner != 'ubuntu-24.04' && format(' on {0}', inputs.runner) || '' }}
+  ${{ inputs.runner && inputs.runner != 'ubuntu-26.04' && format(' on {0}', inputs.runner) || '' }}
 
 on:
   # TODO disable until new module is confirming to work
@@ -21,10 +21,10 @@ on:
       runner:
         description: 'Runner type'
         required: true
-        default: 'ubuntu-24.04'
+        default: 'ubuntu-26.04'
         type: choice
         options:
-        - ubuntu-24.04
+        - ubuntu-26.04
         - matihost
       env:
         description: 'Target environment'
@@ -57,7 +57,7 @@ jobs:
   sources:
     name: Checkout
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
     timeout-minutes: 5
     container:
       image: quay.io/matihost/cd
@@ -65,7 +65,7 @@ jobs:
       GIT_COMMIT_HASH: ${{ steps.git_hash.outputs.GIT_COMMIT_HASH }}
     steps:
     - name: Checkout sources
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
     # Workaround for https://github.com/actions/runner/issues/2033
@@ -92,13 +92,13 @@ jobs:
     name: "AWS :: ${{ inputs.env || 'dev' }} :: ${{ inputs.mode || 'plan' }} :: ${{ inputs.module || 'aws/aws-site'}}"
     needs: sources
     environment: ${{ inputs.env || 'dev' }}
-    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
     timeout-minutes: 30
     container:
       image: quay.io/matihost/cd
     steps:
     - name: Download sources
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ github.workspace }}
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}

@@ -12,7 +12,7 @@ type HttpHandler struct {
 }
 
 func (v *HttpHandler) Welcome(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, v.DefaultAnswer)
+	fmt.Fprintf(w, "%s", v.DefaultAnswer)
 }
 
 func (v *HttpHandler) Headers(w http.ResponseWriter, req *http.Request) {

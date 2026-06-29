@@ -7,7 +7,7 @@ authors = [
 ]
 license = {text = "MIT"}
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
 ]
 packages = [{ include = "learning" }]
@@ -15,9 +15,9 @@ packages = [{ include = "learning" }]
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.6.9"
-mypy = "^1.17.1"
-pytest = "^8.4.1"
-debugpy = "^1.8.16"
+mypy = "^1.20.2"
+pytest = "^8.4.2"
+debugpy = "^1.8.21"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

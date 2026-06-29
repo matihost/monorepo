@@ -1,8 +1,9 @@
 package language
 
 import (
-	lang "github.com/matihost/monorepo/go/learning/internal/language"
 	"strings"
+
+	lang "github.com/matihost/monorepo/go/learning/internal/language"
 )
 
 // A map maps keys to values.
@@ -57,11 +58,7 @@ func wordCount(s string) map[string]int {
 	r := make(map[string]int)
 
 	for _, v := range strings.Fields(s) {
-		if _, ok := r[v]; ok {
-			r[v]++
-		} else {
-			r[v] = 1
-		}
+		r[v]++
 	}
 	return r
 }

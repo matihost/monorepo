@@ -4,7 +4,7 @@ Various script to manage Minikube with "none" mode on Ubuntu.
 
 Tested environment:
 
-* Ubuntu 24.04.1 LTS
+* Ubuntu 2.04 LTS
 
 * CNI: Cilium v1.14.3
 

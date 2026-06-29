@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-26.04
 
 USER root
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \

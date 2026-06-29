@@ -41,7 +41,7 @@ source "amazon-ebs" "main" {
   region        = "${var.region}"
   source_ami_filter {
     filters = {
-      name                = "ubuntu/images/hvm-ssd-*/ubuntu-noble-24.04-*-server-*"
+      name                = "ubuntu/images/hvm-ssd-*/ubuntu-resolute-26.04-*-server-*"
       root-device-type    = "ebs"
       virtualization-type = "hvm"
       architecture        = var.ec2_architecture

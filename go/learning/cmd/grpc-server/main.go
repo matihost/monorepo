@@ -18,7 +18,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type greeterServer struct{
+type greeterServer struct {
 	// Embed the unimplemented server
 	pb.UnimplementedGreeterServer
 }
@@ -36,9 +36,9 @@ func (s *greeterServer) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.
 	return &pb.HelloReply{Message: "Hello " + in.Name}, nil
 }
 
-
-
-type healthServer struct{}
+type healthServer struct {
+	healthpb.UnimplementedHealthServer
+}
 
 // Check is used for health checks
 func (s *healthServer) Check(ctx context.Context, in *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
