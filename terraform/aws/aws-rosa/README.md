@@ -32,12 +32,6 @@ curl -s https://api.github.com/repos/okd-project/okd/releases/latest | jq -r ".a
 xargs curl -sSL | tar -zx -o oc && sudo mv oc /usr/local/bin
 ```
 
-- ROSA CLI logged to RedHat:
-It will prompt you to open a web browser and go to: [https://console.redhat.com/openshift/token/rosa](https://console.redhat.com/openshift/token/rosa), login and click on the "Load token" button to get the token and copy & paste it to cli invocation:
-
-```bash
-rosa login
-```
 
 - Logged to AWS Account and ensure Default Region is set.
 
@@ -57,6 +51,12 @@ export AWS_DEFAULT_REGION=us-east-1
 export AWS_ACCESS_KEY_ID=....
 export AWS_SECRET_ACCESS_KEY=....
 export AWS_SESSION_TOKEN=....
+```
+
+- ROSA CLI logged to RedHat:
+
+```bash
+rosa login --use-auth-code
 ```
 
 - Ensure ROSA verification passes:
@@ -81,6 +81,17 @@ operation identifier is '24fc9a21-708d-4dd4-a911-878ea16b6ccc': billing
 account 666666666666 not linked to organization dummydummydummy
 at the aws marketplace
 ```
+
+- Obtain RedHat ROSA token from [https://console.redhat.com/openshift/token/rosa](https://console.redhat.com/openshift/token/rosa) and
+
+```bash
+# export it as environment variable
+export RHCS_TOKEN=...
+
+# reauthenticate ROSA CLI with this token
+rosa login --token="${RHCS_TOKEN}"
+```
+
 
 ## Usage
 
@@ -124,7 +135,7 @@ make ensure-proxy-tunnel-open
 
 ```
 
-Configure your Web browser setting to use [http://localhost:8888](http://localhost:8888) proxy for ROSA/OpenShift endpoints
+Configure your Web browser setting to use `http://localhost:8888` proxy for ROSA/OpenShift endpoints
 In case of Google Chrome you may install -Proxy Switcher- extension and apply PAC script on it:
 
 ```txt
@@ -134,7 +145,7 @@ function FindProxyForURL(url, host) {
     return "PROXY localhost:8888";
   }
 
-  # other 10.0.0.0/16 endpoints as well (should match your VPC)
+  // other 10.0.0.0/16 endpoints as well (should match your VPC)
   if (isInNet(host, "10.0.0.0", "255.255.0.0")) {
     return "PROXY localhost:8888";
   }

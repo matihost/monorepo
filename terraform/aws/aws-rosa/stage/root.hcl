@@ -1,7 +1,7 @@
 locals {
-  bucket                 = "${local.account}-terraform-state"
-  account                = "${run_cmd("--terragrunt-quiet", "aws", "sts", "get-caller-identity", "--query", "\"Account\"", "--output", "text")}"
-  cluster_admin_password = get_env("CLUSTER_ADMIN_PASS", "")
+  bucket     = "${local.account}-terraform-state"
+  account    = "${run_cmd("--terragrunt-quiet", "aws", "sts", "get-caller-identity", "--query", "\"Account\"", "--output", "text")}"
+  rhcs_token = get_env("RHCS_TOKEN")
 }
 
 remote_state {
@@ -36,9 +36,9 @@ provider "aws" {
   }
 }
 
-# ensure RHCS_TOKEN env variable is set
-# for example via: export RHCS_TOKEN="$(rosa token)"
-provider "rhcs" {}
+provider "rhcs" {
+  token = "${local.rhcs_token}"
+}
 EOF
 }
 
@@ -53,6 +53,5 @@ terraform {
 }
 
 inputs = {
-  account                = local.account
-  cluster_admin_password = local.cluster_admin_password
+  account = local.account
 }

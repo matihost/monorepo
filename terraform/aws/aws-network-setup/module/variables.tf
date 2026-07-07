@@ -74,12 +74,6 @@ variable "partition" {
   default     = "aws"
 }
 
-# tflint-ignore: terraform_unused_declarations
-variable "aws_tags" {
-  type        = map(string)
-  description = "AWS tags"
-  default     = {}
-}
 
 # tflint-ignore: terraform_unused_declarations
 variable "region" {

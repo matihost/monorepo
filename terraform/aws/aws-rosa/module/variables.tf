@@ -48,8 +48,8 @@ variable "zones" {
 
 variable "openshift_version" {
   type        = string
-  default     = "4.17.4"
-  description = "Version of OpenShift, rosa list versions for versions"
+  default     = "4.21.22"
+  description = "Version of OpenShift, `rosa list versions --channel-group stable |head` for versions"
   validation {
     condition     = can(regex("^[0-9]*[0-9]+.[0-9]*[0-9]+.[0-9]*[0-9]+$", var.openshift_version))
     error_message = "openshift_version must be with structure <major>.<minor>.<patch> (for example 4.17.3)."
@@ -59,11 +59,11 @@ variable "openshift_version" {
 
 variable "max_upgrade_version" {
   type        = string
-  default     = "4.17"
-  description = "Indicates acknowledgement of agreements required to upgrade the cluster version between minor versions (e.g. a value of \"4.16\" indicates acknowledgement of any agreements required to upgrade to OpenShift 4.16.z from 4.15 or before)."
+  default     = "4.22"
+  description = "Indicates acknowledgement of agreements required to upgrade the cluster version between minor versions (e.g. a value of \"4.22\" indicates acknowledgement of any agreements required to upgrade to OpenShift 4.22.z from 4.21 or before)."
   validation {
     condition     = can(regex("^[0-9]*[0-9]+.[0-9]*[0-9]+$", var.max_upgrade_version))
-    error_message = "openshift_version must be with structure <major>.<minor> (for example 4.17)."
+    error_message = "max_upgrade_version must be with structure <major>.<minor> (for example 4.22)."
   }
 }
 
@@ -86,7 +86,7 @@ variable "replicas_per_zone" {
 variable "machine_instance_type" {
   type        = string
   description = "Identifies the Instance type used by the default worker machine pool e.g. `m5.xlarge`"
-  default     = "m5.xlarge"
+  default     = "m5.xlarge" # m5.xlarge is minimum size for ROSA
 }
 
 

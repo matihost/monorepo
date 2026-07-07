@@ -17,3 +17,8 @@ output "cluster_current_version" {
   value       = rhcs_cluster_rosa_hcp.rosa_hcp_cluster.current_version
   description = "The currently running version of OpenShift on the cluster."
 }
+
+output "cluster_name" {
+  value       = rhcs_cluster_rosa_hcp.rosa_hcp_cluster.name
+  description = "The name of the cluster."
+}

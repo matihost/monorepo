@@ -1,8 +1,6 @@
 SHELL := /usr/bin/env bash
 .EXPORT_ALL_VARIABLES:
 
-RHCS_TOKEN := $(shell rosa token --refresh)
-
 DEBUG := false
 ifeq ($(strip $(DEBUG)),true)
 	TF_LOG := DEBUG
@@ -25,13 +23,13 @@ init:
 	cd stage/$(ENV) && terragrunt init -upgrade=true --backend-bootstrap --non-interactive
 
 
-run: init ## setup ROSA : make run [ENV=dev] [MODE=apply]
+run: init ## setup ROSA : make run PASS=cluster-admin-password [ENV=dev] [MODE=apply]
 ifndef PASS
 	$(error Env PASS is not defined. Cluster-admin break glass password is needed.)
 endif
 	cd stage/$(ENV) && { export CLUSTER_ADMIN_PASS=$(PASS);  terragrunt validate && terragrunt --non-interactive $(MODE_STR) $(TG_FLAGS); }
 
-destroy: # destroy cluster, usage: make destroy CLUSTER_NAME=dev-us-east-1 [ENV=dev]
+destroy: ## destroy cluster, usage: make destroy CLUSTER_NAME=dev-us-east-1 [ENV=dev]
 ifndef CLUSTER_NAME
 	$(error Env CLUSTER_NAME is not defined. Cluster name is required along with DEV variable)
 endif
@@ -51,7 +49,7 @@ clean: ## clean cached plugins and data
 
 upgrade-providers-version: init
 
-prerequisites:
+prerequisites: ## check prerequisites for ROSA cluster creation
 	@rosa verify rosa && \
 		rosa verify openshift && \
 		rosa whoami && \

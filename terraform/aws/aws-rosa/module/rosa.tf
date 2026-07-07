@@ -108,6 +108,10 @@ resource "rhcs_cluster_rosa_hcp" "rosa_hcp_cluster" {
   disable_waiting_in_destroy          = false
   destroy_timeout                     = 60 # minutes
 
+  # setting to tru disables at the same time internal OCP OAuth server
+  # so break glass cluster-admin user is not created and other break class method has to be used
+  # https://cloud.redhat.com/experts/rosa/entra-external-auth/
+  external_auth_providers_enabled = false
 
   depends_on = [
     aws_iam_role.account_role,
