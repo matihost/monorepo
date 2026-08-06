@@ -6,6 +6,8 @@
   - name: Ensure ~/bin is present
     become: false
     ansible.builtin.file:
+      # Note: Using lookup('env', 'HOME') instead of ansible_facts.env.HOME or ansible_facts.user_dir
+      # because facts are gathered with become: true and the user is root
       path: "{{ lookup('env', 'HOME') }}/bin"
       mode: "0775"
       state: directory
@@ -71,8 +73,14 @@
         executable: /bin/bash
       ignore_errors: true
       loop: "{{ clis | selectattr('become', 'equalto', false) | list }}"
+    - name: Ensure user files config is desired
+      ansible.builtin.include_role:
+        name: file_config
+      vars:
+        file_config: "{{ item | combine({ 'file': ( item.file if item.file.startswith('/') else lookup('env', 'HOME') ~ '/' ~ item.file ) }) }}"
+      loop: "{{ user_files_config | default([]) }}"
 
-  - name: Ensure files config is desired
+  - name: Ensure system files config is desired
     ansible.builtin.include_role:
       name: file_config
     vars:

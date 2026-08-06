@@ -21,9 +21,9 @@ all:
           # https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos#DebianUbuntu:UsingOpenVPNaptrepositories
           openvpn_repo_ubuntu_version: "questing"
           # List of supported Ubuntu versions: https://www.hashicorp.com/official-packaging-guide?product_intent=terraform
-          terraform_ubuntu_version: "questing"
+          terraform_ubuntu_version: "resolute"
           virtualbox_ubuntu_version: "resolute"
-          # TODO change to {{ ansible_facts.distribution_release }} when current is supported Ubuntu LTS
+          # List of supported versions: https://github.com/Mirantis/cri-dockerd/releases/latest
           cri_dockerd_ubuntu_version: "jammy"
           # MQ Version available at: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/
           mq: 9.4.5.1
@@ -58,7 +58,6 @@ all:
           foxundermoon.shell-format
           garytyler.darcula-pycharm
           george-alisson.html-preview-vscode
-          github.copilot-chat
           github.vscode-github-actions
           github.vscode-pull-request-github
           golang.go
@@ -180,7 +179,7 @@ all:
         - net-tools
         - sshuttle
         - apache2-utils # for htpasswd
-        - neofetch
+        - fastfetch
         - mc
         - autofs
         - bind9
@@ -797,7 +796,7 @@ all:
             INSTALLED_VERSION="$(tofu version 2>/dev/null |grep OpenTofu | sed "s/OpenTofu //g")"
             [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
               curl -sL https://api.github.com/repos/opentofu/opentofu/releases/latest | jq -r ".assets[] |
-                select(.name | test(\"amd64.deb\")) | .browser_download_url" |
+                select(.name | test(\"amd64.deb$\")) | .browser_download_url" |
                   xargs curl -s -L -o "/tmp/tofu.deb"
               apt -y install /tmp/tofu.deb
             }
@@ -1030,6 +1029,22 @@ all:
                 npm i ${GLOBAL_PACKAGES} -g
               }
             }
+        - name: ssh_dir
+          desc: Ensures that ~/.ssh directory exists and has correct permissions
+          become: false
+          command: |
+            [ -d ~/.ssh ] || {
+              mkdir -p ~/.ssh
+              chmod 700 ~/.ssh
+            }
+        user_files_config:
+        - file: .ssh/config
+          mode: 600
+          content: |
+            Host *
+              ServerAliveInterval 60
+              ServerAliveCountMax 3
+              LogLevel ERROR
         files_config:
         - file: /etc/gai.conf
           content: |

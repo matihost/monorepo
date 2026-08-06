@@ -26,9 +26,9 @@ all:
           # https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos#DebianUbuntu:UsingOpenVPNaptrepositories
           openvpn_repo_ubuntu_version: "questing"
           # List of supported Ubuntu versions: https://www.hashicorp.com/official-packaging-guide?product_intent=terraform
-          terraform_ubuntu_version: "questing"
+          terraform_ubuntu_version: "resolute"
           virtualbox_ubuntu_version: "resolute"
-          # TODO change to {{ ansible_facts.distribution_release }} when current is supported Ubuntu LTS
+          # List of supported versions: https://github.com/Mirantis/cri-dockerd/releases/latest
           cri_dockerd_ubuntu_version: "jammy"
           # MQ Version available at: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/
           mq: 9.4.5.1
@@ -766,6 +766,21 @@ all:
               sudo tar xzvfC cilium-linux-amd64.tar.gz /usr/local/bin
               rm cilium-linux-amd64.tar.gz{,.sha256sum}
             }
+        - name: velero
+          become: false
+          desc: Ensure latest version of Velero CLI is installed.
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/vmware-tanzu/velero/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(velero version 2>/dev/null| grep Version | sed -E "s/.*Version: (.*)/\1/g")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/vmware-tanzu/velero/releases/latest  | jq -r ".assets[] |
+                select(.name | test(\"velero-.*-linux-amd64.tar.gz$\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/velero.tar.gz"
+              cd /tmp && tar -xzf /tmp/velero.tar.gz
+              sudo mv /tmp/velero*/velero /usr/local/bin/
+              rm -rf /tmp/velero*
+              echo "Velero ${CURRENT_VERSION} has been installed"
+            }
         - name: code-plugins
           become: false
           command: |
@@ -1421,21 +1436,6 @@ all:
                   xargs curl -s -L -o "/tmp/mongodb-mongosh.deb"
               apt --allow-downgrades -y install /tmp/mongodb-mongosh.deb
             }
-        - name: velero
-          become: false
-          desc: Ensure latest version of Velero CLI is installed.
-          command: |
-            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/vmware-tanzu/velero/releases/latest | jq -r ".tag_name")"
-            INSTALLED_VERSION="$(velero version 2>/dev/null| grep Version | sed -E "s/.*Version: (.*)/\1/g")"
-            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
-              curl -sL https://api.github.com/repos/vmware-tanzu/velero/releases/latest  | jq -r ".assets[] |
-                select(.name | test(\"velero-.*-linux-amd64.tar.gz$\")) | .browser_download_url" |
-                  xargs curl -s -L -o "/tmp/velero.tar.gz"
-              cd /tmp && tar -xzf /tmp/velero.tar.gz
-              sudo mv /tmp/velero*/velero /usr/local/bin/
-              rm -rf /tmp/velero*
-              echo "Velero ${CURRENT_VERSION} has been installed"
-            }
         - name: poetry
           desc: Dependency management for Python
           become: false
@@ -1467,6 +1467,22 @@ all:
               bash -ic "nvm use --lts >/dev/null 2>&1 && eval \"$(nvm use --lts >/dev/null 2>&1 && ncu -g 2>/dev/null| grep 'npm -g install')\""
               npm i ${GLOBAL_PACKAGES} -g
             }
+        - name: ssh_dir
+          desc: Ensures that ~/.ssh directory exists and has correct permissions
+          become: false
+          command: |
+            [ -d ~/.ssh ] || {
+              mkdir -p ~/.ssh
+              chmod 700 ~/.ssh
+            }
+        user_files_config:
+        - file: ".ssh/config"
+          mode: "600"
+          content: |
+            Host *
+              ServerAliveInterval 60
+              ServerAliveCountMax 3
+              LogLevel ERROR
         files_config:
         - file: /etc/gai.conf
           content: |

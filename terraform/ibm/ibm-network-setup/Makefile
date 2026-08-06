@@ -45,7 +45,7 @@ ssh-vm: ## ssh to VM, usage: make ssh-vm IP=....
 ifndef IP
 	$(error Env IP is not defined. Usage make ssh-vm IP=...
 endif
-	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.ibm.vm ubuntu@$(IP)
+	ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.ibm.vm ubuntu@$(IP)
 
 expose_bastion_proxy_locally: ## expose bastion's HTTP proxy locally
 	@[ "$(shell sudo ss -antl |grep -c 8888)" -ne 0 ] || eval "$(shell cd stage/$(ENV) && terragrunt output expose_bastion_proxy_locally)"

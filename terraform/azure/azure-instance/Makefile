@@ -59,11 +59,11 @@ expose-jump-box-ssh-locally:
 
 
 expose-proxy-via-ssh-locally: expose-jump-box-ssh-locally ## expose TinyProxy locally to access resource inside VNet - uses ssh tunneling (done via az tunnel), needs 2 ports, but more resilient
-	@[ "$(shell sudo ss -antl |grep -c 8888)" -ne 0 ] || ssh -o StrictHostKeyChecking=accept-new -f -N -i ~/.ssh/id_rsa.cloud.vm ubuntu@127.0.0.1 -p 2022 -L 8888:127.0.0.1:8888
+	@[ "$(shell sudo ss -antl |grep -c 8888)" -ne 0 ] || ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=accept-new -f -N -i ~/.ssh/id_rsa.cloud.vm ubuntu@127.0.0.1 -p 2022 -L 8888:127.0.0.1:8888
 
 
 sshuttle: expose-jump-box-ssh-locally ## create sshuttle VPN via instance to the network where instance is located
-	sshuttle --dns -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa.cloud.vm" -NHr   "ubuntu@localhost:2022" 10.0.0.0/8
+	sshuttle --dns -e "ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa.cloud.vm" -NHr   "ubuntu@localhost:2022" 10.0.0.0/8
 
 test: ## test connectivity via proxy to vm ngnix
 	export http_proxy=http://localhost:8888 && export https_proxy=http://localhost:8888 && curl http://dev-weu-vm

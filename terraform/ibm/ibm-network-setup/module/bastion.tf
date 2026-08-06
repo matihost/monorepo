@@ -56,7 +56,7 @@ resource "ibm_is_floating_ip" "bastion" {
 
 output "bastion_ssh" {
   description = "Connect to bastion to be able to connect to other private only servers"
-  value       = format("ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.ibm.vm ubuntu@%s", ibm_is_floating_ip.bastion.address)
+  value       = format("ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.ibm.vm ubuntu@%s", ibm_is_floating_ip.bastion.address)
 }
 
 output "bastion_id" {
@@ -69,5 +69,5 @@ output "bastion_ip" {
 
 output "expose_bastion_proxy_locally" {
   description = "Exposes proxy on localhost:8888 which can be used to connect to private only servers, sample: HTTP_PROXY=localhost:8888 curl http://private_server"
-  value       = format("ssh -o StrictHostKeyChecking=accept-new -f -N -i ~/.ssh/id_rsa.ibm.vm ubuntu@%s -L 8888:127.0.0.1:8888", ibm_is_floating_ip.bastion.address)
+  value       = format("ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=accept-new -f -N -i ~/.ssh/id_rsa.ibm.vm ubuntu@%s -L 8888:127.0.0.1:8888", ibm_is_floating_ip.bastion.address)
 }

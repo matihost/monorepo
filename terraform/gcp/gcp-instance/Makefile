@@ -25,10 +25,10 @@ run: init-terraform prepare ## setup free-tier eliglible Ubuntu instance, make r
 	cd stage/instance && terragrunt validate && terragrunt $(MODE_STR) --non-interactive $(TG_FLAGS)
 
 ssh: ## ssh to VM instance using ssh client via ssh key added to OS login
-	PUBLIC_IP="$$(cd stage/instance && terragrunt output -raw public_ip)" && ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=accept-new $(CURRENT_ACCOUNT_SSH_USER)@$${PUBLIC_IP}
+	PUBLIC_IP="$$(cd stage/instance && terragrunt output -raw public_ip)" && ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=accept-new $(CURRENT_ACCOUNT_SSH_USER)@$${PUBLIC_IP}
 
 check-startup: ## check VM startup script logs
-	PUBLIC_IP="$$(cd stage/instance && terragrunt output -raw public_ip)" && ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=accept-new $(CURRENT_ACCOUNT_SSH_USER)@$${PUBLIC_IP} sudo journalctl -u google-startup-scripts.service
+	PUBLIC_IP="$$(cd stage/instance && terragrunt output -raw public_ip)" && ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=accept-new $(CURRENT_ACCOUNT_SSH_USER)@$${PUBLIC_IP} sudo journalctl -u google-startup-scripts.service
 
 gssh: ## ssh to VM instance using gcloud
 	@VM_NAME="$$(cd stage/instance && terragrunt output -raw instance_name)" && gcloud compute ssh "$${VM_NAME}"

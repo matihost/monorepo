@@ -40,7 +40,7 @@ ssh: ## ssh to OpenVPN instance via IAP
 	gcloud compute ssh "$(shell cd stage/$(ENV) && terragrunt output -raw vpn-vm-name 2>/dev/null)" --tunnel-through-iap --zone="$(shell cd stage/$(ENV) && terragrunt output -raw vpn-vm-zone 2>/dev/null)"
 
 ssh-over-public-ip: ## ssh to OpenVPN instance via External IP (requires - explicit opening ssh port on VPN firewall)
-	ssh -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=no ubuntu@$(shell cd stage/$(ENV) && terragrunt output -raw vpn_gateway_external_ip 2>/dev/null)
+	ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -i ~/.ssh/id_rsa.cloud.vm -o StrictHostKeyChecking=no ubuntu@$(shell cd stage/$(ENV) && terragrunt output -raw vpn_gateway_external_ip 2>/dev/null)
 
 check-vpn-service-status: ## check Systemd openvpn-server@server.service status on OpenVPN instance
 	gcloud compute ssh "$(shell cd stage/$(ENV) && terragrunt output -raw vpn-vm-name 2>/dev/null)" --tunnel-through-iap --zone="$(shell cd stage/$(ENV) && terragrunt output -raw vpn-vm-zone 2>/dev/null)" -- sudo systemctl status openvpn-server@server.service

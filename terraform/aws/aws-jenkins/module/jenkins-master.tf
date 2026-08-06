@@ -198,7 +198,7 @@ resource "aws_autoscaling_group" "jenkins" {
 
 # output "ec2_ssh" {
 #   description = "Connect to bastion to be able to connect to other private only servers"
-#   value       = format("ssh -i ~/.ssh/id_rsa.aws.vm ubuntu@%s", data.aws_instances.jenkins.public_ips[0])
+#   value       = format("ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@%s", data.aws_instances.jenkins.public_ips[0])
 # }
 
 # output "ec2_user_data" {

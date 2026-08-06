@@ -17,7 +17,7 @@ ssh: ## ssh to VM
 	vagrant ssh
 
 direct-ssh: ## ssh to VM directly via ssh command
-	ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa.vagrant.vm vagrant@172.30.250.3
+	ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa.vagrant.vm vagrant@172.30.250.3
 
 direct-run: ## run VM directly from VirtualBox
 	VBoxManage startvm centos-stream-9 --type headless

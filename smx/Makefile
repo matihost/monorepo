@@ -6,7 +6,7 @@ status: ensure-java8-in-use ## check whether ServiceMix is run
 	./apache-servicemix-7.0.1/bin/status
 
 connect: ## connect to ServiceMix shell, user: smx/smx
-	@ssh -p 8101 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null smx@localhost
+	@ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -p 8101 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null smx@localhost
 
 stop: ensure-java8-in-use ## stop ServiceMix in backgroud
 	./apache-servicemix-7.0.1/bin/stop

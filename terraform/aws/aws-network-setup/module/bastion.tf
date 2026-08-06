@@ -138,10 +138,10 @@ output "bastion_dns" {
 
 output "expose_bastion_proxy_locally" {
   description = "Exposes proxy on localhost:8888 which can be used to connect to private only servers, sample: HTTP_PROXY=localhost:8888 curl http://private_server"
-  value       = format("ssh -o StrictHostKeyChecking=accept-new -f -N -i ~/.ssh/id_rsa.aws.vm ubuntu@%s -L 8888:127.0.0.1:8888", aws_instance.bastion_vm.public_dns)
+  value       = format("ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=accept-new -f -N -i ~/.ssh/id_rsa.aws.vm ubuntu@%s -L 8888:127.0.0.1:8888", aws_instance.bastion_vm.public_dns)
 }
 
 output "bastion_ssh" {
   description = "Connect to bastion to be able to connect to other private only servers"
-  value       = format("ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@%s", aws_instance.bastion_vm.public_dns)
+  value       = format("ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@%s", aws_instance.bastion_vm.public_dns)
 }

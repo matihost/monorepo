@@ -42,7 +42,7 @@ ssh: ## ssh to EC2 instance
 ifndef INSTANCE
 	$(error Env INSTANCE is not defined. Usage make ssh ENV=dev INSTANCE=ubuntu)
 endif
-	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(shell cd $(DEPLOY_PATH)/${INSTANCE} && terragrunt output ec2_dns)
+	ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(shell cd $(DEPLOY_PATH)/${INSTANCE} && terragrunt output ec2_dns)
 
 ssm-ssh: ## ssh to EC2 instance over SSM SSH
 ifndef INSTANCE
@@ -60,13 +60,13 @@ show-instance-startup-logs: # show EC2 cloud-init startup logs
 ifndef INSTANCE
 	$(error Env INSTANCE is not defined. Usage make destroy-instance ENV=dev INSTANCE=ubuntu)
 endif
-	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(shell cd $(DEPLOY_PATH)/${INSTANCE} && terragrunt output ec2_dns) cat /var/log/cloud-init-output.log
+	ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(shell cd $(DEPLOY_PATH)/${INSTANCE} && terragrunt output ec2_dns) cat /var/log/cloud-init-output.log
 
 show-instance-startup-script: # show EC2 cloud-init startup script
 ifndef INSTANCE
 	$(error Env INSTANCE is not defined. Usage make destroy-instance ENV=dev INSTANCE=ubuntu)
 endif
-	ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(shell cd $(DEPLOY_PATH)/${INSTANCE} && terragrunt output ec2_dns) sudo cat /var/lib/cloud/instance/cloud-config.txt
+	ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa.aws.vm ubuntu@$(shell cd $(DEPLOY_PATH)/${INSTANCE} && terragrunt output ec2_dns) sudo cat /var/lib/cloud/instance/cloud-config.txt
 
 
 test: ## test Nginx instance
