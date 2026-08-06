@@ -14,4 +14,9 @@ inputs = {
   locations_short  = ["westeurope", "polandcentral", "northeurope"]
   vm_sizes         = ["Standard_B1s", "Standard_B2ats_v2", "Standard_D8s_v5", "Standard_D4s_v5"]
   enforce_policies = false
+  # oidc_app = {
+  #   display_name_suffix = "oidc"
+  #   # from ARO module run: make get-aro-oidc-callback to get the callback URL for the ARO cluster
+  #   redirect_uris = ["https://.../oauth2callback/..."]
+  # }
 }

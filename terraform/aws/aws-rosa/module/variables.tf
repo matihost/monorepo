@@ -182,3 +182,22 @@ variable "autoscaler_max_nodes_per_zone" {
   default     = 3
   description = "Maximum number of nodes per machine poll (zonal)"
 }
+
+variable "openid" {
+  type = object({
+    idp_name                 = string
+    issuer_url               = string
+    client_id                = string
+    client_secret            = string
+    name_claim               = optional(string, "name")
+    email_claim              = optional(string, "email")
+    preferred_username_claim = optional(string, "preferred_username")
+    groups_claim             = optional(string, "groups")
+    extra_scopes             = optional(list(string), ["email", "profile"])
+  })
+
+  default     = null
+  sensitive   = true
+  description = "ROSA OIDC provider configuration."
+
+}

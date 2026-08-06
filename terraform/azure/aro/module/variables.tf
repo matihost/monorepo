@@ -125,7 +125,7 @@ variable "namespaces" {
     })
   }))
 
-  description = "EKS namespaces configuration"
+  description = "ARO namespaces configuration"
   default = [{
     name = "test"
     quota = {

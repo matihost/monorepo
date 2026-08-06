@@ -95,3 +95,13 @@ variable "tags" {
   description = "Azure tags"
   default     = {}
 }
+
+
+variable "oidc_app" {
+  type = object({
+    display_name_suffix = string
+    redirect_uris       = list(string)
+  })
+  default     = null
+  description = "Enterprise Application configuration for OIDC integration"
+}

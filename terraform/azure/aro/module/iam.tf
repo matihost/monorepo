@@ -16,24 +16,40 @@ resource "azuread_service_principal" "aro" {
   owners      = [data.azuread_client_config.current.object_id]
 }
 
-# resource "azuread_service_principal_password" "aro" {
-#   service_principal_id = azuread_service_principal.aro.id
-# }
-
-data "azuread_service_principal" "redhatopenshift" {
-  // This is the Azure Red Hat OpenShift RP service principal id, do NOT delete it
-  client_id = "f1dd0a37-89c6-4e07-bcd1-ffd3d43d8875"
-}
-
 resource "azurerm_role_assignment" "role_network1" {
   scope                = data.azurerm_resource_group.rg.id
   role_definition_name = "Network Contributor"
   principal_id         = azuread_service_principal.aro.object_id
 }
 
-resource "azurerm_role_assignment" "role_network2" {
-  #  "The resource provider service principal does not have Network Contributor role on nat gateway '/subscriptions/..../resourceGroups/dev/providers/Microsoft.Network/natGateways/dev-neu-natgateway'
-  scope                = data.azurerm_resource_group.rg.id
+# resource "azuread_service_principal_password" "aro" {
+#   service_principal_id = azuread_service_principal.aro.id
+# }
+
+# Need to RH Service Principal privileges to create and manage the cluster.
+# This is a special SP that is used by the RH OpenShift RP to manage the cluster on behalf of the user.
+# It is not used for anything else and should not be deleted.
+#
+# https://learn.microsoft.com/en-us/answers/questions/1687840/whats-the-purpose-and-role-of-azure-red-hat-opensh
+
+data "azuread_service_principal" "redhatopenshift" {
+  // This is the Azure Red Hat OpenShift RP service principal id, do NOT delete it
+  client_id = "f1dd0a37-89c6-4e07-bcd1-ffd3d43d8875"
+}
+
+
+resource "azurerm_role_assignment" "rh_network_contributor" {
+  scope                = data.azurerm_virtual_network.vnet.id
   role_definition_name = "Network Contributor"
   principal_id         = data.azuread_service_principal.redhatopenshift.object_id
 }
+
+resource "azurerm_role_assignment" "rh_contributor" {
+  #  "The resource provider service principal does not have Network Contributor role on nat gateway '/subscriptions/..../resourceGroups/dev/providers/Microsoft.Network/natGateways/dev-neu-natgateway'
+  scope                = data.azurerm_resource_group.rg.id
+  role_definition_name = "Contributor"
+  principal_id         = data.azuread_service_principal.redhatopenshift.object_id
+}
+
+
+## TODO add Reader to RH SP as well?

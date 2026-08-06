@@ -57,7 +57,7 @@ show-current-pull-secret: ## show current pull secret
 show-current-runtime-pull-secret: ## show current pull secret from runtime (kubelet config)
 	oc exec -n openshift-apiserver `oc get pod -n openshift-apiserver -o jsonpath="{.items[0].metadata.name}"` -- cat /var/lib/kubelet/config.json
 
-show-aro-entraid-callback: ## show ARO cluster's callback URL for Azure AD authentication (for use in Entra ID app registration)
+show-aro-oidc-callback: ## show ARO cluster's callback URL for Azure AD authentication (for use in Entra ID app registration)
 	echo "$$(az aro show -g $(CLUSTER_RG) -n $(CLUSTER_NAME) --query consoleProfile.url -o tsv | sed 's/console-openshift-console/oauth-openshift/')oauth2callback/AAD"
 
 show-state: ## show state

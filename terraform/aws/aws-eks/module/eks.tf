@@ -31,6 +31,10 @@ resource "aws_cloudwatch_log_group" "cluster" {
   )
 }
 
+data "aws_security_group" "internal" {
+  name = "${var.env}-${var.region}-internal"
+}
+
 resource "aws_eks_cluster" "cluster" {
   name = local.prefix
 
@@ -74,11 +78,11 @@ resource "aws_eks_cluster" "cluster" {
   }
 
   vpc_config {
-    # TODO make own instead,
     # By default EKS Auto creates SecurityGroup allow access only from same SG and allowing all outbound
-    # security_group_ids = ...
+    # For private clusters to allow access from within VPC (like from Bastion host) we need to add VPC SG to the list of allowed SGs
+    security_group_ids      = [data.aws_security_group.internal.id]
     endpoint_private_access = true
-    endpoint_public_access  = true
+    endpoint_public_access  = var.public_access
 
     subnet_ids = local.private_subnet_ids
   }

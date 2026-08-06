@@ -75,7 +75,7 @@ variable "zones" {
 
 variable "cluster_version" {
   type        = string
-  default     = "1.35"
+  default     = "1.36"
   description = "Version of EKS"
   validation {
     condition     = can(regex("^[0-9]*[0-9]+.[0-9]*[0-9]+$", var.cluster_version))
@@ -107,6 +107,12 @@ variable "install_efs" {
   type        = bool
   default     = true
   description = "Whether to install EFS CSI driver add-on"
+}
+
+variable "public_access" {
+  type        = bool
+  default     = true
+  description = "Whether to allow public access to the EKS API server"
 }
 
 variable "dd_api_key" {

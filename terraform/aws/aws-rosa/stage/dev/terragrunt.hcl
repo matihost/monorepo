@@ -25,4 +25,11 @@ inputs = {
   # machine_instance_type     = "c5.2xlarge" # 8 cores, 16 GiB RAM
   enable_cluster_autoscaler = true
   cluster_admin_password    = local.cluster_admin_password
+
+  # openid = {
+  #   oidc_name                = "AppName"
+  #   issuer_url               = "https://login.microsoftonline.com/...tenantId.../v2.0"
+  #   client_id                = "...."
+  #   client_secret            = get_env("OIDC_CLIENT_SECRET", "")
+  # }
 }
