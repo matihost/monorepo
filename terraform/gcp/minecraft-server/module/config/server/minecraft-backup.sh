@@ -3,6 +3,9 @@
 BUCKET=GS_BUCKET
 SERVER_NAME=MINECRAFT_SERVER_NAME
 PASS=MINECRAFT_PASS
+
+MODE="${1:-}"
+
 function block_minecraft_from_modyfying_world() {
   #  wait until all files are stored
   # TODO make waiting inotifywait
@@ -22,7 +25,11 @@ function create_backup() {
 }
 
 function send_backup_to_gs() {
-  gsutil cp -Z backup/world-backup.tar "gs://${1}/${2}/"
+  MODE_SUFFIX=""
+  if [ "${MODE}" != "" ]; then
+    MODE_SUFFIX="-${MODE}"
+  fi
+  gsutil cp -Z backup/world-backup.tar "gs://${1}/${2}/world-backup${MODE_SUFFIX}.tar"
 }
 
 function unblock_periodic_world_writes() {

@@ -10,7 +10,7 @@ include('gcp/bootstrap')
 
 left to right direction
 
-include('material-4/Hardware/Laptop')
+include('material/Hardware/Laptop')
 
 include('gcp/Item/CloudDns')
 include('gcp/Item/CloudLoadBalancing')
@@ -44,7 +44,7 @@ GroupProjectZone('project', 'GCP Project') {
 laptop --> dns
 dns --> lb
 lb --> instances
-instances <--> gs_backup : hourly
+instances <--> gs_backup : hourly & daily
 
 stop_cs --> ps : //stop// message
 start_cs --> ps : //start// message

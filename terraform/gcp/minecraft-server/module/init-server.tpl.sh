@@ -44,6 +44,7 @@ function install_minecraft_server() {
 function enable_minecraft_server_service() {
   systemctl enable --now minecraft.service
   systemctl enable --now minecraft-backup.timer
+  systemctl enable --now minecraft-backup-daily.timer
 }
 
 # Main

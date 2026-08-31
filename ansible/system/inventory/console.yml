@@ -262,7 +262,6 @@ all:
         - cloud-utils
         # snaps:
         # - mc-installer
-        # - skype
         # Uncomment to use snap packages for gcloud sdk
         # classic_snaps:
         # - google-cloud-sdk

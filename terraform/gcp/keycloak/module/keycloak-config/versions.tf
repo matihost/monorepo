@@ -2,7 +2,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 7"
+      version = "~> 8"
     }
     keycloak = {
       source  = "keycloak/keycloak"

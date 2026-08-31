@@ -1,0 +1,15 @@
+
+
+# /etc/systemd/system/minecraft-backup-daily.timer
+[Unit]
+Description=Minecraft Server Backup Runner Timer
+
+# daily at 19:30 with 5 min randomization, run on reboot in case the server was down at the scheduled time
+[Timer]
+OnCalendar=*-*-* 19:30:00
+Persistent=true
+RandomizedDelaySec=5m
+
+
+[Install]
+WantedBy=timers.target

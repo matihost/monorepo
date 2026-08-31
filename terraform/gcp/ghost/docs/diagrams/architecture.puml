@@ -1,5 +1,4 @@
 @startuml
-' configures the library
 !global $LIB_BASE_LOCATION="https://raw.githubusercontent.com/tmorin/plantuml-libs/master/distribution"
 
 ' loads the library
@@ -7,18 +6,23 @@
 
 ' loads the package bootstrap
 include('gcp/bootstrap')
-include('simpleicons-8/bootstrap')
+
+' loads the package bootstrap
+include('gcp/bootstrap')
 include('c4model/bootstrap')
-include('fontawesome-6/bootstrap')
-include('material-4/bootstrap')
+include('fontawesome/bootstrap')
+include('material/bootstrap')
+include('simpleicons/bootstrap')
 
 include('c4model/full')
-include('material-4/Hardware/Laptop')
-include('material-4/Hardware/PhoneAndroid')
+include('material/Hardware/Laptop')
+include('material/Hardware/PhoneAndroid')
 
 include('gcp/full')
-include('simpleicons-8/M/Mailgun')
-include('material-4/Alert/Warning')
+' include('simpleicons/M/Mailgun')
+include('material/Alert/Warning')
+
+include('gcp/Item/CloudRun')
 
 Title("Ghost Deployment Architecture")
 skinparam linetype ortho
@@ -42,7 +46,8 @@ cloud Internet {
         CloudFunctions('postRemovalFunction', 'Cloud Function', 'post removal function')
     }
   }
-  Mailgun('mailgun', 'Mailgun')
+  ' Mailgunfails with 404 when trying to load it
+  Laptop('mailgun', 'Mailgun')
 }
 
 laptop --> glb

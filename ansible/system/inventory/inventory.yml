@@ -302,7 +302,7 @@ all:
         - mc-installer
         - notepad-plus-plus
         - steam
-        # - skype
+        - whatsapp-linux-app
         # Uncomment to use snap packages for gcloud sdk
         # classic_snaps:
         # - google-cloud-sdk
