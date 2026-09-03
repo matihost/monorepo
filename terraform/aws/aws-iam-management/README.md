@@ -89,21 +89,15 @@ After that you can switch to _OrganizationAccountAccessRole_ from any user/role 
 
   * (Optionally) The root AWS account has to follow [this procedure](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_billing.html?icmpid=docs_iam_console#tutorial-billing-step1) to enable billing access to IAM users.
 
-## Usage
+## Configure AWS CLI profile Options
+
+### Configure AWS CLI profile for IAM user
 
 ```bash
-# list available AWS CLI profiles
-awsume -l
-
 # configure profile with credentials for user
 # after that you need to edit ~/.aws/config to provide mfa_serial for 2FA
 aws configure --profile username@accountalias
 
-# setup SSO profile via aws-sso-util
-# pip3 install --user --break-system-packages aws-sso-util
-aws-sso-util configure profile --sso-start-url "https://SSO_NAME.awsapps.com/start#/" --sso-region "eu-west-1" SSORoleName@accountalias
-# in order to awsume to SSO profile, it requires to be logged first to the profile SSO config
-aws-sso-util login --profile Admin@mati-dev
 
 # activate particular AWS CLI profile
 awsume username@accountalias
@@ -113,11 +107,46 @@ awsume Admin@accountalias
 
 # example of assuming role in child account
 awsume OrganizationAccountAccessRole@accountalias-dev
+```
+
+### Configure AWS CLI profile for SSO user (Native AWS tooling)
+
+```bash
+# setup SSO profile
+aws configure sso --profile SSORoleName@accountalias
+# in order to awsume to SSO profile, it requires to be logged first to the SSO session
+aws sso login --profile SSORoleName@accountalias
+
+# then activate SSO profike
+# you cannot use awsume to SSO profile, since it does not support SSO session
+# https://github.com/trek10inc/awsume/issues/192
+# so using AWS way to activate SSO profile via env variable
+export AWS_PROFILE=admin@sandbox
 
 # check current profile identity
 awswhoami
+aws sts get-caller-identity
+```
 
+### Configure AWS CLI profile for SSO user (via credential_process)
 
+```bash
+# setup SSO profile via aws-sso-util
+# pip3 install --user --break-system-packages aws-sso-util
+aws-sso-util configure profile --sso-start-url "https://SSO_NAME.awsapps.com/start#/" --sso-region "eu-west-1" SSORoleName@accountalias
+# in order to awsume to SSO profile, it requires to be logged first to the profile SSO config
+aws-sso-util login --profile Admin@mati-dev
+
+# activate AWS CLI profile
+awsume SSORoleName@accountalias
+```
+
+## Usage
+
+```bash
+# check current profile identity
+awswhoami
+aws sts get-caller-identity
 
 # setup IAM resources
 make run MODE=apply
@@ -178,3 +207,71 @@ In order to login to AWS:
 
 There is a way to [automatically](https://docs.aws.amazon.com/singlesignon/latest/userguide/provision-automatically.html) map user in Idp to user in AWS Identity center via SCIM protocol.However Keycloak does not support it and [SCIM Keycloak plugin](https://github.com/Captain-P-Goldfish/scim-for-keycloak) is no more open source.
 TODO check with Okta Free Trial
+
+### Configure AWS CLI profiles for Identity Center (SSO)
+
+Once the user is able to log into the AWS access portal, configure AWS CLI profiles with the wizard built into AWS CLI v2: `aws configure sso`.
+No extra tooling is required - since AWS CLI v2.9 the CLI supports shared `sso-session` sections and refreshes SSO tokens natively.
+
+* Run the wizard. It asks for the SSO session name, the AWS access portal URL (_AWS access portal URL_ from the Identity Center dashboard) and the region hosting Identity Center,
+  then opens a browser to authorize the session and finally lets you pick the AWS account and the permission set:
+
+  ```bash
+  aws configure sso --profile Admin@accountalias
+  ```
+
+  ```txt
+  SSO session name (Recommended): accountalias-sso
+  SSO start URL [None]: https://youralias.awsapps.com/start
+  SSO region [None]: us-east-1
+  SSO registration scopes [sso:account:access]:
+  # browser opens - approve the request
+  There are 2 AWS accounts available to you.
+  > accountalias (ACCOUNT_ID)
+    accountalias-dev (ANOTHER_ACCOUNT_ID)
+  Using the role name "AdministratorAccess"
+  CLI default client Region [None]: eu-west-1
+  CLI default output format [None]: json
+  ```
+
+  Keep the convention that role/permission set profiles start with a capital letter, for example `Admin@accountalias`.
+
+* The wizard appends to `~/.aws/config`. `sso_role_name` is the name of the Identity Center _permission set_, not an IAM role:
+
+  ```txt
+  [sso-session accountalias-sso]
+  sso_start_url = https://youralias.awsapps.com/start
+  sso_region = us-east-1
+  sso_registration_scopes = sso:account:access
+
+  [profile Admin@accountalias]
+  sso_session = accountalias-sso
+  sso_account_id = ACCOUNT_ID
+  sso_role_name = AdministratorAccess
+  region = eu-west-1
+  output = json
+  ```
+
+* For every additional account or permission set run `aws configure sso --profile PermissionSetName@accountalias` again and reuse the same
+  SSO session name - then a single login covers all of these profiles. The `[sso-session]` block alone can be created with `aws configure sso-session`.
+  Profiles may also be added by hand - only the four `sso_*` keys above are needed.
+
+* Log in (token is cached in `~/.aws/sso/cache/`, typically valid for 8 hours) and verify:
+
+  ```bash
+  # one login for all profiles sharing the session
+  aws sso login --sso-session accountalias-sso
+  # or per profile
+  aws sso login --profile Admin@accountalias
+
+  aws sts get-caller-identity --profile Admin@accountalias
+  awsume Admin@accountalias
+
+  # invalidate cached SSO tokens
+  aws sso logout
+  ```
+
+  `aws configure sso` logs in as a side effect, so it is only needed once per profile. Afterwards `aws sso login` is used to refresh the expired token
+  (`Error loading SSO Token: Token for ... does not exist` or `Token has expired`).
+
+* On a machine without a browser (bastion, container) use `aws sso login --no-browser` (prints the URL to open elsewhere) or `aws sso login --use-device-code`.

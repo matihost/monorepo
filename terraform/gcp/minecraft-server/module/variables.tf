@@ -74,3 +74,9 @@ variable "skip_scheduler" {
   default     = false
   description = "Whether to disable scheduler doing stopping at 10pm and starting at 10am"
 }
+
+variable "is_spot" {
+  type        = bool
+  default     = false
+  description = "Whether to use spot instance"
+}

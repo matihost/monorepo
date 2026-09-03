@@ -36,36 +36,11 @@ Running [aws-iam-management](../aws-iam-management) can be run on AWS Management
 
 * Logged to AWS Account Linked Account in AWS Organization.
 
+* AWS CLI profile configured to AWS Linked Account. How to configure AWS CLI profile is described in [aws-iam-management :: Configure AWS CLI profile Options](../aws-iam-management/README.md#configure-aws-cli-profile-options) module.
+
 ## Usage
 
 ```bash
-# list available AWS CLI profiles
-awsume -l
-
-# configure profile with credentials for user
-# after that you need to edit ~/.aws/config to provide mfa_serial for 2FA
-aws configure --profile username@accountalias
-
-# setup SSO profile via aws-sso-util
-# pip3 install --user --break-system-packages aws-sso-util
-aws-sso-util configure profile --sso-start-url "https://SSO_NAME.awsapps.com/start#/" --sso-region "eu-west-1" SSORoleName@accountalias
-# in order to awsume to SSO profile, it requires to be logged first to the profile SSO config
-aws-sso-util login --profile Admin@mati-dev
-
-# activate particular AWS CLI profile
-awsume username@accountalias
-
-# convention that role profiles are capital letter
-awsume Admin@accountalias
-
-# example of assuming role in child account
-awsume OrganizationAccountAccessRole@accountalias-dev
-
-# check current profile identity
-awswhoami
-
-
-
 # setup IAM resources
 make run MODE=apply
 ```

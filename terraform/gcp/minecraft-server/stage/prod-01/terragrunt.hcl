@@ -45,7 +45,7 @@ inputs = {
   vpc                   = "dev-vpc"
   vpc_subnet            = "dev-europe-central2-subnet"
   minecraft_server_name = "prod-01"
-  machine_type          = "e2-custom-4-8192" # vs 8cpu & 8GB "e2-highcpu-8"
+  machine_type          = "e2-custom-4-9216" # vs 8cpu & 8GB aka "e2-highcpu-8"
 
   skip_scheduler = true
 }

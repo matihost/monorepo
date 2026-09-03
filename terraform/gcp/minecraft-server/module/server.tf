@@ -20,9 +20,9 @@ resource "google_compute_instance_template" "minecraft_template" {
   # spot instance
   scheduling {
     automatic_restart           = false
-    provisioning_model          = "SPOT"
-    preemptible                 = true
-    instance_termination_action = "STOP"
+    provisioning_model          = var.is_spot ? "SPOT" : "STANDARD"
+    preemptible                 = var.is_spot
+    instance_termination_action = var.is_spot ? "STOP" : null
   }
 
   metadata = {

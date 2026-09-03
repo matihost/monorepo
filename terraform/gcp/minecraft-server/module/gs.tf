@@ -5,9 +5,10 @@ resource "random_id" "minecraft-random" {
 resource "google_storage_bucket" "minecraft-data" {
   name          = "${var.minecraft_server_name}-minecraft-server-data-${random_id.minecraft-random.hex}"
   force_destroy = true
-  # GCP free tier GS is free only with regional class in some US regions
-  location = "US-CENTRAL1"
-  # location      = var.region
+  # GCP free tier GS is free only with regional class in some US regions like US-CENTRAL1
+  # But there is a cost of transfer between regions, so prefer to use the same region as the VM instance
+  # location = "US-CENTRAL1"
+  location = var.region
 
   storage_class = "REGIONAL"
 
