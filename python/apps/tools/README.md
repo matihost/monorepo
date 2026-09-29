@@ -3,6 +3,7 @@
 Contains CLI Python made tools:
 
 * `automount-cifs` - to mount home's router NAS disk automatically (or any SAMBA/CIFS 1 endpoint)
+* `extract-stem` - to extract selected instrument tracks (stems), like guitar and vocals only, from a recording into MP3
 * `setup-opendns` - to publish periodically home's network public IP to OpenDNS
 
 ## Usage
@@ -18,6 +19,58 @@ sudo pip3 install 'git+https://github.com/matihost/monorepo.git#egg=tools&subdir
 setup-opendns -u opendns@user.com -p password Home1
 ```
 
+### Extract Stems
+
+Extracts selected instrument tracks (stems) from a video or audio recording into MP3 file.
+
+Audio is taken out of the recording losslessly, split into stems with
+[Demucs](https://github.com/adefossez/demucs) `htdemucs_6s` AI model,
+and only the requested stems are mixed into the resulting MP3, so the remaining
+instruments are silent.
+
+Defaults: `guitar` and `vocals` are extracted (so drums, bass and the rest are muted)
+and the result loudness is normalized to -14 LUFS, as extracted stems are quiet
+compared to the full mix. Use `--no-normalize` to keep original levels.
+
+Requirements:
+
+* `ffmpeg` and `ffprobe` in PATH - `sudo apt-get install -y ffmpeg`
+* on the first run Demucs with PyTorch is installed automatically into a dedicated
+  virtual env (`~/.venv/demucs` by default), which downloads several GB.
+  It is kept out of this project dependencies on purpose and reused on later runs.
+* NVIDIA GPU is used when available, otherwise CPU, which is much slower.
+  Upon CUDA out of memory error the tool retries on CPU automatically.
+
+```bash
+# guitar + vocals, normalized, written next to the input as Recording_vocals-guitar.mp3
+extract-stem ~/Downloads/Recording.mp4
+
+# single stem only, available stems: drums, bass, other, vocals, guitar, piano
+extract-stem -s guitar ~/Downloads/Recording.mp4
+
+# any combination of stems mixed into one MP3
+extract-stem -s guitar vocals piano ~/Downloads/Recording.mp4
+
+# keep original loudness instead of normalizing to -14 LUFS
+extract-stem --no-normalize ~/Downloads/Recording.mp4
+
+# custom output file and bitrate
+extract-stem -o ~/Music/solo.mp3 -b 192k ~/Downloads/Recording.mp4
+
+# better separation quality, N times slower
+extract-stem --shifts 5 ~/Downloads/Recording.mp4
+
+# save also remaining instruments (drums, bass, other, piano) as Recording_..._rest.mp3
+extract-stem --keep-rest ~/Downloads/Recording.mp4
+
+# force CPU, or lower GPU memory usage when CUDA runs out of memory
+extract-stem -d cpu ~/Downloads/Recording.mp4
+extract-stem --segment 5 ~/Downloads/Recording.mp4
+```
+
+Stem separation is not perfect - expect some bleed of other instruments and mild
+artifacts, especially when the extracted instruments overlap others in the mix.
+
 ## Develop
 
 ```bash
@@ -27,6 +80,7 @@ make init
 # run tool
 make run-automount-cifs
 make run-setup-opendns
+make run-extract-stem INPUT=~/Downloads/Recording.mp4 STEMS="guitar vocals"
 
 # run tests
 make tests
@@ -99,6 +153,8 @@ python -m site
   make debug-automount-cifs
   # or
   make debug-setup-open-dns
+  # or
+  make debug-extract-stem INPUT=~/Downloads/Recording.mp4
   ```
 
 * Select breakpoint in the code

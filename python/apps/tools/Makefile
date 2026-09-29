@@ -11,11 +11,17 @@ run-automount-cifs: ## run application ensuring all deps are in place
 run-setup-open-dns: ## run application ensuring all deps are in place
 	poetry run setup-opendns
 
+run-extract-stem: ## run extract-stem, ex. make run-extract-stem INPUT=~/Downloads/Recording.mp4 STEMS="guitar vocals"
+	poetry run extract-stem $(if $(STEMS),-s $(STEMS)) "$(INPUT)"
+
 debug-automount-cifs: ## debug automouunt-cifs from poetry
 	PYTHONPATH=src poetry run python3 -m debugpy --wait-for-client --listen 5678 -m tools.cli.automount_cifs
 
 debug-setup-open-dns: ## debug setup_opendns from poetry
 	PYTHONPATH=src poetry run python3 -m debugpy --wait-for-client --listen 5678 -m tools.cli.setup_opendns
+
+debug-extract-stem: ## debug extract_stem from poetry, ex. make debug-extract-stem INPUT=~/Downloads/Recording.mp4
+	PYTHONPATH=src poetry run python3 -m debugpy --wait-for-client --listen 5678 -m tools.cli.extract_stem "$(INPUT)"
 
 build: ## build
 	poetry build

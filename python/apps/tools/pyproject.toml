@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "tools"
 version = "0.2.0"
-description = "Project with CLI tools: setup-opendns, automount-cifs"
+description = "Project with CLI tools: setup-opendns, automount-cifs, extract-stem"
 authors = ["matihost"]
 license = "MIT"
 readme = "README.md"
@@ -14,6 +14,7 @@ markupsafe = "^3.0.3"
 
 [tool.poetry.scripts]
 automount-cifs = 'tools.cli.automount_cifs:main'
+extract-stem = 'tools.cli.extract_stem:main'
 setup-opendns = 'tools.cli.setup_opendns:main'
 
 

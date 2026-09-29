@@ -85,6 +85,7 @@ Various technology deployments, tools & code:
   * exchange-rate - example app retrieving exchange rates
   * tools
     * automount-cifs - to setup Linux automount svc with home SAMBA NFS
+    * extract-stem - to extract selected instrument tracks (ex. guitar and vocals only) from a recording into MP3
     * setup-opendns  - to setup regular update of OpenDNS with home public ip
 * [nodejs](nodejs)
   * learning/react - sample React application with OIDC authentication
