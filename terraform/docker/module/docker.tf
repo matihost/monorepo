@@ -4,7 +4,7 @@ resource "docker_image" "image" {
 }
 
 resource "docker_container" "container" {
-  image = docker_image.image.latest
+  image = docker_image.image.image_id
   name  = var.container_name
   ports {
     internal = 80

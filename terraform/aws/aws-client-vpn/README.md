@@ -4,7 +4,6 @@ Terraform scripts creating:
 
 - Client VPN endpoint in selected VPC and its private subnets.
 
-
 ## Prerequisites
 
 - Logged to AWS Account
@@ -16,6 +15,7 @@ aws configure
 - Latest Tofu/Terragrunt, OpenVPN client installed
 
 - Warning: For Linux/Ubuntu clients AppArmor policy may prevent OpenVPN client to change systemd-resolved (aka `/run/systemd/resolve/resolv.conf` content) configuration to update DNS resolver settings.
+
 See: <https://bugs.launchpad.net/ubuntu/+source/apparmor/+bug/2107596> for details.
 Workaround:
 

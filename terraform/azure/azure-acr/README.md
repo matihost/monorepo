@@ -4,7 +4,6 @@ Setup Azure Container Registry (ACR)
 
 * Azure RBAC (aka Azure EntraID) Roles to manage K8S RBAC, with EntraId group acting as cluster-admins
 
-
 ## Prerequisites
 
 * Latest Terragrunt/OpenTofu installed
@@ -28,8 +27,8 @@ Setup Azure Container Registry (ACR)
 * [../azure-entraid](../azure-entraid) - installed for the same stage environment (contains resource group and policies)
 
 * Ensure networking is setup for evn and region: [../azure-network-setup](../azure-network-setup) - installed for the same stage environment and region
-Not all regions are compatible with AKS or contains desired VM sizes:
 
+Not all regions are compatible with AKS or contains desired VM sizes:
 
 ## Usage
 

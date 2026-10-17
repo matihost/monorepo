@@ -84,7 +84,8 @@ resource "azurerm_redhat_openshift_cluster" "aro" {
 
   depends_on = [
     azurerm_role_assignment.role_network1,
-    azurerm_role_assignment.role_network2,
+    azurerm_role_assignment.rh_network_contributor,
+    azurerm_role_assignment.rh_contributor,
   ]
 
   lifecycle {

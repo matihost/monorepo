@@ -10,8 +10,12 @@ SHELL := /usr/bin/env bash
 .EXPORT_ALL_VARIABLES:
 BUILDKIT_PROGRESS=plain
 
-build: ## build all
+build: ## vet and build all
+	go vet -mod=mod ./...
 	go build -mod=mod -o .  ./...
+
+lint: ## run golangci-lint (config in .golangci.yml)
+	golangci-lint run ./...
 
 list-dependencies: ## list all modules dependencies including transient ones
 	go list -m all

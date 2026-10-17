@@ -159,7 +159,6 @@ make run MODE=apply
 * Spin Keycloak deployment available over internet. For example deploy: [../../gcp/keycloak/](../../gcp/keycloak/).
 * Create a Realm in Keycloak
 * It is recommended Realm/Login/Email as username is enabled.
-*
 * Login to AWS console with IAM user of management account capable to access AWS Identity Center (for example `Admin@accountalias` account above)
 * Go to AWS Identity Center. Optionally switch to region which should be a host region for Identity Center service (default: us-east-1)
 * Enable Identity Center. Select _Choose your identity source_ , select _External identity provider_
@@ -175,17 +174,18 @@ make run MODE=apply
 * Proceed and your basic setup is completed.
 
 * (Optionally) Change alias to _AWS access portal URL_.
+
 Idp users login to AWS not as usual IAM users. They use _AWS access portal URL_ which redirect them do Idp page. Upon successful login AWS access portal shows Accounts where use can login.
-The url looks like: <!-- markdown-link-check-disable-line -->https://b-2323443.awsapps.com/start. However the prefix can be change to more human friendly name.
+The url looks like: <!-- markdown-link-check-disable-line --><https://b-2323443.awsapps.com/start>. However the prefix can be change to more human friendly name.
 Go to AWS Identity Center dashboard, Go to setting button, Actions and change the prefix for desired one.
 
 ### Configure federated user mapping to privileges in AWS
 
 By default there is no automatic mapping for IdP user and Users on AWS side.
-For basic setup - SSO and IdP is only to authenticate user. The assumption is that the same user is present in AWS Identity Center Users tab. If you successfully log into: <!-- markdown-link-check-disable-line -->https://youralias.awsapps.com/start - but they user is not present in AWS Identity Center/Users tab - the authentication fails.
+For basic setup - SSO and IdP is only to authenticate user. The assumption is that the same user is present in AWS Identity Center Users tab. If you successfully log into: <!-- markdown-link-check-disable-line --><https://youralias.awsapps.com/start> - but they user is not present in AWS Identity Center/Users tab - the authentication fails.
 
 You need to ensure that user in Keycloak exists in AWS Identity Center/Users with the same user name [manually](https://docs.aws.amazon.com/singlesignon/latest/userguide/provision-manually.html).
-There is a way to [automatically](https://docs.aws.amazon.com/singlesignon/latest/userguide/provision-automatically.html) map user in Idp to user in AWS Identity center via SCIM protocol - however Keycloak does not support it. See [SCIM support #13484 ](https://github.com/keycloak/keycloak/issues/13484). Also [SCIM Keycloak plugin](https://github.com/Captain-P-Goldfish/scim-for-keycloak) is no more open source and [Libre SCIM](https://lab.libreho.st/libre.sh/scim/keycloak-scim) no more works with latest Keycloak
+There is a way to [automatically](https://docs.aws.amazon.com/singlesignon/latest/userguide/provision-automatically.html) map user in Idp to user in AWS Identity center via SCIM protocol - however Keycloak does not support it. See [SCIM support #13484](https://github.com/keycloak/keycloak/issues/13484). Also [SCIM Keycloak plugin](https://github.com/Captain-P-Goldfish/scim-for-keycloak) is no more open source and [Libre SCIM](https://lab.libreho.st/libre.sh/scim/keycloak-scim) no more works with latest Keycloak
 
 #### Manual mapping user in Keycloak with User in AWS Identity Center
 
@@ -201,7 +201,7 @@ In order to login to AWS:
 
 * In IAM Identity Center / AWS accounts page select AWS account and click _Assign users or groups_. Select group and choose permission sets.
 
-* Now you can login to AWS with <!-- markdown-link-check-disable-line -->https://youralias.awsapps.com/start now.
+* Now you can login to AWS with <!-- markdown-link-check-disable-line --><https://youralias.awsapps.com/start> now.
 
 #### Automatic mapping user in Keycloak with User in AWS Identity Center
 

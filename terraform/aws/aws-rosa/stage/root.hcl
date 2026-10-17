@@ -1,6 +1,7 @@
 locals {
-  bucket     = "${local.account}-terraform-state"
-  account    = "${run_cmd("--terragrunt-quiet", "aws", "sts", "get-caller-identity", "--query", "\"Account\"", "--output", "text")}"
+  bucket  = "${local.account}-terraform-state"
+  account = "${run_cmd("--terragrunt-quiet", "aws", "sts", "get-caller-identity", "--query", "\"Account\"", "--output", "text")}"
+  # to enforce that RHCS_TOKEN is set in the environment
   rhcs_token = get_env("RHCS_TOKEN")
 }
 
@@ -20,27 +21,6 @@ remote_state {
   }
 }
 
-
-generate "provider" {
-  path      = "provider.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-variable "aws_tags" {
-   type = map
-}
-
-provider "aws" {
-  region  = var.region
-  default_tags {
-    tags = var.aws_tags
-  }
-}
-
-provider "rhcs" {
-  token = "${local.rhcs_token}"
-}
-EOF
-}
 
 terraform {
   extra_arguments "common_vars" {

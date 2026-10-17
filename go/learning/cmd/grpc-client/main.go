@@ -27,15 +27,16 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"flag"
 	"log"
 	"os"
 	"strings"
 	"time"
-	"crypto/tls"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 	pb "google.golang.org/grpc/examples/helloworld/helloworld"
 	"google.golang.org/grpc/metadata"
 )
@@ -47,7 +48,7 @@ const (
 
 func main() {
 	hostname, _ := os.Hostname()
-	address := flag.String("addr", hostname + ":6565", "host:port of gRPC server")
+	address := flag.String("addr", hostname+":6565", "host:port of gRPC server")
 	cert := flag.String("cert", "/data/cert.pem", "path to TLS certificate")
 	repeat := flag.Int("repeat", 3, "number of unary gRPC requests to send")
 	secure := flag.Bool("tls", true, "connect with TLS")
@@ -58,24 +59,28 @@ func main() {
 	var conn *grpc.ClientConn
 	var err error
 	if !*secure {
-		conn, err = grpc.Dial(*address, grpc.WithInsecure())
+		conn, err = grpc.NewClient(*address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	} else if *tlsNoCheck {
 		config := &tls.Config{
 			InsecureSkipVerify: true,
 		}
-		conn, err = grpc.Dial(*address, grpc.WithTransportCredentials(credentials.NewTLS(config)))
-	}	else {
+		conn, err = grpc.NewClient(*address, grpc.WithTransportCredentials(credentials.NewTLS(config)))
+	} else {
 		tc, tcErr := credentials.NewClientTLSFromFile(*cert, "")
 		if tcErr != nil {
 			log.Fatalf("Failed to generate credentials %v", tcErr)
 		}
-		conn, err = grpc.Dial(*address, grpc.WithTransportCredentials(tc))
+		conn, err = grpc.NewClient(*address, grpc.WithTransportCredentials(tc))
 	}
 
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
-	defer conn.Close()
+	defer func() {
+		if closeErr := conn.Close(); closeErr != nil {
+			log.Printf("failed to close connection: %v", closeErr)
+		}
+	}()
 	c := pb.NewGreeterClient(conn)
 
 	// Determine name to send to server.
@@ -87,7 +92,7 @@ func main() {
 		}
 	}
 	if len(nonFlagArgs) > 1 {
-		name = nonFlagArgs[len(nonFlagArgs) -1 ]
+		name = nonFlagArgs[len(nonFlagArgs)-1]
 	}
 
 	// Contact the server and print out its response multiple times.

@@ -26,6 +26,12 @@ variable "zone" {
 }
 
 
+variable "aws_tags" {
+  type        = map(string)
+  description = "Tags applied to all AWS resources via provider default_tags and to explicitly tagged resources"
+}
+
+
 variable "region" {
   default     = "us-east-1"
   type        = string

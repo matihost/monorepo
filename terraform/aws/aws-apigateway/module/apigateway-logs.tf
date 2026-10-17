@@ -33,7 +33,7 @@ resource "aws_api_gateway_account" "apigateway" {
 #
 resource "aws_api_gateway_method_settings" "gateway_dp_settings" {
   rest_api_id = aws_api_gateway_rest_api.gateway.id
-  stage_name  = aws_api_gateway_deployment.gateway_dp.stage_name
+  stage_name  = aws_api_gateway_stage.test.stage_name
   method_path = "*/*"
   settings {
     # CloudWatch metrics and traces
@@ -54,7 +54,7 @@ resource "aws_api_gateway_method_settings" "gateway_dp_settings" {
 
 # this is manage the CloudWatch Log Group for the API Gateways
 resource "aws_cloudwatch_log_group" "api_gateway_stage_logs" {
-  name              = "API-Gateway-Execution-Logs_${aws_api_gateway_rest_api.gateway.id}/${aws_api_gateway_deployment.gateway_dp.stage_name}"
+  name              = "API-Gateway-Execution-Logs_${aws_api_gateway_rest_api.gateway.id}/${aws_api_gateway_stage.test.stage_name}"
   retention_in_days = 1
 }
 

@@ -30,30 +30,37 @@ repos:
   rev: v0.1.30
   hooks:
   - id: tofu-fmt
-  # - id: tofu-validate
+  - id: tofu-validate
+    # aws-network-setup cannot be validated standalone: its module needs aws provider with for_each (alias by_region)
+    exclude: |
+      (?x)^(
+        terraform/aws/aws-network-setup/.*|
+        .*\.terraform/.*|
+        .*\.terragrunt-cache/.*
+      )$
   - id: terragrunt-hcl-fmt
-  - id: markdown-link-check
+  - id: helmlint
   - id: gofmt
-  #- id: golangci-lint
   - id: goimports
-  # - id: yapf # or ruff-formatter
   - id: packer-validate
-  # TODO add helm lint, https://github.com/gruntwork-io/pre-commit?tab=readme-ov-file#helm-lint-caveats
-  # - id: helmlint
-  # OpenTofu is not supported by tflint
-  # https://github.com/terraform-linters/tflint/issues/2194
-  # Incompatibility between OpenTofu like OpenTofu support for_each for providers
-  # - id: tflint
+  - id: tflint
+    args:
+    - --config=__GIT_ROOT__/.tflint.hcl
+    # aws-network-setup module uses OpenTofu provider for_each, which tflint cannot parse (same limitation as for tofu-validate)
+    exclude: |
+      (?x)^(
+        terraform/aws/aws-network-setup/.*|
+        .*\.terraform/.*|
+        .*\.terragrunt-cache/.*
+      )$
 - repo: https://github.com/antonbabenko/pre-commit-terraform
-  rev: v1.109.0
+  rev: v1.109.2
   hooks:
   - id: terraform_trivy
     args:
     - --args=-s=CRITICAL
     - --args=--ignorefile=__GIT_WORKING_DIR__/.trivyignore.yaml
   - id: terraform_fmt
-  # - id: terrascan
-  # - id: tfupdate
 - repo: https://github.com/jumanjihouse/pre-commit-hooks
   rev: 3.0.0
   hooks:
@@ -63,8 +70,7 @@ repos:
         .*.(png|jpg|ico)
       )$
   - id: git-check
-  # TODO reenable when ruby3.0 is not required
-  # - id: markdownlint
+  - id: markdownlint
   - id: require-ascii
     exclude: |
       (?x)^(
@@ -79,6 +85,26 @@ repos:
     entry: yamllint --strict
 - repo: local
   hooks:
+  - id: markdown-link-check
+    name: markdown-link-check
+    description: |
+      Checks relative and absolute links in Markdown files.
+      Local hook (instead of gruntwork-io markdown-link-check) because the gruntwork one generates its own config
+      and cannot be customized.
+    entry: bash -c 'for f in "$@"; do markdown-link-check -q -c .markdown-link-check.json --projectBaseUrl "$PWD" "$f" || rc=1; done; exit ${rc:-0}' --
+    language: system
+    files: \.md$
+    exclude: vendor\/.*$
+  - id: golangci-lint
+    name: golangci-lint (go/learning)
+    description: |
+      Runs golangci-lint (config: go/learning/.golangci.yml) on the go/learning module.
+      Local hook, because go/learning is a nested module: neither gruntwork-io nor golangci-lint hooks
+      work from the repository root, which has no go.mod.
+    entry: bash -c 'cd go/learning && golangci-lint run ./...'
+    language: system
+    files: ^go/learning/.*(\.go|go\.mod|\.golangci\.yml)$
+    pass_filenames: false
   - id: ansible-lint
     name: Ansible-lint
     description: |
@@ -103,7 +129,7 @@ repos:
     additional_dependencies:
     - .[community,yamllint]
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.16.5
+  rev: v0.17.1
   hooks:
   - id: ruff # python linter
     args: [ --fix ]
@@ -112,7 +138,7 @@ repos:
   rev: v8.30.0
   hooks:
   - id: gitleaks
-# - repo: https://github.com/pocc/pre-commit-hooks
-#   rev: v1.3.5
-#   hooks:
-#   - id: cpplint
+- repo: https://github.com/cpplint/cpplint
+  rev: 2.0.2
+  hooks:
+  - id: cpplint

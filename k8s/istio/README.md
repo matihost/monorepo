@@ -102,7 +102,7 @@ make undeploy-istio-operator-from-gke
 Cloud Operations Metrics (aka StackDriver) requires that KSA uses for Istio Envoys can send metrics.
 
 It requires setup WorkflowIdentity for KSA used by Istio envoys in Istio core namespaces (istio-system, istio-ingress) and by all KSA which have injected.
-It can be done various ways,see [here](https://github.com/istio/istio/issues/22658#issuecomment-662908816) or [here](https://discuss.istio.io/t/v2-stackdriver-telemetry-and-workload-identity/6511/7)
+It can be done various ways, see [here](https://github.com/istio/istio/issues/22658#issuecomment-662908816)
 
 For GKE made in [this](../../terraform/gcp/gke) repository, there is an automation which setups Workflow Identity and Config Connector Addon: [ns-gke-setup](../../terraform/gcp/gke/addons/ns-gke-setup):
 

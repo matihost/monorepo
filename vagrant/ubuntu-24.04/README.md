@@ -17,7 +17,6 @@ Relies on bento/ubuntu-26.04 build as since Hashicorp changes licence model for 
   * 0.0.0.0/0 ::/0
   ```
 
-
 ## Usage
 
 ```bash

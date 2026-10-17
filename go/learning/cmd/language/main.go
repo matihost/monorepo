@@ -6,7 +6,7 @@
 // the package has to be
 // go get github.com/matihost/monorepo/go/learning/cmd/language
 //
-// The library specific packages has normal name (the last directory) and can imported
+// # The library specific packages has normal name (the last directory) and can imported
 //
 // For more language structure go to github.com/matihost/monorepo/go/learning/internal/language and
 // github.com/matihost/monorepo/go/learning/pkg/language
@@ -15,7 +15,7 @@ package main
 // importing other packages from standard library or other sources
 // Go implicitly imports : https://golang.org/pkg/builtin/ package with function like len, cap, make, new etc.
 import (
-	"os"
+
 	// ( ) factored statement to be used to gather more the same elements
 	// in here it is used for imports
 	"fmt"
@@ -90,12 +90,12 @@ func main() {
 	// to defererence pointer
 	fmt.Println("The time is", *now)
 
-	fmt.Fprintln(os.Stdout, "My favorite numbers are ", basic.AddTwo(rand.Intn(10), 5), basic.Add(1, 2, 3))
+	fmt.Println("My favorite numbers are ", basic.AddTwo(rand.Intn(10), 5), basic.Add(1, 2, 3))
 
 	fmt.Printf("Now you have %g problems and PI is %g and i is: %v\n", math.Sqrt(7), math.Pi, i)
 	// casting too big constant to floating value
 	c := float64(nonExportedConstant)
-	fmt.Fprintf(os.Stdout, "Big constant value type: %T and value: %v\n", c, basic.Sqrt(c))
+	fmt.Printf("Big constant value type: %T and value: %v\n", c, basic.Sqrt(c))
 
 	x, y := basic.Split(ExportedConstant)
 	fmt.Println("Swapped strings: ", a, b, "and splitted value", x, y)

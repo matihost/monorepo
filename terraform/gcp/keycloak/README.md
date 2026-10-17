@@ -109,7 +109,6 @@ If you DNS provider does not provide TXT entries or your prefer ACME HTTP verifi
 
 Keycloak installation allows ACME HTTP verification path for Let's Encrypt verification, because it exposes `.well-known/acme-challenge/`  path as static GS bucket content.
 
-
 * Get name of GS where ACME verification file needs to be placed
 
   ```bash
@@ -127,11 +126,12 @@ Keycloak installation allows ACME HTTP verification path for Let's Encrypt verif
   ```
 
 * Follow instruction on the screen.
+
 In case of HTTP mode of ACME authentication :
 
-  * You need to create a file and *place it in above GS root directory*. This is the proof that you control the site.
+* You need to create a file and *place it in above GS root directory*. This is the proof that you control the site.
 
-  * In case you've chosen TXT mode - you need to create TXT record in your DNS provider and ensure it is broadcasted globally.
+* In case you've chosen TXT mode - you need to create TXT record in your DNS provider and ensure it is broadcasted globally.
   For example via: `nslookup -type=TXT _acme-challenge.id.mydomain.com`.
 
 The make script also copies the generated certficate to `~/.tls` directory so that next Terraform invocation can access it. Let's Encrypt will generate TLS certificate for free for 3 months.

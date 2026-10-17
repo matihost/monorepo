@@ -4,7 +4,7 @@ resource "google_secret_manager_secret" "github-token-secret" {
   secret_id = "github-token-secret"
 
   replication {
-    automatic = true
+    auto {}
   }
 }
 

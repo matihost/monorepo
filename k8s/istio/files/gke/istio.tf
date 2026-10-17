@@ -84,11 +84,11 @@ resource "google_container_node_pool" "gke_internal_ingress_nodes" {
       node-role = "internal-ingress"
     }
 
-    taint = [{
+    taint {
       effect = "NO_SCHEDULE"
       key    = "ingress-type"
       value  = "internal"
-    }]
+    }
 
     # network tags - for firewall handling - as various node pool run using same gcp sa
     # use it to open firewall for NEG from LB
@@ -193,11 +193,11 @@ resource "google_container_node_pool" "gke_external_ingress_nodes" {
       node-role  = "external-ingress"
     }
 
-    taint = [{
+    taint {
       effect = "NO_SCHEDULE"
       key    = "ingress-type"
       value  = "external"
-    }]
+    }
 
     # network tags - for firewall handling - as various node pool run using same gcp sa
     # use it to open firewall for NEG from LB

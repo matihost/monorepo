@@ -45,7 +45,7 @@
     <maven.test.skip>false</maven.test.skip>
 
     <!-- Spring Boot -->
-    <spring.boot.version>4.0.6</spring.boot.version>
+    <spring.boot.version>4.1.1</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -54,20 +54,22 @@
     <!-- Latest Travis CI dist:jammmy aka Ubuntu 22.03 has only Maven 3.6.3
     https://docs.travis-ci.com/user/reference/jammy/#jvm-clojure-groovy-java-scala-support
     -->
-    <enforce.maven.version>3.6</enforce.maven.version>
+    <enforce.maven.version>3.9</enforce.maven.version>
 
     <!-- Spock -->
-    <spock.version>2.4-groovy-5.0</spock.version>
+    <spock.version>2.5-groovy-5.0</spock.version>
 
     <!-- Scala 3-->
     <scala.compat.version>3</scala.compat.version>
-    <scala.version>${scala.compat.version}.8.3</scala.version>
-    <scala.spec2.version>5.9.0</scala.spec2.version>
+    <scala.version>${scala.compat.version}.10.0</scala.version>
+    <scala.spec2.version>5.9.1</scala.spec2.version>
     <scala.test.version>3.2.20</scala.test.version>
     <scala.test.plus.version>3.2.20.0</scala.test.plus.version>
 
     <!-- IBM MQ client -->
-    <mq.version>9.4.5.1</mq.version>
+    <mq.version>10.0.1.0</mq.version>
+    <!-- MQ allclient depends on bcprov directly and via bcutil in different versions, pin it to the newer one -->
+    <bouncycastle.version>1.86</bouncycastle.version>
   </properties>
 
   <profiles>
@@ -232,7 +234,7 @@
         <plugin>
           <groupId>org.graalvm.buildtools</groupId>
           <artifactId>native-maven-plugin</artifactId>
-          <version>1.1.0</version>
+          <version>1.1.14</version>
           <extensions>true</extensions>
         </plugin>
         <plugin>
@@ -257,7 +259,7 @@
         <plugin>
           <groupId>io.github.git-commit-id</groupId>
           <artifactId>git-commit-id-maven-plugin</artifactId>
-          <version>10.0.0</version>
+          <version>10.0.1</version>
           <executions>
             <execution>
               <goals>
@@ -279,7 +281,8 @@
         <plugin>
           <groupId>org.codehaus.gmavenplus</groupId>
           <artifactId>gmavenplus-plugin</artifactId>
-          <version>4.3.1</version>
+          <!-- 5.1.0 silently compiles no Groovy classes for this project (target/classes contains only .groovy sources) -->
+          <version>5.0.0</version>
           <executions>
             <execution>
               <goals>
@@ -300,7 +303,7 @@
         <plugin>
           <groupId>net.alchim31.maven</groupId>
           <artifactId>scala-maven-plugin</artifactId>
-          <version>4.9.10</version>
+          <version>4.10.0</version>
           <executions>
             <execution>
               <goals>
@@ -339,7 +342,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
-          <version>3.6.2</version>
+          <version>3.6.3</version>
           <executions>
             <execution>
               <id>enforce-maven</id>
@@ -373,7 +376,7 @@
         <plugin>
           <groupId>org.owasp</groupId>
           <artifactId>dependency-check-maven</artifactId>
-          <version>12.2.2</version>
+          <version>13.0.0</version>
           <configuration>
             <!-- Username and API token from https://ossindex.sonatype.org/ -->
             <ossIndexUsername>${env.OSS_INDEX_USERNAME}</ossIndexUsername>
@@ -401,7 +404,7 @@
         <!-- Versions can be taken from  mvn -T1 versions:display-plugin-updates -->
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.15.0</version>
+          <version>3.16.0</version>
           <configuration>
             <!-- The -release option ensures that the code is compiled following the rules of the programming language of the specified release,
             and that generated classes target the release as well as the public API of that release.
@@ -414,7 +417,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.5.5</version>
+          <version>3.6.0</version>
           <configuration>
             <skipTests>${maven.test.skip}</skipTests>
           </configuration>
@@ -422,7 +425,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>3.5.5</version>
+          <version>3.6.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
@@ -434,15 +437,15 @@
         </plugin>
         <plugin>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>3.1.4</version>
+          <version>3.2.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
-          <version>3.1.4</version>
+          <version>3.2.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.5.0</version>
+          <version>3.5.1</version>
           <configuration>
             <archive>
               <manifest>
@@ -488,7 +491,7 @@
         <plugin>
           <groupId>com.github.spotbugs</groupId>
           <artifactId>spotbugs-maven-plugin</artifactId>
-          <version>4.9.8.3</version>
+          <version>4.10.5.0</version>
           <executions>
             <execution>
               <goals>
@@ -537,7 +540,7 @@
       <dependency>
         <groupId>org.scalatestplus</groupId>
         <artifactId>junit-4-13_${scala.compat.version}</artifactId>
-        <version>${scala.test.plus.version}}</version>
+        <version>${scala.test.plus.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -589,6 +592,11 @@
         <groupId>com.ibm.mq</groupId>
         <artifactId>com.ibm.mq.allclient</artifactId>
         <version>${mq.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk18on</artifactId>
+        <version>${bouncycastle.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

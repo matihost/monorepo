@@ -31,7 +31,9 @@ func (s *greeterServer) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.
 		log.Printf("Unable to get hostname %v", err)
 	}
 	if hostname != "" {
-		grpc.SendHeader(ctx, metadata.Pairs("hostname", hostname))
+		if err := grpc.SendHeader(ctx, metadata.Pairs("hostname", hostname)); err != nil {
+			log.Printf("Unable to send hostname header %v", err)
+		}
 	}
 	return &pb.HelloReply{Message: "Hello " + in.Name}, nil
 }
@@ -42,7 +44,7 @@ type healthServer struct {
 
 // Check is used for health checks
 func (s *healthServer) Check(ctx context.Context, in *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
-	log.Printf("Handling Check request [%v]", in, ctx)
+	log.Printf("Handling Check request [%v]", in)
 	return &healthpb.HealthCheckResponse{Status: healthpb.HealthCheckResponse_SERVING}, nil
 }
 

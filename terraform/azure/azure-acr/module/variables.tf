@@ -18,6 +18,7 @@ locals {
 
   prefix            = "${var.env}-${local.azure_region_abbreviations[var.region]}"
   subscription_name = data.azurerm_subscription.current.display_name
+  # TODO "indiasouth" is defined twice with different values (iss, isw), the last one wins; decide which is correct
   azure_region_abbreviations = {
     "eastus"             = "eus"
     "eastus2"            = "eu2"
@@ -64,8 +65,7 @@ locals {
     "indiacentral"       = "inc"
     "indiaseast"         = "ise"
     "indiasouth"         = "iss"
-    "indiasouth"         = "isw"
-    "japanwest"          = "jpw"
+    "indiasouth"         = "isw" # tflint-ignore: terraform_map_duplicate_keys
     "chinanorth"         = "chn"
     "chinaeast"          = "che"
     "chinaeast2"         = "ch2"
@@ -73,12 +73,6 @@ locals {
     "chinanorth3"        = "ch4"
     "germanycentral"     = "gmc"
     "germanynortheast"   = "gne"
-    "usgovarizona"       = "uga"
-    "usgovtexas"         = "ugt"
-    "usgovvirginia"      = "ugv"
-    "usgovpennsylvania"  = "ugp"
-    "usdodeast"          = "ude"
-    "usdodcentral"       = "udc"
     "usgovarizona"       = "uga"
     "usgovtexas"         = "ugt"
     "usgovvirginia"      = "ugv"

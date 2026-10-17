@@ -60,11 +60,17 @@ resource "aws_api_gateway_deployment" "gateway_dp" {
   ]
 
   rest_api_id = aws_api_gateway_rest_api.gateway.id
-  stage_name  = "test"
 
   lifecycle {
     create_before_destroy = true
   }
+}
+
+# stage exposing the deployment, since AWS provider 6 stage is not a part of aws_api_gateway_deployment anymore
+resource "aws_api_gateway_stage" "test" {
+  rest_api_id   = aws_api_gateway_rest_api.gateway.id
+  deployment_id = aws_api_gateway_deployment.gateway_dp.id
+  stage_name    = "test"
 }
 
 # any two AWS services have no access to one another, until access is explicitly granted
@@ -81,5 +87,5 @@ resource "aws_lambda_permission" "apigw" {
 }
 
 output "base_url" {
-  value = aws_api_gateway_deployment.gateway_dp.invoke_url
+  value = aws_api_gateway_stage.test.invoke_url
 }

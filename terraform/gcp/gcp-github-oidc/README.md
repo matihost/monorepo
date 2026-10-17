@@ -7,7 +7,7 @@ Creates:
 
 * Workload Identity Provider and Pool to allow exchanging a GitHub Actions OIDC token for a Google Cloud access token.
 
-* GCP ServiceAaccount: `gha-<owner/org>-<repo>` with Workflow Identity Federation which allows GitHub Actions workflows running on behalf of <owner/org>/<repo> repository to impersonate to this GCP Service Account.
+* GCP ServiceAaccount: `gha-<owner/org>-<repo>` with Workflow Identity Federation which allows GitHub Actions workflows running on behalf of `<owner/org>/<repo>` repository to impersonate to this GCP Service Account.
 
 * Grants also: GS reader, Artifacts reader and GKE developer roles. So that GitHub Action can use
 

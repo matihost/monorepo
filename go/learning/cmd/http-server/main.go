@@ -3,17 +3,18 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
+
 	handler "github.com/matihost/monorepo/go/learning/internal/http/handlers"
 )
 
 var (
-	host = flag.String("host", ":8080", "<host:port>")
+	host          = flag.String("host", ":8080", "<host:port>")
 	defaultAnswer = flag.String("defaultAnswer", "welcome world", "default HTTP server response")
 
 	httpHandler = handler.HttpHandler{DefaultAnswer: *defaultAnswer}
 )
-
 
 func main() {
 	flag.Parse()
@@ -24,5 +25,5 @@ func main() {
 	http.HandleFunc("/headers", httpHandler.Headers)
 	fmt.Println("Go to :8080/headers  To terminate press CTRL+C")
 	// Start server
-	http.ListenAndServe(*host, nil)
+	log.Fatal(http.ListenAndServe(*host, nil))
 }

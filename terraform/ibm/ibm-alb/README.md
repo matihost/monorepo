@@ -14,7 +14,7 @@ The following repo contains:
 
   or
 
-  - IBM Schemantics structure for deployment (see [schemantics](schemantics/README.md) directory for instructions how to deploy this repo with IBM Cloud Schemantics.
+  - IBM Schematics structure for deployment (see [schematics](schematics/README.md) directory for instructions how to deploy this repo with IBM Cloud Schematics).
 
 Warnings:
 

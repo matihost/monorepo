@@ -1,19 +1,24 @@
 clusterName: devshared1
 region: northeurope
-# tenant_id: ...
-# oidc:
-#   oidc_name: id
-#   issuer_url: "https://KEYCLOAK_SERVER/realms/REALM_NAME"
-#   client_id: "aro"
-#   client_secret: "..."
-#   username_claim: "preferred_username"
-#   groups_claim:  "groups"
+# The values below are provided during real installation (see ../configure-cluster.sh),
+# defaults are empty so that the chart can be linted (helm lint) and rendered without them.
+tenant_id: ""
+# OIDC identity provider for OpenShift OAuth, enabled only when client_secret is set
+oidc:
+  oidc_name: ""
+  issuer_url: ""
+  client_id: ""
+  client_secret: ""
+  username_claim: "preferred_username"
+  groups_claim: "groups"
 azure_monitor:
   forward_metrics: false
-  # client_id: ....
-  # client_secret: ...
-  # dcr_id: ...
-# secret:
-#   kv: aro-kv
-#   client_id: ...
-#   client_secret: ...
+  ingestion_url: ""
+  client_id: ""
+  client_secret: ""
+  dcr_id: ""
+# Azure Key Vault access for External Secrets Operator
+secret:
+  kv: ""
+  client_id: ""
+  client_secret: ""

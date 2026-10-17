@@ -19,6 +19,7 @@ Setup the following resources :
 * Logged to AWS Account. Preferable AWS linked account.
 
 * Opened S3 public access on account level. See [instructions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/configuring-block-public-access-account.html). Site is exposed via S3 bucket. AWS block public access on AWS account level, on a bucket level and on a bucket resource policy IAM level. This module opens access on the bucket and the bucket resource IAM policy level.
+
 You need to open it on the AWS account level. As it is the AWS account level config - it cannot be part of this module.
 You may run  [../aws-iam-linked](../aws-iam-linked) module - which is opinionated IAM config for typical AWS linked account.
 
@@ -77,9 +78,10 @@ HTTPs exposure requires additional steps.
 
   * You only need a domain. You don't need additional services from Domain provider. TLS certificate is taken from free Let's Encrypt provider.
 
-* Decide about subdomain for the site (for example: [www.mydomain.com](www.mydomain.com) when you own [mydomain.com](mydomain.com))
+* Decide about subdomain for the site (for example: `www.mydomain.com` when you own `mydomain.com`)
 
 * If you want to use Let's Encrypt HTTP method of verification - first follow [deployment for HTTP](#deployment-with-http-only) with  `enable_tls` being `false` (which is default) to deploy HTTP only.
+
 Ensure you have working [http://www.mydomain.com](http://www.mydomain.com) site point to S3 site url as CNAME
 This method requires - you do not have enabled RCP on S3 on the account - as it block all unathenticated access to S3.
 
@@ -105,12 +107,13 @@ make generate-letsencrypt-cert MAIN_DOMAIN=www.mydomain.com DOMAINS=www.mydomain
 Follow instructions on the screen (aka edit your DNS TXT entry).
 
 * Change `enable_tls` variable to `true` in your Terragrant config.
+
 It will create IAM certificate and create CloudFront distribution as well point to your S3 (not to S3 HTTP Website).
 Since it is CloudFront pointing to S3 - RCP preventing unauthenticated/confused deputy access can stay.
 
-    ```bash
-    make run ENV=prod MODE=apply
-    ```
+```bash
+make run ENV=prod MODE=apply
+```
 
 * Get CloudFront distribution domain:
 
@@ -135,9 +138,11 @@ Since it is CloudFront pointing to S3 - RCP preventing unauthenticated/confused 
     ```
 
 * But also **remove CNAME record from your domain name pointing to CloudFront distribution**!
+
 If you don't do and you want to recreate CloudFront distribution using same alias/CNAME - it will be rejected with [error](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/troubleshooting-distributions.html#troubleshoot-incorrectly-configured-DNS-record-error).
 
 * If you want to recreate deployment and you use `bucket_as_dns = true` - then you essenctially need to recreate S3 bucket with the same name, (see [prerequisites](#prerequisites) why). S3 buckets are globally unique and information about bucket is eventual consistent.. Translating to human language:
+
 When you remove S3 bucket and you want to create exactly the same bucket again - [you may need to wait from several minutes to several hours](https://serverfault.com/a/770488) - for AWS to let you create S3 bucket with the same name.
 
 ### Refresh TLS certificate

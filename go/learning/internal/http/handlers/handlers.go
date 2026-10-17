@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	lang "github.com/matihost/monorepo/go/learning/pkg/language"
@@ -12,12 +13,16 @@ type HttpHandler struct {
 }
 
 func (v *HttpHandler) Welcome(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "%s", v.DefaultAnswer)
+	if _, err := fmt.Fprintf(w, "%s", v.DefaultAnswer); err != nil {
+		log.Printf("failed to write response: %v", err)
+	}
 }
 
 func (v *HttpHandler) Headers(w http.ResponseWriter, req *http.Request) {
 	headers := getHeaders(req)
-	lang.WriteJSON(w, *headers)
+	if err := lang.WriteJSON(w, *headers); err != nil {
+		log.Printf("failed to write headers response: %v", err)
+	}
 }
 
 func getHeaders(r *http.Request) *map[string]string {

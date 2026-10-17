@@ -239,11 +239,28 @@ jobs:
         queries: security-extended,security-and-quality
     - name: Build Go source code
       working-directory: go/learning
-      run: go build -buildvcs=false -mod=mod -o . ./... && go test ./pkg/language && ./language
+      run: go vet -mod=mod ./... && go build -buildvcs=false -mod=mod -o . ./... && go test ./pkg/language && ./language
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:
         category: "/language:go"
+  lint-go:
+    needs: sources
+    runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
+    timeout-minutes: 15
+    container: golang:1.26
+    steps:
+    - name: Download sources
+      uses: actions/cache/restore@v6
+      with:
+        path: ${{ github.workspace }}
+        key: sources-${{ github.run_id }}-${{ github.run_attempt }}
+        fail-on-cache-miss: true
+    - name: Lint Go source code
+      uses: golangci/golangci-lint-action@v9
+      with:
+        version: v2.12.2
+        working-directory: go/learning
   codeql-python:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}

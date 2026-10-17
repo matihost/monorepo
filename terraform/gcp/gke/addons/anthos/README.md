@@ -3,7 +3,7 @@
 Register cluster in Anthos
 
 Uses
-[Google Hub Terraform Module](https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/tree/master/modules/hub)
+[Google Fleet Membership Terraform Module](https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/tree/main/modules/fleet-membership)
 to register GKE in Anthos.
 
 ## Prerequisites

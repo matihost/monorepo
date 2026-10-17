@@ -65,7 +65,7 @@ func (v Vertex) ShowVertex() {
 	// again methdos like fields of the struct - can be accessed without need of dereference
 	pv.Sum()
 	// pv is pointer ,even thou SumBare with receiver w/o pointer can be called
-	pv.SumBare()
+	fmt.Println("SumBare called via pointer:", pv.SumBare())
 	(*pv).Sum()
 
 	// it is also legal call method on variable without pointer

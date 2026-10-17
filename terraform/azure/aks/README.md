@@ -40,6 +40,7 @@ Setup Azure Kubernetes Service (AKS) along with the following addons:
 * [../azure-entraid](../azure-entraid) - installed for the same stage environment (contains resource group and policies)
 
 * Ensure networking is setup for evn and region: [../azure-network-setup](../azure-network-setup) - installed for the same stage environment and region
+
 Not all regions are compatible with AKS or contains desired VM sizes:
 
 ```bash

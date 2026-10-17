@@ -1,0 +1,30 @@
+{
+  "replacementPatterns": [
+    {
+      "pattern": "^/",
+      "replacement": "file://{{BASEURL}}/"
+    }
+  ],
+  "ignorePatterns": [
+    {
+      "pattern": "^#"
+    },
+    {
+      "pattern": "^https?://([a-z0-9-]+\\.)*(mydomain\\.com|gcp\\.testing|my\\.dns)(/|$)"
+    },
+    {
+      "pattern": "^https://lab\\.libreho\\.st/"
+    }
+  ],
+  "aliveStatusCodes": [
+    200,
+    206,
+    301,
+    302,
+    307,
+    308,
+    401,
+    403
+  ],
+  "timeout": "20s"
+}

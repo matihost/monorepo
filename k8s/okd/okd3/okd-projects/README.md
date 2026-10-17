@@ -6,7 +6,7 @@ Various [OpenShift Origin](https://www.okd.io/) scripts, project deployment.
 
 OKD or Minishift installation.
 
-See [../ansible/okd-installation/okd-3.10](../ansible/okd-installation/okd-3.10) for instruction how to install sample OKD on 3 VirtualBox VMs.
+See [../okd-installation/okd-3.10](../okd-installation/okd-3.10) for instruction how to install sample OKD on 3 VirtualBox VMs.
 
 ## Usage
 

@@ -31,6 +31,7 @@ Setup Azure RedHat OpenShift (ARO) with the following addons:
 * [../azure-entraid](../azure-entraid) - installed for the same stage environment (contains resource group and policies)
 
 * Ensure networking is setup for evn and region: [../azure-network-setup](../azure-network-setup) - installed for the same stage environment and region(contains VNet and Subnets for ARO), if you create new ARO environment, you need also create this repo new environment first for the same env and region.
+
 Not all regions are compatible with ARO or contains desired VM sizes. To select machinig region run following commands:
 
 ```bash
@@ -198,7 +199,7 @@ Ensure that all Upgradeable=False conditions are resolved.
 
 Possible known issues:
 
-* If MCP is preventing the upgrade with the error:    "Cluster operator machine-config should not be upgraded between minor versions: PoolUpdating: One or more machine config pools are updating. Please see oc get mcp for further details." Follow: https://access.redhat.com/solutions/6012101
+* If MCP is preventing the upgrade with the error:    "Cluster operator machine-config should not be upgraded between minor versions: PoolUpdating: One or more machine config pools are updating. Please see oc get mcp for further details." Follow: <https://access.redhat.com/solutions/6012101>
 
 #### Upgrade Procedure
 

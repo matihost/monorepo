@@ -32,7 +32,6 @@ curl -s https://api.github.com/repos/okd-project/okd/releases/latest | jq -r ".a
 xargs curl -sSL | tar -zx -o oc && sudo mv oc /usr/local/bin
 ```
 
-
 - Logged to AWS Account and ensure Default Region is set.
 
 ```bash
@@ -74,6 +73,7 @@ Perform prerequistes on this page (like enabling ROSA on AWS account)
 and click `Continue to RedHat` to log in into the Red Hat Hybrid Cloud Console and link RedHat and your account.
 
 W/o this you will get error like this - it means that account you mark as billing account is not linked with RedHat portal:
+
 ```
 Can't create cluster with name 'dev-us-east-1': status is 400, identifier
 is '400', code is 'CLUSTERS-MGMT-400', at '2024-11-19T21:21:22Z' and
@@ -91,7 +91,6 @@ export RHCS_TOKEN=...
 # reauthenticate ROSA CLI with this token
 rosa login --token="${RHCS_TOKEN}"
 ```
-
 
 ## Usage
 

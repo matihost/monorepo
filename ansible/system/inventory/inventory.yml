@@ -15,23 +15,21 @@ all:
           ruby_user_path: "${HOME}/.local/share/gem/ruby/3.3.0/bin"
           # Current supported kubernetess and crio versions:
           # https://github.com/cri-o/packaging/blob/main/README.md#define-the-kubernetes-version-and-used-cri-o-stream
-          kubernetes: v1.36
-          crio: v1.36
+          kubernetes: v1.37
+          crio: v1.37
           # TODO change to {{ ansible_facts.distribution_version }} when current is supported Ubuntu
           # List of supported Ubuntu versions:
           # https://packages.microsoft.com/repos/azure-cli/dists/
-          azure_repo_ubuntu_version: "noble"
-          # OpenVPN3 repo Supports only LTSs versions
-          # List of supported Ubuntu versions:
-          # https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos#DebianUbuntu:UsingOpenVPNaptrepositories
-          openvpn_repo_ubuntu_version: "questing"
+          azure_repo_ubuntu_version: "resolute"
+          # List of supported Ubuntu versions: https://community.openvpn.net/Pages/OpenVPN3Linux
+          openvpn_repo_ubuntu_version: "resolute"
           # List of supported Ubuntu versions: https://www.hashicorp.com/official-packaging-guide?product_intent=terraform
           terraform_ubuntu_version: "resolute"
           virtualbox_ubuntu_version: "resolute"
           # List of supported versions: https://github.com/Mirantis/cri-dockerd/releases/latest
-          cri_dockerd_ubuntu_version: "jammy"
+          cri_dockerd_ubuntu_version: "noble"
           # MQ Version available at: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/
-          mq: 9.4.5.1
+          mq: 10.0.1.0
           # List of supported Ubuntu versions: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive
           onedrive_ubuntu_version: "26.04"
           # List of supported Ubuntu versions: https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/
@@ -104,6 +102,7 @@ all:
           redhat.vscode-commons
           redhat.vscode-yaml
           samuelcolvin.jinjahtml
+          saoudrizwan.claude-dev
           scala-lang.scala
           streetsidesoftware.code-spell-checker
           streetsidesoftware.code-spell-checker-polish
@@ -157,9 +156,9 @@ all:
           repo: "deb [arch=amd64] https://packages.cloud.google.com/apt cloud-sdk main"
           key_url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
           key_format: asc
-        # - name: openvpn
-        #   repo: "deb [arch=amd64] https://swupdate.openvpn.net/community/openvpn3/repos {{ versions.openvpn_repo_ubuntu_version }} main"
-        #   key_url: https://swupdate.openvpn.net/repos/openvpn-repo-pkg-key.pub
+        - name: openvpn
+          repo: "deb [arch=amd64] https://packages.openvpn.net/openvpn3/debian {{ versions.openvpn_repo_ubuntu_version }} main"
+          key_url: https://packages.openvpn.net/packages-repo.gpg
         - name: terraform
           repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ versions.terraform_ubuntu_version }} main"
           key_url: https://apt.releases.hashicorp.com/gpg
@@ -268,8 +267,8 @@ all:
         # - jenkins
         # requirement for Jetbrains Toolbox
         - libfuse2
-        # Skipped packages:
-        # OpenVPN 3 is supported only on Ubuntu LTS: https://openvpn.net/cloud-docs/openvpn-3-client-for-linux/
+        # OpenVPN3 is constantly broken with latests Ubuntu releases
+        # use OpenVPN2 shipped from Ubuntu repo: openvpn-systemd-resolved instead
         # - openvpn3
         - openvpn-systemd-resolved
         - gh
@@ -1466,6 +1465,50 @@ all:
             [[ "$(bash -ic "nvm use --lts >/dev/null 2>&1 && ncu -g 2>/dev/null")" == *"All global packages are up-to-date"* ]] || {
               bash -ic "nvm use --lts >/dev/null 2>&1 && eval \"$(nvm use --lts >/dev/null 2>&1 && ncu -g 2>/dev/null| grep 'npm -g install')\""
               npm i ${GLOBAL_PACKAGES} -g
+            }
+        - name: claude
+          desc: |
+            Claude Code CLI (native installer, auto-updates itself), installed to ~/.local/bin/claude
+            When ANTHROPIC_BASE_URL and ANTHROPIC_AUTH_TOKEN environment variables are set in the environment ansible-playbook is run from
+            (for example exported in ~/.bashrc of the shell running the playbook, the task itself does not read ~/.bashrc)
+            they are merged into env section of ~/.claude/settings.json (other existing settings are preserved) and the file is kept 0600.
+            Unsetting the variables later does not remove them from ~/.claude/settings.json, remove them manually if needed.
+          become: false
+          command: |
+            [ -x ~/.local/bin/claude ] || {
+              INSTALLER="$(mktemp)"
+              if curl -fsSL https://claude.ai/install.sh -o "${INSTALLER}" && bash "${INSTALLER}"; then
+                rm -f "${INSTALLER}"
+                echo "Claude Code CLI installed: $(~/.local/bin/claude --version)"
+              else
+                rm -f "${INSTALLER}"
+                echo "Claude Code CLI installation failed" >&2
+                exit 1
+              fi
+            }
+            [[ -z "${ANTHROPIC_BASE_URL}" || -z "${ANTHROPIC_AUTH_TOKEN}" ]] || {
+              SETTINGS="${HOME}/.claude/settings.json"
+              umask 077
+              mkdir -p "${HOME}/.claude"
+              [ -s "${SETTINGS}" ] || echo '{}' > "${SETTINGS}"
+              jq -e 'type == "object"' "${SETTINGS}" >/dev/null 2>&1 || {
+                echo "Invalid JSON in ${SETTINGS}, Claude settings not updated" >&2
+                exit 1
+              }
+              [ "$(stat -c %a "${SETTINGS}")" = "600" ] || {
+                chmod 600 "${SETTINGS}" && echo "Claude settings permissions set to 600: ${SETTINGS}"
+              }
+              jq -e '.env.ANTHROPIC_BASE_URL == $ENV.ANTHROPIC_BASE_URL and .env.ANTHROPIC_AUTH_TOKEN == $ENV.ANTHROPIC_AUTH_TOKEN' \
+                "${SETTINGS}" >/dev/null 2>&1 || {
+                if jq '.env.ANTHROPIC_BASE_URL = $ENV.ANTHROPIC_BASE_URL | .env.ANTHROPIC_AUTH_TOKEN = $ENV.ANTHROPIC_AUTH_TOKEN' \
+                  "${SETTINGS}" > "${SETTINGS}.tmp" && mv "${SETTINGS}.tmp" "${SETTINGS}"; then
+                  echo "Claude settings updated: ${SETTINGS}"
+                else
+                  rm -f "${SETTINGS}.tmp"
+                  echo "Claude settings update failed: ${SETTINGS}" >&2
+                  exit 1
+                fi
+              }
             }
         - name: ssh_dir
           desc: Ensures that ~/.ssh directory exists and has correct permissions

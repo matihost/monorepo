@@ -1,0 +1,10 @@
+---
+version: "2"
+linters:
+  # defaults: errcheck, govet, ineffassign, staticcheck, unused
+  exclusions:
+    rules:
+    # Language tour samples intentionally declare variables and functions only to demonstrate syntax
+    - path: (cmd/language|internal/language|pkg/language)/
+      linters:
+      - unused

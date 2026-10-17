@@ -32,6 +32,7 @@ Users management is not part of this setup.
 * Recommended [awsp](https://github.com/antonbabenko/awsp) or [awsume](https://awsu.me/) to easily switch aws profiles.
 
 * AWS Account with Organization being set up. AWS FreeTier Account is ok.
+
 Running [aws-iam-management](../aws-iam-management) can be run on AWS Management account to setup Organization.
 
 * Logged to AWS Account Linked Account in AWS Organization.

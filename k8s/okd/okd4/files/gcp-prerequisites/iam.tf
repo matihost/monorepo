@@ -88,7 +88,7 @@ resource "google_secret_manager_secret" "okd-installer-secret" {
   secret_id = "sa-okd-installer-key"
 
   replication {
-    automatic = true
+    auto {}
   }
 
   depends_on = [
