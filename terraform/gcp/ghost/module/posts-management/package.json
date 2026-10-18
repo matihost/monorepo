@@ -8,7 +8,7 @@
   },
   "main": "index.js",
   "dependencies": {
-    "@google-cloud/functions-framework": "^4.0.0",
+    "@google-cloud/functions-framework": "^5.0.5",
     "@tryghost/admin-api": "^1.14.0",
     "@tryghost/content-api": "^1.12.0"
   }
