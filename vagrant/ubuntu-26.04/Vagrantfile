@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
       vb.gui = true
       vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
       vb.customize ["modifyvm", :id, "--vram", "128"]
-      vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
+      # vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
     end
 
     vb.customize ["modifyvm", :id, "--clipboard-mode", "bidirectional"]
@@ -37,27 +37,27 @@ Vagrant.configure("2") do |config|
     # apt -y upgrade > /dev/null 2>&1
   SHELL
 
-  # # Install software once (with run: "once" as default provisioner option)
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   # install basic edit tools
-  #   yum -y install epel-release bash-completion man-pages vim
-  # SHELL
+  # Install software once (with run: "once" as default provisioner option)
+  config.vm.provision "shell", inline: <<-SHELL
+    # install basic edit tools
+    apt -y install bash-completion man-db vim
+  SHELL
 
   config.vm.provision "shell", run: "once", path: "scripts/system.sh"
   config.vm.provision "shell", run: "once", path: "scripts/networking.sh"
   config.vm.provision "shell", run: "once", path: "scripts/storage.sh"
-  # config.vm.provision "shell", run: "once", path: "scripts/nfs.sh"
-  # config.vm.provision "shell", run: "once", path: "scripts/httpd.sh"
-  # config.vm.provision "shell", run: "once", path: "scripts/containers.sh"
-  # if "#{ENV['GUI']}" == "true"
-  #   config.vm.provision "shell", run: "once", path: "scripts/gui.sh"
-  # end
-  # config.vm.provision "shell", run: "once", path: "scripts/user-container-service.sh", privileged: false
-  # config.vm.provision "shell", run: "once", path: "scripts/guest-additions.sh", reboot: true
+  config.vm.provision "shell", run: "once", path: "scripts/nfs.sh"
+  config.vm.provision "shell", run: "once", path: "scripts/httpd.sh"
+  config.vm.provision "shell", run: "once", path: "scripts/containers.sh"
+  if "#{ENV['GUI']}" == "true"
+    config.vm.provision "shell", run: "once", path: "scripts/gui.sh"
+  end
+  config.vm.provision "shell", run: "once", path: "scripts/user-container-service.sh", privileged: false
+  config.vm.provision "shell", run: "once", path: "scripts/guest-additions.sh", reboot: true
 
-  # # Run script after boot completed
-  # config.trigger.after [:up] do |trigger|
-  #   trigger.info = "Running scripts/host-ssh.sh locally..."
-  #   trigger.run = {path: "scripts/host-ssh.sh"}
-  # end
+  # Run script after boot completed
+  config.trigger.after [:up] do |trigger|
+    trigger.info = "Running scripts/host-ssh.sh locally..."
+    trigger.run = {path: "scripts/host-ssh.sh"}
+  end
 end

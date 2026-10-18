@@ -20,14 +20,14 @@ udevadm settle
 
 # swap partition
 mkswap /dev/sdb1
-echo '/dev/sdb1  swap  swap  defaults 0 0' >>/etc/fstab
+echo '/dev/sdb1  swap  swap  defaults,nofail,x-systemd.device-timeout=10s 0 0' >>/etc/fstab
 systemctl daemon-reload
 mount -a
 
 # second partition as xfs
 mkfs.xfs /dev/sdb2
 mkdir -p /mnt/storage
-echo '/dev/sdb2  /mnt/storage  xfs  defaults 0 0' >>/etc/fstab
+echo '/dev/sdb2  /mnt/storage  xfs  defaults,nofail,x-systemd.device-timeout=10s 0 0' >>/etc/fstab
 systemctl daemon-reload
 mount -a
 
@@ -35,7 +35,7 @@ mount -a
 dd if=/dev/zero of=/mnt/storage/swapfile bs=1M count=600
 chmod 600 /mnt/storage/swapfile
 mkswap /mnt/storage/swapfile
-echo "/mnt/storage/swapfile swap swap defaults 0 0" >>/etc/fstab
+echo "/mnt/storage/swapfile swap swap defaults,nofail,x-systemd.requires-mounts-for=/mnt/storage 0 0" >>/etc/fstab
 systemctl daemon-reload
 # to validate /etc/fstab
 findmnt -x
@@ -63,7 +63,7 @@ lvcreate -n lv01 -L 6GiB vg01
 
 mkfs.xfs /dev/vg01/lv01
 mkdir -p /mnt/lv01
-echo '/dev/vg01/lv01 /mnt/lv01  xfs  defaults 0 0' >>/etc/fstab
+echo '/dev/vg01/lv01 /mnt/lv01  xfs  defaults,nofail,x-systemd.device-timeout=10s 0 0' >>/etc/fstab
 systemctl daemon-reload
 mount -a
 
