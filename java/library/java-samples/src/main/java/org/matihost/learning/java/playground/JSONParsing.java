@@ -3,6 +3,7 @@ package org.matihost.learning.java.playground;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,11 +18,15 @@ public class JSONParsing {
       long before = System.currentTimeMillis();
 
       URI feed = new URI("https://www.manton.org/feed.json");
-      JsonNode node = mapper.readTree(feed.toURL());
+      JsonNode node;
+      // readTree(URL) is deprecated, read from the stream instead
+      try (InputStream feedStream = feed.toURL().openStream()) {
+        node = mapper.readTree(feedStream);
+      }
 
       long duration = System.currentTimeMillis() - before;
 
-      System.out.println(duration);
+      System.out.println(duration + " ms, items: " + node.path("items").size());
 
       Thread.sleep(5_000L);
 

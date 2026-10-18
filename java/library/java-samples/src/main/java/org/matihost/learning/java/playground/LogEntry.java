@@ -142,8 +142,12 @@ public class LogEntry {
     this.timestamp = tokens[0];
     this.licensePlate = tokens[1];
     this.boothType = tokens[3];
-    this.location =
-      Integer.parseInt(tokens[2].substring(0, tokens[2].length() - 1));
+    String locationNumber = tokens[2].substring(0, tokens[2].length() - 1);
+    try {
+      this.location = Integer.parseInt(locationNumber);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Invalid location '" + locationNumber + "' in log line: " + logLine, e);
+    }
     String directionLetter = tokens[2].substring(tokens[2].length() - 1);
     if (directionLetter.equals("E")) {
       this.direction = "EAST";

@@ -13,6 +13,7 @@ import javax.jms.JMSException;
 import java.util.function.Consumer;
 
 import static org.matihost.learning.mq.utils.CmdLineUtils.blockCurrentThread;
+import static org.matihost.learning.mq.utils.CmdLineUtils.sanitizeForLog;
 
 @Component
 @Qualifier("get")
@@ -31,7 +32,7 @@ public class GetHandler implements Consumer<ApplicationArguments> {
 
     connection.asyncReceive(message -> {
       try {
-        logger.info("Message {} has been received from: {}", message.getBody(String.class), connection.getQueueName());
+        logger.info("Message {} has been received from: {}", sanitizeForLog(message.getBody(String.class)), connection.getQueueName());
       } catch (JMSException e) {
         logger.error(String.format("Unable to convert message body to String from queue: %s", this.queue), e);
       }

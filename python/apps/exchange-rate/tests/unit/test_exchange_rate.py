@@ -38,3 +38,28 @@ def test_exchange_rate(currency, expected_convert_rate, convert_date):
     rate = exchange_rates.get_exchange_rate_to_pln(currency, date.fromisoformat(convert_date))
     # then
     assert expected_convert_rate == rate
+
+
+@pytest.mark.parametrize(
+    "malicious_currency",
+    [
+        'USD"]|//*|["',
+        "USD' or '1'='1",
+        "USD/../../admin",
+        "../etc/passwd",
+        "usd",
+        "USD ",
+        "",
+    ],
+)
+def test_malicious_currency_is_rejected(malicious_currency):
+    """Currency code is a part of XML lookup and request URL, anything other than a known currency code is refused."""
+    with pytest.raises(TypeError):
+        exchange_rates.get_exchange_rate_to_pln(malicious_currency)
+    with pytest.raises(TypeError):
+        exchange_rates.get_exchange_rate_to_pln(malicious_currency, date(2024, 9, 12))
+
+
+def test_unknown_currency_in_nbp_table_returns_none():
+    """Valid currency code which is absent in NBP table results in no rate."""
+    assert exchange_rates.get_exchange_rate_to_pln("XXX") is None

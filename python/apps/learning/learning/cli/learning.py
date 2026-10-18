@@ -48,8 +48,8 @@ def sum(arguments: list[str]):
     for i in arguments:
         try:
             sum += float(i)
-        except Exception:
-            pass
+        except ValueError:
+            continue
     print(f"Sum of arguments: {sum}")
 
 

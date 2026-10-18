@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.function.Consumer;
 
 import static org.matihost.learning.mq.utils.CmdLineUtils.getArg;
+import static org.matihost.learning.mq.utils.CmdLineUtils.sanitizeForLog;
 
 @Component
 @Qualifier("sendAndReceive")
@@ -36,7 +37,7 @@ public class SendAndReceiveHandler implements Consumer<ApplicationArguments> {
 
     var response = connection.sendAndReceive(message, rsQueue, 60_000);
 
-    logger.info("Message has been send to {} and received a reply: {} from {}", connection.getQueueName(), response, rsQueue);
+    logger.info("Message has been send to {} and received a reply: {} from {}", connection.getQueueName(), sanitizeForLog(response), sanitizeForLog(rsQueue));
   }
 
   private String retrieveMessageToPut(ApplicationArguments appArgs) {

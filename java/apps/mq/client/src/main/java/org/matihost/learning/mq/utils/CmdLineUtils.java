@@ -15,6 +15,18 @@ public class CmdLineUtils {
       .orElse(defaultValue);
   }
 
+  /**
+   * Neutralizes characters which would let a value break out of a single log line (log injection / log forging, CWE-117):
+   * CR, LF and other control characters are replaced with underscore.
+   * Use for any value which comes from outside the application (messages from queues, user input) before it is logged.
+   */
+  public static String sanitizeForLog(Object value) {
+    if (value == null) {
+      return null;
+    }
+    return String.valueOf(value).replaceAll("\\p{Cntrl}", "_");
+  }
+
   public static void blockCurrentThread(){
     try {
       Thread.currentThread().join();

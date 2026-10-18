@@ -4,7 +4,9 @@
 timedatectl set-timezone Europe/Warsaw
 
 # make journal persistent in /var/log/journal (instead in /run/log/journal)
-sed -i -E 's/^#Storage=.*$/Storage=persistent/g' /etc/systemd/journald.conf
+# /etc/systemd/journald.conf does not exist starting CentOS 10, defaults are in /usr/lib/systemd/journald.conf, use a drop-in
+mkdir -p /etc/systemd/journald.conf.d
+printf '[Journal]\nStorage=persistent\n' >/etc/systemd/journald.conf.d/persistent.conf
 systemctl restart systemd-journald.service
 
 # additional Grub2 entries for rescue, emergency, and rootpasswd entries
@@ -58,6 +60,8 @@ chown root:testers /src
 # files, and directories will have owner same as /src directory which is testing
 chmod g+s /src
 
+# setfacl is not installed by default starting CentOS 10
+yum -y install acl
 # allow full access to infra group as well
 setfacl -m g:infra:rwx /src
 

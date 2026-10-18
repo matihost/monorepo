@@ -12,7 +12,6 @@ from exchange_rate.helpers.currency import validate_currency_code
 class ExchangeRateToPLN:  # pylint: disable=too-few-public-methods
     """Retrieve exchange rates from Polish NBP."""
 
-    __RATE_TO_PLN_XPATH = './pozycja[kod_waluty="{0}"]/kurs_sredni'
     __NPB_FIXING_URL = "https://static.nbp.pl/dane/kursy/xml/LastA.xml"
 
     __NBP_API_URL = "http://api.nbp.pl/api/exchangerates/rates/A/{0}/{1}/"
@@ -24,16 +23,20 @@ class ExchangeRateToPLN:  # pylint: disable=too-few-public-methods
         response = requests.get(self.__NPB_FIXING_URL, timeout=10).text
         self.__nbp_rates_xml = ET.fromstring(response)
 
-    def __get_rate_for_today(self, currency):
+    def __get_rate_for_today(self, currency: str):
         """Get conversion rate for currency for today."""
-        rate = self.__nbp_rates_xml.find(self.__RATE_TO_PLN_XPATH.format(currency))
-        return None if rate is None else rate.text
+        validated_currency = validate_currency_code(currency)
+        for position in self.__nbp_rates_xml.findall("pozycja"):
+            if position.findtext("kod_waluty") == validated_currency:
+                return position.findtext("kurs_sredni")
+        return None
 
     def __get_rate_for_date(self, currency: str, convert_date: date):
         # TODO handle errors
+        validated_currency = validate_currency_code(currency)
         iso_date = convert_date.isoformat()
         response = requests.get(
-            self.__NBP_API_URL.format(currency, iso_date), headers={"Accept": "application/json"}, timeout=10
+            self.__NBP_API_URL.format(validated_currency, iso_date), headers={"Accept": "application/json"}, timeout=10
         ).text
         response_json = json.loads(response)
         return str(response_json["rates"][0]["mid"])

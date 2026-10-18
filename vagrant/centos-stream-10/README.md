@@ -57,3 +57,12 @@ make ensure-latest-base-vm
 # show usage and tasks (default)
 make help
 ```
+
+## Known limitations
+
+* Bidirectional copy/paste (clipboard sharing) between the host and the VM does not work with `make run-with-gui`,
+  even though it is enabled in VirtualBox (`--clipboard-mode bidirectional`) and Guest Additions are installed.
+  CentOS Stream 10 runs a GNOME on Wayland session, and VirtualBox Guest Additions (`VBoxClient --clipboard`)
+  have no Wayland clipboard backend, which is a known VirtualBox limitation.
+  CentOS Stream 10 does not ship an X11 session (Xorg), so there is no session to fall back to.
+  Use `scp`/`ssh` or shared folders to move text and files instead.
