@@ -2,11 +2,14 @@
 
 Various playbooks for Ubuntu machine management.
 
-Supported Ubuntu distributions:
+Supported Ubuntu distributions and inventories:
 
-* For regular Ubuntu workstation - includes Gnome applications: **26.04 (resolute)**
+* Default inventory (`inventory/inventory.yml`, `make all`) - regular Ubuntu workstation, includes Gnome applications: **26.10 (stonking)**.
 
-* For console only environments like Windows Linux Subsystem (WSL) or containers - does not include Gnome applications and virtualizations (like virt or vbox): **26.04 (resolute)**
+* LTS inventory (`inventory/lts.yml`, `make lts`) - regular Ubuntu workstation, includes Gnome applications, runs the LTS tasks: **26.04 (resolute)**
+
+* Console inventory (`inventory/console.yml`, `make wsl`) - only for console environments like Windows Linux Subsystem (WSL) or containers,
+  does not include Gnome applications and virtualizations (like virt or vbox): **26.04 (resolute)**
 
 Container image using these playbooks is managed under [k8s/images/devcontainers](../../k8s/images/devcontainers/)
 
@@ -134,8 +137,11 @@ code
 
 ```bash
 
-# run all management playbooks for most modern Ubuntu version
+# run all management playbooks for most modern Ubuntu version (26.10)
 make all
+
+# run all management playbooks for LTS Ubuntu version (26.04)
+make lts
 
 # run all management playbooks for WSL Ubuntu Linux distribution
 make wsl

@@ -1,0 +1,1557 @@
+---
+all:
+  children:
+    local:
+      hosts:
+        localhost:
+      vars:
+        # to install and configure Datadog agent when DD_API_KEY is set in environment as well
+        datadog_agent: true
+        backup: false
+        # backup location in Restic repository format
+        backup_location: local:/tmp/restic-backup
+        versions:
+          # represents path to local gems, see: 'gem environment' output for example: ~/.local/share/gem/ruby/3.3.0/bin
+          ruby_user_path: "${HOME}/.local/share/gem/ruby/3.3.0/bin"
+          # Current supported kubernetess and crio versions:
+          # https://github.com/cri-o/packaging/blob/main/README.md#define-the-kubernetes-version-and-used-cri-o-stream
+          kubernetes: v1.37
+          crio: v1.37
+          # TODO change to {{ ansible_facts.distribution_version }} when current is supported Ubuntu
+          # List of supported Ubuntu versions:
+          # https://packages.microsoft.com/repos/azure-cli/dists/
+          azure_repo_ubuntu_version: "resolute"
+          # List of supported Ubuntu versions: https://community.openvpn.net/Pages/OpenVPN3Linux
+          openvpn_repo_ubuntu_version: "resolute"
+          # List of supported Ubuntu versions: https://www.hashicorp.com/official-packaging-guide?product_intent=terraform
+          terraform_ubuntu_version: "resolute"
+          virtualbox_ubuntu_version: "resolute"
+          # List of supported versions: https://github.com/Mirantis/cri-dockerd/releases/latest
+          cri_dockerd_ubuntu_version: "noble"
+          # MQ Version available at: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/
+          mq: 10.0.1.0
+          # List of supported Ubuntu versions: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive
+          onedrive_ubuntu_version: "26.04"
+          # List of supported Ubuntu versions: https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/
+          pgadmin_ubuntu_version: "resolute"
+          # List of supported Ubuntu versions: https://apt.envoyproxy.io/
+          envoy_ubuntu_version: "jammy"
+        virtual_interface_ip: 192.168.10.1
+        update_cache_timeout: 30
+        systemd_journal:
+          max_size: 1G
+          max_duration: 10days
+        vs_code_extensions: |
+          4ops.packer
+          4ops.terraform
+          amazonwebservices.aws-toolkit-vscode
+          asciidoctor.asciidoctor-vscode
+          batisteo.vscode-django
+          charliermarsh.ruff
+          davidanson.vscode-markdownlint
+          docker.docker
+          donjayamanne.githistory
+          donjayamanne.python-environment-manager
+          donjayamanne.python-extension-pack
+          dotenv.dotenv-vscode
+          dotjoshjohnson.xml
+          eamodio.gitlens
+          esbenp.prettier-vscode
+          formulahendry.code-runner
+          foxundermoon.shell-format
+          garytyler.darcula-pycharm
+          george-alisson.html-preview-vscode
+          github.vscode-github-actions
+          github.vscode-pull-request-github
+          golang.go
+          hashicorp.terraform
+          jebbs.plantuml
+          kevinrose.vsc-python-indent
+          magicstack.magicpython
+          moshfeu.compare-folders
+          ms-azuretools.vscode-containers
+          ms-azuretools.vscode-docker
+          ms-kubernetes-tools.vscode-kubernetes-tools
+          ms-python.debugpy
+          ms-python.isort
+          ms-python.python
+          ms-python.vscode-pylance
+          ms-python.vscode-python-envs
+          ms-toolsai.jupyter
+          ms-toolsai.jupyter-keymap
+          ms-toolsai.jupyter-renderers
+          ms-toolsai.vscode-jupyter-cell-tags
+          ms-toolsai.vscode-jupyter-slideshow
+          ms-vscode-remote.remote-containers
+          ms-vscode-remote.remote-ssh
+          ms-vscode-remote.remote-ssh-edit
+          ms-vscode-remote.remote-wsl
+          ms-vscode-remote.vscode-remote-extensionpack
+          ms-vscode.cmake-tools
+          ms-vscode.cpp-devtools
+          ms-vscode.cpptools
+          ms-vscode.cpptools-extension-pack
+          ms-vscode.cpptools-themes
+          ms-vscode.makefile-tools
+          ms-vscode.powershell
+          ms-vscode.remote-explorer
+          ms-vscode.remote-server
+          njpwerner.autodocstring
+          redhat.fabric8-analytics
+          redhat.java
+          redhat.vscode-commons
+          redhat.vscode-yaml
+          samuelcolvin.jinjahtml
+          saoudrizwan.claude-dev
+          scala-lang.scala
+          streetsidesoftware.code-spell-checker
+          streetsidesoftware.code-spell-checker-polish
+          techer.open-in-browser
+          tomoki1207.pdf
+          twxs.cmake
+          vmware.vscode-spring-boot
+          vscjava.vscode-gradle
+          vscjava.vscode-java-debug
+          vscjava.vscode-java-dependency
+          vscjava.vscode-java-pack
+          vscjava.vscode-java-test
+          vscjava.vscode-lombok
+          vscjava.vscode-maven
+          vscjava.vscode-spring-boot-dashboard
+          vscjava.vscode-spring-initializr
+          vue.volar
+          wholroyd.jinja
+          yzhang.markdown-all-in-one
+        repositories:
+        - name: universe
+        - name: multiverse
+        - name: pgadmin
+          repo: "deb [arch=amd64] https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/{{ versions.pgadmin_ubuntu_version }} pgadmin4 main"
+          key_url: "https://www.pgadmin.org/static/packages_pgadmin_org.pub"
+        - name: vscode
+          repo: "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main"
+          key_url: "https://packages.microsoft.com/keys/microsoft.asc"
+        - name: azure-cli
+          repo: "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ {{ versions.azure_repo_ubuntu_version }} main"
+        - name: google-chrome
+          repo: "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main"
+          key_url: https://dl.google.com/linux/linux_signing_key.pub
+        - name: virtualbox
+          repo: >-
+            deb [arch=amd64] https://download.virtualbox.org/virtualbox/debian {{ versions.virtualbox_ubuntu_version }} contrib
+          key_url:
+          - https://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc
+          - https://download.virtualbox.org/virtualbox/debian/oracle_vbox_2016.asc
+        - name: kubernetes
+          repo: >-
+            deb [arch=amd64] https://pkgs.k8s.io/core:/stable:/{{ versions.kubernetes }}/deb/ /
+          key_url: >-
+            https://pkgs.k8s.io/core:/stable:/{{ versions.kubernetes }}/deb/Release.key
+        - name: crio
+          repo: >-
+            deb [arch=amd64] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ versions.crio}}/deb/ /
+          key_url: >-
+            https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ versions.crio}}/deb/Release.key
+        - name: google-cloud-sdk
+          repo: "deb [arch=amd64] https://packages.cloud.google.com/apt cloud-sdk main"
+          key_url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+          key_format: asc
+        - name: openvpn
+          repo: "deb [arch=amd64] https://packages.openvpn.net/openvpn3/debian {{ versions.openvpn_repo_ubuntu_version }} main"
+          key_url: https://packages.openvpn.net/packages-repo.gpg
+        - name: terraform
+          repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ versions.terraform_ubuntu_version }} main"
+          key_url: https://apt.releases.hashicorp.com/gpg
+          key_format: asc
+        - name: envoy
+          repo: "deb [arch=amd64] https://apt.envoyproxy.io {{ versions.envoy_ubuntu_version }} main"
+          key_url: ["https://apt.envoyproxy.io/signing.key"]
+        - name: github
+          repo: "deb [arch=amd64] https://cli.github.com/packages stable main"
+          key_url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+          key_format: gpg
+        - name: onedrive
+          repo: "deb [arch=amd64] https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_{{ versions.onedrive_ubuntu_version }}/ ./"
+          key_url: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_{{ versions.onedrive_ubuntu_version }}/Release.key
+        - name: jenkins
+          repo: "deb [arch=amd64] https://pkg.jenkins.io/debian-stable binary/"
+          key_url: "https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key"
+        - name: dbeaver
+          repo: "deb [arch=amd64] https://dbeaver.io/debs/dbeaver-ce /"
+          key_url: "https://dbeaver.io/debs/dbeaver.gpg.key"
+        packages:
+        - net-tools
+        - sshuttle
+        - apache2-utils # for htpasswd
+        - network-manager
+        - fastfetch
+        - eyed3
+        - mc
+        - lm-sensors
+        - psensor
+        - inotify-tools
+        - brasero
+        - autofs
+        - bind9
+        - cifs-utils
+        - dlocate
+        - plocate
+        - ubuntu-restricted-extras
+        - gnome-shell-extensions
+        - gnome-tweaks
+        - hplip
+        - hplip-gui
+        - ddclient
+        - golang-go
+        - golang-golang-x-tools
+        - python3-pip
+        - graphviz
+        - ruby
+        - openjdk-21-jdk
+        - openjdk-21-source
+        - openjdk-25-jdk
+        - openjdk-25-source
+        - dos2unix
+        - guake
+        - mono-complete
+        - jq
+        - yq
+        - curl
+        - keepass2
+        - keepass2-plugin-keepassrpc
+        - code
+        - onedrive
+        - nautilus-dropbox
+        - ffmpeg
+        - openssh-server
+        - iftop
+        - dosbox
+        #- libva-x11-2 # it is steam app dependency
+        - virt-manager
+        - docker.io
+        - docker-buildx
+        - conntrack
+        - fuse-overlayfs
+        # When SecureBoot is enabled - VirtualBox vboxdrv module needs to be signed:
+        # https://askubuntu.com/a/1199583
+        # in order for VirtualBox to run you need to recompile kernel module
+        # and sign for UEFI Secure Boot:
+        # Run:
+        # sudo /sbin/vboxconfig
+        #
+        # TODO use when plucky is supported by Oracle, VirtualBox 7.1 from 24.10/oracular repo does not work on 25.04/plucky
+        # - virtualbox-7.1 # Virtual Box from Oracle repo,
+        - virtualbox # Ubuntu packaged VirtualBox
+        - containernetworking-plugins
+        - kubelet
+        - kubeadm
+        - kubectl
+        - etcd-client
+        # - etcd-server
+        - cri-o
+        - podman
+        - buildah
+        - skopeo
+        # - terraform # OpenTofu is used instead
+        - packer
+        - vagrant
+        - sshpass
+        - notepadqq
+        - certbot
+        - google-chrome-stable
+        - google-cloud-cli
+        - google-cloud-cli-gke-gcloud-auth-plugin
+        - google-cloud-cli-cloud-build-local
+        - google-cloud-cli-kpt
+        - envoy
+        # - jenkins
+        # requirement for Jetbrains Toolbox
+        - libfuse2
+        # OpenVPN3 is constantly broken with latests Ubuntu releases
+        # use OpenVPN2 shipped from Ubuntu repo: openvpn-systemd-resolved instead
+        # - openvpn3
+        - openvpn-systemd-resolved
+        - gh
+        - npm
+        - tox
+        # - pgadmin4-desktop
+        # Python libraries should be installed via Ubuntu distro manager if possible as Ubuntu 23.04+ forces PEP668
+        - python3-venv
+        - python3-ansible-runner
+        - python3-pip
+        - python3-flake8
+        - python3-flake8-docstrings
+        - python3-flake8-2020
+        - python3-openshift
+        # Ansiblie-lint from ubuntu package stopped working
+        # - ansible-lint
+        - python3-requests
+        - pre-commit
+        - pylint
+        - python3-pytest
+        - pipenv
+        - yamllint
+        - youtubedl-gui
+        - libxcb-cursor0 # calibre dependency
+        - apt-transport-https
+        - azure-cli
+        - dbeaver-ce
+        - cloud-utils
+        snaps:
+        - mc-installer
+        - notepad-plus-plus
+        - steam
+        - whatsapp-linux-app
+        # Uncomment to use snap packages for gcloud sdk
+        # classic_snaps:
+        # - google-cloud-sdk
+        # - kubectl
+        # use only to install python libraries which are not available as python3-xyz ubuntu packages
+        # Ubuntu 23.04+ forces PEP668, the following libs are installed as --user --break-system-packages
+        pips:
+        - kubernetes-validate
+        - "molecule[lint]"
+        - "molecule[docker]"
+        - awsume
+        - aws-sso-util
+        - ansible-lint
+        - cpplint
+        restic_profiles_config: |
+          version: 1
+
+          global:
+            scheduler: crond
+            # run 'snapshots' when no command is specified when invoking resticprofile
+            default-command: snapshots
+            # initialize a repository if none exist at location
+            initialize: true
+            # priority is using priority class on windows, and nice on unixes
+            priority: low
+            # resticprofile won't start a profile if there's less than 100MB of RAM available
+            min-memory: 100
+
+          default:
+            repository: {{ backup_location }}
+
+            # For Azure Storage Account format: azure:container:path
+            # repository: azure:restic:/backup
+            # option: azure.connections=3
+            # env:
+            #   AZURE_ACCOUNT_NAME: storageaccountname
+            #   AZURE_CLIENT_ID:
+
+            password-file: key
+
+            backup:
+              verbose: true
+              source:
+                - /home
+                - /opt
+                - /srv
+                - /etc/ssh
+                - /etc/sudoers
+                - /etc/sudoers.d
+                - /etc/passwd
+                - /etc/shadow
+                - /etc/group
+                - /etc/gshadow
+                - /etc/subuid
+                - /etc/subgid
+                - /var/spool/cron
+
+              exclude:
+                - /proc
+                - /sys
+                - /dev
+                - /run
+                - /tmp
+                - /mnt
+                - /media
+                - /var/cache
+                - /var/tmp
+                - /var/lib/docker
+                - /var/lib/containerd
+                - /var/lib/kubelet/pods
+                # Azure agent / provisioning (IMPORTANT)
+                - /var/lib/waagent
+                - /var/lib/azure
+                - /var/lib/cloud
+                - /run/cloud-init
+                - /var/lib/waagent-extensions
+
+                # Optional
+                - /var/log
+                # GNOME / desktop noise (important)
+                - /home/*/.cache
+                - /home/*/.local/share/Trash
+
+                # Azure SDK / CLI tools (your current exclusions are OK)
+                - /opt/az
+                - /opt/microsoft
+                # Exclude cache and temporary files in home directories
+                - /home/*/thinclient_drives
+                - "**/cache/**"
+                - "**/.cache/**"
+                - "**/*Cache*/**"
+                - /home/*/.local/share
+                - /home/*/.local/lib
+                - /home/*/.gvfs
+                - /home/*/.m2/repository
+                - /home/*/.nvm
+                - /home/*/.npm
+                - "**/node_modules/**"
+                - /home/*/.serverless
+                - /home/*/Dropbox
+                - /home/*/OneDrive
+                - /home/*/GDrive
+                - /home/*/go
+                - /home/*/.vagrant.d/boxes
+                - "/home/*/VirtualBox VMs"
+                - /home/*/.sdkman
+                - /home/*/snap
+                - /home/*/.vscode
+                # Exclude mount points (important to avoid backing up other filesystems)
+                - /media
+                - /mnt
+
+                # Optional - exclude large media files in home directories
+                - /home/*/Pictures/**
+                - /home/*/Music/**
+                - /home/*/Videos/**
+                - /home/*/Downloads/**
+
+              exclude-caches: true
+              one-file-system: true
+
+              # daily
+              schedule: daily
+              schedule-permission: system
+              schedule-lock-wait: 45m
+              schedule-after-network-online: true
+
+              #
+              # Optional but HIGHLY recommended for GNOME consistency
+              #
+              run-before:
+                - mkdir -p /tmp/restic-desktop
+                - dconf dump / > /tmp/restic-desktop/dconf.ini || true
+
+              run-after:
+                - rm -rf /tmp/restic-desktop
+
+            retention:
+              after-backup: true
+              keep-daily: 7
+              keep-weekly: 4
+              keep-monthly: 6
+              keep-yearly: 2
+              prune: true
+
+          # sudo apt install cron
+          # az login --identity
+          # resticprofile --config /etc/resticprofile/profiles.yaml schedule --all
+          # resticprofile --config /etc/resticprofile/profiles.yaml schedule --list
+          # crontab -l
+          # resticprofile --config /etc/resticprofile/profiles.yaml schedule --list
+          # resticprofile --config /etc/resticprofile/profiles.yaml backup
+        clis:
+        - name: virtual-network-interface
+          desc: To ensure there is a virtual interface with stable IP
+          become: true
+          command: |
+            [[ "$(nmcli -f ip4.address c s br0 2>/dev/null)" =~ {{ virtual_interface_ip }} ]] || {
+              nmcli conn add type bridge con-name br0 ifname br0
+              nmcli conn modify br0 ipv4.addresses '{{ virtual_interface_ip }}/24'
+              nmcli conn modify br0 ipv4.gateway '{{ virtual_interface_ip }}'
+              nmcli conn modify br0 ipv4.dns '{{ virtual_interface_ip }}'
+              nmcli conn modify br0 ipv4.method manual
+              nmcli conn modify br0 ipv4.never-default yes
+              nmcli conn modify br0 connection.autoconnect yes
+              nmcli conn up br0
+            }
+        - name: ubuntu-upgrade-preference
+          desc: To ensure do-release-upgrade command can see non-LTS releases as well
+          become: true
+          command: |
+            [ "$(grep -c 'Prompt=normal' /etc/update-manager/release-upgrades)" -gt 0 ] || {
+              sed -i -E "s/^Prompt=.+$/Prompt=normal/" /etc/update-manager/release-upgrades
+              echo "Non-LTS releases upgrade possibility enabled"
+            }
+        - name: vboxuser
+          desc: To ensure VirtualBox can see host USB
+          become: false
+          command: |
+            [ "$(groups |grep -c vboxusers)" -ne 0 ] || sudo usermod -aG vboxusers ${USER}
+        - name: python3-user-venv
+          desc: |
+            From Ubuntu 23.04+ user site packages are forbidden in favor of custom venv
+            Hence it is required to create at least one venv and ensure its bin directory is last item on PATH
+            So that Ubuntu distributioon python3, pip3 etc. are taken from /usr/bin/
+            while all installed Python libs on virtual env are possible to be run by installing them via ~/.venv/user/bin/pip3
+          become: false
+          command: |
+            [ -d ~/.venv/user ] || {
+              python3 -m venv ~/.venv/user
+              [ "$(grep -c '.venv/usr/bin' ~/.bashrc)" -gt 0 ] || {
+                echo 'PATH=${PATH}:${HOME}/.venv/user/bin' >> ~/.bashrc
+              }
+            }
+        - name: vbox-settings
+          desc: To ensure VirtualBox can create any host network
+          become: true
+          command: |
+            [ -e "/etc/vbox/networks.conf" ] || {
+              mkdir -p /etc/vbox
+              cat <<EOF > /etc/vbox/networks.conf
+            * 0.0.0.0/0 ::/0
+            EOF
+              echo "/etc/vbox/networks.conf configured to allow any vbox hostnetwork"
+            }
+        - name: git-prompt
+          become: false
+          command: |
+            [ -d ~/.bash-git-prompt ] || {
+              git clone https://github.com/magicmonty/bash-git-prompt.git ~/.bash-git-prompt --depth=1
+              echo 'GIT_PROMPT_ONLY_IN_REPO=0
+              GIT_PROMPT_THEME=Single_line_Ubuntu
+              source ~/.bash-git-prompt/gitprompt.sh' >> ~/.bashrc
+              echo "Installed Git prompt"
+            }
+        - name: bash-history
+          become: false
+          command: |
+            [ "$(grep -c HISTTIMEFORMAT ~/.bashrc)" -gt 0 ] || {
+              sed -i -E "s/^HISTCONTROL=.+$/HISTCONTROL=ignoreboth:erasedups/" ~/.bashrc
+              sed -i -E "s/^HISTSIZE=.+$/HISTSIZE=-1/" ~/.bashrc
+              sed -i -E "s/^HISTFILESIZE=.+$/HISTFILESIZE=-1/" ~/.bashrc
+              echo 'HISTTIMEFORMAT="[%F %T] "' >> ~/.bashrc
+              echo "Bash history configured"
+            }
+        - name: azure-cli config
+          become: false
+          command: |
+            az config get extension.use_dynamic_install 2>/dev/null >/dev/null || {
+              az config set extension.dynamic_install_allow_preview=true
+              az config set extension.use_dynamic_install=yes_without_prompt
+              echo "Azure CLI configured"
+            }
+        - name: golang-bin-on-path
+          desc: Ensure ~/go/bin is on PATH
+          become: false
+          command: |
+            [ "$(grep -c 'go/bin' ~/.bashrc)" -gt 0 ] || {
+              echo 'PATH=${HOME}/go/bin:${PATH}' >> ~/.bashrc
+            }
+        - name: ansible-community-kubernetes-collections
+          desc: To ensure Ansible galaxy collection community.kubernetes with k8s, helm modules is present
+          become: false
+          command: |
+            [ -n "$(ansible-galaxy collection list community.kubernetes --format json |jq -r '(try ..)|objects|.version? //empty')" ] || {
+              ansible-galaxy collection install community.kubernetes
+              echo "Ansible collection community.kubernetes has been installed"
+            }
+        - name: git-config
+          become: false
+          command: |
+            [ "$(git config --global pull.rebase)" == "true" ] || {
+              git config --global pull.rebase true
+              git config --global push.autoSetupRemote true
+              git config --global credential.helper store
+              git config --global fetch.prune true
+              git config --global alias.lol "log --oneline --graph --decorate --all"
+            }
+            ([ -n "$(git config --global user.name)" ] && [ -n "$(git config --global user.email)" ]) || {
+              echo "Git user.name and user.email MUST be set"
+              exit 1
+            }
+        - name: ensure-hp-lip
+          desc: |
+            Ensure the latest hplip is installed from source
+            TODO the latest 3.25.6 cannot be installed on Ubuntu 25.04 out of the box yet: https://bugs.launchpad.net/hplip/+bug/1879353
+            To install latest HPLIP in advanced mode (without GUI): https://developers.hp.com/hp-linux-imaging-and-printing/KnowledgeBase/InstallHPLIPwithqt5.html
+            You need to install the following dependencies
+                PyQt5
+                python-qt5-dbus
+            Go to source of hplip. By default its in ~/Downloads.
+            Run the following commands
+                ./configure --prefix=/usr --enable-qt5 --disable-qt4
+                make
+                "make install" as root user
+          become: false
+          command: |
+            [ -e /etc/hp/hplip.conf ] &&  {
+              # hplip systray does not work in Ubuntu GNOME
+              [ -e /etc/xdg/autostart/hplip-systray.desktop ] && sudo rm -f /etc/xdg/autostart/hplip-systray.desktop
+              HP_LIP_VERSION=$(grep version /etc/hp/hplip.conf | sed -E "s/version=(.+)/\1/")
+              CURRENT_LATEST_HP_LIP_VERSION=$(curl -sL https://developers.hp.com/hp-linux-imaging-and-printing/release_notes |grep -m 1 'HPLIP 3.' | \
+                sed -E "s/.+HPLIP (3.+) -.+/\1/")
+              [ "${HP_LIP_VERSION}" = "${CURRENT_LATEST_HP_LIP_VERSION}" ] || {
+                echo -e "Installed hp-lip is not the latest, follow https://developers.hp.com/hp-linux-imaging-and-printing/gethplip to install latest version\nIn case of problem use advanced mode: https://developers.hp.com/hp-linux-imaging-and-printing/KnowledgeBase/InstallHPLIPwithqt5.html"
+                exit 1
+              }
+            }
+        - name: nss-order
+          become: true
+          command: |
+            sed -i -E "s/^hosts: .+$/hosts:          myhostname files mdns4_minimal [NOTFOUND=return] dns/" /etc/nsswitch.conf
+        - name: keepass-http
+          become: true
+          desc: |
+            Download KeePassRPC plugin to KeePass plugins for integration with Kee plugin to Firefox.
+            Only if keepass2-plugin-keepassrpc is not installed it already.
+          command: |
+            [ -e /usr/lib/keepass2/Plugins/KeePassRPC.dll -o -e /usr/lib/keepass2/Plugins/KeePassRPC.plgx ] || {
+              curl -sL https://api.github.com/repos/kee-org/keepassrpc/releases/latest | jq -r ".assets[] |
+                select(.name | test(\"KeePassRPC.plgx\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/usr/lib/keepass2/Plugins/KeePassRPC.plgx"
+              echo "KeePassRPC downloaded, you may run Firefox with Kee plugin now and KeePass app"
+            }
+        - name: docker-config
+          become: true
+          command: |
+            export DESIRED_DAEMON_CONFIG='{
+              "max-concurrent-uploads": 10,
+              "max-concurrent-downloads": 10,
+              "exec-opts": ["native.cgroupdriver=systemd"],
+              "log-driver": "json-file",
+              "log-opts": {
+                "max-size": "100m"
+              },
+              "storage-driver": "overlay2",
+              "insecure-registries": [
+                "192.168.0.0/16",
+                "172.16.0.0/12",
+                "10.0.0.0/8"
+              ]
+            }'
+            [ "$(grep -c systemd /etc/docker/daemon.json 2>/dev/null || echo 0)" -eq 1 ] || (\
+            echo -n "${DESIRED_DAEMON_CONFIG}" > /etc/docker/daemon.json; \
+            systemctl restart docker && \
+            systemctl is-enabled docker &>/dev/null || systemctl enable docker)
+
+            [ "$(grep -c systemd /etc/docker/daemon.json 2>/dev/null || echo 0)" -eq 1 ] && \
+            systemctl is-enabled docker &>/dev/null && systemctl is-active docker &>/dev/null
+        - name: docker-group
+          desc: Add user to docker group so that docker socket can be accessed w/o sudo
+          become: false
+          command: |
+            [ "$(groups |grep -c docker)" -ne 0 ] || sudo usermod -aG docker ${USER}
+        # TODO remove when confirming python2 is no more used
+        # - name: python-alternatives
+        #   become: true
+        #   command: |
+        #     [ $(update-alternatives --display python 2>/dev/null |grep -c priority) -eq 2 ] || (\
+        #       update-alternatives --debug --install /usr/bin/python python /usr/bin/python3 10;\
+        #       update-alternatives --debug --install /usr/bin/python python /usr/bin/python2 11;\
+        #       update-alternatives --set python /usr/bin/python2)
+        #     [ $(update-alternatives --display python 2>/dev/null |grep -c priority) -eq 2 ]
+        - name: ruby-gems-on-path
+          desc: Ensure ruby local gems are  on path. W/o it it is not possible to install asciidoctor below
+          become: false
+          command: |
+            [ "$(grep -c '{{ versions.ruby_user_path }}' ~/.bashrc)" -ne 0 ] || {
+              echo 'export PATH={{ versions.ruby_user_path }}:${PATH}' >> ~/.bashrc
+              echo "Added user space Ruby libraries binaries to Bash PATH variable"
+            }
+        - name: asciidoctor
+          become: false
+          desc: Requires ruby-gems-on-path above task to be completed and graphviz installed
+          command: |
+            [ $(gem list asciidoctor --no-verbose |grep -cE 'diagram|pdf') -ge 2 ] || (\
+              gem install prawn asciidoctor asciidoctor-diagram rouge --user-install && \
+              gem install asciidoctor-pdf --pre --user-install
+            )
+            [ $(gem list mathematical --no-verbose |wc -l) -ge 2 ] || (\
+              sudo apt-get -qq -y install bison flex libffi-dev libxml2-dev \
+                libgdk-pixbuf2.0-dev libcairo2-dev libpango1.0-dev libzstd-dev libwebp-dev fonts-lyx cmake ruby-dev
+              gem install mathematical asciidoctor-mathematical --user-install
+            )
+            [ $(gem list asciidoctor --no-verbose |grep -cE 'diagram|pdf') -ge 2 ]
+            [ $(gem list mathematical --no-verbose |wc -l) -ge 2 ]
+        - name: sdkman
+          become: false
+          command: |
+            [ -d ~/.sdkman/bin ] || (
+            curl -s "https://get.sdkman.io" | bash
+            bash -ic "sdk i java 21-openjdk /usr/lib/jvm/java-21-openjdk-amd64;\
+            sdk i java 25-openjdk /usr/lib/jvm/java-25-openjdk-amd64;\
+            sdk d java 25-openjdk;\
+            sdk i maven;\
+            sdk i groovy;\
+            sdk i scala;")
+            [ -e ~/.local/share/applications/jconsole.desktop  ] || {
+              mkdir -p ~/.local/share/applications
+              echo "[Desktop Entry]
+            Version=1.0
+            Name=JConsole (jconsole)
+            GenericName=JConsole
+            Comment=Java MBean Viewer
+            Exec=/home/${USER}/.sdkman/candidates/java/current/bin/jconsole
+            StartupNotify=true
+            Terminal=false
+            Type=Application
+            Categories=Java;Profiling;" > ~/.local/share/applications/jconsole.desktop
+              echo "JConsole (jconsole)"
+            }
+            [ $(bash -ic "sdk c 2>/dev/null" |grep -cE 'groovy|maven|scala|java') -eq 4 ]
+        - name: crictl
+          become: true
+          command: |
+            VERSION=$(git ls-remote -t https://github.com/kubernetes-sigs/cri-tools.git | cut -d'/' -f3 |sort -n |tail -n 1)
+            [[ -x /usr/local/bin/crictl && "$(/usr/local/bin/crictl --version)" =~ ${VERSION} ]] || {
+              wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz
+              sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin
+              rm -f crictl-$VERSION-linux-amd64.tar.gz
+              echo 'runtime-endpoint: unix:///var/run/containerd/containerd.sock
+            image-endpoint: unix:///var/run/containerd/containerd.sock' > /etc/crictl.yaml
+            }
+        - name: nerdctr
+          become: true
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/containerd/nerdctl/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(nerdctl --version | sed -E 's/.* ([0-9\.]+).*/\1/')"
+            [ "${CURRENT_VERSION}" = "v${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/containerd/nerdctl/releases/latest | jq -r ".assets[] |
+                select(.name | test(\"linux-amd64.tar.gz$\")) | .browser_download_url" | grep -v full | xargs curl -sSL | tar -zx -o nerdctl
+              mv nerdctl /usr/local/bin
+            }
+        - name: helm
+          desc: |
+            Helm deployment along with various Helm repositories
+            To search chart:
+            helm search repo
+          become: false
+          command: |
+            CURRENT_VERSION="$(curl -Ls https://github.com/helm/helm/releases | grep 'href="/helm/helm/releases/tag/v4.[0-9]*.[0-9]*\"' | \
+              sed -E 's/.*\/helm\/helm\/releases\/tag\/(v[0-9\.]+)".*/\1/g' | head -1)"
+            INSTALLED_VERSION="$(helm version 2>/dev/null | sed -E 's/.*\{Version:"([^"]+)".*/\1/')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-4 | bash
+              helm repo add stable https://charts.helm.sh/stable
+              helm repo add nginx-stable https://helm.nginx.com/stable
+              helm repo add jenkinsci https://charts.jenkins.io
+              helm repo add cilium https://helm.cilium.io/
+              helm repo add bitnami https://charts.bitnami.com/bitnami
+              helm repo add jetstack https://charts.jetstack.io
+              helm repo add istio https://istio-release.storage.googleapis.com/charts
+              helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
+              helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+              helm repo add external-dns https://kubernetes-sigs.github.io/external-dns
+              helm repo add external-secrets https://charts.external-secrets.io
+              helm repo update
+              [ "$(helm plugin list |grep -c diff)" -eq 1 ] || {
+                helm plugin install https://github.com/databus23/helm-diff
+              } && {
+                helm plugin update diff
+              }
+            }
+        - name: minikube
+          become: false
+          command: |
+            CURRENT_VERSION="$(curl -s "https://api.github.com/repos/kubernetes/minikube/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"v([^"]+)".*/\1/')"
+            INSTALLED_VERSION="$(minikube version 2>/dev/null | grep version: | sed -E 's/.*version: v([^"]+)/\1/')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64  &&
+              chmod a+x minikube && sudo mv minikube /usr/bin/ && echo "minikube installed"
+            }
+        - name: cilium-cli
+          become: false
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/cilium/cilium-cli/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(cilium version | grep cilium-cli: | sed -E 's/^cilium.* (v[0-9\.]+).*/\1/')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -L --remote-name-all https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz{,.sha256sum}
+              sha256sum --check cilium-linux-amd64.tar.gz.sha256sum
+              sudo tar xzvfC cilium-linux-amd64.tar.gz /usr/local/bin
+              rm cilium-linux-amd64.tar.gz{,.sha256sum}
+            }
+        - name: velero
+          become: false
+          desc: Ensure latest version of Velero CLI is installed.
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/vmware-tanzu/velero/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(velero version 2>/dev/null| grep Version | sed -E "s/.*Version: (.*)/\1/g")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/vmware-tanzu/velero/releases/latest  | jq -r ".assets[] |
+                select(.name | test(\"velero-.*-linux-amd64.tar.gz$\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/velero.tar.gz"
+              cd /tmp && tar -xzf /tmp/velero.tar.gz
+              sudo mv /tmp/velero*/velero /usr/local/bin/
+              rm -rf /tmp/velero*
+              echo "Velero ${CURRENT_VERSION} has been installed"
+            }
+        - name: code-plugins
+          become: false
+          command: |
+            PLUGINS_TO_INSTALL="{{ vs_code_extensions }}"
+            CODE_PLUGINS="$(code --list-extensions |wc -l)"
+            [ "${CODE_PLUGINS}" -eq {{ vs_code_extensions.split() | length }} ] || {
+              for i in ${PLUGINS_TO_INSTALL} ; do
+                code --force --install-extension "$i"
+              done
+            }
+        - name: krew
+          become: false
+          command: |
+            KREW_VERSION=$(git ls-remote -t https://github.com/kubernetes-sigs/krew.git | grep -v '\^{}' | cut -d'/' -f3 |sort -n |tail -n 1)
+            [[ -e ~/.krew/bin/kubectl-krew && "$(kubectl krew version 2>/dev/null |grep GitTag)" =~ ${KREW_VERSION} ]] || {
+              [ "$(grep -c 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' ~/.bashrc)" -eq 0 ] && \
+              echo 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' >> ~/.bashrc
+              cd "$(mktemp -d)" &&
+              curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/download/${KREW_VERSION}/krew{-linux_amd64.tar.gz,.yaml}" &&
+              tar zxvf krew-linux_amd64.tar.gz &&
+              KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" &&
+              "$KREW" install krew &&
+              "$KREW" install change-ns ctx whoami cilium unused-volumes apparmor-manager advise-psp np-viewer view-webhook oidc-login &&
+              "$KREW" update &&
+              "$KREW" upgrade
+            }
+        - name: k9s
+          become: false
+          command: |
+            CURRENT_VERSION="$(curl -sL "https://api.github.com/repos/derailed/k9s/releases/latest" | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(k9s version -s 2>/dev/null |grep Version | sed -E 's/Version .*(v.*)/\1/')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || (
+              cd "$(mktemp -d)" &&
+              curl -sL "https://api.github.com/repos/derailed/k9s/releases/latest" | jq -r ".assets[] | select(.browser_download_url | endswith(\"k9s_Linux_amd64.tar.gz\")) |.browser_download_url" |
+                xargs curl -sSL | tar -zxv -o k9s &&
+                sudo mv k9s /usr/local/bin &&
+                echo "k9s has been installed"
+            )
+        - name: okd
+          become: false
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/okd-project/okd/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(openshift-install version 2>/dev/null |grep 'openshift-install' | sed -E 's/^openshift-install (.*)/\1/')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              cd "$(mktemp -d)" &&
+              curl -s https://api.github.com/repos/okd-project/okd/releases/latest | jq -r ".assets[] | select(.browser_download_url | contains(\"openshift-install-linux-4\")) |.browser_download_url" |
+                xargs curl -sSL | tar -zx -o openshift-install &&
+                sudo mv openshift-install /usr/local/bin
+              curl -s https://api.github.com/repos/okd-project/okd/releases/latest | jq -r ".assets[] | select(.browser_download_url | contains(\"openshift-client-linux-4\")) |.browser_download_url" |
+                xargs curl -sSL | tar -zx -o oc &&
+                sudo mv oc /usr/local/bin &&
+              curl -s https://api.github.com/repos/okd-project/okd/releases/latest | jq -r ".assets[] | select(.browser_download_url | contains(\"ccoctl-linux\")) |.browser_download_url" |
+                xargs curl -sSL | tar -zx -o ccoctl &&
+                sudo mv ccoctl /usr/local/bin &&
+              echo "oc, openshift-install and ccoctl installed"
+            }
+        - name: rosa
+          become: true
+          command: |
+            [ -x /usr/local/bin/rosa -a "$(rosa version |grep -c "There is a newer release")" -eq 0 ] || {
+              curl -sSL https://mirror.openshift.com/pub/openshift-v4/clients/rosa/latest/rosa-linux.tar.gz | tar -zx -o rosa
+              mv rosa /usr/local/bin/rosa
+              /usr/local/bin/rosa version
+              /usr/local/bin/rosa completion bash > /etc/bash_completion.d/rosa
+            }
+        - name: kubectx-ns
+          become: false
+          command: |
+            [ -h ~/bin/kubectx -o -h ~/bin/kubens ] || (
+              git clone https://github.com/ahmetb/kubectx.git ~/.kubectx
+              COMPDIR=$(pkg-config --variable=completionsdir bash-completion)
+              ln -sf ~/.kubectx/kubectx ~/bin/kubectx
+              ln -sf ~/.kubectx/kubens ~/bin/kubens
+              sudo ln -sf ~/.kubectx/completion/kubens.bash $COMPDIR/kubens
+              sudo ln -sf ~/.kubectx/completion/kubectx.bash $COMPDIR/kubectx
+              echo kubectx and kubens enabled
+            )
+        - name: JDK Mission Control (jmc)
+          become: false
+          command: |
+            [ -d ~/bin/.jmc ] || {
+              cd "$(mktemp -d)" &&
+            curl -sL https://api.github.com/repos/adoptium/jmc-overrides/releases/latest | \
+              jq -r ".assets[] | select(.browser_download_url | contains(\"linux.gtk.x86_64\")) | .browser_download_url" | \
+            xargs curl -sSL | tar -zxv &&
+              mv 'JDK Mission Control' ~/bin/.jmc &&
+              ln -s ~/bin/.jmc/jmc ~/bin/jmc
+            }
+            [ -e ~/.local/share/applications/jmc.desktop  ] || {
+              mkdir -p ~/.local/share/applications
+              echo "[Desktop Entry]
+            Version=1.0
+            Name=JDK Mission Control (jmc)
+            GenericName=JMC
+            Comment=Java Profiler
+            Exec=/home/$(whoami)/bin/jmc
+            StartupNotify=true
+            Terminal=false
+            Icon=/home/$(whoami)/bin/.jmc/icon.xpm
+            Type=Application
+            Categories=Java;Profiling;" > ~/.local/share/applications/jmc.desktop
+              echo "JDK Mission Control (jmc)"
+            }
+        - name: visualvm
+          become: false
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/oracle/visualvm/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(cat ~/bin/.visualvm/VERSION 2>&1)"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              cd "$(mktemp -d)" &&
+              curl -sL https://api.github.com/repos/oracle/visualvm/releases/latest | \
+                jq -r ".assets[]|select(.content_type|test(\"application/zip\"))|select(.name | test(\"visualvm\"))|.browser_download_url" | \
+              xargs curl -sSLO
+              rm -rf ~/bin/.visualvm
+              unzip visualvm*.zip && rm visualvm*.zip &&
+              mv visualvm* ~/bin/.visualvm &&
+              ln -f -s ~/bin/.visualvm/bin/visualvm ~/bin/visualvm
+              echo "${CURRENT_VERSION}" > ~/bin/.visualvm/VERSION
+            }
+            [ -e ~/.local/share/applications/visualvm.desktop  ] || {
+              mkdir -p ~/.local/share/applications
+              echo "[Desktop Entry]
+            Version=1.0
+            Name=VisualVM (visualvm)
+            GenericName=VisualVM
+            Comment=Java Oracle Profiler
+            Exec=/home/$(whoami)/bin/visualvm
+            StartupNotify=true
+            Terminal=false
+            Icon=/home/$(whoami)/bin/.visualvm/etc/visualvm.icns
+            Type=Application
+            Categories=Java;Profiling;" > ~/.local/share/applications/visualvm.desktop
+              echo "VisualVM (visualvm)"
+            }
+        - name: calibre
+          become: true
+          command: |
+            CURRENT_VERSION="$(curl -sL https://calibre-ebook.com/download_linux |grep 'The latest release of calibre is' | sed -E 's/.*The latest release of calibre is (.+)\..*/\1/')"
+            INSTALLED_VERSION="$(calibre --version 2>/dev/null | sed -E 's/.*\(calibre (.*)\)/\1/')"
+            [[ -n "${INSTALLED_VERSION}" && ("${CURRENT_VERSION}" == "${INSTALLED_VERSION}"*) ]] || {
+              echo "Installing Calibre ${CURRENT_VERSION} on top of ${INSTALLED_VERSION}..."
+              wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo bash
+            }
+        - name: kubectl plugins
+          become: true
+          command: |
+            [ -h /usr/local/bin/kubectl-su ] || (
+              ln -s {{ playbook_dir }}/../../k8s/scripts/kubesu /usr/local/bin/kubectl-su
+              echo "kubectl su enabled"
+            )
+        - name: kubectl GKE GCLOUD auth plugin v1.25, and speedp IAP tunnel by installing NumPy lib as gcloud addon
+          become: false
+          command: |
+            [ "$(grep -c 'export USE_GKE_GCLOUD_AUTH_PLUGIN=True' ~/.bashrc)" -ne 0  ] || (
+              echo 'export USE_GKE_GCLOUD_AUTH_PLUGIN=True' >> ~/.bashrc
+              echo "kubectl GKE GCLOUD auth plugin v1.25 enabled"
+            )
+            [ "$($(gcloud info --format='value(basic.python_location)') -m pip list |grep -c numpy)" -ne 0 ] || {
+              $(gcloud info --format='value(basic.python_location)') -m pip install numpy
+            }
+        - name: shellcheck
+          become: false
+          command: |
+            [ -x ~/bin/shellcheck ] || (
+              cd ~/bin &&
+              wget -qO- https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.x86_64.tar.xz | tar -xJv -o shellcheck-stable/shellcheck &&
+              mv shellcheck-stable/shellcheck . && rmdir shellcheck-stable
+            )
+        - name: shfmt
+          become: false
+          command: |
+            [ -x ~/bin/shfmt ] || (
+              go install mvdan.cc/sh/v3/cmd/shfmt@latest
+            )
+        - name: markdownlinter
+          become: true
+          command: |
+            gem list -i --silent mdl || gem install mdl
+        - name: istioctl
+          become: false
+          command: |
+            CURRENT_VERSION="$(curl -sL https://github.com/istio/istio/releases | \
+                  grep -o 'releases/[0-9]*.[0-9]*.[0-9]*/' | sort --version-sort | \
+                  tail -1 | awk -F'/' '{ print $2}')"
+            INSTALLED_VERSION="$(istioctl version --remote=false 2>/dev/null |sed -E 's/.*version: (.+)/\1/')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://istio.io/downloadIstioctl | sh -
+              [[ "${PATH}" == *istioctl/bin* ]] || {
+                echo 'export PATH=$PATH:$HOME/.istioctl/bin' >> ~/.bashrc
+              }
+            }
+        - name: terraform-tofu-config
+          desc: |
+            additional terraform cli configuration, added autocomplete and plugins caching
+          become: false
+          command: |
+            [ "$(grep -c 'complete -C /usr/bin/tofu tofu' ~/.bashrc)" -ne 0 ] || tofu -install-autocomplete
+            [ "$(grep -c 'plugin_cache_dir' ~/.terraformrc 2>/dev/null || echo 0)" -ne 0 ] || {
+              mkdir -p ~/.terraform.d/plugins
+              echo -e 'plugin_cache_dir = "$HOME/.terraform.d/plugins"\nplugin_cache_may_break_dependency_lock_file = true' > ~/.terraformrc
+            }
+        - name: terraformer
+          desc: |
+            Reverse terraform
+            Sample for GC:
+            terraformer import google --connect=true --regions=`gcloud config get-value compute/region` --projects=`gcloud config get-value project` \
+            --resources=dns,monitoring,addresses,autoscalers,regionAutoscalers,globalForwardingRules,healthChecks,globalAddresses,regionBackendServices,urlMaps,regionSslCertificates,forwardingRules,httpHealthChecks,targetTcpProxies,regionInstanceGroupManagers,targetHttpsProxies,backendServices,sslCertificates
+            Sample for AWS
+            awsume rolename@accounr
+            cd "$(mktemp -d)"
+            echo 'terraform {
+              required_providers {
+                aws = {
+                  source  = "hashicorp/aws"
+                  version = "~> 6"
+                }
+              }
+              required_version = ">= 1.0"
+            }' > versions.tf
+            # terraformer supports only Terraform
+            sudo apt install terraform
+            terraform init
+            # TODO https://github.com/GoogleCloudPlatform/terraformer/issues/1743
+            terraformer import aws --resources=api_gateway,alb --regions=us-east-1 --profile=""
+            sudo apt -y remove terraform
+          become: true
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/GoogleCloudPlatform/terraformer/releases/latest | grep tag_name | cut -d '"' -f 4)"
+            INSTALLED_VERSION=$(terraformer --version 2>/dev/null | sed -E 's/version v(.*)/\1/g')
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              export PROVIDER=all
+              curl -LO https://github.com/GoogleCloudPlatform/terraformer/releases/download/$(curl -sL https://api.github.com/repos/GoogleCloudPlatform/terraformer/releases/latest | \
+                grep tag_name | cut -d '"' -f 4)/terraformer-${PROVIDER}-linux-amd64
+              chmod +x terraformer-${PROVIDER}-linux-amd64
+              sudo mv terraformer-${PROVIDER}-linux-amd64 /usr/local/bin/terraformer
+              echo "Terraformer has been installed"
+            }
+        - name: tofu
+          become: true
+          desc: Ensure latest version OpenTofu installed
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/opentofu/opentofu/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(tofu version 2>/dev/null |grep OpenTofu | sed "s/OpenTofu //g")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/opentofu/opentofu/releases/latest | jq -r ".assets[] |
+                select(.name | test(\"amd64.deb$\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/tofu.deb"
+              apt -y install /tmp/tofu.deb
+            }
+        - name: terragrunt
+          become: true
+          desc: Ensure latest version of Terragrunt is installed
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(terragrunt --version 2>/dev/null | sed -E 's/.* version (.*)/\1/g')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r ".assets[] |
+                select(.name | test(\"linux_amd64$\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/usr/local/bin/terragrunt"
+              chmod a+x /usr/local/bin/terragrunt
+              echo "Terragrunt has been installed"
+            }
+        - name: trivy
+          become: true
+          desc: Ensure latest version of Trivy is installed
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/aquasecurity/trivy/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="v$(trivy --version 2>/dev/null |grep Version | sed -E 's/Version: (.*)/\1/g')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/aquasecurity/trivy/releases/latest | jq -r ".assets[] |
+                select(.name | test(\"Linux-64bit.tar.gz$\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/trivy.tar.gz"
+              cd /tmp && tar -xzf trivy.tar.gz trivy && rm trivy.tar.gz && mv trivy /usr/local/bin
+              chmod a+x /usr/local/bin/trivy
+              echo "Trivy has been installed"
+            }
+        - name: ibm-mq-client
+          desc: |
+            Install minimal MQ client library in /opt/mqm
+            Bare commands are placed on path
+            Sample MQ apps located in /opt/mqm/samp/bin
+
+            To install MQ along with server on Ubuntu follow:
+            https://developer.ibm.com/tutorials/mq-connect-app-queue-manager-ubuntu/
+            or run a script:
+            https://github.com/ibm-messaging/mq-dev-samples/blob/master/gettingStarted/installing-mq-ubuntu/mq-ubuntu-install.sh
+          become: true
+          command: |
+            # TODO consider full server version
+            # https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/9.4.1.1-IBM-MQ-Advanced-for-Developers-LinuxX64.tar.gz
+            # TODO add detect a new version
+            [ -e /opt/mqm ] || {
+              rm -rf /tmp/mq && mkdir -p /tmp/mq && cd /tmp/mq
+              curl -sSL https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/{{ versions.mq }}-IBM-MQC-Redist-LinuxX64.tar.gz |
+                tar -zx
+              export genmqpkg_inc{sdk,tls,man,adm,samp}=1
+              rm -rf /opt/mqm
+              [ "$(grep -c 'opt/mqm' ~/.bashrc)" -gt 0 ] || {
+                echo 'PATH=/opt/mqm/bin:${PATH}' >> ~/.bashrc
+              }
+              ./bin/genmqpkg.sh -b /opt/mqm
+              rm -rf /tmp/mq
+            }
+        - name: tflint
+          become: false
+          command: |
+            CURRENT_VERSION="$(curl -sL "https://api.github.com/repos/terraform-linters/tflint/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"v([^"]+)".*/\1/')"
+            INSTALLED_VERSION="$(tflint --version 2>/dev/null | grep version |  sed -E 's/.*version ([^"]+)/\1/')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh |bash
+            }
+        - name: gnome-dark-theme
+          become: false
+          desc: To ensure Ubuntu is fully in dark theme
+          command: |
+            CURRENT_VALUE="$(gsettings get org.gnome.shell.extensions.user-theme name 2>/dev/null)"
+            [ "${CURRENT_VALUE}" = "'Yaru-dark'" ] || {
+              gsettings set org.gnome.shell enabled-extensions "['desktop-icons@csoriano', 'user-theme@gnome-shell-extensions.gcampax.github.com']"
+              gsettings set org.gnome.shell.extensions.user-theme name 'Yaru-dark'
+              gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark'
+              echo "Dark theme for Ubuntu Gnome has been set"
+            }
+        - name: gnome-config
+          become: false
+          desc: To ensure Gnome config is optimal one
+          command: |
+            CURRENT_VALUE="$(gsettings get org.gnome.desktop.thumbnail-cache maximum-age 2>/dev/null)"
+            [ "${CURRENT_VALUE}" -eq 30 ] || {
+              gsettings set org.gnome.desktop.thumbnail-cache maximum-age 30
+              gsettings set org.gnome.desktop.thumbnail-cache maximum-size 128
+              echo "Ubuntu Gnome thumbnail cache settings have been set"
+            }
+        - name: log-rotate-config
+          become: true
+          desc: To ensure Ubuntu has not too much system logs
+          command: |
+            CURRENT_VALUE="$(grep -c 'rotate [2-9]' /etc/logrotate.d/rsyslog 2>/dev/null)"
+            [ "${CURRENT_VALUE}" -eq 0 ] || {
+              sed -i 's/rotate .$/rotate 1/g' /etc/logrotate.d/rsyslog /etc/logrotate.conf
+              sed -i 's/weekly/daily/g' /etc/logrotate.d/rsyslog /etc/logrotate.conf
+              sed -i 's/#SystemMaxFiles=.*$/SystemMaxFiles=7/g' /etc/systemd/journald.conf
+              sed -i 's/#SystemMaxUse=.*$/SystemMaxUse={{ systemd_journal.max_size }}/g' /etc/systemd/journald.conf
+              sed -i 's/#RuntimeMaxUse=.*$/RuntimeMaxUse={{ systemd_journal.max_size }}/g' /etc/systemd/journald.conf
+              echo "Ubuntu log rotate config has been changed"
+            }
+        - name: awscli2
+          become: false
+          desc: To install awscli2
+          command: |
+            CURRENT_VERSION="$(git ls-remote -t https://github.com/aws/aws-cli.git | grep -v '{}'|cut -d'/' -f3 | sort -t. -k1,1n -k2,2n -k3,3n |tail -n 1)"
+            INSTALLED_VERSION="$(aws --version  |cut -d'/' -f2 |cut -d' ' -f1)"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              rm -rf /tmp/awscli-installer && mkdir -p /tmp/awscli-installer && cd /tmp/awscli-installer
+              curl -sSLO "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+              unzip awscli-exe-linux-x86_64.zip
+              sudo aws/install --update
+              rm -rf /tmp/awscli-installer
+              echo "AWC CLI Installed"
+              curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "/tmp/session-manager-plugin.deb"
+              sudo dpkg -i /tmp/session-manager-plugin.deb
+              echo "AWC Session Manager Plugin Installed"
+            }
+            [ -e /etc/bash_completion.d/aws_bash_completer ] || {
+              sudo sh -c "echo 'complete -C aws_completer aws' > /etc/bash_completion.d/aws_bash_completer"
+              echo "AWC CLI Bash completion Enabled"
+            }
+            [ -e "$HOME/.aws/config" ] || {
+              mkdir -p ~/.aws
+              echo '[default]
+            region=us-east-1' > ~/.aws/config
+            }
+        - name: eksctl
+          become: true
+          command: |
+            CURRENT_VERSION="$(curl -sL "https://api.github.com/repos/eksctl-io/eksctl/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"v([^"]+)".*/\1/')"
+            INSTALLED_VERSION="$(eksctl version 2</dev/null)";
+            [[ "${INSTALLED_VERSION}" == "${CURRENT_VERSION}"* ]] || {
+              echo "Downloading EKSCTL ${CURRENT_VERSION}..."
+              curl -sSL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz" | tar -zx -o eksctl
+              mv eksctl /usr/local/bin
+              echo "EKSCTL CLI installed"
+            }
+        - name: restic
+          become: true
+          command: |
+            CURRENT_VERSION="$(curl -sL "https://api.github.com/repos/restic/restic/releases/latest" | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(restic version 2</dev/null |cut -d' ' -f2)";
+            [[ "v${INSTALLED_VERSION}" == "${CURRENT_VERSION}"* ]] || {
+              echo "Downloading RESTIC ${CURRENT_VERSION}..."
+              curl -sSL "https://github.com/restic/restic/releases/download/${CURRENT_VERSION}/restic_${CURRENT_VERSION:1}_linux_amd64.bz2" | bzip2 -d > /usr/local/bin/restic
+              chmod a+x /usr/local/bin/restic
+              echo "Restic CLI installed"
+            }
+            CURRENT_VERSION="$(curl -sL "https://api.github.com/repos/creativeprojects/resticprofile/releases/latest" | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(resticprofile version 2</dev/null |cut -d' ' -f3)";
+            [[ "v${INSTALLED_VERSION}" == "${CURRENT_VERSION}"* ]] || {
+              echo "Downloading Resticprofile ${CURRENT_VERSION}..."
+              cd /usr/local && curl -sfL https://raw.githubusercontent.com/creativeprojects/resticprofile/master/install.sh | sh
+              echo "Resticprofile CLI installed"
+            }
+            [ "{{ backup | default("False") }}" = "False" ] || {
+              sudo mkdir -p /etc/resticprofile
+              echo "{{ restic_profiles_config }}" | sudo tee /etc/resticprofile/profiles.yaml
+              echo "password" > /etc/resticprofile/key
+              chmod 600 /etc/resticprofile/profiles.yaml /etc/resticprofile/key
+              resticprofile --config /etc/resticprofile/profiles.yaml schedule --all
+              echo "Resticprofile configured and scheduled"
+            }
+        - name: root-ca
+          become: true
+          desc: To ensure that there is a root CA certificate for the host and it is added to the trusted store and can be used by browsers and CLI tools.
+          command: |
+            trust list --filter=ca-anchors | grep -qi "{{ ansible_facts.hostname }} Internal Root CA" \
+              && [ -f "/usr/local/share/ca-certificates/{{ ansible_facts.hostname }}-root-ca.crt" ] \
+              || {
+              openssl genrsa -out /usr/local/share/ca-certificates/{{ ansible_facts.hostname }}-root-ca.key 4096
+              openssl req -x509 -new -nodes \
+                -key /usr/local/share/ca-certificates/{{ ansible_facts.hostname }}-root-ca.key \
+                -sha256 -days 3650 \
+                -out /usr/local/share/ca-certificates/{{ ansible_facts.hostname }}-root-ca.crt \
+                -subj "/CN={{ ansible_facts.hostname }} Internal Root CA" \
+                -addext "basicConstraints=critical,CA:TRUE" \
+                -addext "keyUsage=critical,keyCertSign,cRLSign"
+              update-ca-certificates
+              echo "Root CA certificate for {{ ansible_facts.hostname }} installed"
+            }
+        - name: ibmcloud
+          become: false
+          desc: To install ibmcloud cli
+          command: |
+            CURRENT_VERSION="$(curl -sL "https://api.github.com/repos/IBM-Cloud/ibm-cloud-cli-release/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"v([^"]+)".*/\1/')"
+            INSTALLED_VERSION="$(ibmcloud --version 2>/dev/null | head -n 1 |sed -E 's/ibmcloud (.+[0-9]) .+/\1/')";
+            [[ "${INSTALLED_VERSION}" == "${CURRENT_VERSION}"* ]] || {
+              curl -fsSL https://clis.cloud.ibm.com/install/linux | sudo sh
+              ibmcloud plugin install is -f
+            }
+        - name: awsp
+          become: false
+          command: |
+            AWSP_BASHRC='#AWS Profile Switcher (awsp)
+            source ~/bin/awsp_functions.sh
+            alias awsall="_awsListProfile"
+            alias awsp="_awsSetProfile"
+            alias awswho="aws configure list"
+            alias awswhoami="aws sts get-caller-identity"
+            alias awsgettoken="aws sts get-session-token"
+            [ -e "$HOME/.aws/credentials" ] && complete -W "$(cat $HOME/.aws/credentials | grep -Eo [.*] | tr -d [])" _awsSwitchProfile
+            [ -e "$HOME/.aws/config" ] && complete -W "$(cat $HOME/.aws/config | grep -Eo [.*] | tr -d [] | cut -d " " -f 2)" _awsSetProfile'
+
+            [ -e ~/bin/awsp_functions.sh  ] || {
+              cd ~/bin && curl -sSLO https://raw.githubusercontent.com/antonbabenko/awsp/master/awsp_functions.sh && chmod u+x awsp_functions.sh
+              echo "${AWSP_BASHRC}" >> ~/.bashrc
+              echo "AWSP Installed"
+            }
+        - name: awsume
+          desc: |
+            Ensure AWS config is present: https://awsu.me/general/aws-file-configuration.html
+          become: false
+          command: |
+            AWSSUME_BASHRC='alias awsume=". awsume"'
+            [ "$(grep -c 'awsume' ~/.bashrc)" -gt 0 ] || {
+              echo "${AWSSUME_BASHRC}" >> ~/.bashrc
+            }
+        - name: chrome unsafe link
+          become: false
+          desc: chrome allowing access to site with self-signed or invalid TLS certificates
+          command: |
+            [ -e ~/.local/share/applications/unsafe-chrome.desktop  ] || {
+              mkdir -p ~/.local/share/applications
+              echo '[Desktop Entry]
+            Version=1.0
+            Name=Unsafe Google Chrome
+            GenericName=Web Browser
+            Comment=Access the Internet
+            Exec=/usr/bin/google-chrome-stable --ignore-certificate-errors
+            StartupNotify=true
+            Terminal=false
+            Icon=google-chrome
+            Type=Application
+            Categories=Network;WebBrowser;' > ~/.local/share/applications/unsafe-chrome.desktop
+              echo "Unsafe Chrome link installed"
+            }
+        - name: guake link
+          become: false
+          desc: guake link so that it can be add to tweaks autostart
+          command: |
+            [ -e ~/.local/share/applications/guake.desktop  ] || {
+              mkdir -p ~/.local/share/applications
+              echo '[Desktop Entry]
+            Version=1.0
+            Name=Guake
+            GenericName=Guake
+            Comment=Guake
+            Exec=/usr/bin/guake
+            StartupNotify=true
+            Terminal=false
+            Type=Application
+            Categories=Terminal;' > ~/.local/share/applications/guake.desktop
+              echo "Guake link installed"
+            }
+        - name: caprine
+          become: true
+          desc: Ensure latest version of Caprine/unofficial Messenger client for Linux is installed
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/sindresorhus/caprine/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(dpkg -s caprine 2>/dev/null |grep Version | sed "s/Version: /v/g")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/sindresorhus/caprine/releases/latest | jq -r ".assets[] |
+                select(.name | test(\".deb\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/caprine.deb"
+              apt -y install /tmp/caprine.deb
+            }
+        - name: musescore
+          become: false
+          desc: Ensure latest version of Muse Score Studio is installed
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/musescore/MuseScore/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(musescore4portable --version 2>/dev/null | sed "s/MuseScore4 /v/g")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              if command -v musescore4portable >/dev/null; then
+                musescore4portable upgrade
+              else
+                curl -sL https://api.github.com/repos/musescore/MuseScore/releases/latest | jq -r ".assets[] |
+                  select(.name | (endswith(\"x86_64.AppImage\")) and startswith(\"MuseScore-Studio\")) | .browser_download_url" |
+                    xargs curl -s -L -o "/tmp/musescore.AppImage"
+                chmod u+x /tmp/musescore.AppImage
+                /tmp/musescore.AppImage install
+              fi
+            }
+            [ -e ~/.local/share/applications/musescore.desktop  ] || {
+              mkdir -p ~/.local/share/applications
+              echo "[Desktop Entry]
+            Version=1.0
+            Name=MuseScore Studio
+            GenericName=MuseScore
+            Comment=MuseScore Studio
+            Exec=${HOME}/.local/bin/musescore4portable
+            StartupNotify=true
+            Terminal=false
+            Type=Application
+            Categories=Entertainment;" > ~/.local/share/applications/musescore.desktop
+              echo "MuseScore link installed"
+            }
+        - name: datadog
+          become: true
+          desc: |
+            Ensure latest version of Datadog agent is installed
+            Datadog Agent is installed only when DD_API_KEY environment variable is set (for example via ~/.bashrc export)
+            To uninstall Datadog run: datadog-installer purge; apt -y remove datadog-agent; rm -rf /etc/datadog-agent
+            Install script parameters: https://github.com/DataDog/agent-linux-install-script
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/DataDog/datadog-agent/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(datadog-agent version 2>/dev/null| sed -E "s/Agent (.*) - Commit: .*/\1/g")"
+            CURRENT_DD_API_KEY="$(yq -r ".api_key" /etc/datadog-agent/datadog.yaml 2>/dev/null)"
+            DD_API_KEY="{{ lookup('env', 'DD_API_KEY') }}"
+            [ -z "${DD_API_KEY}" ] || [ "{{ datadog_agent | default("False") }}" = "False" ] ||  {
+              ! [ "${CURRENT_VERSION}" != "${INSTALLED_VERSION}" -o "${CURRENT_DD_API_KEY}" != "${DD_API_KEY}" ] || {
+                DD_API_KEY="${DD_API_KEY}" \
+                DD_SITE="datadoghq.com" \
+                DD_TAGS="role:developer" \
+                DD_APM_INSTRUMENTATION_ENABLED=host \
+                DD_APM_INSTRUMENTATION_LIBRARIES=java:1,python:4,js:5,php:1,dotnet:3,ruby:2\
+                DD_APM_ERROR_TRACKING_STANDALONE=true \
+                DD_RUNTIME_SECURITY_CONFIG_ENABLED=false \
+                DD_COMPLIANCE_CONFIG_ENABLED=false \
+                DD_REMOTE_UPDATES=true \
+                DD_DISCOVERY_ENABLED=true \
+                DD_ENV="home" \
+                DD_PRIVILEGED_LOGS_ENABLED=true \
+                DD_OTELCOLLECTOR_ENABLED=false \
+                DD_SYSTEM_PROBE_SERVICE_MONITORING_ENABLED=false \
+                DD_LOGS_CONFIG_PROCESS_COLLECT_ALL=true \
+                bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)"
+                usermod -a -G docker dd-agent
+
+                echo "network_config:
+                enabled: true" >> /etc/datadog-agent/system-probe.yaml
+                # workaound for error in datadog system probe status:
+                # NPM === Status: Not running
+                # Error: error loading CO-RE network tracer:
+                # error reading tracer.o: /opt/datadog-agent/embedded/share/system-probe/ebpf/co-re/tracer.o has incorrect permissions: user=995, group=983, permissions=-rw-r--r--
+                chown root:root /opt/datadog-agent/embedded/share/system-probe/ebpf/co-re/tracer.o /opt/datadog-agent/embedded/share/system-probe/ebpf/runtime-security-syscall-wrapper.o
+                chmod 700 /opt/datadog-agent/embedded/share/system-probe/ebpf/co-re/tracer.o /opt/datadog-agent/embedded/share/system-probe/ebpf/runtime-security-syscall-wrapper.o
+
+                # enabling journald log collection
+                cp /etc/datadog-agent/conf.d/journald.d/conf.yaml.example /etc/datadog-agent/conf.d/journald.d/conf.yaml
+                echo "logs:
+                - type: journald
+                  container_mode: true" > /etc/datadog-agent/conf.d/journald.d/conf.yaml
+
+                datadog-installer apm instrument
+                systemctl restart datadog-agent
+              }
+            }
+        - name: cri-dockerd
+          become: true
+          desc: Ensure latest version of cri-dockerd is installed. cri-dockerd is a requirement for Minikube to run
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(cri-dockerd --version 2>&1| sed -E "s/cri-dockerd (.*) .*/v\1/g")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest  | jq -r ".assets[] |
+                select(.name | test(\"ubuntu-{{ versions.cri_dockerd_ubuntu_version }}_amd64.deb\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/cri-dockerd.deb"
+              apt --allow-downgrades -y install /tmp/cri-dockerd.deb
+            }
+        - name: discord
+          become: true
+          desc: Discord app
+          command: |
+            DOWNLOAD_URL="$(curl -s -o /dev/null -w '%header{location}' https://discord.com/api/download?platform=linux)"
+            CURRENT_VERSION="$(echo $DOWNLOAD_URL |  sed -E 's#.*/discord-([0-9]+\.[0-9]+\.[0-9]+)\.deb#\1#')"
+            INSTALLED_VERSION="$(apt list discord 2>/dev/null | grep discord |  sed -E 's/.* ([0-9]+\.[0-9]+\.[0-9]+) amd.*/\1/')"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -s -L -o "/tmp/discord.deb" "${DOWNLOAD_URL}"
+              apt -y install /tmp/discord.deb
+            }
+        - name: otel
+          become: true
+          desc: Ensure latest version of Open Telemetry (otel/  opentelemetry-collector contrib) is installed.
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(otelcol-contrib --version 2>&1| sed -E "s/otelcol-contrib version (.*)/v\1/g")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases  | jq -r ".[0].assets[] |
+                select(.name | (endswith(\"linux_$(dpkg --print-architecture).deb\")) and startswith(\"otelcol-contrib\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/otelcol-contrib.deb"
+              apt -y install /tmp/otelcol-contrib.deb
+              # so that otelcol-contrib user which runs systemctl service can access journal logs
+              usermod -a -G adm otelcol-contrib
+            }
+        - name: mongodb-compass
+          become: false
+          desc: Ensure latest version of MongoDB Compass (GUI) is installed.
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/mongodb-js/compass/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="$(mongodb-compass --version 2>/dev/null| sed -E "s/.*ompass (.*)/v\1/g")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/mongodb-js/compass/releases/latest  | jq -r ".assets[] |
+                select(.name | test(\"mongodb-compass_.*_amd64.deb$\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/mongodb-compass.deb"
+              sudo apt --allow-downgrades -y install /tmp/mongodb-compass.deb
+            }
+        - name: mongosh
+          become: true
+          desc: Ensure latest version of MongoDB Shell (mongosh) is installed.
+          command: |
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/mongodb-js/mongosh/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="v$(mongosh --version 2>&1)"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -sL https://api.github.com/repos/mongodb-js/mongosh/releases/latest  | jq -r ".assets[] |
+                select(.name | test(\"mongodb-mongosh_.*_amd64.deb$\")) | .browser_download_url" |
+                  xargs curl -s -L -o "/tmp/mongodb-mongosh.deb"
+              apt --allow-downgrades -y install /tmp/mongodb-mongosh.deb
+            }
+        - name: poetry
+          desc: Dependency management for Python
+          become: false
+          command: |
+            [ -x ~/.local/bin/poetry ] || (
+              curl -sSL https://install.python-poetry.org | python3 -
+              ${HOME}/.local/bin/poetry completions bash >> ~/.bash_completion
+              # ensure poetry will create virtualenv in project directory
+              ${HOME}/.local/bin/poetry config virtualenvs.in-project true
+            )
+        - name: nvm_node_npm
+          desc: Node.js swithing engine, NodeJS LTS install/update plus global tools - Serverless, ncu installation
+          become: false
+          command: |
+            GLOBAL_PACKAGES="npm-check-updates serverless markdown-link-check"
+            CURRENT_VERSION="$(curl -sL https://api.github.com/repos/nvm-sh/nvm/releases/latest | jq -r ".tag_name")"
+            INSTALLED_VERSION="v$(bash -ic  "nvm --version")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${CURRENT_VERSION}/install.sh" | bash
+              bash -ic "nvm install --lts --latest-npm && nvm use --lts && npm i ${GLOBAL_PACKAGES} -g"
+            }
+            INSTALLED_VERSION="$(bash -ic "nvm use --lts >/dev/null 2>&1 && nvm version")"
+            CURRENT_VERSION="$(bash -ic "nvm version-remote --lts")"
+            [ "${CURRENT_VERSION}" = "${INSTALLED_VERSION}" ] || {
+              echo "Installing NodeJS: ${CURRENT_VERSION} and uninstalling: ${INSTALLED_VERSION}"
+              bash -ic "nvm install --lts --latest-npm && nvm use --lts && npm i ${GLOBAL_PACKAGES} -g && nvm uninstall ${INSTALLED_VERSION}"
+            }
+            [[ "$(bash -ic "nvm use --lts >/dev/null 2>&1 && ncu -g 2>/dev/null")" == *"All global packages are up-to-date"* ]] || {
+              bash -ic "nvm use --lts >/dev/null 2>&1 && eval \"$(nvm use --lts >/dev/null 2>&1 && ncu -g 2>/dev/null| grep 'npm -g install')\""
+              npm i ${GLOBAL_PACKAGES} -g
+            }
+        - name: claude
+          desc: |
+            Claude Code CLI (native installer, auto-updates itself), installed to ~/.local/bin/claude
+            When ANTHROPIC_BASE_URL and ANTHROPIC_AUTH_TOKEN environment variables are set in the environment ansible-playbook is run from
+            (for example exported in ~/.bashrc of the shell running the playbook, the task itself does not read ~/.bashrc)
+            they are merged into env section of ~/.claude/settings.json (other existing settings are preserved) and the file is kept 0600.
+            Unsetting the variables later does not remove them from ~/.claude/settings.json, remove them manually if needed.
+          become: false
+          command: |
+            [ -x ~/.local/bin/claude ] || {
+              INSTALLER="$(mktemp)"
+              if curl -fsSL https://claude.ai/install.sh -o "${INSTALLER}" && bash "${INSTALLER}"; then
+                rm -f "${INSTALLER}"
+                echo "Claude Code CLI installed: $(~/.local/bin/claude --version)"
+              else
+                rm -f "${INSTALLER}"
+                echo "Claude Code CLI installation failed" >&2
+                exit 1
+              fi
+            }
+            [[ -z "${ANTHROPIC_BASE_URL}" || -z "${ANTHROPIC_AUTH_TOKEN}" ]] || {
+              SETTINGS="${HOME}/.claude/settings.json"
+              umask 077
+              mkdir -p "${HOME}/.claude"
+              [ -s "${SETTINGS}" ] || echo '{}' > "${SETTINGS}"
+              jq -e 'type == "object"' "${SETTINGS}" >/dev/null 2>&1 || {
+                echo "Invalid JSON in ${SETTINGS}, Claude settings not updated" >&2
+                exit 1
+              }
+              [ "$(stat -c %a "${SETTINGS}")" = "600" ] || {
+                chmod 600 "${SETTINGS}" && echo "Claude settings permissions set to 600: ${SETTINGS}"
+              }
+              jq -e '.env.ANTHROPIC_BASE_URL == $ENV.ANTHROPIC_BASE_URL and .env.ANTHROPIC_AUTH_TOKEN == $ENV.ANTHROPIC_AUTH_TOKEN' \
+                "${SETTINGS}" >/dev/null 2>&1 || {
+                if jq '.env.ANTHROPIC_BASE_URL = $ENV.ANTHROPIC_BASE_URL | .env.ANTHROPIC_AUTH_TOKEN = $ENV.ANTHROPIC_AUTH_TOKEN' \
+                  "${SETTINGS}" > "${SETTINGS}.tmp" && mv "${SETTINGS}.tmp" "${SETTINGS}"; then
+                  echo "Claude settings updated: ${SETTINGS}"
+                else
+                  rm -f "${SETTINGS}.tmp"
+                  echo "Claude settings update failed: ${SETTINGS}" >&2
+                  exit 1
+                fi
+              }
+            }
+        - name: ssh_dir
+          desc: Ensures that ~/.ssh directory exists and has correct permissions
+          become: false
+          command: |
+            [ -d ~/.ssh ] || {
+              mkdir -p ~/.ssh
+              chmod 700 ~/.ssh
+            }
+        user_files_config:
+        - file: ".ssh/config"
+          mode: "600"
+          content: |
+            Host *
+              ServerAliveInterval 60
+              ServerAliveCountMax 3
+              LogLevel ERROR
+        files_config:
+        - file: /etc/gai.conf
+          content: |
+            precedence  ::1/128       50
+            precedence  ::/0          40
+            precedence  2002::/16     30
+            precedence ::/96          20
+            precedence ::ffff:0:0/96  100
+        - file: /etc/security/limits.d/open-files-limit.conf
+          content: |
+            *   soft    nofile    32768
+            *   hard    nofile    65536
+        - file: /etc/autofs.conf
+          content: |
+            logging = verbose
+        - file: /etc/modules
+          content: |
+            # The list here shoud be generated by `sudo sensors-detect`
+            # Chip drivers
+            coretemp
+        - file: /etc/modprobe.d/blacklist.conf
+          desc: |
+            Disablement of KVM is requirement of VirtualBox:
+            VirtualBox can't operate in VMX root mode.
+            Please disable the KVM kernel extension, recompile your kernel and reboot.
+            (VERR_VMX_IN_VMX_ROOT_MODE).
+          content: |
+            blacklist kvm_amd
+            blacklist kvm_intel

@@ -7,10 +7,15 @@ endif
 *.yaml: ## run particular Ansible playbook file
 	ansible-playbook $@ $(VERBOSITY)
 
-all: ## run all playbooks for most modern Ubuntu version
+all: ## run all playbooks for most modern Ubuntu version (26.10)
 	ansible-playbook ubuntu-setup.yaml $(VERBOSITY) && \
 		ansible-playbook update.yaml $(VERBOSITY) && \
 		ansible-playbook clean.yaml $(VERBOSITY)
+
+lts: ## run all playbooks for LTS Ubuntu version (26.04, inventory/lts.yml)
+	ansible-playbook -i inventory/lts.yml ubuntu-setup.yaml $(VERBOSITY) && \
+		ansible-playbook -i inventory/lts.yml update.yaml $(VERBOSITY) && \
+		ansible-playbook -i inventory/lts.yml clean.yaml $(VERBOSITY)
 
 wsl: ## run all playbooks for WSL
 	ansible-playbook -i inventory/console.yml ubuntu-setup.yaml -e wsl=true -e node=true $(VERBOSITY) && \
@@ -24,4 +29,4 @@ get-github-quota: ## run current GitHub API quota
 help: ## show usage and tasks (default)
 	@eval $$(sed -E -n 's/^([\*\.a-zA-Z0-9_-]+):.*?## (.*)$$/printf "\\033[36m%-30s\\033[0m %s\\n" "\1" "\2" ;/; ta; b; :a p' $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
-.PHONY: help *.yaml
+.PHONY: help *.yaml all lts wsl

@@ -19,7 +19,7 @@ all:
           # OpenVPN3 repo Supports only LTSs versions
           # List of supported Ubuntu versions:
           # https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos#DebianUbuntu:UsingOpenVPNaptrepositories
-          openvpn_repo_ubuntu_version: "questing"
+          openvpn_repo_ubuntu_version: "resolute"
           # List of supported Ubuntu versions: https://www.hashicorp.com/official-packaging-guide?product_intent=terraform
           terraform_ubuntu_version: "resolute"
           virtualbox_ubuntu_version: "resolute"

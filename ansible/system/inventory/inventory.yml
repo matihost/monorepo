@@ -25,6 +25,7 @@ all:
           openvpn_repo_ubuntu_version: "resolute"
           # List of supported Ubuntu versions: https://www.hashicorp.com/official-packaging-guide?product_intent=terraform
           terraform_ubuntu_version: "resolute"
+          # List of supported Ubuntu versions: https://download.virtualbox.org/virtualbox/debian/dists/
           virtualbox_ubuntu_version: "resolute"
           # List of supported versions: https://github.com/Mirantis/cri-dockerd/releases/latest
           cri_dockerd_ubuntu_version: "noble"
