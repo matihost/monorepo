@@ -65,7 +65,7 @@ jobs:
     # Configure Workload Identity Federation and generate an access token.
     - id: 'auth'
       name: 'Authenticate to Google Cloud'
-      uses: 'google-github-actions/auth@v2'
+      uses: 'google-github-actions/auth@v3'
       with:
         token_format: 'access_token'
         # Format: 'projects/137505059283/locations/global/workloadIdentityPools/gh-pool/providers/gh-pool-provider'
@@ -75,7 +75,7 @@ jobs:
 
     # Alternative option - authentication via credentials json
     # - id: 'auth'
-    #   uses: 'google-github-actions/auth@v2'
+    #   uses: 'google-github-actions/auth@v3'
     #   with:
     #     credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 
@@ -96,7 +96,7 @@ jobs:
         /kaniko/executor -f ./Dockerfile -c "$(pwd)" --insecure  --push-retry 5 - --skip-tls-verify --cache=true --ignore-path=/var/mail --ignore-path=/var/spool/mail \
           --destination="${GAR_LOCATION}-docker.pkg.dev/${GCP_PROJECT}/${GAR_REPOSITORY}/ansible:${{ env.IMAGE_TAG }}"
     - name: Set up GKE credentials
-      uses: google-github-actions/get-gke-credentials@v2
+      uses: google-github-actions/get-gke-credentials@v3
       if: ((inputs.runner || 'ubuntu-26.04') != 'ubuntu-26.04')
       with:
         cluster_name: ${{ env.GKE_CLUSTER }}

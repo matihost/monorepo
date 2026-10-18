@@ -42,7 +42,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Build Ansible image on GH hosted runner
-      uses: aevea/action-kaniko@master
+      uses: aevea/action-kaniko@v0.14.0
       with:
         registry: ${{ vars.REGISTRY }}
         image: matihost/ansible
@@ -54,7 +54,7 @@ jobs:
         cache: true
         debug: true
     - name: Build Ansible root image on GH hosted runner
-      uses: aevea/action-kaniko@master
+      uses: aevea/action-kaniko@v0.14.0
       with:
         registry: ${{ vars.REGISTRY }}
         image: matihost/ansible

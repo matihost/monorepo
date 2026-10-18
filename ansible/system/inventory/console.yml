@@ -10,12 +10,12 @@ all:
           ruby_user_path: "${HOME}/.local/share/gem/ruby/3.3.0/bin"
           # Current supported kubernetess and crio versions:
           # https://github.com/cri-o/packaging/blob/main/README.md#define-the-kubernetes-version-and-used-cri-o-stream
-          kubernetes: v1.36
-          crio: v1.36
+          kubernetes: v1.37
+          crio: v1.37
           # TODO change to {{ ansible_facts.distribution_version }} when current is supported Ubuntu
           # List of supported Ubuntu versions:
           # https://packages.microsoft.com/repos/azure-cli/dists/
-          azure_repo_ubuntu_version: "noble"
+          azure_repo_ubuntu_version: "resolute"
           # OpenVPN3 repo Supports only LTSs versions
           # List of supported Ubuntu versions:
           # https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos#DebianUbuntu:UsingOpenVPNaptrepositories
@@ -24,9 +24,9 @@ all:
           terraform_ubuntu_version: "resolute"
           virtualbox_ubuntu_version: "resolute"
           # List of supported versions: https://github.com/Mirantis/cri-dockerd/releases/latest
-          cri_dockerd_ubuntu_version: "jammy"
+          cri_dockerd_ubuntu_version: "noble"
           # MQ Version available at: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/
-          mq: 9.4.5.1
+          mq: 10.0.1.0
           # List of supported Ubuntu versions: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive
           onedrive_ubuntu_version: "26.04"
           # List of supported Ubuntu versions: https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/
@@ -171,7 +171,7 @@ all:
           key_url: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_{{ versions.onedrive_ubuntu_version }}/Release.key
         - name: jenkins
           repo: "deb [arch=amd64] https://pkg.jenkins.io/debian-stable binary/"
-          key_url: "https://pkg.jenkins.io/debian/jenkins.io-2023.key"
+          key_url: "https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key"
         - name: dbeaver
           repo: "deb [arch=amd64] https://dbeaver.io/debs/dbeaver-ce /"
           key_url: "https://dbeaver.io/debs/dbeaver.gpg.key"
@@ -225,10 +225,10 @@ all:
         - vagrant
         - sshpass
         - certbot
-        - google-cloud-sdk
-        - google-cloud-sdk-gke-gcloud-auth-plugin
-        - google-cloud-sdk-cloud-build-local
-        - google-cloud-sdk-kpt
+        - google-cloud-cli
+        - google-cloud-cli-gke-gcloud-auth-plugin
+        - google-cloud-cli-cloud-build-local
+        - google-cloud-cli-kpt
         - envoy
         # - jenkins
         # requirement for Jetbrains Toolbox

@@ -37,7 +37,7 @@ jobs:
     go: "1.26"
     before_install: cd go/learning
     script:
-    - go build -mod=mod -o .  ./...
+    - go build -o .  ./...
     - go test ./pkg/language
     - ./language
     cache:

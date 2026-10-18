@@ -259,10 +259,10 @@ all:
         - notepadqq
         - certbot
         - google-chrome-stable
-        - google-cloud-sdk
-        - google-cloud-sdk-gke-gcloud-auth-plugin
-        - google-cloud-sdk-cloud-build-local
-        - google-cloud-sdk-kpt
+        - google-cloud-cli
+        - google-cloud-cli-gke-gcloud-auth-plugin
+        - google-cloud-cli-cloud-build-local
+        - google-cloud-cli-kpt
         - envoy
         # - jenkins
         # requirement for Jetbrains Toolbox

@@ -29,7 +29,7 @@ Creates SSH keys automatically on the host for connecting to vagrant via ssh
 make ensure-latest-base-vm
 
 # run VM
-man run
+make run
 
 # run VM with GUI and Guest Additions
 make run-with-gui
@@ -51,7 +51,7 @@ make stop
 # remove VM from disk
 make destroy
 
-# cleans base box so that if Vagrant file contains newer base box it will be downloaded
+# download the newest base box version, if a newer one is available
 make ensure-latest-base-vm
 
 # show usage and tasks (default)

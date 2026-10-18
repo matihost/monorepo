@@ -22,7 +22,7 @@ Various technology deployments, tools & code:
     * ansible - docker image with Ansible, available at: quay.io/matihost/ansible
     * jenkins - docker image with Jenkins and predefined plugins, available at: quay.io/matihost/jenkins:lts
     * devcontainers - docker image for DevContainers remote development
-    * buildah - experiments with buildah
+    * buildah - Buildah container image (Ubuntu/CentOS based) to build images inside of a container
     * and usually each app has also Makefile task to build its docker image as well
 
 * [terraform/tofu](terraform)
@@ -69,7 +69,7 @@ Various technology deployments, tools & code:
     * azure-entraid - setup IAM resource needed on fresh Azure subscription (resource group)
     * azure-instance - VM setup
 * [scripts](scripts) - various bash scripts (tools for TLS handling, K8S etc.)
-* [vagrant](vagrant)  - CentOS VM buildout with Vagrant with various Linux networking tools examples
+* [vagrant](vagrant)  - CentOS Stream 10 and Ubuntu 26.04 LTS VMs buildout with Vagrant with various Linux networking tools examples
 * [algorithms](algorithms/project-euler) - Java based project solving various <https://projecteuler.net> problems
 * [ansible](ansible)
   * system - script to provision/update and keep clean home Ubuntu based desktop environment

@@ -11,8 +11,8 @@ SHELL := /usr/bin/env bash
 BUILDKIT_PROGRESS=plain
 
 build: ## vet and build all
-	go vet -mod=mod ./...
-	go build -mod=mod -o .  ./...
+	go vet ./...
+	go build -o .  ./...
 
 lint: ## run golangci-lint (config in .golangci.yml)
 	golangci-lint run ./...
@@ -27,7 +27,7 @@ update-dependencies: clean ## update dependencies, remove requires section from 
 	go mod tidy
 
 clean: ## removes compiled application and vendor directory
-	@rm -rf ${CMD_PACKAGE_NAME} http-server grpc-client grpc-server go.sum vendor
+	@rm -rf ${CMD_PACKAGE_NAME} http-server grpc-client grpc-server vendor
 
 build-image: ## builds docker image
 	docker build --load -t $(GO_PACKAGE)/cmd/language:latest .

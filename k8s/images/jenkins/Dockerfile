@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:2.462.2
+FROM jenkins/jenkins:2.580.1-lts-jdk25
 RUN jenkins-plugin-cli --verbose --latest true --plugins \
   branch-api \
   pipeline-stage-view \

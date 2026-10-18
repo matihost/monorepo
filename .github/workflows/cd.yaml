@@ -71,13 +71,13 @@ jobs:
     # Workaround for https://github.com/actions/runner/issues/2033
     - name: Set ownership
       run: |
-        chown -R $(id -u):$(id -g) $PWD
+        chown -R "$(id -u):$(id -g)" "${PWD}"
     - name: Obtain git version
       id: git_hash
       run: |
-        echo "GIT_COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+        echo "GIT_COMMIT_HASH=$(git rev-parse HEAD)" >> "${GITHUB_OUTPUT}"
     - name: Cache workspace
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v6
       with:
         # avoid using github.workspace in caching?
         # so how effectivelly share source code between jobs?
@@ -105,7 +105,7 @@ jobs:
         fail-on-cache-miss: true
         enableCrossOsArchive: true
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@v6
       with:
         aws-region: us-east-1
         role-to-assume: ${{ secrets.AWS_OIDC_ASSUMED_ROLE }}

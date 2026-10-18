@@ -17,11 +17,11 @@ Vagrant.configure("2") do |config|
     vb.memory = 5 * 1024
     vb.default_nic_type = "virtio"
 
-    if "#{ENV['GUI']}" == "true"
+    if ENV['GUI'] == "true"
       vb.gui = true
-      # vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
-      vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
+      vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
       vb.customize ["modifyvm", :id, "--vram", "128"]
+      vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
     end
 
     vb.customize ["modifyvm", :id, "--clipboard-mode", "bidirectional"]

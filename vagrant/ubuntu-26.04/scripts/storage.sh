@@ -6,8 +6,8 @@
 # /dev/sdd - two partitions /dev/sdd{1..2} marked to use by LVM
 # /dev/sd{e,f} - assigned to Stratis
 
-# install Logical Volume Manager, XFS Dump/Restore Utility, Virtual Data Optimizer, AutoFS
-apt -y install lvm2 xfsdump autofs
+# install partitioning tool, Logical Volume Manager, XFS Dump/Restore Utility, Virtual Data Optimizer, AutoFS
+apt -y install parted lvm2 xfsdump autofs
 
 # Enable autofs
 systemctl enable autofs.service --now

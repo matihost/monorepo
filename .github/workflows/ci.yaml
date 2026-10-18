@@ -56,13 +56,13 @@ jobs:
     # Workaround for https://github.com/actions/runner/issues/2033
     - name: Set ownership
       run: |
-        chown -R $(id -u):$(id -g) $PWD
+        chown -R "$(id -u):$(id -g)" "${PWD}"
     - name: Obtain git version
       id: git_hash
       run: |
-        echo "GIT_COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+        echo "GIT_COMMIT_HASH=$(git rev-parse HEAD)" >> "${GITHUB_OUTPUT}"
     - name: Cache workspace
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v6
       with:
         # avoid using github.workspace in caching?
         # so how effectivelly share source code between jobs?
@@ -95,11 +95,11 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
-    # Do not use actions/setup-java@v3 cache option as it requires downloading java again, but container image contains java already
+    # Do not use actions/setup-java cache option as it requires downloading java again, but container image contains java already
     # Use actions/cache to cache M2 repository manually instead
     #
     # - name: Set up JDK 21
-    #   uses: actions/setup-java@v3
+    #   uses: actions/setup-java@v6
     #   with:
     #     java-version: '25'
     #     distribution: 'adopt'
@@ -114,7 +114,7 @@ jobs:
         path: java/apps/**/target/*.jar
         retention-days: 2
     - name: Cache java build sources
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v6
       with:
         path: ${{ github.workspace }}/java
         key: java-${{ github.run_id }}-${{ github.run_attempt }}
@@ -198,7 +198,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@v4
       with:
         languages: java
         queries: security-extended,security-and-quality
@@ -206,7 +206,7 @@ jobs:
       working-directory: java
       run: mvn -s .mvn/settings.xml --show-version clean install
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@v4
       with:
         category: "/language:java"
   codeql-go:
@@ -233,15 +233,15 @@ jobs:
     - name: Install CodeQL dependencies
       run: apt update && apt -y install file
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@v4
       with:
         languages: go
         queries: security-extended,security-and-quality
     - name: Build Go source code
       working-directory: go/learning
-      run: go vet -mod=mod ./... && go build -buildvcs=false -mod=mod -o . ./... && go test ./pkg/language && ./language
+      run: go vet ./... && go build -buildvcs=false -o . ./... && go test ./pkg/language && ./language
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@v4
       with:
         category: "/language:go"
   lint-go:
@@ -275,7 +275,7 @@ jobs:
         key: sources-${{ github.run_id }}-${{ github.run_attempt }}
         fail-on-cache-miss: true
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@v4
       with:
         languages: python
         queries: security-extended,security-and-quality
@@ -292,7 +292,7 @@ jobs:
     - name: Run Ruff
       run: ruff check --output-format=github .
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@v4
       with:
         category: "/language:python"
   ansible:

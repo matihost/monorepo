@@ -1,7 +1,7 @@
 FROM golang:1.26 AS builder
 COPY . /tmp/build
 WORKDIR /tmp/build
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=mod -o . ./cmd/language
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o . ./cmd/language
 
 FROM gcr.io/distroless/static:debug-nonroot
 COPY --from=builder /tmp/build/language .

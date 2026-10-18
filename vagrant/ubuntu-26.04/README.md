@@ -1,7 +1,9 @@
-# CentOS 8 Stream Vagrant VM
+# Ubuntu 26.04 LTS Vagrant VM
 
-Provisions locally CentOS 8 Stream via VirtualBox/Vagrant.
-Creates SSH keys automatically on the host for connecting to vagrant via ssh
+Provisions locally Ubuntu 26.04 LTS (resolute) via VirtualBox/Vagrant.
+Creates SSH keys automatically on the host for connecting to vagrant via ssh.
+
+Relies on bento/ubuntu-26.04 build as since Hashicorp changes licence model for vagrant Canonical stopped providing own Vagrant images.
 
 ## Prerequisites
 
@@ -15,21 +17,11 @@ Creates SSH keys automatically on the host for connecting to vagrant via ssh
   * 0.0.0.0/0 ::/0
   ```
 
-* Download base OS image:
-
-  ```bash
-  # download Vagrant image
-  make ensure-latest-base-vm
-  ```
-
 ## Usage
 
 ```bash
-# download Vagrant image
-make ensure-latest-base-vm
-
 # run VM
-man run
+make run
 
 # run VM with GUI and Guest Additions
 make run-with-gui
@@ -50,9 +42,6 @@ make stop
 
 # remove VM from disk
 make destroy
-
-# cleans base box so that if Vagrant file contains newer base box it will be downloaded
-make ensure-latest-base-vm
 
 # show usage and tasks (default)
 make help
