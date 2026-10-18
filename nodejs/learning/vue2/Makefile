@@ -6,8 +6,8 @@ init: ## install dependencies
 		npm install -g serve npm-check-updates && \
 		npm install
 
-update: ## update dependencies
-	ncu -u
+update: ## update dependencies within current major versions (major upgrades are blocked by the toolchain, see README)
+	ncu -u --target minor
 	npm install
 
 ENV := dev

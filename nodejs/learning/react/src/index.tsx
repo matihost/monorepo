@@ -13,8 +13,8 @@ const onSigninCallback = (_user: User | void): void => {
 };
 
 const oidcConfig = {
-  authority: process.env.REACT_APP_OIDC_ISSUER,
-  client_id: process.env.REACT_APP_OIDC_CLIENT_ID,
+  authority: import.meta.env.VITE_OIDC_ISSUER,
+  client_id: import.meta.env.VITE_OIDC_CLIENT_ID,
   redirect_uri: window.location.origin,
   scope: "openid profile email",
   // mandatory cleanup

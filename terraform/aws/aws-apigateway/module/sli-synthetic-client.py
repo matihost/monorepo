@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Emulate a client by calling directly EC2 instance."""
 
-import os
-import sys
 import json
 import logging
+import os
+import sys
 
 # AWS Lambda does not ship requests out of the box
 # import requests
@@ -12,20 +12,21 @@ import urllib3
 
 # Global configuration
 logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s", level=logging.INFO)
+logger = logging.getLogger(__name__)
 http = urllib3.PoolManager()
 
 
 def test_ec2_via_http(ip):
     """Call EC2 via HTTP."""
     try:
-        r = http.request("GET", "http://{0}".format(ip), timeout=3.5, retries=0)
+        r = http.request("GET", f"http://{ip}", timeout=3.5, retries=0)
         response = r.data.decode("utf-8")
-        if logging.getLogger().isEnabledFor(logging.DEBUG):
-            logging.debug("Correct response: %s...", response[:20])
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("Correct response: %s...", response[:20])
         return (200 <= r.status < 300, r.status, response)
     except urllib3.exceptions.HTTPError as err:
         err_string = str(err)
-        logging.error("Encountered error while accessing %s: %s ", ip, err_string)
+        logger.error("Encountered error while accessing %s: %s ", ip, err_string)
         return (False, 500, err_string)
 
 
@@ -52,7 +53,8 @@ def main():
     test_result = test_ec2_via_http(ip_to_test)
 
     # then
-    logging.info("Status: {0}, Code: {1}, Text: {2}".format(*test_result))
+    status, code, text = test_result
+    logger.info(f"Status: {status}, Code: {code}, Text: {text}")
 
 
 if __name__ == "__main__":

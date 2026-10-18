@@ -88,7 +88,8 @@ Various technology deployments, tools & code:
     * extract-stem - to extract selected instrument tracks (ex. guitar and vocals only) from a recording into MP3
     * setup-opendns  - to setup regular update of OpenDNS with home public ip
 * [nodejs](nodejs)
-  * learning/react - sample React application with OIDC authentication
-  * learning/vue2 - sample React application with Auth0 authentication
+  * learning/react - sample React (Vite) application with OIDC authentication
+  * learning/vue - sample Vue 3 (Vite) application with Auth0 authentication
+  * learning/vue2 - sample Vue 2 (end of life) application with Auth0 authentication
 * [rust](rust) - sample Rust example
 * [github actions](.github), [jenkins](Jenkinsfile), [travis](.travis.yml), [gcp cloudbuild](cloudbuild.yaml) - various Continous Integration toolset integration

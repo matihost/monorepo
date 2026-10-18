@@ -26,11 +26,11 @@ python -m debugpy --listen 5678 --wait-for-client ./uploadApiProxy.py -n echoser
 
 import getopt
 import http.client
-import json
-import re
-import os
-import sys
 import io
+import json
+import os
+import re
+import sys
 import urllib.parse
 import zipfile
 
@@ -42,9 +42,9 @@ def httpCall(verb, uri, headers, body):
     else:
         conn = http.client.HTTPConnection(httpHost)
 
-    hdrs = dict() if headers is None else headers
+    hdrs = {} if headers is None else headers
 
-    hdrs["Authorization"] = "Bearer %s" % Token
+    hdrs["Authorization"] = f"Bearer {Token}"
     conn.request(verb, uri, body, hdrs)
 
     return conn.getresponse()
@@ -71,7 +71,7 @@ def getDeployments():
     hdrs = {"Accept": "application/json"}
     resp = httpCall(
         "GET",
-        "/v1/organizations/%s/apis/%s/deployments" % (Organization, Name),
+        f"/v1/organizations/{Organization}/apis/{Name}/deployments",
         hdrs,
         None,
     )
@@ -79,7 +79,7 @@ def getDeployments():
     if resp.status != 200:
         return None
 
-    ret = list()
+    ret = []
     parsed_response = json.load(resp)
     if "deployments" in parsed_response:
         deployments = parsed_response["deployments"]
@@ -99,12 +99,9 @@ def getDeployments():
 def printDeployments(dep):
     """Print proxy deployment on the screen."""
     for d in dep:
-        print(("Environment: %s" % d["environment"]))
+        print(f"Environment: {d['environment']}")
         print(
-            (
-                "  Revision: %s DeploymentStartTime = %s"
-                % (d["revision"], d["deployStartTime"])
-            )
+            f"  Revision: {d['revision']} DeploymentStartTime = {d['deployStartTime']}"
         )
 
 
@@ -176,17 +173,17 @@ elif ZipFile is not None:
 
 # Upload the bundle to the API
 hdrs = {"Content-Type": "application/octet-stream", "Accept": "application/json"}
-uri = "/v1/organizations/%s/apis?action=import&name=%s" % (Organization, Name)
+uri = f"/v1/organizations/{Organization}/apis?action=import&name={Name}"
 resp = httpCall("POST", uri, hdrs, body)
 
 if resp.status != 200 and resp.status != 201:
-    print("Import failed to %s with status %i:\n%s" % (uri, resp.status, resp.read()))
+    print(f"Import failed to {uri} with status {resp.status}:\n{resp.read()}")
     sys.exit(2)
 
 deployment = json.load(resp)
 revision = int(deployment["revision"])
 
-print(("Imported new proxy version %i" % revision))
+print(f"Imported new proxy version {revision}")
 
 deps = getDeployments()
 printDeployments(deps)

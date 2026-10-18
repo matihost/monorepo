@@ -2,6 +2,19 @@
 
 Basic project in Vue2.js
 
+Vue 2 reached end of life on 31 December 2023 and Vue CLI is in maintenance mode, so this project is kept as a learning
+sample and its dependencies cannot be fully updated:
+
+- `vue` (2.7), `vue-router` (3.x), `eslint` (8) and `eslint-plugin-vue` (8) stay on the last versions supporting Vue 2.
+- `npm audit` reports vulnerabilities in Vue CLI 5 build tooling (webpack-dev-server, postcss 7 bundled in
+  `@vue/component-compiler-utils` and others). They have no fix available within Vue CLI 5
+  (`npm audit fix --force` would downgrade Vue CLI to version 3), and they affect build/dev time only, not the produced bundle.
+- `webpack` is pinned to 5.110.1 via `overrides` in `package.json`: webpack 5.110.2+ reports
+  `export 'default' ... was not found` warnings for `<style>` blocks of single file components. Remove the override
+  once newer webpack builds the project without those warnings.
+
+For a current Vue project see [vue](../vue).
+
 ## Prerequisites
 
 - Nvm tool installed

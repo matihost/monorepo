@@ -11,7 +11,7 @@ function Basic() {
   if (auth.isAuthenticated) {
     content = (
       <div>
-        Hello {auth.user?.profile.name} on {process.env.REACT_APP_ENV}
+        Hello {auth.user?.profile.name} on {import.meta.env.VITE_ENV}
         <MyButton button={{ buttonName: "Ala" }} />
         <button onClick={() => void auth.removeUser()}>Log out</button>
       </div>

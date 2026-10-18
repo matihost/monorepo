@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
 """Resize image."""
 
-import boto3
-import uuid
-from PIL import Image
 import json
+import uuid
+
+import boto3
+from PIL import Image
 
 s3_client = boto3.client("s3")
 s3 = boto3.resource("s3")
