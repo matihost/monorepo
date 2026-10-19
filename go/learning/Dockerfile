@@ -1,4 +1,4 @@
-FROM golang:1.26 AS builder
+FROM golang:1.27 AS builder
 COPY . /tmp/build
 WORKDIR /tmp/build
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o . ./cmd/language
