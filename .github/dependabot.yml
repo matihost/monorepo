@@ -1,25 +1,216 @@
 ---
+# Dependabot version updates. Dependabot does not recurse into subdirectories, so every manifest directory is listed explicitly.
+# When a new project with a manifest (pom.xml, pyproject.toml, package.json, go.mod, Cargo.toml, Dockerfile, Chart.yaml, *.tf) is added, add its directory here.
+# Intentionally not covered: legacy k8s/okd, nodejs/learning/vue2 (EOL framework), .terragrunt-cache.
 version: 2
 updates:
-  - package-ecosystem: "maven"
-    directory: "/"
-    schedule:
-      interval: "daily"
   - package-ecosystem: "github-actions"
-    # To scan workflow files stored in the
-    # default location of `.github/workflows` provider directory: /
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "monday"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 5
+    groups:
+      actions:
+        patterns:
+          - "*"
+  - package-ecosystem: "maven"
+    directories:
+      - "/java"
+      - "/algorithms/project-euler"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "pip"
-    directory: "/"
+    directories:
+      - "/python/apps/exchange-rate"
+      - "/python/apps/learning"
+      - "/python/apps/tools"
+      - "/terraform/aws/aws-serverless"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "monday"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+  - package-ecosystem: "npm"
+    directories:
+      - "/nodejs/learning/react"
+      - "/nodejs/learning/vue"
+      - "/terraform/aws/aws-serverless"
+      - "/terraform/gcp/ghost/module/posts-management"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "gomod"
-    directory: "/"
+    directories:
+      - "/go/learning"
+      - "/terraform/gcp/minecraft-server/module/scheduler"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "monday"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+  - package-ecosystem: "cargo"
+    directory: "/rust/guessing_game"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+  - package-ecosystem: "docker"
+    directories:
+      - "/go/learning"
+      - "/go/learning/cmd/grpc-client"
+      - "/go/learning/cmd/grpc-server"
+      - "/java/apps/command-line"
+      - "/java/apps/mq/client"
+      - "/k8s/images/ansible"
+      - "/k8s/images/buildah"
+      - "/k8s/images/devcontainers"
+      - "/k8s/images/gh-images/cd"
+      - "/k8s/images/gh-images/java-ci"
+      - "/k8s/images/jenkins"
+      - "/nodejs/learning/vue"
+      - "/python/apps/exchange-rate"
+      - "/terraform/gcp/keycloak"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 5
+    groups:
+      docker-images:
+        patterns:
+          - "*"
+  - package-ecosystem: "helm"
+    directories:
+      - "/k8s/apps/echoserver"
+      - "/k8s/apps/mq"
+      - "/terraform/aws/aws-eks/module/cluster-config-chart"
+      - "/terraform/aws/aws-eks/module/namespace-config-chart"
+      - "/terraform/azure/aks/module/cluster-config-chart"
+      - "/terraform/azure/aks/module/namespace-config-chart"
+      - "/terraform/azure/aro/module/cluster-config-chart"
+      - "/terraform/azure/aro/module/namespace-config-chart"
+      - "/terraform/gcp/gke/module/cluster-config-chart"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 5
+    groups:
+      helm-charts:
+        patterns:
+          - "*"
   - package-ecosystem: "terraform"
+    directories:
+      - "/k8s/gatekeeper/files/gke"
+      - "/k8s/istio/files/gke"
+      - "/k8s/istio/files/gke/external-lb"
+      - "/k8s/jenkins/files/gke"
+      - "/terraform/aws/aws-alb/module"
+      - "/terraform/aws/aws-apigateway/module"
+      - "/terraform/aws/aws-client-vpn/module"
+      - "/terraform/aws/aws-ecs/module"
+      - "/terraform/aws/aws-efs/module"
+      - "/terraform/aws/aws-eks/module"
+      - "/terraform/aws/aws-github-oidc/module"
+      - "/terraform/aws/aws-glue/module"
+      - "/terraform/aws/aws-iam-linked/module"
+      - "/terraform/aws/aws-iam-management/module"
+      - "/terraform/aws/aws-instana/module"
+      - "/terraform/aws/aws-instance/module"
+      - "/terraform/aws/aws-jenkins/module"
+      - "/terraform/aws/aws-network-setup/module"
+      - "/terraform/aws/aws-rds/module"
+      - "/terraform/aws/aws-rosa/module"
+      - "/terraform/aws/aws-site/module"
+      - "/terraform/aws/aws-sns-sqs-lambda/module"
+      - "/terraform/azure/aks/module"
+      - "/terraform/azure/aro/module"
+      - "/terraform/azure/azure-acr/module"
+      - "/terraform/azure/azure-entraid/module"
+      - "/terraform/azure/azure-instance/module"
+      - "/terraform/azure/azure-monitoring/module"
+      - "/terraform/azure/azure-network-setup/module"
+      - "/terraform/docker"
+      - "/terraform/docker/module"
+      - "/terraform/gcp/apigee/module"
+      - "/terraform/gcp/gcp-bigquery-dataset/module"
+      - "/terraform/gcp/gcp-cloudbuild"
+      - "/terraform/gcp/gcp-github-oidc/module"
+      - "/terraform/gcp/gcp-iam/module"
+      - "/terraform/gcp/gcp-instance/module"
+      - "/terraform/gcp/gcp-kms/module"
+      - "/terraform/gcp/gcp-monitoring/module"
+      - "/terraform/gcp/gcp-network-setup/module"
+      - "/terraform/gcp/gcp-open-vpn/module"
+      - "/terraform/gcp/gcp-repository/module"
+      - "/terraform/gcp/gcp-workstations"
+      - "/terraform/gcp/ghost/module/ghost"
+      - "/terraform/gcp/ghost/module/posts-management"
+      - "/terraform/gcp/gke/addons/anthos"
+      - "/terraform/gcp/gke/addons/config-sync"
+      - "/terraform/gcp/gke/addons/config-sync/prerequisites"
+      - "/terraform/gcp/gke/addons/ns-gke-setup"
+      - "/terraform/gcp/gke/module"
+      - "/terraform/gcp/keycloak/module/keycloak"
+      - "/terraform/gcp/keycloak/module/keycloak-config"
+      - "/terraform/gcp/minecraft-server/module"
+      - "/terraform/ibm/ibm-alb/module"
+      - "/terraform/ibm/ibm-alb/schematics"
+      - "/terraform/ibm/ibm-iam/module"
+      - "/terraform/ibm/ibm-network-setup/module"
+      - "/terraform/ibm/ibm-network-setup/schematics"
+      - "/terraform/ibm/ibm-ocp/module"
+      - "/terraform/ibm/ibm-ocp/schematics"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 5
+    groups:
+      terraform-providers:
+        patterns:
+          - "*"
+  - package-ecosystem: "pre-commit"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "monday"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 5
+    groups:
+      pre-commit-hooks:
+        patterns:
+          - "*"

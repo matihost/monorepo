@@ -161,6 +161,8 @@ build/Release
 
 # Dependency directories
 node_modules/
+# Vite dependency pre-bundling cache
+.vite/
 jspm_packages/
 
 # Snowpack dependency directory (https://snowpack.dev/)
