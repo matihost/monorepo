@@ -131,7 +131,7 @@ public class LogEntry {
    *     "ENTRY", "EXIT", or "MAINROAD".
    **/
 
-  private final String timestamp;
+  private final float timestamp;
   private final String licensePlate;
   private final String boothType;
   private final int location;
@@ -139,7 +139,11 @@ public class LogEntry {
 
   public LogEntry(String logLine) {
     String[] tokens = logLine.split(" ");
-    this.timestamp = tokens[0];
+    try {
+      this.timestamp = Float.parseFloat(tokens[0]);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Invalid timestamp '" + tokens[0] + "' in log line: " + logLine, e);
+    }
     this.licensePlate = tokens[1];
     this.boothType = tokens[3];
     String locationNumber = tokens[2].substring(0, tokens[2].length() - 1);
@@ -159,7 +163,7 @@ public class LogEntry {
   }
 
   public float getTimestamp() {
-    return  Float.parseFloat(timestamp);
+    return timestamp;
   }
 
   public String getLicensePlate() {
@@ -182,7 +186,7 @@ public class LogEntry {
   public String toString() {
     return String.format(
       "<LogEntry timestamp: %s  license: %s  location: %s  direction: %s  booth type: %s>",
-      String.valueOf(timestamp),
+      timestamp,
       String.valueOf(licensePlate),
       String.valueOf(location),
       String.valueOf(direction),

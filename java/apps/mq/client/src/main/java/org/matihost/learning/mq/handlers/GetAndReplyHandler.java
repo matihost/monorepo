@@ -40,12 +40,12 @@ public class GetAndReplyHandler implements Consumer<ApplicationArguments> {
 
     connection.asyncReceive(rq -> {
       try {
-        logger.info("Message {} has been received from: {}", sanitizeForLog(rq.getBody(String.class)), connection.getQueueName());
+        logger.info("Message {} has been received from: {}", sanitizeForLog(rq.getBody(String.class)), sanitizeForLog(connection.getQueueName()));
         Queue jmsReplyTo = (Queue) rq.getJMSReplyTo();
         if (Objects.nonNull(jmsReplyTo)){
           var replyConnection = mqClientManager.getQueueConnection(jmsReplyTo);
           replyConnection.reply(rq, responseText);
-          logger.info("Replied with {} to {}", sanitizeForLog(responseText), replyConnection.getQueueName());
+          logger.info("Replied with {} to {}", sanitizeForLog(responseText), sanitizeForLog(replyConnection.getQueueName()));
         }
       } catch (JMSException e) {
         logger.error("JMS Error occured during getAndReply mode", e);

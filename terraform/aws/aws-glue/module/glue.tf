@@ -8,58 +8,9 @@ resource "aws_s3_object" "script" {
   bucket = aws_s3_bucket.glue-data.id
   key    = "scripts/CopyS3.py"
 
-  content = <<EOF
-import sys
-from awsglue.transforms import *
-from awsglue.utils import getResolvedOptions
-from pyspark.context import SparkContext
-from awsglue.context import GlueContext
-from awsglue.job import Job
-from awsglueml.transforms import EntityDetector
-
-args = getResolvedOptions(sys.argv, ["JOB_NAME"])
-sc = SparkContext()
-glueContext = GlueContext(sc)
-spark = glueContext.spark_session
-job = Job(glueContext)
-job.init(args["JOB_NAME"], args)
-
-# Script generated for node Input
-Input_node1705505530241 = glueContext.create_dynamic_frame.from_options(
-    format_options={"multiline": True},
-    connection_type="s3",
-    format="json",
-    connection_options={
-        "paths": ["s3://dev-glue-data-${local.account_id}/data/input/"],
-        "recurse": True,
-    },
-    transformation_ctx="Input_node1705505530241",
-)
-
-# Script generated for node Detect Sensitive Data
-detection_parameters = {
-    "CREDIT_CARD": [{"action": "REDACT", "actionOptions": {"redactText": "******"}}]
-}
-
-entity_detector = EntityDetector()
-DetectSensitiveData_node1705506030398 = entity_detector.detect(
-    Input_node1705505530241, detection_parameters, "DetectedEntities", "HIGH"
-)
-
-# Script generated for node Amazon S3
-AmazonS3_node1705506389906 = glueContext.write_dynamic_frame.from_options(
-    frame=DetectSensitiveData_node1705506030398,
-    connection_type="s3",
-    format="json",
-    connection_options={
-        "path": "s3://dev-glue-data-${local.account_id}/data/output/",
-        "partitionKeys": [],
-    },
-    transformation_ctx="AmazonS3_node1705506389906",
-)
-
-job.commit()
-EOF
+  source = "${path.module}/CopyS3.py"
+  # re-upload the script when its content changes
+  etag = filemd5("${path.module}/CopyS3.py")
 }
 
 resource "aws_s3_object" "temporary-dir" {
@@ -96,6 +47,7 @@ resource "aws_glue_job" "pci-s3-job" {
 
   default_arguments = {
     "--TempDir"                          = "s3://dev-glue-data-${local.account_id}/temporary/"
+    "--DATA_BUCKET"                      = aws_s3_bucket.glue-data.id
     "--enable-auto-scaling"              = "true"
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-glue-datacatalog"          = "true"
