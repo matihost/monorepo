@@ -282,7 +282,7 @@
           <groupId>org.codehaus.gmavenplus</groupId>
           <artifactId>gmavenplus-plugin</artifactId>
           <!-- 5.1.0 silently compiles no Groovy classes for this project (target/classes contains only .groovy sources) -->
-          <version>5.0.0</version>
+          <version>5.1.0</version>
           <executions>
             <execution>
               <goals>
