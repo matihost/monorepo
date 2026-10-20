@@ -33,8 +33,7 @@ output "nginx-ip" {
 
 resource "azurerm_private_dns_a_record" "lb" {
   name                = "*.svc"
-  zone_name           = azurerm_private_dns_zone.aks-private-zone.name
-  resource_group_name = local.resource_group_name
+  private_dns_zone_id = azurerm_private_dns_zone.aks-private-zone.id
   ttl                 = 300
   records             = [local.nginx-ip]
 }

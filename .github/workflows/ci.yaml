@@ -213,7 +213,7 @@ jobs:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
     timeout-minutes: 30
-    container: golang:1.26
+    container: golang:1.27
     env:
       GO_CACHE: /go
     steps:
@@ -248,7 +248,7 @@ jobs:
     needs: sources
     runs-on: ${{ inputs.runner || 'ubuntu-26.04' }}
     timeout-minutes: 15
-    container: golang:1.26
+    container: golang:1.27
     steps:
     - name: Download sources
       uses: actions/cache/restore@v6
@@ -259,7 +259,7 @@ jobs:
     - name: Lint Go source code
       uses: golangci/golangci-lint-action@v9
       with:
-        version: v2.12.2
+        version: v2.15.0
         working-directory: go/learning
   codeql-python:
     needs: sources

@@ -1,5 +1,5 @@
 ARG JAR_FILE
-FROM eclipse-temurin:21-jdk AS builder
+FROM eclipse-temurin:25-jdk AS builder
 RUN apt -y update && apt -y install binutils
 # build JRE with only modules app depens on
 # + jfr and jcmd tooling (jcmd,jps,jmap,jstack etc.) ~ adds 6 MiB to image size

@@ -26,8 +26,7 @@ resource "azurerm_private_dns_zone" "aks-private-zone" {
 # }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "aks-private-zone-vpc-link" {
-  name                  = "aks-${local.cluster_name}-domain2vpc-${data.azurerm_virtual_network.vnet.name}-link"
-  resource_group_name   = local.resource_group_name
-  private_dns_zone_name = azurerm_private_dns_zone.aks-private-zone.name
-  virtual_network_id    = data.azurerm_virtual_network.vnet.id
+  name                = "aks-${local.cluster_name}-domain2vpc-${data.azurerm_virtual_network.vnet.name}-link"
+  private_dns_zone_id = azurerm_private_dns_zone.aks-private-zone.id
+  virtual_network_id  = data.azurerm_virtual_network.vnet.id
 }

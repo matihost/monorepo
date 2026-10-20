@@ -5,10 +5,10 @@
 package scheduler
 
 import (
-	"errors"
-	"testing"
 	"context"
+	"errors"
 	"os"
+	"testing"
 )
 
 func TestMain(m *testing.M) {

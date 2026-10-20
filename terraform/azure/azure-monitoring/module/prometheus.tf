@@ -5,10 +5,11 @@ resource "azurerm_monitor_workspace" "monitor" {
 }
 
 resource "azurerm_dashboard_grafana" "grafana" {
-  name                  = "${local.prefix}-grafana"
-  location              = local.location
-  resource_group_name   = local.resource_group_name
-  grafana_major_version = 11
+  name                = "${local.prefix}-grafana"
+  location            = local.location
+  resource_group_name = local.resource_group_name
+  # azurerm 5 accepts only 12 and 13 (11 was dropped), 13 is the latest
+  grafana_major_version = 13
   api_key_enabled       = true
 
   # The following properties have an input value that is inconsistent with sku type Essential: DeterministicOutboundIP

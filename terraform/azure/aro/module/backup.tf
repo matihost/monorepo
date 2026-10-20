@@ -12,8 +12,8 @@ resource "azurerm_storage_account" "backup" {
   https_traffic_only_enabled = true
   min_tls_version            = "TLS1_2"
   # TODO disable public network access, requires private endpoint connections, and figure out how to force Velero to use it
-  public_network_access_enabled = true
-  shared_access_key_enabled     = false
+  public_network_access     = "Enabled"
+  shared_access_key_enabled = false
 
   allow_nested_items_to_be_public   = false
   infrastructure_encryption_enabled = true

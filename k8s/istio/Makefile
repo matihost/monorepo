@@ -39,8 +39,8 @@ undeploy-istio-helm-from-gke: ## undeploys Istio via Helm on GKE with internal i
 	ansible-playbook -i inventory/gke undeploy-istio-helm.yaml -v
 
 clean: ## clean Terraform cached plugins and data
-	find . -name ".?terra*" -exec rm -rf {} +
-	find . -name "terra*" -exec rm -rf {} +
+	find . -name ".terra*" -exec rm -rf {} +
+	find . -name "terraform.tfstate*" -exec rm -rf {} +
 	find . -name "target" -exec rm -rf {} +
 
 

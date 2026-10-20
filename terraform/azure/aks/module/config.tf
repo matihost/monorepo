@@ -138,9 +138,8 @@ resource "azuread_group_member" "ns-workload-identity-edit-membership" {
 resource "azurerm_federated_identity_credential" "ns-workload-identity-edit-federation" {
   for_each = { for namespace in var.namespaces : namespace.name => namespace }
 
-  name                = "${azurerm_user_assigned_identity.ns-workload-identity-edit[each.key].name}-federated-identity"
-  resource_group_name = local.resource_group_name
-  parent_id           = azurerm_user_assigned_identity.ns-workload-identity-edit[each.key].id
+  name                      = "${azurerm_user_assigned_identity.ns-workload-identity-edit[each.key].name}-federated-identity"
+  user_assigned_identity_id = azurerm_user_assigned_identity.ns-workload-identity-edit[each.key].id
 
   issuer   = azurerm_kubernetes_cluster.aks.oidc_issuer_url
   subject  = "system:serviceaccount:${each.key}:app"

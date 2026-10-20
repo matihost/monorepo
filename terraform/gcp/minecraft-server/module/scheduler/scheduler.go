@@ -4,8 +4,9 @@ import (
 	"context"
 	"log"
 	"os"
+
 	compute "cloud.google.com/go/compute/apiv1"
-	computepb "google.golang.org/genproto/googleapis/cloud/compute/v1"
+	"cloud.google.com/go/compute/apiv1/computepb"
 )
 
 // PubSubMessage is the payload of a Pub/Sub event.
@@ -29,7 +30,6 @@ func Handle(ctx context.Context, m PubSubMessage) error {
 	return ScaleInstanceGroup(projectId, minecraftServerName, zone, desiredSize)
 }
 
-
 func ScaleInstanceGroup(projectId, instanceGroup, zone string, desiredSize int32) error {
 	log.Printf("About to scale instance group: %s/%s to %d", zone, instanceGroup, desiredSize)
 	ctx := context.Background()
@@ -42,9 +42,9 @@ func ScaleInstanceGroup(projectId, instanceGroup, zone string, desiredSize int32
 	req := &computepb.ResizeInstanceGroupManagerRequest{
 		// See https://pkg.go.dev/google.golang.org/genproto/googleapis/cloud/compute/v1#ResizeInstanceGroupManagerRequest.
 		InstanceGroupManager: instanceGroup,
-		Size: desiredSize,
-		Zone: zone,
-		Project: projectId,
+		Size:                 desiredSize,
+		Zone:                 zone,
+		Project:              projectId,
 	}
 	resp, err := c.Resize(ctx, req)
 	if err != nil {

@@ -4,7 +4,9 @@ resource "azurerm_subnet" "cloudshell" {
   name                 = "${azurerm_virtual_network.vnet.name}-cloudshell"
   resource_group_name  = local.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  service_endpoints    = ["Microsoft.Storage"]
+  service_endpoint {
+    service = "Microsoft.Storage"
+  }
   delegation {
     name = "CloudShellDelegation"
     service_delegation {
@@ -132,18 +134,16 @@ data "azurerm_private_dns_zone" "privatelink" {
 
 resource "azurerm_private_dns_a_record" "relay" {
   name                = azurerm_relay_namespace.relay.name
-  zone_name           = data.azurerm_private_dns_zone.privatelink.name
-  resource_group_name = local.resource_group_name
+  private_dns_zone_id = data.azurerm_private_dns_zone.privatelink.id
   ttl                 = 300
   records             = [azurerm_private_endpoint.relay.custom_dns_configs[0].ip_addresses[0]]
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "example" {
-  name                  = azurerm_relay_namespace.relay.name
-  resource_group_name   = local.resource_group_name
-  private_dns_zone_name = data.azurerm_private_dns_zone.privatelink.name
-  virtual_network_id    = azurerm_virtual_network.vnet.id
-  registration_enabled  = false
+  name                 = azurerm_relay_namespace.relay.name
+  private_dns_zone_id  = data.azurerm_private_dns_zone.privatelink.id
+  virtual_network_id   = azurerm_virtual_network.vnet.id
+  registration_enabled = false
 }
 
 # Storage Account has to be from the same resource group Cloud Shell attached VNet/Subnet is

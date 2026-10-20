@@ -135,6 +135,12 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   # Addons
 
+  # required since azurerm 5: node pools are managed manually via default_node_pool/azurerm_kubernetes_cluster_node_pool
+  # (Auto would enable AKS Node Auto Provisioning)
+  node_provisioning_profile {
+    mode = "Manual"
+  }
+
   # to enable Azure AD Workload Identity oidc_issuer_enabled
   oidc_issuer_enabled       = true
   workload_identity_enabled = true

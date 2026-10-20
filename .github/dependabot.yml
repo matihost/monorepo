@@ -29,6 +29,12 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    ignore:
+      # 5.1.0 silently compiles no Groovy classes for this project (see java/pom.xml), stay on 5.0.0
+      # only this version is ignored: a later release may fix it, so Dependabot proposes it again (re-check with a build)
+      - dependency-name: "org.codehaus.gmavenplus:gmavenplus-plugin"
+        versions:
+          - "5.1.0"
   - package-ecosystem: "pip"
     directories:
       - "/python/apps/exchange-rate"
@@ -108,6 +114,16 @@ updates:
       day: "monday"
       timezone: "Europe/Warsaw"
     open-pull-requests-limit: 5
+    ignore:
+      # keep Node.js images on an LTS (even) major, see .nvmrc (lts/*)
+      - dependency-name: "node"
+        versions:
+          - ">= 25, < 26"
+          - ">= 26, < 27"
+      # Temurin builder JDK must match java.version in java/pom.xml (25): do not suggest non-LTS or older JDKs
+      - dependency-name: "eclipse-temurin"
+        update-types:
+          - "version-update:semver-major"
     groups:
       docker-images:
         patterns:

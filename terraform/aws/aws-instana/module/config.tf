@@ -1,7 +1,7 @@
 resource "instana_rbac_group" "admin" {
   name = "admin"
 
-  permission_set {
+  permission_set = {
     application_ids             = []
     infra_dfq_filter            = null
     kubernetes_cluster_uuids    = []
@@ -19,15 +19,27 @@ resource "instana_rbac_group" "admin" {
       "CAN_VIEW_LOGS",
       "CAN_CONFIGURE_SESSION_SETTINGS",
       "CAN_CONFIGURE_INTEGRATIONS",
-      "CAN_CONFIGURE_GLOBAL_ALERT_CONFIGS",
+      # provider 4+ split CAN_CONFIGURE_GLOBAL_ALERT_CONFIGS
+      "CAN_CONFIGURE_GLOBAL_APPLICATION_SMART_ALERTS",
+      "CAN_CONFIGURE_GLOBAL_SYNTHETIC_SMART_ALERTS",
+      "CAN_CONFIGURE_GLOBAL_INFRA_SMART_ALERTS",
+      "CAN_CONFIGURE_GLOBAL_LOG_SMART_ALERTS",
       "CAN_CONFIGURE_GLOBAL_ALERT_PAYLOAD",
       "CAN_CONFIGURE_MOBILE_APP_MONITORING",
       "CAN_CONFIGURE_API_TOKENS",
-      "CAN_CONFIGURE_SERVICE_LEVEL_INDICATORS",
+      # provider 7 replaced CAN_CONFIGURE_SERVICE_LEVEL_INDICATORS
+      "CAN_CONFIGURE_SERVICE_LEVELS",
+      "CAN_CONFIGURE_SERVICE_LEVEL_CORRECTION_WINDOWS",
+      "CAN_CONFIGURE_SERVICE_LEVEL_SMART_ALERTS",
       "CAN_CONFIGURE_AUTHENTICATION_METHODS",
       "CAN_CONFIGURE_RELEASES",
       "CAN_VIEW_AUDIT_LOG",
-      "CAN_CONFIGURE_CUSTOM_ALERTS",
+      # provider 4+ split CAN_CONFIGURE_CUSTOM_ALERTS
+      "CAN_CONFIGURE_EVENTS_AND_ALERTS",
+      "CAN_CONFIGURE_MAINTENANCE_WINDOWS",
+      "CAN_CONFIGURE_APPLICATION_SMART_ALERTS",
+      "CAN_CONFIGURE_WEBSITE_SMART_ALERTS",
+      "CAN_CONFIGURE_MOBILE_APP_SMART_ALERTS",
       "CAN_CONFIGURE_AGENT_RUN_MODE",
       "CAN_CONFIGURE_SERVICE_MAPPING",
       "CAN_EDIT_ALL_ACCESSIBLE_CUSTOM_DASHBOARDS",
@@ -54,28 +66,30 @@ resource "instana_custom_dashboard" "environment_dashboard" {
     }
   )
 
-  access_rule {
-    access_type   = "READ_WRITE"
-    related_id    = instana_rbac_group.admin.id
-    relation_type = "TEAM"
-  }
-  access_rule {
-    access_type   = "READ_WRITE"
-    related_id    = "-1" # Owner build in group
-    relation_type = "TEAM"
-  }
-  access_rule {
-    access_type   = "READ"
-    related_id    = null
-    relation_type = "GLOBAL"
-  }
+  access_rule = [
+    {
+      access_type   = "READ_WRITE"
+      related_id    = instana_rbac_group.admin.id
+      relation_type = "TEAM"
+    },
+    {
+      access_type   = "READ_WRITE"
+      related_id    = "-1" # Owner build in group
+      relation_type = "TEAM"
+    },
+    {
+      access_type   = "READ"
+      related_id    = null
+      relation_type = "GLOBAL"
+    },
+  ]
 }
 
 
 resource "instana_alerting_channel" "email" {
   name = "email"
 
-  email {
+  email = {
     emails = [var.instana_admin_email]
   }
 }

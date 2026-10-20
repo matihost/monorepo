@@ -11,8 +11,8 @@ resource "azurerm_log_analytics_workspace" "workspace" {
 
   # daily_quota_gb = 5 # GB, -1 to disable quota
 
-  internet_ingestion_enabled = true
-  internet_query_enabled     = true
+  internet_ingestion_access_type = "Enabled"
+  internet_query_access_type     = "Enabled"
 }
 
 resource "azurerm_log_analytics_solution" "container_insights" {

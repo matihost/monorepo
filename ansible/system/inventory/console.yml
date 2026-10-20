@@ -721,9 +721,24 @@ all:
         - name: shfmt
           become: false
           command: |
-            [ -x ~/bin/shfmt ] || (
+            [ -x ~/go/bin/shfmt ] || (
               go install mvdan.cc/sh/v3/cmd/shfmt@latest
             )
+        - name: golangci-lint
+          desc: >-
+            Go linter used by the golangci-lint pre-commit hook (go/learning). It is installed with go install (not apt/curl)
+            and reinstalled when the binary was built with another Go than the installed toolchain, as golangci-lint refuses
+            to lint modules targeting a newer Go than the one it was built with.
+          become: false
+          command: |
+            export PATH="${HOME}/go/bin:${PATH}"
+            BUILT_WITH="$(go version -m "$(command -v golangci-lint || echo /nonexistent)" 2>/dev/null | head -1 | awk '{print $2}')"
+            [ "${BUILT_WITH}" = "$(go env GOVERSION)" ] || {
+              go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest >/dev/null 2>&1 || {
+                echo "ERROR: cannot install golangci-lint" >&2
+                exit 1
+              }
+            }
         - name: markdownlinter
           become: true
           command: |

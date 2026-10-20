@@ -87,7 +87,7 @@ jobs:
         key: "${{ runner.os }}-path"
     - uses: actions/setup-go@v7
       with:
-        go-version: '1.26'
+        go-version: '1.27'
     - run: cd go/learning && go build -o .  ./... && go test ./pkg/language && ./language
   python:
     runs-on: ubuntu-26.04

@@ -34,7 +34,7 @@ jobs:
     before_script: cd rust/guessing_game
     cache: cargo
   - language: go
-    go: "1.26"
+    go: "1.27"
     before_install: cd go/learning
     script:
     - go build -o .  ./...

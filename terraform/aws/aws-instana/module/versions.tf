@@ -5,15 +5,11 @@ terraform {
       version = "~> 6"
     }
     instana = {
-      # TODO rebranded instana is not migrated to OpenTofu (yet?)
-      # OpenTofu only contains: https://search.opentofu.org/provider/gessnerfl/instana/latest
-      # While Terraform instana: https://registry.terraform.io/providers/instana/instana/latest/docs
-      # Created ticket to OpenTofu Registry: https://github.com/opentofu/registry/issues/1412
+      # Official IBM Instana provider, available in both registries (OpenTofu: https://search.opentofu.org/provider/instana/instana/latest,
+      # Terraform: https://registry.terraform.io/providers/instana/instana/latest/docs)
+      # Since 6.0 it uses the Plugin Framework: nested settings are attributes (permission_set = {...}), not blocks
       source  = "instana/instana"
-      version = "~> 3"
-      # version = "3.1.0"
-      # source = "gessnerfl/instana"
-      # version = "2.4.3"
+      version = "~> 7"
     }
   }
   required_version = ">= 1.6"
