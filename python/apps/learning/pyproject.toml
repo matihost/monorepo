@@ -16,7 +16,7 @@ packages = [{ include = "learning" }]
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.17.3"
 mypy = "^2.4.0"
-pytest = "^9.1.1"
+pytest = "^9.2.0"
 debugpy = "^1.8.22"
 
 [build-system]
