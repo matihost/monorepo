@@ -1,6 +1,5 @@
 resource "google_dns_managed_zone" "cluster-zone" {
-  provider = google-beta
-  project  = var.project
+  project = var.project
 
   force_destroy = true
 
@@ -25,8 +24,7 @@ resource "google_dns_managed_zone" "cluster-zone" {
 
 # External DNS resources
 resource "google_dns_managed_zone" "external-dns-cluster-zone" {
-  provider = google-beta
-  project  = var.project
+  project = var.project
 
   force_destroy = true
 

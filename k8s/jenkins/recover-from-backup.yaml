@@ -33,7 +33,7 @@
 
   - name: Set jenkins_recover_job_name fact
     ansible.builtin.set_fact:
-      jenkins_recover_job_name: "{{ namespace }}-jenkins-backup-recover-{{ ansible_date_time.epoch }}"
+      jenkins_recover_job_name: "{{ jenkins_namespace }}-jenkins-backup-recover-{{ ansible_date_time.epoch }}"
     when: gke_mode | default(false)
 
   - name: Create recover backup Job
@@ -49,7 +49,7 @@
       api_version: batch/v1
       kind: Job
       name: "{{ jenkins_recover_job_name }}"
-      namespace: "{{ namespace }}"
+      namespace: "{{ jenkins_namespace }}"
     register: job_status
     until: job_status.resources[0].status is defined
       and (job_status.resources[0].status.conditions[0]|default({})).type|default("") == "Complete"
@@ -64,7 +64,7 @@
       api_version: batch/v1
       kind: Job
       name: "{{ jenkins_recover_job_name }}"
-      namespace: "{{ namespace }}"
+      namespace: "{{ jenkins_namespace }}"
     register: job_status
 
   - name: Fail when recover job didn't finished properly

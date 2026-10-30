@@ -190,18 +190,18 @@ controller:
             - cssUrl:
                 url: "https://tobix.github.io/jenkins-neo2-theme/dist/neo-light.css"
 serviceAccount:
-  name: "{{ namespace }}-jenkins"
+  name: "{{ jenkins_namespace }}-jenkins"
   create: true
 {% if gke_mode is sameas true %}
   annotations:
-    iam.gke.io/gcp-service-account: "{{ namespace }}-jenkins@{{ lookup('pipe', 'gcloud config get-value project') }}.iam.gserviceaccount.com"
+    iam.gke.io/gcp-service-account: "{{ jenkins_namespace }}-jenkins@{{ lookup('pipe', 'gcloud config get-value project') }}.iam.gserviceaccount.com"
 {% endif %}
 serviceAccountAgent:
-  name: "{{ namespace }}-agent"
+  name: "{{ jenkins_namespace }}-agent"
   create: true
 {% if gke_mode is sameas true %}
   annotations:
-    iam.gke.io/gcp-service-account: "{{ namespace }}-agent@{{ lookup('pipe', 'gcloud config get-value project') }}.iam.gserviceaccount.com"
+    iam.gke.io/gcp-service-account: "{{ jenkins_namespace }}-agent@{{ lookup('pipe', 'gcloud config get-value project') }}.iam.gserviceaccount.com"
 {% endif %}
 agent:
   #TODO jenkins/inbound-agent mirrored image dissapeared from mirror.gcr.io
@@ -235,8 +235,8 @@ backup:
     sidecar.istio.io/inject: "false"
   serviceAccount:
     create: false
-    name: "{{ namespace }}-jenkins"
+    name: "{{ jenkins_namespace }}-jenkins"
   schedule: "0 2 * * *" # at 2am
-  destination: "gcs://{{ gcp_project }}-{{ namespace }}-jenkins-server-data/jenkins-backup"
+  destination: "gcs://{{ gcp_project }}-{{ jenkins_namespace }}-jenkins-server-data/jenkins-backup"
   onlyJobs: true
 {% endif %}

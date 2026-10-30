@@ -3,19 +3,19 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   labels:
-    app: "{{ namespace }}-jenkins-backup-recover"
+    app: "{{ jenkins_namespace }}-jenkins-backup-recover"
   name: "{{ jenkins_recover_job_name }}"
-  namespace: "{{ namespace }}"
+  namespace: "{{ jenkins_namespace }}"
 spec:
   template:
     metadata:
       labels:
-        app: "{{ namespace }}-jenkins-backup-recover"
+        app: "{{ jenkins_namespace }}-jenkins-backup-recover"
         # to prevent injecting istio sidecar as it prevents job from completion
         sidecar.istio.io/inject: "false"
     spec:
       restartPolicy: OnFailure
-      serviceAccountName: "{{ namespace }}-jenkins"
+      serviceAccountName: "{{ jenkins_namespace }}-jenkins"
       containers:
       - name: jenkins-backup-recover
         image: maorfr/skbn
@@ -23,7 +23,7 @@ spec:
         args:
         - "cp"
         - "--src"
-        - "gcs://{{ gcp_project }}-{{ namespace }}-jenkins-server-data/jenkins-backup/{{ backup_id }}"
+        - "gcs://{{ gcp_project }}-{{ jenkins_namespace }}-jenkins-server-data/jenkins-backup/{{ backup_id }}"
         - "--dst"
-        - "k8s://{{ namespace }}/{{ namespace }}-jenkins-0/jenkins/var/jenkins_home/jobs"
+        - "k8s://{{ jenkins_namespace }}/{{ jenkins_namespace }}-jenkins-0/jenkins/var/jenkins_home/jobs"
         imagePullPolicy: IfNotPresent

@@ -21,7 +21,7 @@
   - name: Ensure Prometheus PodMonitoring is absent for Istio
     k8s:
       state: absent
-      definition: "{{ lookup('template', '{{ files }}/monitoring.yaml.j2') }}"
+      definition: "{{ lookup('template', files ~ '/monitoring.yaml.j2') }}"
 
     when:
     - options.gke_mode|default(false)
@@ -38,12 +38,12 @@
   - name: Ensure Istio ClusterRoles present
     k8s:
       state: absent
-      definition: "{{ lookup('template', '{{ files }}/roles.yaml.j2') }}"
+      definition: "{{ lookup('template', files ~ '/roles.yaml.j2') }}"
 
   - name: Ensure Istio internal ingress wildcard Gateway are exposed
     k8s:
       state: absent
-      definition: "{{ lookup('template', '{{ files }}/internal_vs_config.yaml.j2') }}"
+      definition: "{{ lookup('template', files ~ '/internal_vs_config.yaml.j2') }}"
 
   - name: Ensure TLS Secret internal-wildcard-gateway-tls is absent in namespace istio-ingress
     k8s:
@@ -59,7 +59,7 @@
   - name: Ensure Istio IngressClass absent
     k8s:
       state: absent
-      definition: "{{ lookup('template', '{{ files }}/ingress_class.yaml.j2') }}"
+      definition: "{{ lookup('template', files ~ '/ingress_class.yaml.j2') }}"
 
   - name: Undeploy {{ istio.version }} version of istio/ztunnel chart inside istio-ingress namespace
     helm:
@@ -69,8 +69,8 @@
       release_namespace: "istio-system"
       release_state: absent
       wait: true
-      wait_timeout: "5m0s"
-      values: "{{ lookup('template', '{{ files }}/istio-ztunnel-helm-values.yaml.j2') | from_yaml }}"
+      timeout: "5m0s"
+      values: "{{ lookup('template', files ~ '/istio-ztunnel-helm-values.yaml.j2') | from_yaml }}"
 
   - name: Undeploy {{ istio.version }} version of istio/cni chart inside istio-ingress namespace
     helm:
@@ -80,8 +80,8 @@
       release_namespace: "{{ 'kube-system' if options.gke_mode | default(false) else 'istio-system' }}"
       release_state: absent
       wait: true
-      wait_timeout: "5m0s"
-      values: "{{ lookup('template', '{{ files }}/istio-cni-helm-values.yaml.j2') | from_yaml }}"
+      timeout: "5m0s"
+      values: "{{ lookup('template', files ~ '/istio-cni-helm-values.yaml.j2') | from_yaml }}"
     when: options.gke_mode|default(cni.enable|default(true))
 
 
@@ -93,8 +93,8 @@
       release_namespace: "istio-ingress"
       release_state: absent
       wait: true
-      wait_timeout: "5m0s"
-      values: "{{ lookup('template', '{{ files }}/istio-ingress-helm-values.yaml.j2') | from_yaml }}"
+      timeout: "5m0s"
+      values: "{{ lookup('template', files ~ '/istio-ingress-helm-values.yaml.j2') | from_yaml }}"
 
   - name: Ensure istio-ingress namespace absent
     k8s:
@@ -111,8 +111,8 @@
       release_namespace: "istio-system"
       release_state: absent
       wait: true
-      wait_timeout: "5m0s"
-      values: "{{ lookup('template', '{{ files }}/istiod-helm-values.yaml.j2') | from_yaml }}"
+      timeout: "5m0s"
+      values: "{{ lookup('template', files ~ '/istiod-helm-values.yaml.j2') | from_yaml }}"
 
   - name: Undeploy {{ istio.version }} version of istio/base chart inside istio-system namespace
     helm:
@@ -122,8 +122,8 @@
       release_namespace: "istio-system"
       release_state: absent
       wait: true
-      wait_timeout: "5m0s"
-      values: "{{ lookup('template', '{{ files }}/istio-base-helm-values.yaml.j2') | from_yaml }}"
+      timeout: "5m0s"
+      values: "{{ lookup('template', files ~ '/istio-base-helm-values.yaml.j2') | from_yaml }}"
 
   - name: Ensure istio-system namespace absent
     k8s:
@@ -131,13 +131,6 @@
       api_version: v1
       kind: Namespace
       state: absent
-
-  - name: Ensure PodSecurityPolicy present for Istio CNI Daemon Set
-    k8s:
-      state: absent
-      definition: "{{ lookup('template', '{{ files }}/psp.yaml.j2') }}"
-    when: lookup('pipe', 'kubectl version -o json | jq -r .serverVersion.minor') | int < 25
-
 
   - name: Ensure GCP prerequisites for Istio deployment are missing
     terraform:

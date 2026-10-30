@@ -9,10 +9,6 @@ terraform {
       # Full Changelog for all version is here:
       # https://github.com/hashicorp/terraform-provider-google/blob/master/CHANGELOG.md
     }
-    google-beta = {
-      source  = "hashicorp/google-beta"
-      version = "~> 8"
-    }
   }
   required_version = ">= 1.6"
 }

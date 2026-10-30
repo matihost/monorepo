@@ -1,16 +1,14 @@
 data "google_container_engine_versions" "versions" {
-  provider = google-beta
   # version differ per region or zonal cluster
   # run: gcloud container get-server-config
   # to see available versions
   location       = local.location
-  version_prefix = "1.31."
+  version_prefix = "1.36."
 
   project = var.project
 }
 
 resource "google_container_cluster" "gke" {
-  provider = google-beta
 
   name        = local.gke_name
   description = "GKE Cluster ${local.gke_name}"
@@ -78,11 +76,6 @@ resource "google_container_cluster" "gke" {
       enabled = true
     }
 
-    # Disabled Application Manager:
-    # https://cloud.google.com/kubernetes-engine/docs/how-to/add-on/application-delivery
-    kalm_config {
-      enabled = false
-    }
     config_connector_config {
       enabled = true
     }
@@ -195,11 +188,6 @@ resource "google_container_cluster" "gke" {
         enabled = true
       }
     }
-  }
-
-
-  pod_security_policy_config {
-    enabled = var.enable_pod_security_policy
   }
 
   # Ability to use G Suite Groups in GKE RBACs
@@ -343,7 +331,6 @@ resource "random_id" "gke_node_pool_id" {
 }
 
 resource "google_container_node_pool" "gke_nodes" {
-  provider = google-beta
 
   name     = "compute-${random_id.gke_node_pool_id.hex}"
   location = local.location

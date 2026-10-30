@@ -20,7 +20,8 @@ pip3 install --user ansible
 pip3 install --user openshift kubernetes
 rm -rf ~/.ansible/collections/ansible_collections/kubernetes && \
 rm -rf ~/.ansible/collections/ansible_collections/community && \
-ansible-galaxy collection install kubernetes.core
+# kubernetes.core older than 6.6.0 rejects Helm 4 ("Helm version must be >=3.0.0,<4.0.0")
+ansible-galaxy collection install "kubernetes.core:>=6.6.0"
 ansible-galaxy collection install community.general
 ```
 

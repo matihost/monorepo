@@ -3,8 +3,8 @@ all:
     localhost:
   vars:
     istio:
-      hub: "gcr.io/istio-release"
-      version: "1.23.0"
+      hub: "docker.io/istio"
+      version: "1.31.3"
       istiod:
         minReplicas: 1
         maxReplicas: 1

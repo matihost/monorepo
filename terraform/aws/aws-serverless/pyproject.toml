@@ -9,12 +9,12 @@ packages = [{include = "website", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.14"
-fastapi = {extras = ["standard"], version = "^0.146.0"}
+fastapi = {extras = ["standard"], version = ">=0.146,<0.162"}
 mangum = "^0.22.0"
 
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.17.1"
+ruff = "^0.17.2"
 mypy = "^2.4.0"
 pytest = "^9.1.1"
 debugpy = "^1.8.22"

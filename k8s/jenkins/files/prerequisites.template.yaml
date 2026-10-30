@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: "{{ namespace }}"
+  name: "{{ jenkins_namespace }}"
   labels:
     istio-injection: enabled
 ---
@@ -10,13 +10,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: ci
-  namespace: "{{ namespace }}"
+  namespace: "{{ jenkins_namespace }}"
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: ci
-  namespace: "{{ namespace }}"
+  namespace: "{{ jenkins_namespace }}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -24,7 +24,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: ci
-  namespace: "{{ namespace }}"
+  namespace: "{{ jenkins_namespace }}"
 - kind: ServiceAccount
-  name: "{{ namespace }}-jenkins"
-  namespace: "{{ namespace }}"
+  name: "{{ jenkins_namespace }}-jenkins"
+  namespace: "{{ jenkins_namespace }}"

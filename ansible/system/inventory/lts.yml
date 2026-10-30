@@ -733,7 +733,7 @@ all:
               helm repo add cilium https://helm.cilium.io/
               helm repo add bitnami https://charts.bitnami.com/bitnami
               helm repo add jetstack https://charts.jetstack.io
-              helm repo add istio https://istio-release.storage.googleapis.com/charts
+              helm repo add istio https://blob.istio.io/istio-release/charts
               helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
               helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
               helm repo add external-dns https://kubernetes-sigs.github.io/external-dns
@@ -802,7 +802,7 @@ all:
               tar zxvf krew-linux_amd64.tar.gz &&
               KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" &&
               "$KREW" install krew &&
-              "$KREW" install change-ns ctx whoami cilium unused-volumes apparmor-manager advise-psp np-viewer view-webhook oidc-login &&
+              "$KREW" install change-ns ctx whoami cilium unused-volumes apparmor-manager np-viewer view-webhook oidc-login &&
               "$KREW" update &&
               "$KREW" upgrade
             }
@@ -1477,6 +1477,7 @@ all:
               echo "Installing NodeJS: ${CURRENT_VERSION} and uninstalling: ${INSTALLED_VERSION}"
               bash -ic "nvm install --lts --latest-npm && nvm use --lts && npm i ${GLOBAL_PACKAGES} -g && nvm uninstall ${INSTALLED_VERSION}"
             }
+            [ "$(cat ~/.nvm/alias/default 2>/dev/null)" = 'lts/*' ] || bash -ic "nvm alias default 'lts/*' >/dev/null"
             [[ "$(bash -ic "nvm use --lts >/dev/null 2>&1 && ncu -g 2>/dev/null")" == *"All global packages are up-to-date"* ]] || {
               bash -ic "nvm use --lts >/dev/null 2>&1 && eval \"$(nvm use --lts >/dev/null 2>&1 && ncu -g 2>/dev/null| grep 'npm -g install')\""
               npm i ${GLOBAL_PACKAGES} -g

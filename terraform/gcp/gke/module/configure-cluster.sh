@@ -43,7 +43,7 @@ function ensure-external-dns() {
   # Istio CRD are required to be present
   # otherwise External DNS crashes
   # https://github.com/kubernetes-sigs/external-dns/issues/4901#issuecomment-2553221038
-  helm repo add istio https://istio-release.storage.googleapis.com/charts
+  helm repo add istio https://blob.istio.io/istio-release/charts
   helm repo add bitnami https://charts.bitnami.com/bitnami
   helm repo update
   helm upgrade --install istio-base -n istio-system --create-namespace istio/base

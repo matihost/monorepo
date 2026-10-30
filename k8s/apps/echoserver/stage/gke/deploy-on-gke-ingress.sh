@@ -9,10 +9,7 @@ CN="echoserver.learning.internal.gke.shared1.dev.gcp.testing"
   [ -e "/tmp/${CN}.key" ] || {
     openssl req -x509 -sha256 -nodes -days 365 -subj "/CN=${CN}" -newkey rsa:2048 -keyout "/tmp/${CN}.key" -out "/tmp/${CN}.crt"
   }
-  # GKE tweaks in variables:
-  # PSP privileged cluster role is different thatn psp:privileged
   helm upgrade --install echoserver "$(dirname "${SCRIPT_DIR}")" -n learning --set ingress.tls.crt="$(base64 -w 0 /tmp/${CN}.crt)" --set ingress.tls.key="$(base64 -w 0 /tmp/${CN}.key)" \
-    --set pspPrivilegedClusterRole=gce:podsecuritypolicy:privileged \
     --set ingress.host="${CN}" \
     --set networkPolicy.enabled=true \
     --set ingress.class=istio

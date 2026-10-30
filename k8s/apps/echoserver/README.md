@@ -2,7 +2,7 @@
 
 Example Helm chart and ArgoCD deployment to deploy echoserver application.
 
-It demonstrate app deployment along with antiAffinity, nodeSelectors, PDB, HPA PSP/securityContext, Ingress exposure, NodePolicy setup etc.
+It demonstrate app deployment along with antiAffinity, nodeSelectors, PDB, HPA, securityContext, Ingress exposure, NodePolicy setup etc.
 
 For ArgoCD deployment the [ArgoCD](../../argocd/) needs to be deployed.
 

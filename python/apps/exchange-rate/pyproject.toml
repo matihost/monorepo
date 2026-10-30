@@ -20,7 +20,7 @@ exchange-rate-web = 'exchange_rate.cli.exchange_rate_web:main'
 
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.17.1"
+ruff = "^0.17.2"
 mypy = "^2.4.0"
 pytest = "^9.1.1"
 debugpy = "^1.8.22"

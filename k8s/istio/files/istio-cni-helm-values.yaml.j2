@@ -25,7 +25,9 @@ cni:
   cniConfFileName: ""
   # This directory must exist on the node, if it does not, consult your container runtime
   # documentation for the appropriate path.
-  cniNetnsDir: # Defaults to '/var/run/netns', in minikube/docker/others can be '/var/run/docker/netns'.
+  # An empty value overrides the chart default and renders an invalid DaemonSet (hostPath.path: Required value) since the ambient mode uses it.
+  # Use '/var/run/docker/netns' for Minikube with the docker driver (this repo uses the none driver, so the host path is right).
+  cniNetnsDir: /var/run/netns
 
 
   excludeNamespaces:

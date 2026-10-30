@@ -1,10 +1,5 @@
 # default values:  helm show values nginx-stable/nginx-ingress
 controller:
-  # serviceAccount has to be overriden for PodSecurityPolicy to work
-  # https://kubernetes.github.io/ingress-nginx/examples/psp/
-  serviceAccount:
-    name: ingress-nginx
-
   ## Only for Kubernetes >= 1.18
   ## New Ingresses without an ingressClassName field specified will be assigned the class specified in `controller.ingressClass`.
   setAsDefaultIngress: true

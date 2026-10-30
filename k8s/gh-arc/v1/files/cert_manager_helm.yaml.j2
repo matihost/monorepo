@@ -29,10 +29,6 @@ global:
     # Aggregate ClusterRoles to Kubernetes default user-facing roles. Ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles
     aggregateClusterRoles: true
 
-  podSecurityPolicy:
-    enabled: false
-    useAppArmor: true
-
   # Set the verbosity of cert-manager. Range of 0 - 6 with 6 being the most verbose.
   logLevel: 2
 

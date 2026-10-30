@@ -32,7 +32,6 @@ inputs = {
   expose_master_via_external_ip = true
   encrypt_etcd                  = false
   bigquery_metering             = false
-  enable_pod_security_policy    = false
   secondary_ip_range_number     = "0"
 
   region = "us-central1"

@@ -45,7 +45,7 @@
     <maven.test.skip>false</maven.test.skip>
 
     <!-- Spring Boot -->
-    <spring.boot.version>4.1.1</spring.boot.version>
+    <spring.boot.version>4.1.2</spring.boot.version>
 
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -234,7 +234,7 @@
         <plugin>
           <groupId>org.graalvm.buildtools</groupId>
           <artifactId>native-maven-plugin</artifactId>
-          <version>1.1.14</version>
+          <version>1.1.17</version>
           <extensions>true</extensions>
         </plugin>
         <plugin>
@@ -417,7 +417,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.6.0</version>
+          <version>3.6.1</version>
           <configuration>
             <skipTests>${maven.test.skip}</skipTests>
           </configuration>
@@ -425,7 +425,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>3.6.0</version>
+          <version>3.6.1</version>
         </plugin>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>

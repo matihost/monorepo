@@ -88,12 +88,6 @@ variable "autoscalling" {
   description = "Enable auto NodePools provisioning and autoscalling of cluster"
 }
 
-variable "enable_pod_security_policy" {
-  default     = true
-  description = "Whether to enable PodSecurityPolicy in the GKE cluster, PSP are deprecated since K8S 1.21 and going to be removed in K8S 1.25"
-  type        = bool
-}
-
 variable "encrypt_etcd" {
   default     = false
   description = "Whether to encrypt GKE etcd with KMS key, requires prerequisites/kms to be run once"

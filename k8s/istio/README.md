@@ -2,11 +2,7 @@
 
 Deployment of Istio to Minikube or GKE
 
-Two flavors of deployments:
-
-* via Helm charts
-
-* via Operator (deprecated by Istio but still supported)
+Deployed via Helm charts (Ambient profile). The Istio Operator mode was removed: Istio dropped the operator in 1.24.
 
 Exposes automatically internal Kubernetes API ClusterIp Service via internal Istio ingress gateway.
 
@@ -29,7 +25,8 @@ pip3 install --user ansible
 pip3 install --user openshift kubernetes
 rm -rf ~/.ansible/collections/ansible_collections/kubernetes && \
 rm -rf ~/.ansible/collections/ansible_collections/community && \
-ansible-galaxy collection install kubernetes.core
+# kubernetes.core older than 6.6.0 rejects Helm 4 ("Helm version must be >=3.0.0,<4.0.0")
+ansible-galaxy collection install "kubernetes.core:>=6.6.0"
 ansible-galaxy collection install community.general
 ```
 
@@ -38,7 +35,7 @@ ansible-galaxy collection install community.general
 * Helm istio charts repository imported
 
 ```bash
-helm repo add istio https://istio-release.storage.googleapis.com/charts
+helm repo add istio https://blob.istio.io/istio-release/charts
 ```
 
 * For GKE: gcloud cli, terraform and GKE itself
@@ -68,33 +65,6 @@ make deploy-istio-helm-on-gke
 
 # undeploys Istio from GKE
 make undeploy-istio-helm-from-gke
-```
-
-## Running deployment with Operator
-
-```bash
-# Deploys Istio on Minikube (assumes current kubecontext points to Minikube) and CNI is enabled
-make deploy-istio-operator-on-minikube
-#  Deploys Istio on Minikube on docker w/o CNI
-make deploy-istio-operator-on-minikube-on-docker-wo-cni
-
-# undeploys Istio from minikube (assumes current kubecontext points to Minikube)
-make undeploy-istio-operator-from-minikube
-
-
-# Deploys Istio on GKE with standalone NEGs exposed via External Global HTTPS LoadBalancer for external provisioning
-# Assumes current kubecontext points to GKE cluster and gcloud context to project where GKE cluster is deployed
-make deploy-istio-operator-on-gke-neg
-
-# undeploys Istio from GKE with nEGs
-make undeploy-istio-operator-from-gke-neg
-
-# Deploys Istio on GKE
-# Assumes current kubecontext points to GKE cluster and gcloud context to project where GKE cluster is deployed
-make deploy-istio-operator-on-gke
-
-# undeploys Istio from GKE
-make undeploy-istio-operator-from-gke
 ```
 
 ## Post installation steps in GKE

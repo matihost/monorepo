@@ -6,7 +6,7 @@ apiVersion: monitoring.googleapis.com/v1
 kind: PodMonitoring
 metadata:
   name: jenkins
-  namespace: "{{ namespace }}"
+  namespace: "{{ jenkins_namespace }}"
   labels:
     app.kubernetes.io/name: jenkins
     app.kubernetes.io/part-of: google-cloud-managed-prometheus

@@ -5,16 +5,16 @@
 }
 
 function usage() {
-  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-containder|containerd|c] [--with-crio|crio] [--with-docker | docker | d] [--with-cni] [--with-version stable/latest/x.x.x] [--with-nginx | nginx] [--with-istio | istio] [--with-gatekeeper | gatekeeper] [--with-psp | psp]
+  echo -e "Usage: $(basename "$0") [-h|--help|help] [--with-containder|containerd|c] [--with-crio|crio] [--with-docker | docker | d] [--with-version stable/latest/x.x.x] [--with-nginx | nginx] [--with-istio | istio] [--with-gatekeeper | gatekeeper]
 
 Starts Minikube in bare / none mode. Assumes latest Ubuntu.
 
 Minimum set of features enabled in every Minikube:
-- Container runtime selection (--with-containerd, --with-crio, --with-docker) - by default docker is selected along with --with-cilium.
+- Container runtime selection (--with-containerd, --with-crio, --with-docker) - by default containerd is selected along with --with-cilium.
 - Minikube Tunnel Loadbalancer along with Nginx Ingress
 - Nginx Ingress Class (--with-nginx) - installs Ngnix Ingress Class
 - Registry, Dashboard
-- NetworkPolicy via CNI/Cilium (for docker container engine it has to be explicitely defined with either --with-cni or --with-cilium)
+- NetworkPolicy via CNI/Cilium
 
 Optional features:
 - K8S Version (--with-version) - default to stable, possible values: stable, latest, same as Minikube's --kubernetes-version
@@ -27,10 +27,8 @@ Samples:
 # start default bare/none driver Minikube with containerd with CNI enablement (Cilium installed via Helm)
 $(basename "$0")
 
-# start Minikube with docker with CNI/Cilium enablement (Cilium installed via Minikube addon)
-$(basename "$0") --with-docker --with-cilium
 
-# start Minikube with docker
+# start Minikube with docker with CNI/Cilium enablement
 $(basename "$0") --with-docker
 
 # start Minikube with containerd with K8S latest version (default: stable)
@@ -43,6 +41,11 @@ $(basename "$0") --with-crio
 $(basename "$0") --with-crio --with-gatekeeper
 "
 }
+
+# Versions of tools installed by this script, tested with Minikube 1.39.0 / Kubernetes 1.37
+# Latest Minikube: https://github.com/kubernetes/minikube/releases/latest
+CRIO_VERSION=v1.37
+CILIUM_CHART_VERSION=1.20.3
 
 function ensureMinikubePresent() {
   [ ! -x /usr/bin/minikube ] &&
@@ -61,7 +64,7 @@ function ensureDockerCGroupSystemD() {
 
 function ensureCrictlPresent() {
   [ -x /usr/local/bin/crictl ] || (
-    CRICTL_VERSION=$(git ls-remote -t https://github.com/kubernetes-sigs/cri-tools.git | cut -d'/' -f3 | sort -n | tail -n 1)
+    CRICTL_VERSION=$(git ls-remote -t https://github.com/kubernetes-sigs/cri-tools.git | cut -d'/' -f3 | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1)
     wget "https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz"
     sudo tar zxvf "crictl-${CRICTL_VERSION}-linux-amd64.tar.gz" -C /usr/local/bin
     rm -f "crictl-${CRICTL_VERSION}-linux-amd64.tar.gz"
@@ -77,25 +80,35 @@ function ensureCriDockerdPresent() {
     # shellcheck disable=SC1091
     . /etc/os-release
 
-    curl -s https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest | jq -r ".assets[] |
-      select(.name | test(\"ubuntu-${VERSION_CODENAME}_amd64.deb\")) | .browser_download_url" |
-      xargs curl -s -L -o "/tmp/cri-dockerd.deb"
-    apt install /tmp/cri-dockerd.deb
+    # cri-dockerd publishes .deb only for some Ubuntu releases (focal, jammy, noble as of v0.4.9),
+    # use the one for the current release when available, otherwise the latest published one
+    # List of supported versions: https://github.com/Mirantis/cri-dockerd/releases/latest
+    RELEASE_JSON=$(curl -s https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest)
+    for CODENAME in "${VERSION_CODENAME}" noble; do
+      DEB_URL=$(echo "${RELEASE_JSON}" | jq -r ".assets[] |
+        select(.name | test(\"ubuntu-${CODENAME}_amd64.deb\")) | .browser_download_url")
+      [ -n "${DEB_URL}" ] && break
+    done
+    [ -n "${DEB_URL}" ] || {
+      echo "Unable to find cri-dockerd .deb for Ubuntu ${VERSION_CODENAME} nor noble"
+      exit 1
+    }
+    curl -s -L -o "/tmp/cri-dockerd.deb" "${DEB_URL}"
+    sudo apt -y install /tmp/cri-dockerd.deb
   )
 }
 
 function ensureCrioPresent() {
-  CRIO_VERSION=v1.33
-
   [ -x /usr/bin/crio ] || (
     # shellcheck disable=SC1091
     . /etc/os-release
 
-    curl -fsSL https://download.opensuse.org/repositories/isv:/cri-o:/stable:/$CRIO_VERSION/deb/Release.key |
-      sudo gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+    sudo mkdir -p /etc/apt/keyrings
+    curl -fsSL "https://download.opensuse.org/repositories/isv:/cri-o:/stable:/${CRIO_VERSION}/deb/Release.key" |
+      sudo gpg --dearmor --yes -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
 
-    echo "deb [signed-by= /etc/apt/keyrings/cri-o-apt-keyring.gpg] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/$CRIO_VERSION/deb/ /" |
-      sudo tee /etc/apt/sources.list.d/kubernetes.list
+    echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/${CRIO_VERSION}/deb/ /" |
+      sudo tee /etc/apt/sources.list.d/crio.list
 
     sudo apt-get update -qq
     sudo apt-get install -y cri-o cri-o-runc buildah
@@ -114,6 +127,16 @@ function ensureCrioPresent() {
 
 [crio.runtime]
 # cgroup_manager = ""' | sudo tee /etc/crio/crio.conf.d/02-crio.conf >/dev/null
+  )
+
+  # CRI-O 1.37 package sets default_runtime = "crun" (/etc/crio/crio.conf.d/10-crio.conf), keeping container state in /run/crun.
+  # Minikube checks for paused containers with a hardcoded "sudo runc list", sees none and fails every addon with
+  # "MK_ADDON_ENABLE_PAUSED: list returned 0 containers, but ps returned N". Use runc so that its state (/run/runc) is the one listed.
+  # Minikube rewrites 02-crio.conf, so use own drop-in, sorted after the package one (10-crio.conf), as the last file wins.
+  [ -e /etc/crio/crio.conf.d/99-minikube-runc.conf ] || (
+    echo '[crio.runtime]
+default_runtime = "runc"' | sudo tee /etc/crio/crio.conf.d/99-minikube-runc.conf >/dev/null
+    sudo systemctl restart crio
   )
 
   # minikube uses cilium as CNI provider when crio mode is enabled
@@ -144,7 +167,7 @@ function installGatekeeper() {
 # ingress controlles needs to be installed manually
 function addNginxIngress() {
   [ -x /usr/local/bin/helm ] || {
-    curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+    curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-4 | bash
     helm repo add stable https://charts.helm.sh/stable
     helm repo add nginx-stable https://helm.nginx.com/stable
     helm repo update
@@ -201,9 +224,27 @@ spec:
   )
 }
 
+# With --driver=none the control plane runs on the host network, so its ports must be free.
+# A system etcd (apt package etcd-server, enabled by default) listens on 2379/2380 and makes Minikube's etcd crash-loop,
+# then kube-apiserver talks to the foreign etcd and fails the TLS handshake.
+function ensureControlPlanePortsFree() {
+  local busy=0 port
+  for port in 2379 2380 8443 10250 10257 10259; do
+    if ss -ltnH "sport = :${port}" 2>/dev/null | grep -q .; then
+      # process name is visible only for own processes or with sudo
+      echo "Port ${port} is already in use ($(sudo -n ss -ltnpH "sport = :${port}" 2>/dev/null | grep -o 'users:.*' | head -1 || true)), see: sudo ss -ltnp 'sport = :${port}'"
+      busy=1
+    fi
+  done
+  [ "${busy}" -eq 0 ] || {
+    echo -e "Minikube with --driver=none needs the ports above free.\nIf it is the system etcd: sudo systemctl disable --now etcd (or stop it for the time of using Minikube)"
+    exit 1
+  }
+}
+
 ensureMinikubePresent
 K8S_VERSION='stable'
-MODE='docker'
+MODE='containerd'
 
 ADDONS="registry dashboard nginx volumesnapshots csi-hostpath-driver"
 EXTRA_PARAMS='--cni=cilium'
@@ -227,9 +268,6 @@ while [[ "$#" -gt 0 ]]; do
     ;;
   --with-docker | docker | d)
     MODE='docker'
-    ;;
-  --with-cilium)
-    EXTRA_PARAMS="${EXTRA_PARAMS} --cni=cilium"
     ;;
   --with-istio | istio)
     ADDONS="${ADDONS} istio"
@@ -256,7 +294,8 @@ containerd)
 docker)
   ensureDockerCGroupSystemD
   ensureCriDockerdPresent
-  EXTRA_PARAMS='--network-plugin=cni'
+  # Minikube 1.39 auto-selects containerd for the none driver, docker has to be requested explicitly
+  EXTRA_PARAMS='--container-runtime=docker --network-plugin=cni'
   ;;
 *)
   usage
@@ -265,6 +304,7 @@ docker)
 esac
 
 if ! minikube status &>/dev/null; then
+  ensureControlPlanePortsFree
   #TODO remove when https://github.com/kubernetes/minikube/issues/6391 is fixed
   [ "$(sudo sysctl -en fs.protected_regular)" != '0' ] &&
     sudo sysctl fs.protected_regular=0 && echo "Disabled fs.protected_regular to allow running Minikube in none mode"
@@ -286,8 +326,12 @@ if ! minikube status &>/dev/null; then
   # Added --extra-config=kubelet.resolv-conf=/run/systemd/resolve/resolv.conf due to  https://coredns.io/plugins/loop/
   # because under Ubuntu systemd-resolved service conflicts create a loop between CodeDNS and systemc DNS wrapper systemd-resolved.
   # TODO replace usage of /run/systemd/resolve/resolv.conf with some temporary file withot any 127.0.0.x entries ,because CRC add dnsmasq
+  # Variables are passed explicitly with env: sudo-rs (default sudo in Ubuntu 25.10+) does not preserve them with -E,
+  # so Minikube would use HOME=/root, write the profile to /root/.minikube and the context to /root/.kube/config
   # shellcheck disable=SC2086
-  sudo -E minikube start --vm-driver=none --apiserver-ips 127.0.0.1 --apiserver-name localhost \
+  sudo env MINIKUBE_HOME="${MINIKUBE_HOME}" KUBECONFIG="${KUBECONFIG}" CHANGE_MINIKUBE_NONE_USER="${CHANGE_MINIKUBE_NONE_USER}" \
+    MINIKUBE_WANTUPDATENOTIFICATION="${MINIKUBE_WANTUPDATENOTIFICATION}" MINIKUBE_WANTREPORTERRORPROMPT="${MINIKUBE_WANTREPORTERRORPROMPT}" \
+    minikube start --driver=none --apiserver-ips 127.0.0.1 --apiserver-name localhost \
     --kubernetes-version="${K8S_VERSION}" \
     --extra-config=apiserver.enable-admission-plugins="${ADMISSION_PLUGINS}" \
     --extra-config=kubelet.resolv-conf=/run/systemd/resolve/resolv.conf \
@@ -295,10 +339,16 @@ if ! minikube status &>/dev/null; then
     --addons=volumesnapshots \
     ${EXTRA_PARAMS}
   set +x
-  sudo chmod -R a+rwx /etc/kubernetes &&
-    minikube update-context &>/dev/null &&
-    { minikube tunnel -c &>/tmp/minikube-tunnel.log & } &&
-    echo "Minikube has been started"
+  sudo chmod -R a+rwx /etc/kubernetes
+  # Minikube writes the profile to MINIKUBE_HOME and the context to KUBECONFIG, fail here when they are not usable by this user,
+  # otherwise the steps below (Cilium, Nginx, addons) are skipped or run against another cluster
+  if ! minikube update-context &>/dev/null || [ "$(kubectl config current-context 2>/dev/null)" != "minikube" ]; then
+    echo "Minikube started, but the minikube kube context is not available for ${USER} (KUBECONFIG=${KUBECONFIG}, MINIKUBE_HOME=${MINIKUBE_HOME})."
+    echo "Check: minikube status; kubectl config get-contexts; sudo minikube status (a profile under /root means env was not passed through sudo)"
+    exit 1
+  fi
+  { minikube tunnel -c &>/tmp/minikube-tunnel.log & }
+  echo "Minikube has been started"
 
   [ "$(sudo systemctl is-enabled kubelet)" == 'enabled' ] &&
     sudo systemctl disable kubelet && echo "Disabled Minikube from auto startup on boot"
@@ -306,6 +356,7 @@ if ! minikube status &>/dev/null; then
   # install Cilium daemon set for CRIO or CNI mode
   # do no use --cni=cilium as it breaks network connectivity
   # it is more robust to setup network-plugin to cni and install CNI driver itself
+  # NOTE: Minikube 1.39 still accepts --network-plugin=cni but warns that it is deprecated in favour of --cni
   if [[ "${EXTRA_PARAMS}" == *'network-plugin'* ]]; then
     # Set cilium/cilium helm config: operator.numReplicas=1
     # because there is antiAffinity rule so that minikube cannot run 2 instances on single node
@@ -313,7 +364,7 @@ if ! minikube status &>/dev/null; then
     # because there is conflict with Istio https://github.com/istio/istio/issues/46764
     # making Istio CNI unable to spin istio-cni-node
     # shellcheck disable=SC2046
-    helm install cilium cilium/cilium --namespace kube-system --set operator.replicas=1 --set cni.exclusive=false
+    helm install cilium cilium/cilium --version "${CILIUM_CHART_VERSION}" --namespace kube-system --set operator.replicas=1 --set cni.exclusive=false
   fi
 
   for ADDON in ${ADDONS}; do
