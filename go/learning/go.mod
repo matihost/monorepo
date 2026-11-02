@@ -5,7 +5,7 @@ go 1.27.0
 require (
 	github.com/pkg/errors v0.9.1
 	go.uber.org/zap v1.28.0
-	google.golang.org/grpc v1.84.0
+	google.golang.org/grpc v1.85.0
 	google.golang.org/grpc/examples v0.0.0-20261016230555-3d85ab3cf6bf
 )
 
