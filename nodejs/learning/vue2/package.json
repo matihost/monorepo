@@ -14,14 +14,14 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@auth0/auth0-spa-js": "^2.28.4",
-    "core-js": "^3.50.0",
+    "@auth0/auth0-spa-js": "^2.30.0",
+    "core-js": "^3.51.0",
     "vue": "^2.7.16",
     "vue-router": "^3.6.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.29.7",
-    "@babel/eslint-parser": "^7.29.9",
+    "@babel/core": "^7.29.13",
+    "@babel/eslint-parser": "^7.29.13",
     "@vue/cli-plugin-babel": "~5.0.9",
     "@vue/cli-plugin-eslint": "~5.0.9",
     "@vue/cli-plugin-router": "~5.0.9",
