@@ -61,7 +61,7 @@
 
     <!-- Scala 3-->
     <scala.compat.version>3</scala.compat.version>
-    <scala.version>${scala.compat.version}.10.0</scala.version>
+    <scala.version>3.10.1</scala.version>
     <scala.spec2.version>5.11.0</scala.spec2.version>
     <scala.test.version>3.2.20</scala.test.version>
     <scala.test.plus.version>3.2.20.0</scala.test.plus.version>
@@ -69,7 +69,7 @@
     <!-- IBM MQ client -->
     <mq.version>10.0.1.0</mq.version>
     <!-- MQ allclient depends on bcprov directly and via bcutil in different versions, pin it to the newer one -->
-    <bouncycastle.version>1.86</bouncycastle.version>
+    <bouncycastle.version>1.87</bouncycastle.version>
   </properties>
 
   <profiles>
