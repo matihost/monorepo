@@ -29,12 +29,6 @@ updates:
         update-types:
           - "minor"
           - "patch"
-    ignore:
-      # 5.1.0 silently compiles no Groovy classes for this project (see java/pom.xml), stay on 5.0.0
-      # only this version is ignored: a later release may fix it, so Dependabot proposes it again (re-check with a build)
-      - dependency-name: "org.codehaus.gmavenplus:gmavenplus-plugin"
-        versions:
-          - "5.1.0"
   - package-ecosystem: "pip"
     directories:
       - "/python/apps/exchange-rate"
