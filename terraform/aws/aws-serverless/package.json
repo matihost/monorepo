@@ -6,16 +6,21 @@
     "node": ">=24"
   },
   "devDependencies": {
-    "serverless": "^4",
-    "serverless-domain-manager": "^11.0.1",
-    "serverless-offline": "^14.7.4",
+    "esbuild": "^0.28.2",
+    "serverless": "^4.46.0",
+    "serverless-domain-manager": "^11.0.2",
+    "serverless-offline": "^14.8.5",
     "serverless-offline-ssm": "^6.2.0",
     "serverless-plugin-conditional-functions": "^1.0.8",
     "serverless-plugin-resource-tagging": "^1.2.0",
-    "serverless-python-requirements": "^6.1.2",
-    "esbuild": "^0.28.1"
+    "serverless-python-requirements": "^6.1.2"
   },
   "scripts": {
     "offline": "sls offline --stage offline"
+  },
+  "overrides": {
+    "serverless-domain-manager": {
+      "proxy-agent": "^8.0.3"
+    }
   }
 }

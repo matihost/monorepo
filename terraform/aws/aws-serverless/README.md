@@ -98,3 +98,10 @@ python -m site
 * Select breakpoint in the code
 
 * Select Run and Debug on the left pane and run Python debugger.
+
+### npm dependency override
+
+`package.json` overrides `proxy-agent` for `serverless-domain-manager` to `^8`.
+The plugin pins `proxy-agent@^6.5.0`, which pulls `get-uri@6` and a vulnerable `basic-ftp@5.x` (Dependabot alert, fixed in `basic-ftp` 6.2.4).
+Only `proxy-agent@8` gets `get-uri@8` and `basic-ftp@6`. The plugin only calls `new ProxyAgent()`, so it is expected to work, but it has not been tested with this major.
+Remove the override once `serverless-domain-manager` depends on a `proxy-agent` that resolves `basic-ftp >= 6.2.4`.
